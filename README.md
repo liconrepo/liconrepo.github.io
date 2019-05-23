@@ -1,6 +1,6 @@
 # Khairul Alam Licon
 
-Android Developer. 
+Software Engineer (Android) 
 
 # Related links
 
