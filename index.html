@@ -3,193 +3,943 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Khairul Alam | Software Engineer (Android)</title>
-  <meta name="description" content="Portfolio of Khairul Alam, Software Engineer (Android) at Tokyo, Japan" />
-  <meta name="theme-color" content="#0a1f24" />
-
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
+  <title>Khairul Alam — Senior Software Engineer</title>
+  <meta name="description" content="Portfolio of Khairul Alam, Senior Software Engineer (Android), 11+ years — Tokyo, Japan." />
+  <meta name="theme-color" content="#08080a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23131317'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
   <style>
     :root {
-      --bg: #0a1f24;
-      --card: #143536;
-      --accent: #1abc9c;
-      --accent2: #e67e22;
-      --text: #f0f6f5;
-      --muted: #a0b3b2;
-      --glass: rgba(255, 255, 255, 0.05);
+      --bg:       #08080a;
+      --surface:  #0e0e12;
+      --card:     #131317;
+      --card-h:   #1a1a20;
+      --border:   rgba(255,255,255,0.07);
+      --border-h: rgba(255,255,255,0.13);
+      --text:     #f0f0f2;
+      --sub:      #a1a1aa;
+      --muted:    #52525b;
+      --w:        #ffffff;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(180deg, #081819 0%, var(--bg) 100%);
+    *  { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
-      scroll-behavior: smooth;
+      line-height: 1.65;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    main.wrap {
-      max-width: 800px;
-      margin: 60px auto;
-      padding: 40px 32px;
-      background: var(--card);
-      border-radius: 20px;
-      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255,255,255,0.08);
-      animation: fadeIn 0.8s ease;
+    /* ── AMBIENT BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 900px 600px at 15% 10%, rgba(220,220,230,0.04) 0%, transparent 65%),
+        radial-gradient(ellipse 600px 500px at 85% 90%, rgba(220,220,230,0.03) 0%, transparent 65%);
+      animation: ambientShift 18s ease-in-out infinite alternate;
+    }
+    @keyframes ambientShift {
+      from { opacity:.5; transform:scale(1); }
+      to   { opacity:1;  transform:scale(1.06); }
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* ── NOISE GRAIN ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 200px 200px;
     }
 
-    header {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 32px;
-    }
+    /* all content above bg */
+    nav, .hero-wrap, .stats-wrap, .container, footer, .mobile-menu { position: relative; z-index: 1; }
 
-    .logo {
-      width: 60px;
+    /* ────────────────── NAV ────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,10,0.82);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
       height: 60px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 22px;
-      color: #fff;
-      box-shadow: 0 0 15px rgba(26, 188, 156, 0.5);
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 600; color: var(--text);
+      letter-spacing: -.4px;
+    }
+    .nav-logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+    .nav-links { display: flex; gap: 2px; }
+    .nav-links a {
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      text-decoration: none; padding: 7px 14px; border-radius: 8px;
+      transition: color .18s, background .18s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: 5px; left: 14px; right: 14px; height: 1px;
+      background: var(--sub);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .22s ease;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; }
+
+    /* ────────────────── HERO ────────────────── */
+    .hero-wrap {
+      max-width: 860px; margin: 0 auto;
+      padding: 100px 40px 80px;
+      display: flex; align-items: center; gap: 56px;
     }
 
-    h1 {
-      font-size: 26px;
-      font-weight: 700;
+    /* Avatar */
+    .avatar-wrap {
+      flex-shrink: 0;
     }
-
-    p.lead {
-      color: var(--muted);
-      font-size: 16px;
+    @keyframes avatarIn {
+      from { opacity: 0; transform: translateX(-28px) scale(.96); }
+      to   { opacity: 1; transform: none; }
     }
-
-    section.intro {
-      background: var(--glass);
-      padding: 28px 24px;
-      border-radius: 16px;
+    .avatar {
+      width: 180px; height: 180px; border-radius: 50%;
+      position: relative; overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.8);
+    }
+    .avatar img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      filter: grayscale(15%);
+      transition: filter .4s;
+    }
+    .avatar:hover img { filter: grayscale(0%); }
+    .avatar::after {
+      content: '';
+      position: absolute; inset: 0; border-radius: 50%;
+      background: linear-gradient(155deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    /* Slow rotate ring */
+    .avatar-ring {
+      position: absolute; inset: -4px; border-radius: 50%;
       border: 1px solid rgba(255,255,255,0.07);
-      margin-bottom: 28px;
+      animation: ringRotate 20s linear infinite;
+      pointer-events: none;
+    }
+    .avatar-ring::before {
+      content: '';
+      position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+    }
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+
+    /* Text side */
+    .hero-text { flex: 1; min-width: 0; }
+    .hero-text h1 {
+      font-size: 52px; font-weight: 700; letter-spacing: -2px; line-height: 1.06;
+      color: var(--w);
+      animation: riseIn .9s .1s cubic-bezier(.16,1,.3,1) both;
+    }
+    .hero-text .role {
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      margin-top: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+      animation: riseIn .9s .2s cubic-bezier(.16,1,.3,1) both;
+    }
+    .cursor {
+      display: inline-block; width: 2px; height: .9em;
+      background: var(--muted); margin-left: 2px;
+      vertical-align: baseline; border-radius: 1px;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .hero-text .location {
+      font-size: 12px; color: var(--muted); margin-top: 10px; letter-spacing: .2px;
+      display: flex; align-items: center; gap: 6px;
+      animation: riseIn .9s .28s cubic-bezier(.16,1,.3,1) both;
+    }
+    .location-pin { font-size: 14px; }
+    .hero-text .tagline {
+      font-size: 15px; color: var(--sub); line-height: 1.82;
+      margin-top: 22px; max-width: 440px;
+      animation: riseIn .9s .36s cubic-bezier(.16,1,.3,1) both;
+    }
+    .hero-text .tagline .philosophy {
+      font-size: 14px; color: var(--muted); line-height: 1.85;
+      margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .hero-links {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px;
+      animation: riseIn .9s .44s cubic-bezier(.16,1,.3,1) both;
     }
 
-    section.intro h2 {
-      margin-bottom: 14px;
-      font-size: 22px;
-      color: var(--accent);
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: none; }
     }
 
-    section.intro p {
-      color: var(--muted);
-      margin-bottom: 22px;
-      font-size: 15px;
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: 10px;
+      font-size: 13px; font-weight: 500; letter-spacing: -.1px;
+      text-decoration: none; transition: all .2s; border: none; cursor: pointer;
+    }
+    .btn-primary { background: var(--card); color: var(--sub); border: 1px solid var(--border); font-weight: 400; }
+    .btn-primary:hover { background: var(--card-h); color: var(--text); border-color: var(--border-h); transform: translateY(-1px); }
+    .btn-ghost  { background: var(--card); color: var(--sub); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--border-h); background: var(--card-h); transform: translateY(-1px); }
+
+    /* ────────────────── STATS ────────────────── */
+    .stats-wrap { max-width: 860px; margin: 0 auto; padding: 0 40px 72px; }
+    .stats {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; background: var(--border);
+      gap: 1px;
+    }
+    .stat-card {
+      background: var(--card); padding: 28px 16px; text-align: center;
+      transition: background .2s;
+    }
+    .stat-card:hover { background: var(--card-h); }
+    .stat-card:first-child { border-radius: 15px 0 0 15px; }
+    .stat-card:last-child  { border-radius: 0 15px 15px 0; }
+    .stat-num {
+      font-size: 30px; font-weight: 700; color: var(--w);
+      letter-spacing: -1px; line-height: 1;
+    }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 6px; letter-spacing: .4px; text-transform: uppercase; }
+
+    /* ────────────────── SHARED SECTION ────────────────── */
+    .container { max-width: 860px; margin: 0 auto; padding: 0 40px; }
+    section { padding: 64px 0; border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 32px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
     }
 
-    .meta {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 10px;
+    /* ────────────────── FOOTPRINT ────────────────── */
+    .footprint { display: flex; gap: 12px; }
+    .country-card {
+      flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: background .22s, border-color .22s, transform .28s cubic-bezier(.16,1,.3,1);
+      position: relative; overflow: hidden;
+    }
+    .country-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      opacity: 0; transition: opacity .28s;
+    }
+    .country-card.jp::after { background: linear-gradient(90deg, #bc002d, #ff4d6d); }
+    .country-card.vn::after { background: linear-gradient(90deg, #da251d, #ff6b35); }
+    .country-card.bd::after { background: linear-gradient(90deg, #006a4e, #00a878); }
+    .country-card:hover { background: var(--card-h); border-color: var(--border-h); transform: translateY(-4px); }
+    .country-card:hover::after { opacity: 1; }
+    .country-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -.2px; }
+    .country-companies { font-size: 11px; color: var(--muted); letter-spacing: .2px; line-height: 1.6; }
+
+    /* ────────────────── EXPERIENCE ────────────────── */
+    .exp-list { display: flex; flex-direction: column; gap: 10px; }
+    .exp-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px; display: flex; gap: 18px; align-items: center;
+      transition: background .25s, border-color .25s, transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .exp-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+      transform: translateX(-100%); transition: transform .5s ease;
+      pointer-events: none;
+    }
+    .exp-card:hover { background: var(--card-h); border-color: var(--border-h); transform: translateX(6px); box-shadow: -4px 0 24px rgba(0,0,0,0.4); }
+    .exp-card:hover::before { transform: translateX(100%); }
+    .company-logo {
+      width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(155deg, #222228, #1c1c24);
+      border: 1px solid var(--border-h);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--sub); letter-spacing: -.3px;
+    }
+    .exp-info { flex: 1; min-width: 0; }
+    .exp-title  { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -.25px; }
+    .exp-company{ font-size: 13px; color: var(--sub); margin-top: 2px; }
+    .exp-meta   { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .exp-tenure {
+      flex-shrink: 0; font-size: 11px; color: var(--muted);
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 7px; white-space: nowrap; letter-spacing: .2px;
     }
 
-    .skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+    /* ────────────────── SKILLS ────────────────── */
+    .skills-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .skill-group {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 22px; transition: border-color .2s;
     }
-
+    .skill-group:hover { border-color: var(--border-h); }
+    .skill-group h3 {
+      font-size: 10px; font-weight: 600; letter-spacing: 1.8px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; }
     .tag {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: 7px;
+      font-size: 12px; color: var(--sub); letter-spacing: -.1px;
+      transition: all .18s; cursor: default;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .tag:hover { background: rgba(255,255,255,0.07); color: var(--text); border-color: var(--border-h); }
+    .tag i { font-size: 15px; flex-shrink: 0; }
+    .tag .ti { font-size: 14px; flex-shrink: 0; opacity: .6; }
+    .tag .si { width: 14px; height: 14px; flex-shrink: 0; opacity: .65; filter: invert(1); }
+
+    /* ────────────────── BLOG ────────────────── */
+    .blog-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .blog-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; text-decoration: none; color: inherit; display: block;
+      transition: all .22s; position: relative; overflow: hidden;
+    }
+    .blog-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.1) 50%, transparent 90%);
+      transform: scaleX(0); transition: transform .3s ease;
+    }
+    .blog-card:hover { background: var(--card-h); border-color: var(--border-h); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+    .blog-card:hover::before { transform: scaleX(1); }
+    .blog-idx { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+    .blog-title { font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--text); letter-spacing: -.15px; }
+    .blog-footer { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+    .views-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      color: var(--sub); padding: 3px 9px; border-radius: 6px;
+      font-size: 11px; font-weight: 500;
+    }
+    .blog-date { font-size: 11px; color: var(--muted); }
+    .blog-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+    .blog-tag {
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 2px 7px; border-radius: 5px; font-size: 10px; color: var(--muted); letter-spacing: .2px;
+    }
+    .view-all-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--sub); font-size: 13px; font-weight: 500; text-decoration: none;
+      margin-top: 24px; padding: 8px 0; border-bottom: 1px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    .view-all-link:hover { color: var(--text); border-color: var(--border-h); }
+
+    /* ────────────────── LEADERSHIP ────────────────── */
+    .lead-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .lead-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 22px; transition: all .2s;
+    }
+    .lead-item:hover { background: var(--card-h); border-color: var(--border-h); }
+    .lead-icon { font-size: 20px; margin-bottom: 12px; display: block; }
+    .lead-item p { color: var(--sub); font-size: 13px; line-height: 1.7; }
+
+    /* ────────────────── EDUCATION ────────────────── */
+    .edu-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 28px; display: flex; gap: 22px; align-items: center;
+      transition: all .2s;
+    }
+    .edu-card:hover { background: var(--card-h); border-color: var(--border-h); }
+    .edu-badge {
+      width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+      background: #fff;
+      border: 1px solid var(--border-h);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; padding: 4px;
+    }
+    .edu-badge img { width: 100%; height: 100%; object-fit: contain; }
+    .edu-degree { font-size: 15px; font-weight: 600; letter-spacing: -.25px; }
+    .edu-uni    { font-size: 13px; color: var(--sub); margin-top: 4px; }
+    .edu-years  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ────────────────── INTERESTS ────────────────── */
+    .interests-row { display: flex; flex-wrap: nowrap; gap: 14px; }
+    .interest-chip { flex: 1; justify-content: center; }
+    .interest-chip {
+      display: flex; align-items: center; gap: 12px;
       background: var(--card);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 7px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-      color: var(--text);
-      transition: all 0.3s ease;
+      border-radius: 16px; padding: 16px 24px;
+      position: relative; overflow: hidden;
+      transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
+      cursor: default;
+    }
+    .interest-chip::before {
+      content: '';
+      position: absolute; inset: 0; border-radius: 16px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.08) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none;
+    }
+    .interest-chip::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%);
+      opacity: 0; transition: opacity .3s;
+      pointer-events: none;
+    }
+    .interest-chip:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.5); }
+    .interest-chip:hover::after { opacity: 1; }
+    .interest-icon {
+      font-size: 24px; line-height: 1; flex-shrink: 0;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+    .interest-label {
+      font-size: 13px; font-weight: 500; color: var(--sub);
+      letter-spacing: -.1px;
     }
 
-    .tag:hover {
-      background: var(--accent);
-      color: #fff;
-      transform: translateY(-2px);
+    /* ────────────────── FOOTER ────────────────── */
+    footer { border-top: 1px solid var(--border); padding: 48px 28px 40px; text-align: center; }
+    .footer-watermark {
+      font-size: 11px; color: rgba(255,255,255,0.06); letter-spacing: 2.5px;
+      text-transform: uppercase; margin-bottom: 12px; user-select: none;
+      font-weight: 600;
+    }
+    .footer-copy { color: var(--muted); font-size: 12px; letter-spacing: .2px; }
+
+    /* ────────────────── MOBILE MENU ────────────────── */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(8,8,10,0.97); padding: 80px 32px 32px;
+      flex-direction: column; gap: 2px; backdrop-filter: blur(24px);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text); font-size: 20px; font-weight: 600;
+      text-decoration: none; padding: 14px 0; border-bottom: 1px solid var(--border);
+      transition: color .18s;
+    }
+    .mobile-menu a:hover { color: var(--w); }
+    .mobile-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; }
+
+    /* Avatar entrance */
+    .avatar-wrap { animation: avatarIn 1s cubic-bezier(.16,1,.3,1) both; }
+
+    /* ────────────────── RESPONSIVE ────────────────── */
+    @media(max-width:720px){
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: block; }
+      .hero-wrap { flex-direction: column; align-items: center; text-align: center; padding: 64px 20px 52px; gap: 36px; }
+      .hero-text h1 { font-size: 38px; letter-spacing: -1.4px; }
+      .hero-text .tagline { max-width: 100%; }
+      .hero-links { justify-content: center; }
+      .avatar { width: 140px; height: 140px; }
+      .stats-wrap { padding: 0 20px 52px; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .stat-card:nth-child(1){ border-radius: 15px 0 0 0; }
+      .stat-card:nth-child(2){ border-radius: 0 15px 0 0; }
+      .stat-card:nth-child(3){ border-radius: 0 0 0 15px; }
+      .stat-card:nth-child(4){ border-radius: 0 0 15px 0; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .skills-grid .skill-group[style] { grid-column: span 1; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .lead-grid { grid-template-columns: 1fr; }
+      .edu-card { flex-direction: column; text-align: center; }
+      .exp-tenure { display: none; }
+      .container { padding: 0 20px; }
+      .footprint { flex-direction: column; }
+      .interests-row { flex-wrap: wrap; }
+      .interest-chip { flex: calc(50% - 7px); }
     }
 
-    footer {
-      margin-top: 32px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    footer a {
-      color: var(--accent2);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    footer a:hover {
-      color: var(--accent);
-    }
-
-    @media (max-width: 640px) {
-      main.wrap {
-        margin: 24px;
-        padding: 28px 20px;
-      }
-      header { flex-direction: column; align-items: flex-start; }
-    }
+    /* ────────────────── SCROLL REVEAL ────────────────── */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .d1 { transition-delay: .08s; }
+    .d2 { transition-delay: .16s; }
+    .d3 { transition-delay: .24s; }
+    .d4 { transition-delay: .32s; }
   </style>
 </head>
-
 <body>
-  <main class="wrap">
-    <header>
-      <div class="logo">KA</div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">Khairul <em>Alam</em></span>
+  <div class="nav-links">
+    <a href="#experience">Experience</a>
+    <a href="#skills">Skills</a>
+    <a href="#blogs">Writing</a>
+    <a href="#leadership">Leadership</a>
+    <a href="#education">Education</a>
+  </div>
+  <button class="hamburger" onclick="openMenu()" aria-label="Menu">&#9776;</button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMenu()">&#x2715;</button>
+  <a href="#experience" onclick="closeMenu()">Experience</a>
+  <a href="#skills" onclick="closeMenu()">Skills</a>
+  <a href="#blogs" onclick="closeMenu()">Writing</a>
+  <a href="#leadership" onclick="closeMenu()">Leadership</a>
+  <a href="#education" onclick="closeMenu()">Education</a>
+</div>
+
+<!-- HERO -->
+<div class="hero-wrap">
+  <div class="avatar-wrap">
+    <div class="avatar">
+      <img src="avatar.png" alt="Khairul Alam">
+      <div class="avatar-ring"></div>
+    </div>
+  </div>
+  <div class="hero-text">
+    <h1>Khairul Alam</h1>
+    <div class="role">Senior Software Engineer (Android)<br>11+ Years Building Scalable Mobile Applications<span class="cursor"></span></div>
+    <div class="location"><svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;opacity:.5"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 6.75A1.75 1.75 0 1 1 6 3.25a1.75 1.75 0 0 1 0 3.5z" fill="currentColor"/></svg>Tokyo, Japan &nbsp;&middot;&nbsp; Currently at Rakuten</div>
+    <div class="tagline">
+      I'm passionate about building thoughtful digital experiences where great design, solid engineering, and real-world impact come together. I believe the best products are not only functional and reliable, but also intuitive, purposeful, and carefully crafted.
+      <div class="philosophy">
+        With 11+ years across Japan, Vietnam, and Bangladesh, I specialise in scalable Android applications, SDKs, and platform capabilities — spanning Kotlin, Jetpack Compose, Clean Architecture, and large-scale mobile ecosystems. I enjoy turning complex challenges into simple, maintainable solutions, and I'm continuously exploring how AI-assisted development can enhance engineering workflows.
+      </div>
+    </div>
+    <div class="hero-links">
+      <a href="mailto:licon.cseru10@gmail.com" class="btn btn-primary">Email</a>
+      <a href="https://www.linkedin.com/in/khairul-alam-licon/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn</a>
+      <a href="https://viblo.asia/u/licon" target="_blank" rel="noopener" class="btn btn-ghost">Blog</a>
+      <a href="https://github.com/liconrepo" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-wrap">
+  <div class="stats reveal" style="margin-bottom:10px">
+    <div class="stat-card">
+      <div class="stat-num" data-count="11" data-suffix="+">0</div>
+      <div class="stat-label">Years Experience</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" data-count="4">0</div>
+      <div class="stat-label">Companies</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" data-count="23">0</div>
+      <div class="stat-label">Technical Blogs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" data-count="50" data-suffix="K+">0</div>
+      <div class="stat-label">Blog Views</div>
+    </div>
+  </div>
+
+  <div class="footprint reveal">
+    <div class="country-card jp">
+      <div class="country-name">Japan</div>
+      <div class="country-companies">Rakuten, Inc. · Mercari, Inc.</div>
+    </div>
+    <div class="country-card vn">
+      <div class="country-name">Vietnam</div>
+      <div class="country-companies">Sun Asterisk Vietnam Co., Ltd.</div>
+    </div>
+    <div class="country-card bd">
+      <div class="country-name">Bangladesh</div>
+      <div class="country-companies">Lantas Technologies, Inc.</div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <p class="section-label">Work Experience</p>
+
+    <div class="exp-list">
+
+      <div class="exp-card reveal">
+        <div class="company-logo">R</div>
+        <div class="exp-info">
+          <div class="exp-title">Senior Software Engineer (Android)</div>
+          <div class="exp-company">Rakuten, Inc.</div>
+          <div class="exp-meta">Tokyo, Japan</div>
+        </div>
+        <div class="exp-tenure">Feb 2020 &ndash; Present</div>
+      </div>
+
+      <div class="exp-card reveal d1">
+        <div class="company-logo">M</div>
+        <div class="exp-info">
+          <div class="exp-title">Software Engineer (Android)</div>
+          <div class="exp-company">Mercari, Inc.</div>
+          <div class="exp-meta">Tokyo, Japan</div>
+        </div>
+        <div class="exp-tenure">Feb 2018 &ndash; Jan 2020</div>
+      </div>
+
+      <div class="exp-card reveal d2">
+        <div class="company-logo">SA</div>
+        <div class="exp-info">
+          <div class="exp-title">Software Engineer (Android)</div>
+          <div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div>
+          <div class="exp-meta">Hanoi, Vietnam</div>
+        </div>
+        <div class="exp-tenure">Aug 2015 &ndash; Jan 2018</div>
+      </div>
+
+      <div class="exp-card reveal d3">
+        <div class="company-logo">LT</div>
+        <div class="exp-info">
+          <div class="exp-title">Software Engineer (Android)</div>
+          <div class="exp-company">Lantas Technologies, Inc.</div>
+          <div class="exp-meta">Dhaka, Bangladesh</div>
+        </div>
+        <div class="exp-tenure">Nov 2014 &ndash; Jul 2015</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <p class="section-label">Technical Skills</p>
+    <div class="skills-grid">
+
+      <div class="skill-group reveal">
+        <h3>Programming &amp; Architecture</h3>
+        <div class="tags">
+          <span class="tag"><i class="devicon-kotlin-plain colored"></i>Kotlin</span>
+          <span class="tag"><i class="devicon-java-plain colored"></i>Java</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>MVVM</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>MVP</span>
+          <span class="tag"><i class="devicon-redux-original colored"></i>Redux</span>
+          <span class="tag"><span class="ti">⬡</span>Clean Architecture</span>
+          <span class="tag"><span class="ti">⬡</span>Clean Code</span>
+          <span class="tag"><span class="ti">⬡</span>SOLID</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Modularization</span>
+          <span class="tag"><i class="devicon-figma-plain colored"></i>Design Language System</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/googlechrome" alt="">MiniApps</span>
+          <span class="tag"><i class="devicon-react-original colored"></i>React</span>
+          <span class="tag"><i class="devicon-javascript-plain colored"></i>JavaScript</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal d1" style="grid-column: span 2">
+        <h3>Android &amp; Development Tools</h3>
+        <div class="tags">
+          <span class="tag"><i class="devicon-android-plain colored"></i>Android SDK</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/jetpackcompose" alt="">Jetpack Compose</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>ViewModel</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>LiveData</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/sqlite" alt="">Room</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Navigation</span>
+          <span class="tag"><i class="devicon-kotlin-plain colored"></i>KTX</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Widget</span>
+          <span class="tag"><i class="devicon-kotlin-plain colored"></i>Coroutines</span>
+          <span class="tag"><i class="devicon-kotlin-plain colored"></i>Flow</span>
+          <span class="tag"><i class="devicon-rxjs-plain colored"></i>RxJava</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Dagger Hilt</span>
+          <span class="tag"><i class="devicon-kotlin-plain colored"></i>Kodein</span>
+          <span class="tag"><span class="ti">⬡</span>Retrofit</span>
+          <span class="tag"><span class="ti">⬡</span>OkHttp</span>
+          <span class="tag"><span class="ti">⬡</span>Moshi</span>
+          <span class="tag"><i class="devicon-grpc-plain colored"></i>gRPC</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/glide" alt="">Glide</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/androidstudio" alt="">Coil</span>
+          <span class="tag"><span class="ti">⬡</span>Braze</span>
+          <span class="tag"><i class="devicon-salesforce-plain colored"></i>Salesforce</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/googleplay" alt="">In-App Purchase</span>
+          <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase Crashlytics</span>
+          <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase Analytics</span>
+          <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase Remote Config</span>
+          <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase Performance</span>
+          <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase App Distribution</span>
+          <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase A/B Testing</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal d2">
+        <h3>Testing Tools</h3>
+        <div class="tags">
+          <span class="tag"><i class="devicon-junit-plain colored"></i>JUnit</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Robolectric</span>
+          <span class="tag"><i class="devicon-java-plain colored"></i>Mockito</span>
+          <span class="tag"><i class="devicon-kotlin-plain colored"></i>Kluent</span>
+          <span class="tag"><i class="devicon-selenium-plain colored"></i>Appium</span>
+          <span class="tag"><i class="devicon-codecov-plain colored"></i>Codecov</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>LeakCanary</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Timber</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>Stetho</span>
+          <span class="tag"><i class="devicon-postman-plain colored"></i>Postman</span>
+          <span class="tag"><span class="ti">⬡</span>Charles Proxy</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal d3">
+        <h3>CI/CD &amp; Deployment</h3>
+        <div class="tags">
+          <span class="tag"><i class="devicon-circleci-plain colored"></i>CircleCI</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/githubactions" alt="">GitHub Actions</span>
+          <span class="tag"><i class="devicon-android-plain colored"></i>DeployGate</span>
+          <span class="tag"><i class="devicon-azuredevops-plain colored"></i>AppCenter</span>
+          <span class="tag"><i class="devicon-google-plain colored"></i>Google Play Console</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal d1">
+        <h3>Collaboration &amp; Productivity</h3>
+        <div class="tags">
+          <span class="tag"><i class="devicon-jira-plain colored"></i>Jira</span>
+          <span class="tag"><i class="devicon-figma-plain colored"></i>Figma</span>
+          <span class="tag"><img class="si" src="https://cdn.simpleicons.org/zapier" alt="">Zapier</span>
+          <span class="tag"><i class="devicon-git-plain colored"></i>Git</span>
+          <span class="tag"><i class="devicon-github-original colored"></i>GitHub</span>
+          <span class="tag"><i class="devicon-slack-plain colored"></i>Slack</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal d2">
+        <h3>AI &amp; Developer Productivity</h3>
+        <div class="tags">
+          <span class="tag"><span class="ti">✦</span>Claude Code</span>
+          <span class="tag"><span class="ti">✦</span>Codex</span>
+          <span class="tag"><span class="ti">✦</span>AI-Assisted Development</span>
+          <span class="tag"><span class="ti">✦</span>AI Debugging &amp; Log Analysis</span>
+          <span class="tag"><span class="ti">✦</span>Token-Efficient LLM Workflows</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BLOGS -->
+<section id="blogs">
+  <div class="container">
+    <p class="section-label">Technical Writing</p>
+    <div class="blog-grid">
+
+      <a href="https://viblo.asia/p/simple-way-to-create-a-custom-analog-clock-in-android-1VgZv9aRKAw" target="_blank" rel="noopener" class="blog-card reveal">
+        <div class="blog-idx">01</div>
+        <div class="blog-title">Simple way to create a custom Analog clock in Android</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">9.9K views</span><span class="blog-date">Nov 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/the-common-ways-to-pass-data-in-the-android-applications-yMnKMqrrK7P" target="_blank" rel="noopener" class="blog-card reveal d1">
+        <div class="blog-idx">02</div>
+        <div class="blog-title">The common ways to pass data in Android applications</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">7.1K views</span><span class="blog-date">Apr 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/android-demo-application-of-creating-qr-code-using-kotlin-jvElaXaYZkw" target="_blank" rel="noopener" class="blog-card reveal d2">
+        <div class="blog-idx">03</div>
+        <div class="blog-title">Android demo: Creating QR code using Kotlin</div>
+        <div class="blog-tags"><span class="blog-tag">Kotlin</span><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">6.0K views</span><span class="blog-date">Sep 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/creating-a-custom-dialpad-soft-keyboard-in-android-E375zEDqlGW" target="_blank" rel="noopener" class="blog-card reveal d3">
+        <div class="blog-idx">04</div>
+        <div class="blog-title">Creating a Custom Dialpad Soft Keyboard in Android</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">IME</span></div>
+        <div class="blog-footer"><span class="views-badge">3.3K views</span><span class="blog-date">Oct 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/how-to-write-a-sync-adapter-DzVGpLOyGnW" target="_blank" rel="noopener" class="blog-card reveal">
+        <div class="blog-idx">05</div>
+        <div class="blog-title">How to Write a Sync Adapter</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">2.8K views</span><span class="blog-date">Nov 2016</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/use-buck-in-android-projects-to-speed-up-your-build-time-63vKjJ2yK2R" target="_blank" rel="noopener" class="blog-card reveal d1">
+        <div class="blog-idx">06</div>
+        <div class="blog-title">Use BUCK in Android projects to speed up build time</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">Build System</span></div>
+        <div class="blog-footer"><span class="views-badge">2.2K views</span><span class="blog-date">May 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/how-to-write-an-androidauthenticator-qzaGzNLdGyO" target="_blank" rel="noopener" class="blog-card reveal d2">
+        <div class="blog-idx">07</div>
+        <div class="blog-title">How to Write an Android Authenticator</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">1.9K views</span><span class="blog-date">Aug 2016</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/build-uber-like-tracking-system-using-hypertrack-63vKj6QxK2R" target="_blank" rel="noopener" class="blog-card reveal d3">
+        <div class="blog-idx">08</div>
+        <div class="blog-title">Build Uber-like tracking system using HyperTrack</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">React Native</span></div>
+        <div class="blog-footer"><span class="views-badge">1.7K views</span><span class="blog-date">Aug 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/access-github-restful-api-via-retrofit-from-android-l0rvmm0ovyqA" target="_blank" rel="noopener" class="blog-card reveal">
+        <div class="blog-idx">09</div>
+        <div class="blog-title">Access GitHub RESTful API via Retrofit from Android</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">Retrofit</span></div>
+        <div class="blog-footer"><span class="views-badge">1.5K views</span><span class="blog-date">Dec 2015</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/difference-among-picasso-uil-glide-fresco-oOVlYE84l8W" target="_blank" rel="noopener" class="blog-card reveal d1">
+        <div class="blog-idx">10</div>
+        <div class="blog-title">Difference among Picasso, UIL, Glide &amp; Fresco</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">1.5K views</span><span class="blog-date">Mar 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/android-bottom-sheet-V3m5WEaEZO7" target="_blank" rel="noopener" class="blog-card reveal d2">
+        <div class="blog-idx">11</div>
+        <div class="blog-title">Android Bottom Sheet</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span></div>
+        <div class="blog-footer"><span class="views-badge">1.5K views</span><span class="blog-date">Feb 2017</span></div>
+      </a>
+
+      <a href="https://viblo.asia/p/tower-of-hanoi-nwmGyEgXGoW" target="_blank" rel="noopener" class="blog-card reveal d3">
+        <div class="blog-idx">12</div>
+        <div class="blog-title">Tower of Hanoi</div>
+        <div class="blog-tags"><span class="blog-tag">Algorithm</span><span class="blog-tag">Puzzle</span></div>
+        <div class="blog-footer"><span class="views-badge">1.4K views</span><span class="blog-date">Oct 2016</span></div>
+      </a>
+
+    </div>
+    <a href="https://viblo.asia/u/licon" target="_blank" rel="noopener" class="view-all-link reveal">
+      View all 23 posts on Viblo &nbsp;&rarr;
+    </a>
+  </div>
+</section>
+
+<!-- LEADERSHIP -->
+<section id="leadership">
+  <div class="container">
+    <p class="section-label">Leadership &amp; Collaboration</p>
+    <div class="lead-grid">
+      <div class="lead-item reveal">
+        <span class="lead-icon">&#127919;</span>
+        <p>Drive alignment and transparency through Agile ceremonies, proactive risk mitigation, and clear prioritisation across stakeholders.</p>
+      </div>
+      <div class="lead-item reveal d1">
+        <span class="lead-icon">&#128218;</span>
+        <p>Lead technical workshops sharing Android best practices, new technologies, and engineering patterns across teams.</p>
+      </div>
+      <div class="lead-item reveal d2">
+        <span class="lead-icon">&#129309;</span>
+        <p>Mentor engineers through code reviews and onboarding, contributing to faster ramp-up and a stronger engineering culture.</p>
+      </div>
+      <div class="lead-item reveal d3">
+        <span class="lead-icon">&#128161;</span>
+        <p>Navigate ambiguity with open discussion and a solution-first approach to technical and organisational challenges.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="container">
+    <p class="section-label">Education</p>
+    <div class="edu-card reveal">
+      <div class="edu-badge" style="background:#1a2540;border-color:rgba(255,255,255,0.1);padding:6px">
+        <img src="https://upload.wikimedia.org/wikipedia/en/e/e2/University_of_Rajshahi_logo.svg" alt="RU" style="width:100%;height:100%;object-fit:contain" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:13px;font-weight:700;color:#a0b4d0;letter-spacing:-.5px\'>RU</span>')">
+      </div>
       <div>
-        <h1>Khairul Alam</h1>
-        <p class="lead">Software Engineer (Android) at Tokyo, Japan</p>
+        <div class="edu-degree">Bachelor of Science &mdash; Computer Science &amp; Engineering</div>
+        <div class="edu-uni">University of Rajshahi, Bangladesh</div>
+        <div class="edu-years">2010 &ndash; 2014</div>
       </div>
-    </header>
+    </div>
+  </div>
+</section>
 
-    <section class="intro">
-      <h2>Hello 👋 I’m Khairul!</h2>
-      <p>
-        I build scalable, user-focused mobile experiences blending performance and design. With over 10 years in Android development, I work with Kotlin, Jetpack Compose, and Clean Architecture to deliver high-quality apps.
-      </p>
-
-      <div class="meta">Core Skills</div>
-      <div class="skills">
-        <span class="tag">Kotlin</span>
-        <span class="tag">Java</span>
-        <span class="tag">Jetpack Compose</span>
-        <span class="tag">Android SDK</span>
-        <span class="tag">MVP / MVVM / Redux</span>
-        <span class="tag">Mobile SDK Development</span>
-        <span class="tag">MiniApps</span>
-        <span class="tag">Clean Architecture</span>
+<!-- INTERESTS -->
+<section id="interests">
+  <div class="container">
+    <p class="section-label">Loves To</p>
+    <div class="interests-row reveal">
+      <div class="interest-chip">
+        <span class="interest-icon">✍️</span>
+        <span class="interest-label">Writing / Coding</span>
       </div>
-    </section>
+      <div class="interest-chip">
+        <span class="interest-icon">🥾</span>
+        <span class="interest-label">Hiking</span>
+      </div>
+      <div class="interest-chip">
+        <span class="interest-icon">🎱</span>
+        <span class="interest-label">Billiards</span>
+      </div>
+      <div class="interest-chip">
+        <span class="interest-icon">🏏</span>
+        <span class="interest-label">Cricket</span>
+      </div>
+      <div class="interest-chip">
+        <span class="interest-icon">💻</span>
+        <span class="interest-label">Hackathons</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <footer>
-      <p>
-        <a href="mailto:licon.cseru10@gmail.com">licon.cseru10@gmail.com</a> ·
-        <a href="https://github.com/liconrepo" target="_blank" rel="noopener noreferrer">GitHub</a> ·
-        <a href="https://www.linkedin.com/in/khairul-alam-licon/" target="_blank" rel="noopener noreferrer">LinkedIn</a> ·
-        <a href="https://viblo.asia/u/licon" target="_blank" rel="noopener noreferrer">Blogs</a>
-      </p>
-    </footer>
-  </main>
+<!-- FOOTER -->
+<footer>
+  <p class="footer-watermark">Constantly learning &nbsp;&middot;&nbsp; Refining the craft &nbsp;&middot;&nbsp; Building software that matters</p>
+  <p class="footer-copy">&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</p>
+</footer>
+
+<script>
+  /* Mobile menu */
+  function openMenu()  { document.getElementById('mobileMenu').classList.add('open'); }
+  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+  /* Scroll reveal */
+  const revealObs = new IntersectionObserver(
+    es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  /* Count-up on stats */
+  const countObs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = +el.dataset.count;
+      const suffix = el.dataset.suffix || '';
+      const duration = 1200;
+      const step = 16;
+      const steps = duration / step;
+      let current = 0;
+      const inc = target / steps;
+      const timer = setInterval(() => {
+        current += inc;
+        if (current >= target) { current = target; clearInterval(timer); }
+        el.textContent = Math.floor(current) + suffix;
+      }, step);
+      countObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.stat-num[data-count]').forEach(el => countObs.observe(el));
+</script>
 </body>
 </html>
