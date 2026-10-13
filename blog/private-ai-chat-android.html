@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Building a private AI chat app for Android — Khairul Alam</title>
+  <meta name="description" content="How an Android chat app can run a language model on the phone, call an online model, fall back between them, and ship to Google Play: the theory, the architecture and the pitfalls." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Mobile &middot; On-device AI &middot; For beginners</p>
+    <h1>Building a private AI chat app for Android: local models, online models, and shipping to Google Play</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~25 min read</span></div>
+    <div class="tags"><span class="tag">Android</span><span class="tag">Kotlin</span><span class="tag">LLM</span><span class="tag">llama.cpp</span><span class="tag">Google Play</span></div>
+
+    <p class="lede">You type a message, a few seconds later an AI answers. It feels like magic, but it is a handful of simple ideas stacked together. I built an Android chat app that can answer from a model running <em>on the phone itself</em>, switch to an <em>online</em> model when you want a bigger brain, and quietly fall back to the phone when the internet disappears. This article explains every idea in plain words, with pictures, so you can follow it even if you have never touched AI before.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>An AI chat model is a very fancy <em>autocomplete</em>: it keeps guessing the next small piece of text.</li>
+        <li>It does not remember anything between messages. The app re-sends the whole conversation every time.</li>
+        <li>A model is just a big file of numbers. A small, shrunk-down one fits on a phone and runs with no internet.</li>
+        <li>An online model does the same job on someone else's computer. The phone only sends text and shows the answer.</li>
+        <li>Hide both behind one &ldquo;give me text&rdquo; interface, and you can switch or fall back freely.</li>
+        <li>Most of what makes it <em>feel</em> good is handling the waiting: instant echo, a &ldquo;thinking&rdquo; dot, streaming text, a Stop button.</li>
+        <li>Publishing needs a signed app bundle, a privacy policy and honest disclosures. A big bundled model needs special handling.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents</strong>
+      <ol>
+        <li><a href="#big-picture">The big picture</a></li>
+        <li><a href="#how-it-works">How an AI chat actually works</a></li>
+        <li><a href="#architecture">How the app is organised</a></li>
+        <li><a href="#local">Adding a model that runs on the phone</a></li>
+        <li><a href="#slow">Why the first word takes time (and how to speed it up)</a></li>
+        <li><a href="#online">Adding an online model</a></li>
+        <li><a href="#fallback">Offline vs online, heat, and falling back</a></li>
+        <li><a href="#memory">Remembering across chats</a></li>
+        <li><a href="#ux">Making it feel like a real chat app</a></li>
+        <li><a href="#tiny">Making a very simple model</a></li>
+        <li><a href="#pitfall">A pitfall: the crash that only some phones had</a></li>
+        <li><a href="#play">Publishing on Google Play</a></li>
+        <li><a href="#limits">Limitations</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </div>
+
+    <!-- 1 -->
+    <h2 id="big-picture">1. The big picture</h2>
+    <p>From the outside, the app is just a chat screen. Behind it there is a &ldquo;brain&rdquo; that turns your message into a reply. The trick is that the brain can come from three different places, and the screen does not need to know which one is in use.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="A phone chat screen connected to three possible brains: a model on the phone, an online model, and a simple rule-based responder.">
+        <rect class="box" x="18" y="28" width="130" height="214" rx="22"/>
+        <rect class="rule" x="62" y="38" width="42" height="6" rx="3"/>
+        <rect class="boxb" x="30" y="62" width="76" height="26" rx="10"/><text class="sub" x="40" y="79">Hello!</text>
+        <rect class="box" x="58" y="100" width="82" height="42" rx="10"/><text class="sub" x="66" y="118">Hi, how can</text><text class="sub" x="66" y="133">I help?</text>
+        <rect class="box" x="30" y="204" width="106" height="26" rx="13"/><text class="sub" x="42" y="221">Ask anything</text>
+        <text class="b c" x="83" y="260">Chat screen</text>
+
+        <rect class="boxg" x="300" y="20" width="320" height="64" rx="14"/>
+        <text class="b" x="318" y="46">A model on the phone</text><text class="sub" x="318" y="66">Private, works offline, warms the phone</text>
+        <rect class="boxb" x="300" y="103" width="320" height="64" rx="14"/>
+        <text class="b" x="318" y="129">An online model</text><text class="sub" x="318" y="149">Smarter, cool phone, needs internet</text>
+        <rect class="boxo" x="300" y="186" width="320" height="64" rx="14"/>
+        <text class="b" x="318" y="212">A simple rule-based helper</text><text class="sub" x="318" y="232">Instant, no AI, knows only a few words</text>
+
+        <path class="arrow" d="M150,135 L296,52"/><path class="arrow" d="M150,135 L296,135"/><path class="arrow" d="M150,135 L296,218"/>
+      </svg>
+      <figcaption>One chat screen, three possible brains. The app picks one for each message.</figcaption>
+    </figure>
+
+    <!-- 2 -->
+    <h2 id="how-it-works">2. How an AI chat actually works</h2>
+    <p>A <strong>large language model (LLM)</strong> is a program that has read an enormous amount of text and learned its patterns. Give it some text and it predicts what should come next. A chat is built on top of that one ability.</p>
+
+    <div class="analogy"><strong>Think of it like phone autocomplete</strong>
+      <p>When you type &ldquo;see you&rdquo;, your keyboard suggests &ldquo;later&rdquo;. An LLM is the same idea, trained on far more text and able to keep going for whole paragraphs. It writes an answer one small piece at a time, each piece chosen to fit everything before it.</p>
+    </div>
+
+    <h3>Tokens: the pieces it reads and writes</h3>
+    <p>Models do not read letters or whole words. They read <strong>tokens</strong>, which are short chunks of text. Roughly, one token is three-quarters of an English word. Speed, memory limits and price are all counted in tokens.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 130" role="img" aria-label="The sentence 'Hello, how are you?' split into seven coloured token chunks.">
+        <text class="sub" x="12" y="22">The sentence</text><text class="b" x="12" y="44" style="font-size:17px">Hello, how are you?</text>
+        <path class="arrow" d="M320,52 L320,72"/>
+        <g>
+          <rect class="boxb" x="14"  y="80" width="70" height="34" rx="8"/><text class="c" x="49"  y="102">Hel</text>
+          <rect class="boxg" x="92"  y="80" width="60" height="34" rx="8"/><text class="c" x="122" y="102">lo</text>
+          <rect class="boxo" x="160" y="80" width="40" height="34" rx="8"/><text class="c" x="180" y="102">,</text>
+          <rect class="boxp" x="208" y="80" width="80" height="34" rx="8"/><text class="c" x="248" y="102"> how</text>
+          <rect class="boxb" x="296" y="80" width="76" height="34" rx="8"/><text class="c" x="334" y="102"> are</text>
+          <rect class="boxg" x="380" y="80" width="76" height="34" rx="8"/><text class="c" x="418" y="102"> you</text>
+          <rect class="boxo" x="464" y="80" width="40" height="34" rx="8"/><text class="c" x="484" y="102">?</text>
+        </g>
+        <text class="sub" x="520" y="102">= 7 tokens</text>
+      </svg>
+      <figcaption>The model never sees &ldquo;words&rdquo;, only these chunks. Even a short sentence is several tokens.</figcaption>
+    </figure>
+
+    <h3>It has no memory, so the app re-sends the chat</h3>
+    <p>This is the idea that surprises most people. A model does <em>not</em> remember your previous message. Each time you press send, the app packs the whole conversation so far into one big block of text and hands it over. The model reads it all and continues it.</p>
+    <p>The model can only look at a limited amount of text at once, called the <strong>context window</strong>. It is measured in tokens (for example 4,096 on a phone). When the conversation grows past the window, the oldest messages have to be dropped, and the model effectively forgets them.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="A row of six messages. A window covers the newest four plus the new message; the two oldest are outside the window and are forgotten.">
+        <text class="sub" x="12" y="20">Conversation, oldest to newest</text>
+        <rect class="box" x="14"  y="36" width="76" height="50" rx="8" style="opacity:.45"/><text class="sub c" x="52"  y="66">msg 1</text>
+        <rect class="box" x="98"  y="36" width="76" height="50" rx="8" style="opacity:.45"/><text class="sub c" x="136" y="66">msg 2</text>
+        <rect class="box" x="182" y="36" width="76" height="50" rx="8"/><text class="c" x="220" y="66">msg 3</text>
+        <rect class="box" x="266" y="36" width="76" height="50" rx="8"/><text class="c" x="304" y="66">msg 4</text>
+        <rect class="box" x="350" y="36" width="76" height="50" rx="8"/><text class="c" x="388" y="66">msg 5</text>
+        <rect class="box" x="434" y="36" width="76" height="50" rx="8"/><text class="c" x="472" y="66">msg 6</text>
+        <rect class="boxb" x="518" y="36" width="108" height="50" rx="8"/><text class="b c" x="572" y="66">your new one</text>
+        <rect class="ghost" x="174" y="26" width="458" height="70" rx="12"/>
+        <text class="b" x="186" y="122">The context window: what the model can read right now</text>
+        <path class="arrow" d="M95,100 L95,136"/>
+        <text class="sub" x="14" y="158">Too old for the window: forgotten</text>
+        <text class="sub" x="14" y="176">(the app drops the oldest messages first)</text>
+      </svg>
+      <figcaption>The window is like a whiteboard of fixed size. New text goes on the right; once it is full, the oldest text is wiped from the left.</figcaption>
+    </figure>
+
+    <h3>The chat template: labels the model understands</h3>
+    <p>A raw model only continues text, so the app marks who is speaking using special labels the model was trained on. Different model families use different labels, and using the wrong ones is the number one reason a small model produces nonsense.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="A prompt made of a system message, a user message and an empty assistant line where the model continues.">
+        <rect class="boxp" x="14" y="12" width="612" height="52" rx="10"/><text class="b" x="28" y="34">system</text><text class="sub" x="28" y="54">&ldquo;You are a helpful assistant.&rdquo;  (how to behave)</text>
+        <rect class="boxb" x="14" y="74" width="612" height="52" rx="10"/><text class="b" x="28" y="96">user</text><text class="sub" x="28" y="116">&ldquo;What is a token?&rdquo;  (what you typed)</text>
+        <rect class="boxg" x="14" y="136" width="612" height="52" rx="10"/><text class="b" x="28" y="158">assistant</text><text class="sub" x="28" y="178">the model writes here, one token at a time &#9612;</text>
+        <text class="sub" x="14" y="214">The model stops when it writes its own &ldquo;end of turn&rdquo; marker. Then the reply is finished.</text>
+      </svg>
+      <figcaption>A chat prompt is three labelled parts. The last one is left open for the model to fill in.</figcaption>
+    </figure>
+    <p>The first part, the <strong>system prompt</strong>, is a standing instruction such as &ldquo;be concise&rdquo; or &ldquo;you are a code reviewer&rdquo;. It is just text at the top, which makes it a handy place to slip in anything else the model should know. We will use that for memory.</p>
+
+    <h3>The dials: why answers differ each time</h3>
+    <p>At every step the model rates every possible next token, and the app has to pick one. A few dials control that pick:</p>
+    <ul>
+      <li><strong>Temperature</strong>: low means safe and repetitive, high means creative and sometimes wrong.</li>
+      <li><strong>Top-k / top-p</strong>: only consider the most likely few candidates.</li>
+      <li><strong>Repeat penalty</strong>: nudges the model away from looping.</li>
+      <li><strong>Max tokens</strong>: a hard cap on how long a reply can be.</li>
+    </ul>
+
+    <h3>Streaming</h3>
+    <p>Because tokens appear one by one, the app shows them as they arrive instead of waiting for the whole answer. That is why replies seem to be &ldquo;typed&rdquo; in front of you, both for on-device and online models.</p>
+
+    <!-- 3 -->
+    <h2 id="architecture">3. How the app is organised</h2>
+    <p>The most useful design decision is to hide <em>where the answer comes from</em> behind one small interface. The screens ask for text and get a stream of text back; they never need to know whether it came from the phone, a server, or a rule list.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 290" role="img" aria-label="Layers: screens, a view-model that builds the prompt and talks to a database, and three interchangeable text sources.">
+        <rect class="boxb" x="110" y="10" width="300" height="46" rx="12"/><text class="b c" x="260" y="38">Screens (Jetpack Compose)</text>
+        <path class="arrow" d="M260,58 L260,84"/>
+        <rect class="boxp" x="80" y="86" width="360" height="56" rx="12"/><text class="b c" x="260" y="110">ViewModel</text><text class="sub c" x="260" y="130">builds the prompt: instructions + memory + chat</text>
+        <path class="arrow" d="M442,114 L486,114"/><path class="arrow" d="M486,122 L442,122"/>
+        <rect class="box" x="488" y="76" width="140" height="76" rx="12"/><text class="b c" x="558" y="106">Database</text><text class="sub c" x="558" y="124">chats, memories,</text><text class="sub c" x="558" y="140">models, settings</text>
+        <path class="arrow" d="M170,144 L120,180"/><path class="arrow" d="M260,144 L320,180"/><path class="arrow" d="M350,144 L520,180"/>
+        <rect class="boxg" x="20" y="182" width="190" height="60" rx="12"/><text class="b c" x="115" y="208">Model on the phone</text><text class="sub c" x="115" y="228">llama.cpp</text>
+        <rect class="boxb" x="225" y="182" width="190" height="60" rx="12"/><text class="b c" x="320" y="208">Online model</text><text class="sub c" x="320" y="228">HTTPS, streaming</text>
+        <rect class="boxo" x="430" y="182" width="190" height="60" rx="12"/><text class="b c" x="525" y="208">Simple rules</text><text class="sub c" x="525" y="228">keywords</text>
+        <text class="sub c" x="320" y="270">Each one gives back the same thing: a stream of text pieces.</text>
+      </svg>
+      <figcaption>The ViewModel builds the prompt and picks one of three interchangeable text sources. Swapping or falling back becomes easy.</figcaption>
+    </figure>
+    <p>In Kotlin that boundary can be tiny:</p>
+<pre><code>interface LlmEngine {
+    suspend fun load(modelPath: String, config: EngineConfig)
+    fun generate(prompt: String, params: GenerationParams): Flow&lt;String&gt;
+    suspend fun unload()
+}</code></pre>
+    <p>A <code>Flow&lt;String&gt;</code> is Kotlin's way of saying &ldquo;a stream of text pieces that arrive over time&rdquo;. The screen collects them and shows each one as it comes. Cancel the collector and generation stops, which gives you a working Stop button for free. Chats and messages live in Room (a friendly layer over SQLite), so history survives restarts.</p>
+
+    <!-- 4 -->
+    <h2 id="local">4. Adding a model that runs on the phone</h2>
+
+    <h3>What is a model file?</h3>
+    <p>A model is a big collection of numbers, called <strong>weights</strong>, learned during training. Think of it as a very large recipe card of what the AI &ldquo;knows&rdquo;. To fit on a phone you need two tricks:</p>
+    <ul>
+      <li><strong>Small models</strong>: 0.3 to 3 billion parameters instead of hundreds of billions.</li>
+      <li><strong>Quantization</strong>: storing each number with fewer bits (about 4 instead of 16 or 32). Imagine rounding every price to the nearest dollar: much smaller, slightly less precise. A 4-bit file is roughly 3&ndash;4 times smaller with a modest drop in quality.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Bar chart of file sizes: about 270 MB for a 0.3B model, 490 MB for 0.5B, 800 MB for 1B and 1.1 GB for 1.5B.">
+        <text class="sub" x="14" y="18">Typical 4-bit file size</text>
+        <text x="14" y="58">~0.3B</text><rect class="bar-g" x="90" y="40" width="108" height="26" rx="6"/><text class="sub" x="206" y="58">270 MB &middot; very fast, simple chat</text>
+        <text x="14" y="102">~0.5B</text><rect class="bar-g" x="90" y="84" width="196" height="26" rx="6"/><text class="sub" x="294" y="102">490 MB &middot; fast, basic Q&amp;A</text>
+        <text x="14" y="146">~1B</text><rect class="bar-b" x="90" y="128" width="320" height="26" rx="6"/><text class="sub" x="418" y="146">800 MB &middot; good chat, ~3 GB RAM</text>
+        <text x="14" y="190">~1.5B</text><rect class="bar-o" x="90" y="172" width="440" height="26" rx="6"/><text class="sub" x="90" y="218">1.1 GB &middot; smarter, slower, warmer</text>
+      </svg>
+      <figcaption>Bigger usually means smarter, but also bigger downloads, more memory, slower replies and more heat.</figcaption>
+    </figure>
+    <p>A handy rule of thumb: a 4-bit model needs about 0.6 GB of storage per billion parameters, and about that much free RAM, plus extra for the conversation.</p>
+
+    <h3>The GGUF file format</h3>
+    <p>The common format for phone-sized models is <strong>GGUF</strong>. It is a single file that holds the weights, the tokenizer (the thing that splits text into tokens) and some notes about the model. Tools create it; nobody writes one by hand (more in section 10).</p>
+
+    <h3>Running it: llama.cpp, a bridge, and Kotlin</h3>
+    <p><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">llama.cpp</a> is an open-source engine written in C++ that can run GGUF models on an ordinary phone processor. Android apps are written in Kotlin, so we need a bridge between the two languages.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Pipeline: model file, C++ engine, JNI bridge, Kotlin stream, screen.">
+        <rect class="boxo" x="6"   y="40" width="108" height="76" rx="12"/><text class="b c" x="60"  y="70">Model file</text><text class="sub c" x="60"  y="90">.gguf</text><text class="sub c" x="60"  y="106">(the numbers)</text>
+        <rect class="boxg" x="140" y="40" width="108" height="76" rx="12"/><text class="b c" x="194" y="70">Engine</text><text class="sub c" x="194" y="90">llama.cpp</text><text class="sub c" x="194" y="106">(C++)</text>
+        <rect class="boxp" x="274" y="40" width="108" height="76" rx="12"/><text class="b c" x="328" y="70">Bridge</text><text class="sub c" x="328" y="90">JNI</text><text class="sub c" x="328" y="106">(translator)</text>
+        <rect class="boxb" x="408" y="40" width="108" height="76" rx="12"/><text class="b c" x="462" y="70">Kotlin</text><text class="sub c" x="462" y="90">Flow of</text><text class="sub c" x="462" y="106">text pieces</text>
+        <rect class="box"  x="542" y="40" width="92"  height="76" rx="12"/><text class="b c" x="588" y="70">Screen</text><text class="sub c" x="588" y="90">streamed</text><text class="sub c" x="588" y="106">reply</text>
+        <path class="arrow" d="M114,78 L138,78"/><path class="arrow" d="M248,78 L272,78"/><path class="arrow" d="M382,78 L406,78"/><path class="arrow" d="M516,78 L540,78"/>
+        <text class="sub c" x="320" y="150">Built once with the Android NDK; shipped inside the app as a .so library</text>
+      </svg>
+      <figcaption>The model file is only data. The C++ engine does the maths. A thin bridge lets Kotlin ask for one piece of text at a time.</figcaption>
+    </figure>
+    <ol>
+      <li><strong>Compile the engine</strong> with the Android NDK. Add llama.cpp as a git submodule and a <code>CMakeLists.txt</code> that builds it into a shared library for each processor type (<code>arm64-v8a</code> for phones, <code>x86_64</code> for the emulator).</li>
+      <li><strong>Write a thin bridge</strong> with JNI (Java Native Interface). Keep it tiny: <em>load</em>, <em>start a reply</em>, <em>get next piece</em>, <em>stop</em>, <em>free</em>.</li>
+      <li><strong>Wrap it</strong> in the same <code>LlmEngine</code> interface, turning &ldquo;get next piece&rdquo; into a <code>Flow</code>.</li>
+    </ol>
+<pre><code>object LlamaBridge {
+    init { System.loadLibrary("native_llm") }
+    external fun nativeLoad(path: String, contextSize: Int, threads: Int): Long
+    external fun nativeStart(handle: Long, prompt: String /* + sampling args */): Int
+    external fun nativeNext(handle: Long): ByteArray?   // null when finished
+    external fun nativeAbort(handle: Long)
+    external fun nativeFree(handle: Long)
+}</code></pre>
+    <p>Two practical rules: run <em>all</em> native calls on one dedicated thread, so freeing the model can never collide with a running reply; and treat native crashes as serious, because there is no Kotlin error message to catch (see section 11).</p>
+    <p>An alternative is Google's <strong>MediaPipe / LiteRT</strong> LLM runtime, which uses its own <code>.task</code> files and avoids writing C++. Both can sit behind the same interface.</p>
+
+    <h3>Getting the model onto the phone</h3>
+    <ul>
+      <li><strong>Download on demand.</strong> List a few small models and download the one the user picks. Make downloads <em>resumable</em> (HTTP <code>Range</code> requests), https-only, and cap the allowed size so nobody pulls a model the phone cannot run.</li>
+      <li><strong>Import a file</strong> with the system file picker and copy it into app-private storage.</li>
+      <li><strong>Bundle one inside the app.</strong> Put a small model in the app's <code>assets</code> and copy it out on first launch, so a fresh install works with no download. The cost is a bigger download for everyone, plus consequences for Google Play (section 12).</li>
+    </ul>
+    <p>Loading a model reads hundreds of megabytes into memory and takes seconds. Load it lazily on the first message, keep it while the app is open, free it when the app closes, and always show &ldquo;Loading&hellip;&rdquo; so the first reply does not look frozen.</p>
+
+    <!-- 5 -->
+    <h2 id="slow">5. Why the first word takes time (and how to speed it up)</h2>
+    <p>When you press send, two different jobs happen on the phone:</p>
+    <ol>
+      <li><strong>Reading</strong> the whole prompt (instructions + chat + your message). The model has to process every token once. Developers call this <em>prefill</em>.</li>
+      <li><strong>Writing</strong> the answer, one token at a time.</li>
+    </ol>
+    <p>Nothing appears on screen until the reading is done. On a fast phone that takes a blink. On an older phone, with a long prompt, it can take most of a minute. On a test phone from 2018 I measured about 16 tokens per second of reading: a 900-token prompt meant a 55-second wait before the first word, even though the phone was working the whole time.</p>
+
+    <h3>Fix 1: don't re-read what hasn't changed (the KV cache)</h3>
+    <p>While reading, the model builds notes about the text it has seen, called the <strong>KV cache</strong>. Next time you send a message, the start of the prompt (instructions and the earlier chat) is identical, so those notes are still valid. The engine keeps them and only reads the <em>new</em> part.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="Two horizontal bars. Without the cache the model reads all 600 tokens. With the cache it reuses 580 tokens and reads only 20 new ones.">
+        <text class="b" x="14" y="24">Without the cache: read everything again</text>
+        <rect class="bar-o" x="14" y="34" width="612" height="30" rx="6"/><text class="c" x="320" y="54" style="fill:#fff">read 600 tokens</text>
+        <text class="b" x="14" y="106">With the cache: reuse the unchanged start</text>
+        <rect class="bar-m" x="14" y="116" width="592" height="30" rx="6"/><text class="c sub" x="310" y="136">reused from last time (580 tokens)</text>
+        <rect class="bar-g" x="606" y="116" width="20" height="30" rx="4"/>
+        <text class="sub" x="14" y="172">&#8593; only the 20 new tokens (green) need reading</text>
+        <text class="sub" x="14" y="196">The more of the chat stays the same, the faster each follow-up gets.</text>
+      </svg>
+      <figcaption>The first message in a chat pays the full price. Follow-ups are much cheaper.</figcaption>
+    </figure>
+    <p>In the bridge this is a small change: remember which tokens are in the cache, find how many match the new prompt from the start, delete the rest, and decode only the difference. If nothing matches (for example old messages were dropped), it falls back to reading everything.</p>
+
+    <h3>Fix 2: send less</h3>
+    <ul>
+      <li><strong>Cap the prompt</strong> on the phone, for example around 800 tokens, and drop the oldest messages first. Offer a small setting (Fast / Balanced / Long) so users choose speed versus memory.</li>
+      <li><strong>Add extras only when needed.</strong> A recap of other chats is only worth its size when the user actually asks about earlier chats. For a plain &ldquo;hi&rdquo; it just slows things down.</li>
+    </ul>
+
+    <h3>Fix 3: pick a file the phone is fast at</h3>
+    <p>Quantized models come in several flavours. Newer phones have special instructions that make the popular &ldquo;Q4_K_M&rdquo; type quick; older phones do not, and a plainer type called <strong>Q4_0</strong> reads prompts much faster there. Offering both in the download list lets people on older phones have a better time.</p>
+
+    <!-- 6 -->
+    <h2 id="online">6. Adding an online model</h2>
+    <p>An online model does the heavy computing on a server. Many providers, and many self-hosted gateways, speak the same language, the <strong>OpenAI-compatible chat completions API</strong>. One small client therefore covers a lot of services.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="The phone sends the conversation as JSON to a server; the server streams back small text pieces ending with DONE.">
+        <rect class="box" x="14"  y="20" width="120" height="150" rx="16"/><text class="b c" x="74" y="90">Phone</text><text class="sub c" x="74" y="110">chat app</text>
+        <rect class="boxb" x="506" y="20" width="120" height="150" rx="16"/><text class="b c" x="566" y="90">Server</text><text class="sub c" x="566" y="110">online model</text>
+        <path class="arrow" d="M138,52 L502,52"/><text class="sub c" x="320" y="42">1. sends the conversation (JSON) + your API key</text>
+        <path class="arrow" d="M502,100 L138,100"/><text class="sub c" x="320" y="92">2. streams back small pieces as they are written</text>
+        <rect class="boxg" x="190" y="112" width="60" height="26" rx="8"/><text class="c sub" x="220" y="130">"Hel"</text>
+        <rect class="boxg" x="258" y="112" width="60" height="26" rx="8"/><text class="c sub" x="288" y="130">"lo!"</text>
+        <rect class="box" x="326" y="112" width="84" height="26" rx="8"/><text class="c sub" x="368" y="130">[DONE]</text>
+        <text class="sub c" x="320" y="198">If the connection drops mid-way, the app keeps what already arrived.</text>
+      </svg>
+      <figcaption>The request is one message out; the answer comes back as a stream of small pieces.</figcaption>
+    </figure>
+<pre><code>POST {baseUrl}/chat/completions
+Authorization: Bearer &lt;api key&gt;
+
+{ "model": "some-model-name", "stream": true,
+  "messages": [ {"role": "system", "content": "..."},
+                {"role": "user",   "content": "Hello"} ] }</code></pre>
+    <p>The reply arrives as <strong>Server-Sent Events</strong>: lines starting with <code>data:</code>, each holding a tiny JSON chunk, ending with <code>data: [DONE]</code>.</p>
+<pre><code>data: {"choices":[{"delta":{"content":"Hel"}}]}
+data: {"choices":[{"delta":{"content":"lo!"}}]}
+data: [DONE]</code></pre>
+    <p>Read each line, pull out <code>choices[0].delta.content</code>, and emit it into the same <code>Flow&lt;String&gt;</code> the local engine uses. To the screen, nothing changed.</p>
+
+    <h3>Details that matter</h3>
+    <ul>
+      <li><strong>Stopping.</strong> A waiting network read cannot be interrupted by cancelling a coroutine. Close the connection from the cancellation callback so Stop works.</li>
+      <li><strong>Friendly errors.</strong> Turn 401/403 into &ldquo;the key was rejected&rdquo; and 429 into &ldquo;quota reached&rdquo; so people know what to fix.</li>
+      <li><strong>https only.</strong> Refuse plain http.</li>
+      <li><strong>The API key.</strong> A key the <em>user</em> types stays on their phone, but plain preferences are not encrypted; prefer the Android Keystore. <strong>Never ship your own key inside the app</strong>: anyone can pull it out of the APK. To offer a hosted model yourself, put your own server in the middle to hold the key and limit usage.</li>
+      <li><strong>Privacy.</strong> Everything in the prompt leaves the phone, including any memory you add. Say so clearly.</li>
+    </ul>
+
+    <!-- 7 -->
+    <h2 id="fallback">7. Offline vs online, heat, and falling back</h2>
+    <p>Neither mode is better. They trade different things.</p>
+    <table>
+      <tr><th></th><th>Offline (on the phone)</th><th>Online (remote model)</th></tr>
+      <tr><td>Privacy</td><td>Nothing leaves the device</td><td>Messages go to the provider</td></tr>
+      <tr><td>Internet</td><td>Not needed</td><td>Required</td></tr>
+      <tr><td>Answer quality</td><td>Small models, limited</td><td>Large models, much stronger</td></tr>
+      <tr><td>Heat &amp; battery</td><td>CPU works hard: warm phone, faster drain</td><td>Light: mostly network traffic</td></tr>
+      <tr><td>Cost</td><td>Free after the download</td><td>Per-use fees or a subscription</td></tr>
+    </table>
+    <h3>Why the phone gets warm</h3>
+    <p>Writing each token means doing a huge pile of arithmetic on the processor, using several cores at once, a bit like running a demanding game. It happens in bursts: the phone warms while it writes and cools when idle. If it gets too hot, Android slows the processor down on its own, which makes replies slower but does not damage the phone. Smaller models, fewer threads and shorter replies reduce the heat; Online mode avoids it, because the work happens elsewhere.</p>
+
+    <h3>The automatic fallback</h3>
+    <p>If the user chose Online but the connection is gone, the app should not just fail. It should quietly use the phone instead.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 330" role="img" aria-label="Flow chart: online mode on? internet reachable? ask the online model; otherwise or on early failure use the on-device model.">
+        <rect class="boxb" x="220" y="8" width="200" height="38" rx="10"/><text class="b c" x="320" y="32">You send a message</text>
+        <path class="arrow" d="M320,48 L320,70"/>
+        <path class="boxo" d="M320,72 L430,108 L320,144 L210,108 Z"/><text class="b c" x="320" y="104">Online mode</text><text class="b c" x="320" y="122">turned on?</text>
+        <path class="arrow" d="M210,108 L110,108 L110,246"/><text class="sub" x="150" y="100">no</text>
+        <path class="arrow" d="M320,146 L320,168"/><text class="sub" x="330" y="162">yes</text>
+        <path class="boxo" d="M320,170 L450,206 L320,242 L190,206 Z"/><text class="b c" x="320" y="202">Internet really</text><text class="b c" x="320" y="220">reachable?</text>
+        <path class="arrow" d="M450,206 L540,206 L540,258"/><text class="sub" x="470" y="198">yes</text>
+        <rect class="boxb" x="440" y="260" width="190" height="52" rx="12"/><text class="b c" x="535" y="283">Ask the online model</text><text class="sub c" x="535" y="301">stream the reply</text>
+        <path class="arrow" d="M190,206 L110,206"/><text class="sub" x="150" y="198">no</text>
+        <rect class="boxg" x="10" y="260" width="200" height="52" rx="12"/><text class="b c" x="110" y="283">Use the phone's model</text><text class="sub c" x="110" y="301">tell the user why</text>
+        <path class="arrow" d="M440,286 L212,286" style="stroke-dasharray:5 4"/><text class="sub c" x="326" y="278">fails before any text arrives</text>
+      </svg>
+      <figcaption>Online is tried first when it can work. Any early failure falls back to the phone; a failure part-way keeps the text already received.</figcaption>
+    </figure>
+    <p>One detail: check that the network can <em>really</em> reach the internet. Android reports a <code>VALIDATED</code> capability for that; being &ldquo;connected to Wi-Fi&rdquo; is not enough.</p>
+
+    <!-- 8 -->
+    <h2 id="memory">8. Remembering across chats</h2>
+    <p>Since the model has no memory, &ldquo;remembering&rdquo; is something the <em>app</em> does by adding text to the prompt. Two simple mechanisms:</p>
+    <ul>
+      <li><strong>Saved facts.</strong> A short list the user can edit (&ldquo;I'm vegetarian&rdquo;, &ldquo;my dog is called Rex&rdquo;), or fill by typing &ldquo;Remember that&hellip;&rdquo;. These go into the system prompt of every chat.</li>
+      <li><strong>A recap of other chats.</strong> A few recent messages from other conversations (what the user asked and what the model answered), added <em>only when the user asks about earlier chats</em>.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 300" role="img" aria-label="The final prompt is built from base instructions, saved facts, an optional recap, the chat history and the new message, and then sent to the model.">
+        <rect class="boxp" x="20" y="10" width="360" height="42" rx="10"/><text class="b" x="34" y="36">1. Base instructions</text><text class="sub" x="230" y="36">"be helpful, be concise"</text>
+        <text class="b" x="196" y="68" style="font-size:18px">+</text>
+        <rect class="boxg" x="20" y="74" width="360" height="42" rx="10"/><text class="b" x="34" y="100">2. Saved facts</text><text class="sub" x="190" y="100">"vegetarian, dog = Rex"</text>
+        <text class="b" x="196" y="132" style="font-size:18px">+</text>
+        <rect class="ghost" x="20" y="138" width="360" height="42" rx="10"/><text class="b" x="34" y="164">3. Recap of other chats</text><text class="sub" x="236" y="164">only if you ask</text>
+        <text class="b" x="196" y="196" style="font-size:18px">+</text>
+        <rect class="box" x="20" y="202" width="360" height="42" rx="10"/><text class="b" x="34" y="228">4. This chat so far</text><text class="sub" x="214" y="228">(newest kept)</text>
+        <text class="b" x="196" y="260" style="font-size:18px">+</text>
+        <rect class="boxb" x="20" y="262" width="360" height="32" rx="10"/><text class="b" x="34" y="283">5. Your new message</text>
+        <path class="arrow" d="M384,150 L470,150"/>
+        <rect class="boxo" x="474" y="96" width="146" height="108" rx="16"/><text class="b c" x="547" y="146">The model</text><text class="sub c" x="547" y="166">reads it all,</text><text class="sub c" x="547" y="184">then replies</text>
+      </svg>
+      <figcaption>&ldquo;Memory&rdquo; is just extra text placed in front of the question. The dashed box is optional.</figcaption>
+    </figure>
+    <p>Two cautions. First, keep this extra text small, or it eats the context window of a small model and slows it (section 5). Second, give users control: toggles to switch each part off, a screen to view and delete facts, and an honest note about what an online model would receive. Reopening the last conversation on launch completes the feeling that the app &ldquo;remembers&rdquo;.</p>
+
+    <!-- 9 -->
+    <h2 id="ux">9. Making it feel like a real chat app</h2>
+    <p>Much of what people like in popular chat apps is not the model. It is how the <em>waiting</em> is handled. An app that goes silent for 30 seconds feels broken, even if it is working hard.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Four stages: message sent, thinking with a pulsing dot, streaming text, finished with copy and continue.">
+        <rect class="boxb" x="6"   y="20" width="146" height="100" rx="14"/><text class="b c" x="79"  y="46">1. Sent</text>
+        <rect class="box" x="30" y="62" width="98" height="26" rx="12"/><text class="sub c" x="79" y="80">your message</text><text class="sub c" x="79" y="108">appears instantly</text>
+        <rect class="boxo" x="170" y="20" width="146" height="100" rx="14"/><text class="b c" x="243" y="46">2. Thinking</text>
+        <circle cx="243" cy="74" r="9" fill="#f59e0b"/><text class="sub c" x="243" y="98">pulsing dot +</text><text class="sub c" x="243" y="112">"Still thinking… 8s"</text>
+        <rect class="boxg" x="334" y="20" width="146" height="100" rx="14"/><text class="b c" x="407" y="46">3. Streaming</text>
+        <text class="sub c" x="407" y="72">The capital of</text><text class="sub c" x="407" y="90">France is Par &#9679;</text><text class="sub c" x="407" y="110">Send becomes Stop</text>
+        <rect class="boxp" x="498" y="20" width="136" height="100" rx="14"/><text class="b c" x="566" y="46">4. Done</text>
+        <text class="sub c" x="566" y="72">Copy</text><text class="sub c" x="566" y="90">Continue (if cut off)</text><text class="sub c" x="566" y="110">speed shown</text>
+        <path class="arrow" d="M154,70 L168,70"/><path class="arrow" d="M318,70 L332,70"/><path class="arrow" d="M482,70 L496,70"/>
+        <text class="sub c" x="320" y="154">Each stage tells the user something is happening.</text>
+      </svg>
+      <figcaption>The four stages of one reply. Every stage gives visible feedback.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Show the user's message instantly</strong>, before any model work starts.</li>
+      <li><strong>Never leave a blank screen.</strong> Pulse a dot with &ldquo;Thinking&hellip;&rdquo;, switch to &ldquo;Still thinking&hellip; 8s&rdquo; after a few seconds, and say &ldquo;Loading&hellip;&rdquo; while the model loads.</li>
+      <li><strong>Stream the text</strong> with a small dot at the end.</li>
+      <li><strong>Follow long replies.</strong> If the list stays scrolled to the <em>start</em> of a tall reply, the user sees the beginning and thinks it stopped. Scroll to the end as text arrives.</li>
+      <li><strong>Offer &ldquo;Continue&rdquo;.</strong> Replies stop at a length limit, or when the user presses Stop. Mark those replies and show a Continue button that simply asks the model to carry on.</li>
+      <li><strong>Handle empty replies.</strong> Small models sometimes end their turn immediately. Retry once with a new random seed, and if it is still empty, say so, instead of failing silently.</li>
+      <li><strong>Look familiar:</strong> plain full-width replies, compact bubbles for the user, a rounded input pill, a flat neutral palette and a side drawer for chats.</li>
+    </ul>
+
+    <!-- 10 -->
+    <h2 id="tiny">10. Making a very simple model</h2>
+    <p>People often ask: <em>can I make my own model?</em> There are two very different answers.</p>
+
+    <h3>Option A: a rule-based &ldquo;model&rdquo; (an afternoon)</h3>
+    <p>If the app only needs a small vocabulary, you do not need a neural network. A list of keywords and canned replies is instant, uses almost no battery, needs no file and behaves the same way every time. It is not AI, but behind the interface from section 3 the screen cannot tell the difference.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Your message is split into words, matched against a keyword list, and the first matching rule gives a canned reply.">
+        <rect class="boxb" x="10" y="38" width="130" height="66" rx="12"/><text class="b c" x="75" y="66">"hello there"</text><text class="sub c" x="75" y="86">your message</text>
+        <path class="arrow" d="M142,71 L178,71"/>
+        <rect class="box" x="180" y="38" width="130" height="66" rx="12"/><text class="b c" x="245" y="66">words</text><text class="sub c" x="245" y="86">{hello, there}</text>
+        <path class="arrow" d="M312,71 L348,71"/>
+        <rect class="boxo" x="350" y="14" width="150" height="116" rx="12"/><text class="b c" x="425" y="38">Rule list</text>
+        <text class="sub" x="364" y="60">hi, hello  &#8594; greeting</text><text class="sub" x="364" y="80">time  &#8594; clock</text><text class="sub" x="364" y="100">thanks  &#8594; "welcome!"</text><text class="sub" x="364" y="120">(none)  &#8594; "don't know"</text>
+        <path class="arrow" d="M502,71 L528,71"/>
+        <rect class="boxg" x="530" y="38" width="104" height="66" rx="12"/><text class="b c" x="582" y="66">"Hello!"</text><text class="sub c" x="582" y="86">canned reply</text>
+      </svg>
+      <figcaption>No learning involved: just match words and answer from a list.</figcaption>
+    </figure>
+<pre><code>private val rules = listOf(
+    Rule(setOf("hi", "hello", "hey")) { "Hello! How can I help?" },
+    Rule(setOf("time", "clock"))      { "It's ${now.format("h:mm a")}." },
+    Rule(setOf("thanks", "thank"))    { "You're welcome!" },
+)
+
+fun reply(input: String): String {
+    val words = Regex("[\\p{L}\\p{N}']+").findAll(input.lowercase()).map { it.value }.toSet()
+    return rules.firstOrNull { r -&gt; r.keywords.any { it in words } }?.reply?.invoke(ctx)
+        ?: "I don't know that one yet."
+}</code></pre>
+    <p>It also makes a graceful last resort: a fresh install with no model downloaded can still answer, and can point the user to a real model. Show its text word by word with a short delay so it feels like typing.</p>
+
+    <h3>Option B: train a real tiny model (a project)</h3>
+    <p>A GGUF file holds <em>learned numbers</em>, not words or rules, which is why it cannot be written by hand. Making one has three stages:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 140" role="img" aria-label="Pipeline: your data, train a tiny network, convert to GGUF, shrink with quantization, load in the app.">
+        <rect class="box" x="6" y="30" width="108" height="64" rx="12"/><text class="b c" x="60" y="58">Your data</text><text class="sub c" x="60" y="78">Q&amp;A pairs</text>
+        <rect class="boxp" x="132" y="30" width="108" height="64" rx="12"/><text class="b c" x="186" y="58">Train</text><text class="sub c" x="186" y="78">tiny network</text>
+        <rect class="boxg" x="258" y="30" width="108" height="64" rx="12"/><text class="b c" x="312" y="58">Convert</text><text class="sub c" x="312" y="78">to .gguf</text>
+        <rect class="boxo" x="384" y="30" width="108" height="64" rx="12"/><text class="b c" x="438" y="58">Shrink</text><text class="sub c" x="438" y="78">quantize Q4</text>
+        <rect class="boxb" x="510" y="30" width="124" height="64" rx="12"/><text class="b c" x="572" y="58">Load in app</text><text class="sub c" x="572" y="78">same as others</text>
+        <path class="arrow" d="M116,62 L130,62"/><path class="arrow" d="M242,62 L256,62"/><path class="arrow" d="M368,62 L382,62"/><path class="arrow" d="M494,62 L508,62"/>
+        <text class="sub c" x="320" y="124">A tiny model mostly memorises its examples: great on those, nonsense on anything else.</text>
+      </svg>
+      <figcaption>Making a real model file is a pipeline, and the training stage is the hard one.</figcaption>
+    </figure>
+<pre><code>python convert_hf_to_gguf.py ./my-tiny-model --outfile tiny-f16.gguf --outtype f16
+llama-quantize tiny-f16.gguf tiny-q4_k_m.gguf Q4_K_M</code></pre>
+    <p>The result loads through exactly the same code as any downloaded model, so it is a good way to test your loading path. For real quality it is far easier to start from an existing small open model and, if needed, fine-tune it.</p>
+
+    <!-- 11 -->
+    <h2 id="pitfall">11. A pitfall: the crash that only some phones had</h2>
+    <p>The first test build died instantly on one phone with <code>SIGILL</code>, short for &ldquo;illegal instruction&rdquo;, deep inside the native library.</p>
+    <div class="analogy"><strong>The workshop analogy</strong>
+      <p>Imagine writing a recipe that says &ldquo;use the electric mixer&rdquo;. It works in kitchens that have one. In a kitchen without one, the cook simply stops. The compiler had been told to assume a newer processor feature (called <code>dotprod</code>) existed. On a phone whose processor lacked it, the first time the program used that instruction, the system killed the app.</p>
+    </div>
+    <p>To make it worse, the engine chose its fast routines based on how it was <em>compiled</em>, not on what the phone could actually do. The fix was to compile for plain <code>armv8-a</code>, which every 64-bit ARM phone understands. The price is some speed on newer phones; the proper solution is to build several variants and choose one at runtime. The general lesson: <strong>native crashes are not ordinary errors</strong>, so test on a real, ideally older, phone, and read <code>logcat</code> for the signal name and the top of the stack trace.</p>
+
+    <!-- 12 -->
+    <h2 id="play">12. Publishing on Google Play</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 206" role="img" aria-label="Release steps: build a signed app bundle, upload to internal testing, closed testing, then production. A note says large models need an asset pack or a download.">
+        <rect class="boxb" x="6"   y="24" width="112" height="70" rx="12"/><text class="b c" x="62"  y="52">Build</text><text class="sub c" x="62"  y="72">signed .aab</text>
+        <rect class="boxp" x="140" y="24" width="112" height="70" rx="12"/><text class="b c" x="196" y="52">Listing</text><text class="sub c" x="196" y="72">+ policies</text>
+        <rect class="boxg" x="274" y="24" width="112" height="70" rx="12"/><text class="b c" x="330" y="52">Internal</text><text class="sub c" x="330" y="72">testing</text>
+        <rect class="boxo" x="408" y="24" width="112" height="70" rx="12"/><text class="b c" x="464" y="52">Closed</text><text class="sub c" x="464" y="72">testing</text>
+        <rect class="boxr" x="542" y="24" width="92"  height="70" rx="12"/><text class="b c" x="588" y="52">Production</text><text class="sub c" x="588" y="72">review</text>
+        <path class="arrow" d="M120,59 L138,59"/><path class="arrow" d="M254,59 L272,59"/><path class="arrow" d="M388,59 L406,59"/><path class="arrow" d="M522,59 L540,59"/>
+        <rect class="ghost" x="6" y="112" width="628" height="84" rx="12"/>
+        <text class="b" x="22" y="138">Watch the size:</text><text class="sub" x="22" y="160">The base app is limited to about 200 MB.</text><text class="sub" x="22" y="180">A bigger bundled model needs an install-time asset pack, or a download after install.</text>
+      </svg>
+      <figcaption>The path to the store, and the one size trap that matters for AI apps.</figcaption>
+    </figure>
+    <h3>Account and format</h3>
+    <ul>
+      <li>Create a Play Console developer account (one-time fee, identity check). New personal accounts have usually had to run a closed test with a minimum number of testers for a couple of weeks before production access. Check the current rule.</li>
+      <li>Pick your <strong>application ID</strong> carefully; it can never change after the first upload.</li>
+      <li>Upload an <strong>Android App Bundle</strong>, not an APK: <code>./gradlew :app:bundleRelease</code>. Turn on Play App Signing and keep your upload key backed up.</li>
+      <li>Raise <code>versionCode</code> for every upload, and keep <code>targetSdk</code> at or above Play's current minimum, which rises every year.</li>
+    </ul>
+    <h3>Native code specifics</h3>
+    <ul>
+      <li>Ship only the processor types you need; drop <code>x86_64</code> in release if it exists just for the emulator.</li>
+      <li>Newer Android versions require native libraries to be aligned for 16 KB memory pages. Link with <code>-Wl,-z,max-page-size=16384</code> and use a current NDK.</li>
+      <li>Test the <em>release</em> build on a device. Code shrinking (R8) can remove classes that native code looks up by name, so add keep rules for your JNI class.</li>
+    </ul>
+    <h3>The size problem</h3>
+    <ul>
+      <li><strong>Download on first run</strong> instead of bundling. Simplest, and people who never need a big model never pay for it.</li>
+      <li><strong>Play Asset Delivery</strong>: put the model in an <em>install-time asset pack</em>, delivered with the install, which allows far larger files. The app then reads it from the pack and copies it into private storage.</li>
+      <li><strong>Bundle a tiny model</strong> and offer bigger ones as downloads.</li>
+    </ul>
+    <h3>Listing and policy</h3>
+    <ul>
+      <li>App name, descriptions, a 512&times;512 icon, a feature graphic and phone screenshots.</li>
+      <li>A public <strong>privacy policy</strong> URL.</li>
+      <li>The <strong>Data safety</strong> form. Be precise: offline mode keeps conversations on the device; online mode sends the user's text to the service they configure.</li>
+      <li><strong>Generative AI content</strong>: Play expects AI apps to give users a way to report offensive or harmful replies, so plan an in-app report option.</li>
+      <li><strong>Model licences</strong>: open models come with terms. Some require attribution or limit use. Read each one and credit them, for example on an About screen.</li>
+      <li>Roll out through <strong>internal</strong>, then <strong>closed</strong> testing, before production.</li>
+    </ul>
+
+    <!-- 13 -->
+    <h2 id="limits">13. Limitations</h2>
+    <ul>
+      <li><strong>Small models are small.</strong> Sub-billion-parameter models follow instructions loosely, make facts up and struggle with long or multi-step questions.</li>
+      <li><strong>Older phones are slow at reading prompts.</strong> The cache, the prompt cap and Q4_0 files help, but a long first prompt still takes time.</li>
+      <li><strong>CPU only.</strong> No GPU or NPU acceleration, so speed varies a lot between phones.</li>
+      <li><strong>Memory is shallow.</strong> A short recap is not real long-term recall; the context window is the hard limit.</li>
+      <li><strong>Text only.</strong> Image input needs a vision model, an extra projector file and more native code.</li>
+      <li><strong>Heat and battery</strong> in long on-device sessions.</li>
+      <li><strong>The online path depends on the provider:</strong> availability, cost and what they do with your data.</li>
+      <li><strong>A bundled model inflates the download</strong> and complicates Play distribution.</li>
+    </ul>
+
+    <!-- 14 -->
+    <h2 id="takeaways">14. Takeaways and glossary</h2>
+    <ol>
+      <li>An AI chat is &ldquo;re-send the conversation, stream back the continuation&rdquo;. Learn tokens, the context window and the chat template and the rest follows.</li>
+      <li>Put every source of text behind one interface. Local, online and rule-based answers then become interchangeable, and fallbacks are easy.</li>
+      <li>For local models, use a small quantized GGUF through llama.cpp and the NDK, with a very thin bridge and one native thread.</li>
+      <li>Speed on the phone is mostly about reading the prompt: reuse the cache, send less, and pick a file type the phone is fast at.</li>
+      <li>For online models, an OpenAI-compatible streaming client covers many providers. Treat API keys and user text with care.</li>
+      <li>The experience is mostly about the waiting: instant echo, a thinking dot, streaming, a working Stop button and a Continue button.</li>
+      <li>Plan distribution early: the model's size, native-library requirements and privacy disclosures all shape how you publish.</li>
+    </ol>
+
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>LLM</td><td>A program that predicts the next piece of text, trained on huge amounts of writing.</td></tr>
+      <tr><td>Token</td><td>A short chunk of text (about three-quarters of a word) that models read and write.</td></tr>
+      <tr><td>Context window</td><td>How much text the model can look at at once. Older text falls off.</td></tr>
+      <tr><td>Chat template</td><td>Labels like &ldquo;system / user / assistant&rdquo; that tell the model who said what.</td></tr>
+      <tr><td>System prompt</td><td>A standing instruction at the top of the prompt.</td></tr>
+      <tr><td>Weights</td><td>The numbers a model learned; the contents of a model file.</td></tr>
+      <tr><td>Quantization</td><td>Storing those numbers with fewer bits to make the file smaller.</td></tr>
+      <tr><td>GGUF</td><td>A file format for phone-sized models.</td></tr>
+      <tr><td>llama.cpp</td><td>An open-source engine that runs GGUF models on ordinary processors.</td></tr>
+      <tr><td>NDK / JNI</td><td>Android's tools for running C++ code from Kotlin; JNI is the translator between them.</td></tr>
+      <tr><td>Prefill</td><td>The model reading the whole prompt before it writes the first word.</td></tr>
+      <tr><td>KV cache</td><td>The model's notes about text it already read, reused to skip re-reading.</td></tr>
+      <tr><td>Streaming / SSE</td><td>Sending a reply in small pieces as it is written.</td></tr>
+      <tr><td>AAB</td><td>The app bundle format Google Play requires.</td></tr>
+    </table>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

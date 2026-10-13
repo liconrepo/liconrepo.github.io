@@ -517,6 +517,21 @@
       transition: color .2s, border-color .2s;
     }
     .view-all-link:hover { color: var(--text); border-color: var(--border-h); }
+    .blog-grid.new-grid { grid-template-columns: 1fr; }
+    .blog-card .blog-new { display: inline-block; background: #3b82f6; color: #fff; border-radius: 5px; padding: 1px 7px; margin-left: 8px; letter-spacing: .8px; }
+    .blog-summary { font-size: calc(13px * var(--fs, 1)); color: var(--sub); margin-top: 8px; line-height: 1.6; }
+    .blog-card.featured .blog-title { font-size: calc(17px * var(--fs, 1)); }
+    .archive-btn {
+      display: inline-flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 28px;
+      font: inherit; font-size: calc(13px * var(--fs, 1)); font-weight: 500; color: var(--sub);
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px;
+      transition: border-color .18s, color .18s;
+    }
+    .archive-btn:hover { border-color: var(--border-h); color: var(--text); }
+    .archive-btn .chev { transition: transform .2s; display: inline-block; }
+    .archive-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    #archive { margin-top: 18px; }
+    #archive[hidden] { display: none; }
 
     /* ────────────────── LEADERSHIP ────────────────── */
     .lead-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
@@ -755,7 +770,7 @@
       <div class="stat-label">Companies</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" data-count="23">0</div>
+      <div class="stat-num" data-count="24">0</div>
       <div class="stat-label">Technical Blogs</div>
     </div>
     <div class="stat-card">
@@ -950,6 +965,22 @@
 <section id="blogs">
   <div class="container">
     <p class="section-label">Technical Writing</p>
+
+    <div class="blog-grid new-grid">
+      <a href="blog/private-ai-chat-android.html" class="blog-card featured reveal">
+        <div class="blog-idx">Latest<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Building a private AI chat app for Android: local models, online models, and shipping to Google Play</div>
+        <div class="blog-summary">How a chat app can run a language model on the phone, call an online model, fall back between them, and reach the Play Store: the theory, the architecture, a tiny model of your own, and the pitfalls.</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">On-device AI</span><span class="blog-tag">llama.cpp</span><span class="blog-tag">Google Play</span></div>
+        <div class="blog-footer"><span class="views-badge">~25 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+    </div>
+
+    <button type="button" class="archive-btn" id="archiveBtn" aria-expanded="false" aria-controls="archive">
+      <span>Archive &middot; 23 earlier posts from Viblo</span><span class="chev">&#9662;</span>
+    </button>
+
+    <div id="archive" hidden>
     <div class="blog-grid">
 
       <a href="https://viblo.asia/p/simple-way-to-create-a-custom-analog-clock-in-android-1VgZv9aRKAw" target="_blank" rel="noopener" class="blog-card reveal">
@@ -1040,6 +1071,7 @@
     <a href="https://viblo.asia/u/licon" target="_blank" rel="noopener" class="view-all-link reveal">
       View all 23 posts on Viblo &nbsp;&rarr;
     </a>
+    </div>
   </div>
 </section>
 
@@ -1175,6 +1207,15 @@
     location.href = 'mailto:licon.cseru10@gmail.com?subject=' + encodeURIComponent(f.subject.value) + '&body=' + encodeURIComponent(body);
   });
 
+  /* Archive of the older Viblo posts */
+  const archiveBtn = document.getElementById('archiveBtn');
+  const archiveBox = document.getElementById('archive');
+  function setArchive(open) {
+    archiveBox.hidden = !open;
+    archiveBtn.setAttribute('aria-expanded', String(open));
+  }
+  archiveBtn.addEventListener('click', () => setArchive(archiveBox.hidden));
+
   /* Site search — indexes the page content itself */
   const SEARCH_SOURCES = [
     { sel: '.hero-text',          section: 'About',      title: () => 'About Khairul Alam' },
@@ -1282,11 +1323,12 @@
   function closeSearch() { sOverlay.classList.remove('open'); }
   function openItem(it) {
     closeSearch();
-    if (it.link.protocol === 'mailto:') location.href = it.link.href;
+    if (it.link.protocol === 'mailto:' || it.link.target !== '_blank') location.href = it.link.href;
     else window.open(it.link.href, '_blank', 'noopener');
   }
   function goTo(it) {
     closeSearch();
+    if (it.el.closest('#archive')) setArchive(true);
     it.el.classList.add('visible');
     it.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     it.el.classList.add('search-hit');
