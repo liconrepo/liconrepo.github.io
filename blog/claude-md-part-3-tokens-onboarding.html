@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fewer tokens, faster onboarding with CLAUDE.md — Claude Code series part 3</title>
+  <meta name="description" content="How CLAUDE.md saves tokens, when it costs more than it saves, and how to use it to onboard onto a new project or feature. Part 3 of 8." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="3">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Series &middot; Part 3 of 3</p>
+    <h1>Fewer tokens, faster onboarding: making CLAUDE.md pay for itself</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~26 min read</span></div>
+    <div class="tags"><span class="tag">Claude Code</span><span class="tag">Tokens</span><span class="tag">Onboarding</span><span class="tag">Team workflow</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a class="on" href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">By now you have a CLAUDE.md. Two questions remain. Does it really save tokens, or does it just add more? And can it help when you join a new project or start a new feature? The honest answers: <em>yes, if you keep it lean</em>, and <em>yes, and this is where I find it most valuable</em>.</p>
+
+    <div class="callout">
+      <strong>Part 3 in 60 seconds</strong>
+      <ul>
+        <li>Check spending with <code>/usage</code>, <code>/context</code> and the status line; the dollar figure is an estimate.</li>
+        <li>The file costs tokens every session, but saves more by cutting repeated explanations and blind exploration.</li>
+        <li>Claude does not learn from your usage. Day 10 is cheaper only because your notes remove steps and wrong turns.</li>
+        <li>Keep the always-loaded part small; put detail in separate files that are read only when needed.</li>
+        <li>Pair it with habits: <code>/clear</code> between tasks, <code>/compact</code> for long ones, the right model for the job.</li>
+        <li>For onboarding, ask Claude to explore and write the file, then have a human correct it.</li>
+        <li>For a new feature, add a short feature note and link it, then remove it when the feature is done.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 3</strong>
+      <ol>
+        <li><a href="#tokens">Tokens and where they go</a></li>
+        <li><a href="#spend">How to check what you are spending</a></li>
+        <li><a href="#saves">How CLAUDE.md saves tokens</a></li>
+        <li><a href="#learn">Does Claude get better after 10 days?</a></li>
+        <li><a href="#costs">When it costs more than it saves</a></li>
+        <li><a href="#habits">Habits that save more</a></li>
+        <li><a href="#project">Onboarding onto a new project</a></li>
+        <li><a href="#feature">Starting a new feature</a></li>
+        <li><a href="#team">Making it a team habit</a></li>
+        <li><a href="#pitfalls">Pitfalls and a checklist</a></li>
+      </ol>
+    </div>
+
+    <h2 id="tokens">1. Tokens and where they go</h2>
+    <p>Recall from Part 2 that everything Claude sees is text, counted in <strong>tokens</strong> (short chunks of roughly three-quarters of a word). Your usage allowance, the speed of replies and the size of the context window are all measured in them. A session spends tokens in four places:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="The context window is split into four parts: memory files, files Claude reads, the conversation, and room left for the reply.">
+        <text class="sub" x="14" y="20">One session's context window</text>
+        <rect class="boxp" x="14"  y="30" width="110" height="52" rx="8"/><text class="b c" x="69"  y="54">CLAUDE.md</text><text class="sub c" x="69"  y="72">always there</text>
+        <rect class="boxb" x="128" y="30" width="190" height="52" rx="8"/><text class="b c" x="223" y="54">Files Claude reads</text><text class="sub c" x="223" y="72">grows as it explores</text>
+        <rect class="boxo" x="322" y="30" width="180" height="52" rx="8"/><text class="b c" x="412" y="54">The conversation</text><text class="sub c" x="412" y="72">grows every turn</text>
+        <rect class="ghost" x="506" y="30" width="120" height="52" rx="8"/><text class="b c" x="566" y="54">Free space</text><text class="sub c" x="566" y="72">for the reply</text>
+        <text class="b" x="14" y="116">Where you have control</text>
+        <text class="sub" x="14" y="140">&#8226; CLAUDE.md: you choose its size, once</text>
+        <text class="sub" x="14" y="160">&#8226; Files read: a good map means fewer wasted reads</text>
+        <text class="sub" x="14" y="180">&#8226; Conversation: /clear and /compact keep it from ballooning</text>
+      </svg>
+      <figcaption>The window is a shared budget. Every part competes for the same space.</figcaption>
+    </figure>
+
+    <h2 id="spend">2. How to check what you are spending</h2>
+    <p>Saving tokens only works if you can see them. Claude Code has several built-in views, from a quick glance to a detailed breakdown. Everything below comes from the official <a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Manage costs effectively</a> guide.</p>
+
+    <h3>Where to look</h3>
+    <table>
+      <tr><th>You want to know&hellip;</th><th>Look here</th></tr>
+      <tr><td>What this session has cost so far</td><td><code>/usage</code> (alias <code>/cost</code>), the Session block at the top.</td></tr>
+      <tr><td>What is filling the context window right now</td><td><code>/context</code>, which shows a grid of what is using space and suggests fixes for heavy tools or memory bloat.</td></tr>
+      <tr><td>How big this reply is as it is written</td><td>The token count beside the spinner while Claude works, for example &ldquo;&darr; 5.5k tokens&rdquo;.</td></tr>
+      <tr><td>Context usage all the time</td><td>Configure your status line to show it (see the <a href="https://code.claude.com/docs/en/statusline" target="_blank" rel="noopener">status line docs</a>).</td></tr>
+      <tr><td>How much of your plan limit you have used, and on what</td><td><code>/usage</code> on a Pro, Max, Team or Enterprise plan: usage bars plus a breakdown by skills, subagents, plugins and MCP servers.</td></tr>
+      <tr><td>How you work, and where you waste effort</td><td><code>/insights</code>, a report on your recent sessions. It uses tokens itself.</td></tr>
+      <tr><td>Your real bill on an API account</td><td>The <a href="https://platform.claude.com/usage" target="_blank" rel="noopener">Usage page in the Claude Console</a>.</td></tr>
+    </table>
+
+    <h3>Reading /usage</h3>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/usage</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/usage</span>
+
+Total cost:            <span class="t-g">$0.55</span>
+Total duration (API):  6m 20s
+Total duration (wall): 6h 33m 10s
+Total code changes:    0 lines added, 0 lines removed
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output,
+                       940.0k cache read, 50.0k cache write ($0.55)</code></pre>
+      </div>
+      <figcaption>The example from the official docs, shown as an illustration. Your numbers and layout will differ.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Input and output</strong> are the tokens you send and the tokens Claude writes. Output costs more per token (Part 4 has the prices).</li>
+      <li><strong>Cache read</strong> is repeated content (like CLAUDE.md and earlier conversation) re-read at the cheaper cached rate. Notice it is by far the biggest number: a long session mostly pays to re-read its own history.</li>
+      <li><strong>Cache write</strong> is new content being stored for reuse.</li>
+      <li><strong>It is an estimate.</strong> Claude Code works the cost out locally from token counts at list price. For authoritative billing on an API account use the Console. On a Pro or Max subscription your usage is included in the plan, so the dollar figure is not what you are billed; look at the plan usage bars instead.</li>
+      <li><strong>It resets on <code>/clear</code>.</strong> The next session starts again from $0.</li>
+      <li><strong>Newer versions add a &ldquo;Prompt cache&rdquo; line</strong> showing how many requests hit the cache and whether it is currently warm.</li>
+    </ul>
+
+    <h3>A worked estimate you can do by hand</h3>
+    <p>You can check the order of magnitude yourself with the prices from Part 4. Suppose one request sends 100,000 input tokens and gets 5,000 tokens back from Sonnet 5.5 ($2 per million input, $10 per million output), with nothing cached:</p>
+<pre><code>input : 100,000 / 1,000,000 x $2  = $0.20
+output:   5,000 / 1,000,000 x $10 = $0.05
+total                             = $0.25   (list price, no caching)</code></pre>
+    <p>Real sessions are cheaper than this per request because most of the input is a cache read, and costlier overall because Claude Code sends the whole conversation with every request and makes many requests per task. This is only an illustration of how the numbers combine, not a prediction of your bill.</p>
+
+    <h3>What typical spend looks like</h3>
+    <p>The official guide says that across enterprise deployments the average is around $13 per developer per active day and $150 to $250 per developer per month, with 90% of users below $30 per active day. It stresses that costs vary widely with model choice, codebase size, running several instances and automation, and suggests starting with a small pilot group to find your own baseline.</p>
+
+    <h3>Why usage climbs in a long session</h3>
+    <ul>
+      <li><strong>Long context:</strong> Claude Code sends your full conversation with every request, so even a one-line question late in a long session draws on the whole history.</li>
+      <li><strong>Cache misses:</strong> the first message after a break longer than the cache lifetime reprocesses everything. The lifetime is about an hour on a subscription and five minutes by default on an API key.</li>
+      <li><strong>Background and parallel work:</strong> scheduled tasks, subagents and agent teammates send their own requests, each with their own context.</li>
+      <li><strong>Compaction itself:</strong> <code>/compact</code> has to read the conversation it summarises, so compacting a huge context is a large request. When you want a clean start, <code>/clear</code> costs nothing.</li>
+    </ul>
+    <p>The &ldquo;Habits that save more&rdquo; section below turns these into actions. For the plan-limit breakdown, behaviour flags (long context, cache misses) appear in <code>/usage</code> when one accounts for 10% or more of your recent usage, with a tip to reduce it. If you hit a limit message such as &ldquo;You've hit your session limit&rdquo;, that is a seat-based usage window on a subscription plan, and the message tells you when it resets.</p>
+
+    <h2 id="saves">3. How CLAUDE.md saves tokens</h2>
+    <p>Think about what Claude does on a project it has never seen. To answer &ldquo;how do I run the tests?&rdquo; it must search, open the build files, read the README, maybe try a wrong command first. Each step reads files (tokens in), reasons (tokens out), and adds to the conversation. A one-line note in CLAUDE.md replaces all of that.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Without CLAUDE.md Claude searches, reads several files and guesses a command before answering. With CLAUDE.md it reads one line and goes straight to the task.">
+        <text class="b" x="14" y="22">Without notes: &ldquo;run the tests&rdquo;</text>
+        <rect class="box" x="14"  y="34" width="110" height="40" rx="8"/><text class="sub c" x="69"  y="59">search repo</text>
+        <rect class="box" x="132" y="34" width="110" height="40" rx="8"/><text class="sub c" x="187" y="59">read README</text>
+        <rect class="box" x="250" y="34" width="110" height="40" rx="8"/><text class="sub c" x="305" y="59">read build file</text>
+        <rect class="boxr" x="368" y="34" width="120" height="40" rx="8"/><text class="sub c" x="428" y="59">try wrong cmd</text>
+        <rect class="box" x="496" y="34" width="130" height="40" rx="8"/><text class="sub c" x="561" y="59">try again, works</text>
+        <path class="arrow" d="M126,54 L130,54"/><path class="arrow" d="M244,54 L248,54"/><path class="arrow" d="M362,54 L366,54"/><path class="arrow" d="M490,54 L494,54"/>
+        <rect class="bar-o" x="14" y="86" width="612" height="14" rx="5"/><text class="sub" x="14" y="118">&#8593; lots of tokens spent finding out</text>
+        <text class="b" x="14" y="154">With notes</text>
+        <rect class="boxg" x="14" y="166" width="190" height="40" rx="8"/><text class="sub c" x="109" y="191">CLAUDE.md has the command</text>
+        <rect class="boxg" x="224" y="166" width="120" height="40" rx="8"/><text class="sub c" x="284" y="191">run it. Done.</text>
+        <path class="arrow" d="M206,186 L222,186"/>
+        <rect class="bar-g" x="14" y="218" width="130" height="14" rx="5"/><text class="sub" x="156" y="230">&#8592; a fraction of the cost</text>
+      </svg>
+      <figcaption>The saving is not magic. It comes from replacing searching with knowing.</figcaption>
+    </figure>
+    <p>Four separate savings add up:</p>
+    <ul>
+      <li><strong>No re-explaining.</strong> You stop typing the same background into every session, and Claude stops spending a turn confirming it.</li>
+      <li><strong>Less blind exploration.</strong> A folder map lets Claude open the right file first instead of reading five wrong ones.</li>
+      <li><strong>Fewer wrong turns.</strong> A recorded gotcha prevents an attempt, a failure and a retry.</li>
+      <li><strong>Cheaper to re-read.</strong> Claude Code uses prompt caching: content that is repeated at the start of every request, such as your CLAUDE.md, is re-read at a lower cached rate. The cache has a limited lifetime (the docs give about an hour on a subscription and five minutes by default on an API key), so the first message after a long break reprocesses the whole context at full price. See <a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Manage costs effectively</a>.</li>
+    </ul>
+
+    <h2 id="learn">4. Does Claude get better after 10 days?</h2>
+    <p>This is the question I get asked most, so let me answer it straight. <strong>No, Claude does not learn from your usage.</strong> The model is fixed. Working with it for ten days does not change it, and on day 10 a new session starts as blank as on day 1, apart from the files you have written down.</p>
+    <p>Yet day 10 <em>can</em> feel cheaper and faster. The difference is not in Claude, it is in your notes and your habits.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Two timelines for the same task. Day 1 has many steps including searching, reading and a wrong attempt. Day 10 with notes has few steps. The model is the same on both days.">
+        <text class="b" x="14" y="22">Day 1: no notes yet</text>
+        <rect class="box" x="14"  y="32" width="84" height="34" rx="8"/><text class="sub c" x="56"  y="54">search</text>
+        <rect class="box" x="104" y="32" width="84" height="34" rx="8"/><text class="sub c" x="146" y="54">read files</text>
+        <rect class="box" x="194" y="32" width="84" height="34" rx="8"/><text class="sub c" x="236" y="54">read more</text>
+        <rect class="boxr" x="284" y="32" width="96" height="34" rx="8"/><text class="sub c" x="332" y="54">wrong try</text>
+        <rect class="box" x="386" y="32" width="84" height="34" rx="8"/><text class="sub c" x="428" y="54">retry</text>
+        <rect class="boxg" x="476" y="32" width="150" height="34" rx="8"/><text class="sub c" x="551" y="54">do the task</text>
+        <text class="b" x="14" y="112">Day 10: the lessons are written down</text>
+        <rect class="boxp" x="14"  y="122" width="140" height="34" rx="8"/><text class="sub c" x="84" y="144">read CLAUDE.md</text>
+        <rect class="boxg" x="160" y="122" width="150" height="34" rx="8"/><text class="sub c" x="235" y="144">do the task</text>
+        <rect class="ghost" x="14" y="180" width="612" height="56" rx="12"/>
+        <text class="b" x="30" y="204">Same model on both days.</text>
+        <text class="sub" x="30" y="224">The saving is fewer steps and fewer wrong turns, not a smarter or faster Claude.</text>
+      </svg>
+      <figcaption>An illustrative example, not measured data. Notes remove steps; they do not change the model.</figcaption>
+    </figure>
+
+    <h3>What does and does not get faster</h3>
+    <table>
+      <tr><th>Thing</th><th>After 10 days of use</th></tr>
+      <tr><td>The model's intelligence</td><td>Unchanged. It does not learn from your sessions.</td></tr>
+      <tr><td>How fast it writes each reply</td><td>Unchanged. It depends on the model and the platform.</td></tr>
+      <tr><td>Steps needed to finish a task</td><td><strong>Fewer</strong>, if your notes remove searching and guessing.</td></tr>
+      <tr><td>Wrong attempts and retries</td><td><strong>Fewer</strong>, if gotchas are recorded.</td></tr>
+      <tr><td>Context size at the start</td><td><strong>Smaller and more focused</strong>, if you prune and use <code>/clear</code>.</td></tr>
+      <tr><td>Your own prompts</td><td><strong>Better</strong>: you learn to name files and ask for small, clear tasks.</td></tr>
+    </table>
+    <p>So a task takes less time not because each reply streams faster, but because it needs fewer replies. A large, stale context does the opposite: it makes everything slower, whatever day it is.</p>
+
+    <h3>Things that do not give you savings</h3>
+    <ul>
+      <li><strong>Resuming an old conversation.</strong> Claude Code can reopen a previous session (for example with <code>claude --continue</code> or <code>--resume</code>). That brings the old text back into the window, so it usually costs <em>more</em> tokens, not fewer. On Pro and Max, resuming a big session after a long break offers to continue from a summary, which is cheaper but keeps only what the summary kept. Resuming is useful for continuity, not for saving.</li>
+      <li><strong>Plan mode on its own.</strong> The plan lives in the conversation and disappears with it. To keep it, save it to a file and link it from CLAUDE.md (section 8).</li>
+      <li><strong>Automatic memory.</strong> Claude can save notes for a project in a <code>memory</code> folder under <code>~/.claude/projects/</code> (Part 2, section 3). It is useful, but it is still saved text being read back in, not the model learning. The start of its <code>MEMORY.md</code> index (up to 200 lines or 25 KB) is loaded every session, so it takes up context like any other file. Review it now and then, and delete notes that are wrong or stale.</li>
+    </ul>
+
+    <h3>A two-minute end-of-day habit</h3>
+    <ol class="steps">
+      <li><strong>Write down what surprised you.</strong> A wrong turn, a command that failed, a rule you had to repeat. Add it to CLAUDE.md or the feature note.</li>
+      <li><strong>Delete one stale line.</strong> Anything that is no longer true or no longer needed.</li>
+      <li><strong>Save the plan, not the chat.</strong> If tomorrow continues today's work, write a handoff note (below) so the next step is in a file.</li>
+    </ol>
+    <p>Do this for ten days and day 10 really is easier, because <em>you</em> taught the next session, not because Claude remembered. The honest way to put it: Claude does not get smarter or faster, it gets less lost.</p>
+
+    <h3>The handoff note: what &ldquo;remember this session&rdquo; should really be</h3>
+    <p>It is tempting to end a day by typing &ldquo;remember this session&rdquo;. As Part 2 explained, that alone saves nothing unless Claude writes a file. A reliable version is an explicit <strong>handoff note</strong>:</p>
+    <div class="doc"><div class="doc-bar">Prompt to run before you close the session</div>
+<pre><code>Before I close this session, write a handoff note to docs/notes/2026-10-14.md:
+- what we finished
+- decisions made, and why
+- what is still broken or unfinished
+- the exact next step
+Then add one line to CLAUDE.md pointing to that file.</code></pre></div>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>end of day</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">Write a handoff note to docs/notes/2026-10-14.md and link it from CLAUDE.md.</span>
+
+<span class="t-o">&#9679;</span> <span class="t-dim">Write(docs/notes/2026-10-14.md)</span>
+  <span class="t-g">+ Done: reachability check, fallback notice</span>
+  <span class="t-g">+ Decision: fall back only if no text has arrived yet</span>
+  <span class="t-g">+ Next: unit tests for the partial-failure case</span>
+<span class="t-o">&#9679;</span> <span class="t-dim">Update(CLAUDE.md)</span>
+  <span class="t-g">+ Latest handoff: docs/notes/2026-10-14.md</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. The point is the two file writes: that is what makes it real memory.</figcaption>
+    </figure>
+    <p>Next morning, start with: <em>&ldquo;Read docs/notes/2026-10-14.md and continue.&rdquo;</em> That costs far fewer tokens than resuming the whole old conversation, and you can read and correct the note first.</p>
+    <ul>
+      <li><strong>Check that it happened.</strong> Look for the file write, or run <code>git diff</code>. No file change means nothing was kept.</li>
+      <li><strong>Read the note before you trust it.</strong> A summary keeps only what Claude chose to include, and subtle details can be lost.</li>
+      <li><strong>Keep secrets out.</strong> Never put passwords or keys in a note.</li>
+      <li><strong>Prune old notes.</strong> Keep the latest handoff linked, and archive or delete the rest so CLAUDE.md stays lean.</li>
+    </ul>
+
+    <h2 id="costs">5. When it costs more than it saves</h2>
+    <p>The file is loaded every time, even for a tiny question. A 3,000-line CLAUDE.md pays that price on &ldquo;what does this function do?&rdquo; as well. The balance depends on how long and how relevant it is:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="A curve: as the file grows from short to huge, the savings rise at first and then fall as the file's own cost dominates, so there is a sweet spot in the middle.">
+        <path class="rule" d="M50,20 L50,180 L620,180"/>
+        <text class="sub" x="56" y="16">Net benefit</text>
+        <text class="sub" x="620" y="202" style="text-anchor:end">File size (and imports) &#8594;</text>
+        <path d="M50,170 C140,60 230,30 330,40 C430,50 500,120 610,172" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <circle cx="260" cy="36" r="6" fill="#10b981"/>
+        <text class="b" x="196" y="22">Sweet spot</text>
+        <text class="sub" x="62" y="198">empty: Claude explores</text>
+        <text class="sub" x="470" y="30">too long: costs more</text>
+        <text class="sub" x="470" y="48">than it saves</text>
+      </svg>
+      <figcaption>Conceptual, not measured data. The point is the shape: there is an optimum, and it is smaller than most people think.</figcaption>
+    </figure>
+    <p>Practical limits that keep you near the sweet spot:</p>
+    <ul>
+      <li><strong>Aim for short.</strong> The official guidance is to keep each CLAUDE.md under about 200 lines, because longer files use more context and Claude follows them less reliably. If you cannot say it briefly, it probably belongs in a linked doc, a skill or a path-scoped rule.</li>
+      <li><strong>Leave comments for people.</strong> Block-level HTML comments in CLAUDE.md are stripped before it is sent, so maintainer notes cost no tokens.</li>
+      <li><strong>Always-needed in the file, sometimes-needed in a link.</strong> The release checklist is read once a month, so link it from the file and let Claude open it only when you ask about releases.</li>
+      <li><strong>Use skills for long how-tos.</strong> A skill shows Claude only a short description until the task matches, so a ten-step procedure costs nothing on unrelated work (Part 2, section 9).</li>
+      <li><strong>Deny noisy files.</strong> A <code>deny</code> rule for lock files, dependency folders and build output keeps Claude from reading thousands of useless lines. It also keeps secrets out of the context.</li>
+      <li><strong>Use sub-folder files.</strong> Rules for <code>server/</code> only load when Claude works in <code>server/</code>.</li>
+      <li><strong>Delete the obvious.</strong> If the code makes it clear, the line is a tax with no benefit.</li>
+    </ul>
+    <p>A caution on imports from Part 2: <code>@docs/architecture.md</code> loads that whole file every session. If it is long, mention it by name in plain text instead (&ldquo;deep architecture notes are in docs/architecture.md; read them when changing the engine&rdquo;) so it is read on demand.</p>
+
+    <h2 id="habits">6. Habits that save more</h2>
+    <p>The file is one lever. These habits matter just as much, and most of them come straight from the official <a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Manage costs effectively</a> guide:</p>
+    <table>
+      <tr><th>Habit</th><th>Why it helps</th></tr>
+      <tr><td><code>/clear</code> between unrelated tasks</td><td>An old conversation about the login screen is dead weight when you move to the database. Start clean. Use <code>/rename</code> first if you want to find the old one later with <code>/resume</code>.</td></tr>
+      <tr><td><code>/compact</code> in a long task</td><td>Summarises the history so far and frees space. Add focus instructions, such as <code>/compact focus on test output and code changes</code>, or put a short &ldquo;Compact instructions&rdquo; section in CLAUDE.md.</td></tr>
+      <tr><td>Point at files by name</td><td>&ldquo;Look at <code>app/chat/ChatViewModel.kt</code>&rdquo; beats &ldquo;find the chat code&rdquo;.</td></tr>
+      <tr><td>Right-size the model</td><td>The docs say Sonnet handles most coding tasks well and costs less than Opus, so save Opus for complex architecture and multi-step reasoning. The <code>opusplan</code> alias plans with Opus and executes with Sonnet (Part 1).</td></tr>
+      <tr><td>Plan mode for big changes</td><td>Agree the plan before any edits. A wrong assumption fixed in a plan costs a sentence, not twenty rewritten files. The docs recommend plan mode for complex tasks for exactly this reason.</td></tr>
+      <tr><td>Specific prompts</td><td>&ldquo;Add input validation to the login function in auth.ts&rdquo; lets Claude read a few files. &ldquo;Improve this codebase&rdquo; triggers broad scanning.</td></tr>
+      <tr><td>Course-correct early</td><td>If Claude heads the wrong way, press <kbd>Esc</kbd> straight away. <code>/rewind</code> or double-tapping Esc restores an earlier point in the conversation and code.</td></tr>
+      <tr><td>Give a way to verify</td><td>Include test cases or expected output in the prompt, so Claude can catch its own mistakes before you ask for fixes.</td></tr>
+      <tr><td>Move long how-tos into skills</td><td>CLAUDE.md loads every session; a skill loads only when used (Part 2).</td></tr>
+    </table>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/compact</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/compact focus on the database migration decisions</span>
+
+<span class="t-o">&#9679;</span> Summarising the conversation&hellip;
+  <span class="t-dim">Kept: migration plan, the failing test, files changed</span>
+  <span class="t-dim">Dropped: exploratory reads, resolved side-questions</span>
+
+<span class="t-g">&#10003;</span> Conversation compacted. CLAUDE.md is still loaded.</code></pre>
+      </div>
+      <figcaption>Illustrative mockup. A short hint after /compact tells Claude what matters most to keep.</figcaption>
+    </figure>
+
+    <h2 id="project">7. Onboarding onto a new project</h2>
+    <p>Joining a project is the same problem Claude has every morning: lots of unknowns, little context. The file helps both of you. There are two situations.</p>
+    <h3>You are new to the project</h3>
+    <p>If the project already has a CLAUDE.md, reading it is the fastest tour you will get: commands, structure and traps in one page. If it does not, you can use Claude to build the tour, then correct it with a teammate.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 140" role="img" aria-label="Onboarding loop: run /init, ask Claude to explain the architecture, have a teammate review and correct, commit the file.">
+        <rect class="boxb" x="6"   y="30" width="118" height="70" rx="12"/><text class="b c" x="65"  y="58">1. /init</text><text class="sub c" x="65"  y="78">draft the file</text>
+        <rect class="boxp" x="144" y="30" width="118" height="70" rx="12"/><text class="b c" x="203" y="58">2. Explore</text><text class="sub c" x="203" y="78">ask how it works</text>
+        <rect class="boxo" x="282" y="30" width="118" height="70" rx="12"/><text class="b c" x="341" y="58">3. Verify</text><text class="sub c" x="341" y="78">team reviews</text>
+        <rect class="boxg" x="420" y="30" width="118" height="70" rx="12"/><text class="b c" x="479" y="58">4. Commit</text><text class="sub c" x="479" y="78">shared with all</text>
+        <rect class="box"  x="558" y="30" width="76"  height="70" rx="12"/><text class="b c" x="596" y="58">5. Keep</text><text class="sub c" x="596" y="78">it fresh</text>
+        <path class="arrow" d="M126,65 L142,65"/><path class="arrow" d="M264,65 L280,65"/><path class="arrow" d="M402,65 L418,65"/><path class="arrow" d="M540,65 L556,65"/>
+      </svg>
+      <figcaption>The loop turns your learning curve into a document that helps the next person too.</figcaption>
+    </figure>
+    <p>Questions that work well in a first session, with or without a file:</p>
+<pre><code>Give me a one-page tour of this codebase for a new developer.
+What are the main modules and how do they depend on each other?
+Trace what happens when a user sends a chat message, file by file.
+Which parts look risky or fragile, and why?
+What do I need to know before changing the engine code?</code></pre>
+    <p>Then write what you learned into the file. A new teammate asks Claude the same questions you did; the file answers them before they ask.</p>
+    <div class="callout">
+      <strong>Verify before you trust</strong>
+      <p>Claude's tour is a draft. It can misread intent or miss history that lives only in people's heads. Have someone who knows the project read the generated file and strike what is wrong. This is also a fast way to find out which parts of your project are poorly documented.</p>
+    </div>
+
+    <h3>You are bringing someone (or Claude) into your project</h3>
+    <p>If you maintain the project, CLAUDE.md doubles as onboarding documentation that is actually kept current, because you use it daily. A new hire reads the same file their assistant does, and both start with the same understanding.</p>
+
+    <h2 id="feature">8. Starting a new feature</h2>
+    <p>Features have a different problem from projects: the knowledge is temporary. The decisions you make this week (names, trade-offs, what is out of scope) matter until it ships and then mostly do not. Putting all of that in the permanent root file would bloat it.</p>
+    <p>Instead, write a short feature note and point to it:</p>
+    <div class="doc"><div class="doc-bar">docs/features/offline-fallback.md</div>
+<pre><code># Feature: automatic offline fallback
+
+## Goal
+If the user picked Online but the internet is not reachable,
+answer from the on-device model and tell the user why.
+
+## Decisions
+- Check VALIDATED network capability, not just "connected".
+- If the online call fails before any text arrives, fall back.
+- If it fails part-way, keep the text already received.
+
+## Out of scope
+- Switching back to online mid-conversation.
+
+## Done when
+- Unit tests for the decision logic pass.
+- Manual test: airplane mode shows the fallback message.</code></pre></div>
+    <div class="doc"><div class="doc-bar">CLAUDE.md  (while the feature is in progress)</div>
+<pre><code>## Current work
+Working on automatic offline fallback.
+Read docs/features/offline-fallback.md before changing the engine selection code.</code></pre></div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Lifecycle of a feature note: written at the start, linked from CLAUDE.md during work, then removed or folded into permanent notes when shipped.">
+        <rect class="boxb" x="6"   y="26" width="140" height="70" rx="12"/><text class="b c" x="76"  y="54">Start</text><text class="sub c" x="76"  y="74">write the note</text>
+        <rect class="boxp" x="170" y="26" width="140" height="70" rx="12"/><text class="b c" x="240" y="54">Link it</text><text class="sub c" x="240" y="74">from CLAUDE.md</text>
+        <rect class="boxo" x="334" y="26" width="140" height="70" rx="12"/><text class="b c" x="404" y="54">Build</text><text class="sub c" x="404" y="74">update as you decide</text>
+        <rect class="boxg" x="498" y="26" width="136" height="70" rx="12"/><text class="b c" x="566" y="54">Ship</text><text class="sub c" x="566" y="74">unlink, keep lessons</text>
+        <path class="arrow" d="M148,61 L168,61"/><path class="arrow" d="M312,61 L332,61"/><path class="arrow" d="M476,61 L496,61"/>
+        <text class="sub c" x="320" y="136">Only lessons that stay true (a new convention, a gotcha) move into the permanent file.</text>
+      </svg>
+      <figcaption>Temporary knowledge gets a temporary home. The permanent file stays lean.</figcaption>
+    </figure>
+    <p>This also helps across sessions. If you stop on Friday and resume on Monday, the new session reads the feature note and picks up where you left off, without you retelling the story.</p>
+
+    <h2 id="team">9. Making it a team habit</h2>
+    <ol class="steps">
+      <li><strong>Commit the root CLAUDE.md</strong> so everybody shares the same baseline.</li>
+      <li><strong>Review changes in pull requests</strong> like code. A bad line affects every future session.</li>
+      <li><strong>Add a line when something goes wrong.</strong> A bug caused by a missing convention becomes a one-line prevention for the next person.</li>
+      <li><strong>Prune on a schedule.</strong> Every month or so, delete lines that are no longer true or no longer needed.</li>
+      <li><strong>Keep personal taste personal.</strong> Preferences such as tone or language go in <code>~/.claude/CLAUDE.md</code>, not the shared file.</li>
+    </ol>
+
+    <h2 id="pitfalls">10. Pitfalls and a checklist</h2>
+    <table>
+      <tr><th>Pitfall</th><th>What to do instead</th></tr>
+      <tr><td>Pasting the whole README and wiki in</td><td>Summarise in a few lines and link the rest.</td></tr>
+      <tr><td>Rules that contradict each other</td><td>Search the file for overlaps when you add a rule.</td></tr>
+      <tr><td>Vague advice (&ldquo;write clean code&rdquo;)</td><td>Name the command, file or rule you actually mean.</td></tr>
+      <tr><td>Stale instructions</td><td>Review in pull requests; delete what is no longer true.</td></tr>
+      <tr><td>Secrets in the file</td><td>Never. Use environment variables and deny rules for secret files.</td></tr>
+      <tr><td>Treating it as a hard guarantee</td><td>Use permission settings for rules that must hold.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Starter checklist</strong>
+      <ul>
+        <li>Run <code>/init</code>, then read every line of the result.</li>
+        <li>Make sure build, test and lint commands are correct and copy-pasteable.</li>
+        <li>Add a short folder map and the two or three biggest gotchas.</li>
+        <li>Move personal taste to <code>~/.claude/CLAUDE.md</code>.</li>
+        <li>Commit it, and ask a teammate to correct it.</li>
+        <li>Use <code>/clear</code> between tasks and pick the model that fits the job.</li>
+      </ul>
+    </div>
+
+    <h3>The whole series in one picture</h3>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Summary: Part 1 set up and settings, Part 2 CLAUDE.md as project memory, Part 3 tokens and onboarding, all feeding a Claude that starts each session already informed.">
+        <rect class="boxb" x="10" y="14" width="190" height="86" rx="14"/><text class="b" x="26" y="40">Part 1</text><text class="sub" x="26" y="62">Install, interfaces,</text><text class="sub" x="26" y="80">models and settings</text>
+        <rect class="boxp" x="225" y="14" width="190" height="86" rx="14"/><text class="b" x="241" y="40">Part 2</text><text class="sub" x="241" y="62">CLAUDE.md: where it</text><text class="sub" x="241" y="80">lives and what to write</text>
+        <rect class="boxo" x="440" y="14" width="190" height="86" rx="14"/><text class="b" x="456" y="40">Part 3</text><text class="sub" x="456" y="62">Token savings, onboarding,</text><text class="sub" x="456" y="80">features, team habits</text>
+        <path class="arrow" d="M105,102 L290,150"/><path class="arrow" d="M320,102 L320,148"/><path class="arrow" d="M535,102 L350,150"/>
+        <rect class="boxg" x="150" y="152" width="340" height="66" rx="16"/><text class="b c" x="320" y="180">A Claude that starts every session informed</text><text class="sub c" x="320" y="200">less repeating, less guessing, faster results</text>
+      </svg>
+      <figcaption>The model forgets by design. A small, honest, maintained file is how you give it the context it needs.</figcaption>
+    </figure>
+
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Token</td><td>A short chunk of text; the unit that usage and limits are counted in.</td></tr>
+      <tr><td>/clear</td><td>Starts a fresh conversation, dropping the old one from the window.</td></tr>
+      <tr><td>/compact</td><td>Summarises the conversation so far to free up space.</td></tr>
+      <tr><td>Feature note</td><td>A short temporary doc holding the decisions for one feature.</td></tr>
+      <tr><td>Handoff note</td><td>A short file written at the end of a session so the next one can continue.</td></tr>
+      <tr><td>Onboarding</td><td>Getting a person (or Claude) productive on a project quickly.</td></tr>
+      <tr><td>Sweet spot</td><td>A file big enough to help, small enough to be cheap and read.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-2-memory.html"><small>&larr; Previous &middot; Part 2</small>CLAUDE.md: the project memory</a>
+      <a class="next" href="claude-md-part-4-api-models-links.html"><small>Next &middot; Part 4 &rarr;</small>Claude API, models and official links</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

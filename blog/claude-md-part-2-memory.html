@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CLAUDE.md: the project memory Claude reads every time — Claude Code series part 2</title>
+  <meta name="description" content="Why Claude forgets between sessions, what a CLAUDE.md file is, where it lives, how to create it with /init and what to write in it. Part 2 of 8." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="2">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Series &middot; Part 2 of 3</p>
+    <h1>CLAUDE.md: the project memory that Claude reads every time</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~26 min read</span></div>
+    <div class="tags"><span class="tag">Claude Code</span><span class="tag">CLAUDE.md</span><span class="tag">Memory</span><span class="tag">Context window</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a class="on" href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">In Part 1 we installed Claude Code and had a first session. Now the important question: what happens tomorrow? Open a new session and Claude has no idea who you are, what the project is, or the three things you corrected yesterday. This part explains why that happens and how a plain text file solves it.</p>
+
+    <div class="callout">
+      <strong>Part 2 in 60 seconds</strong>
+      <ul>
+        <li>A model has no memory between conversations. Everything it &ldquo;knows&rdquo; must be in the text it is given.</li>
+        <li><code>CLAUDE.md</code> is a markdown file that Claude Code loads into that text at the start of every session.</li>
+        <li>It can live in your home folder (personal), the project root (shared), or sub-folders (specific).</li>
+        <li>Bigger projects split into a <code>.claude/</code> folder of rules and skills.</li>
+        <li><code>/init</code> drafts one for you; <code>/memory</code> opens it for editing.</li>
+        <li>Good files are short, specific and checkable. Bad ones are long, vague or out of date.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 2</strong>
+      <ol>
+        <li><a href="#forget">Why Claude forgets</a></li>
+        <li><a href="#what">What CLAUDE.md is</a></li>
+        <li><a href="#remember">All the ways Claude &ldquo;remembers&rdquo;</a></li>
+        <li><a href="#where">Where the file can live</a></li>
+        <li><a href="#init">Creating one with /init</a></li>
+        <li><a href="#write">What to put in it</a></li>
+        <li><a href="#example">A complete example</a></li>
+        <li><a href="#imports">Splitting it up with imports</a></li>
+        <li><a href="#claude-folder">Growing up: the .claude folder</a></li>
+        <li><a href="#edit">Keeping it up to date</a></li>
+        <li><a href="#limits">What it cannot do</a></li>
+      </ol>
+    </div>
+
+    <h2 id="forget">1. Why Claude forgets</h2>
+    <p>If you read my <a href="private-ai-chat-android.html#how-it-works">earlier post on how AI chat works</a>, this will sound familiar. A language model does not store your conversation. Every time you send a message, the app packs the conversation so far into one block of text, called the <strong>context</strong>, and hands it to the model. The model can only look at a fixed amount of text at once, the <strong>context window</strong>.</p>
+    <p>When you close the session, that block is gone. A new session starts with an empty window. The model is the same, but it is meeting you for the first time.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Two sessions side by side. Without CLAUDE.md the second session starts empty. With CLAUDE.md both sessions start with the project notes already in the window.">
+        <text class="b" x="14" y="22">Without a memory file</text>
+        <rect class="box" x="14" y="32" width="290" height="44" rx="10"/><text class="sub" x="26" y="59">Monday: you explain build, style, folders&hellip;</text>
+        <rect class="ghost" x="14" y="86" width="290" height="44" rx="10"/><text class="sub" x="26" y="113">Tuesday: empty window. Explain it all again.</text>
+        <text class="b" x="336" y="22">With CLAUDE.md</text>
+        <rect class="boxp" x="336" y="32" width="290" height="44" rx="10"/><text class="sub" x="348" y="59">Monday: CLAUDE.md loaded, then your task</text>
+        <rect class="boxp" x="336" y="86" width="290" height="44" rx="10"/><text class="sub" x="348" y="113">Tuesday: CLAUDE.md loaded, then your task</text>
+        <rect class="boxg" x="14" y="150" width="612" height="84" rx="12"/>
+        <text class="b" x="30" y="178">The idea</text>
+        <text class="sub" x="30" y="200">Claude does not remember. The file is put back into the window for it,</text>
+        <text class="sub" x="30" y="218">automatically, at the start of every session. You write it once.</text>
+      </svg>
+      <figcaption>The model forgets by design. CLAUDE.md is how the project's knowledge gets back in front of it.</figcaption>
+    </figure>
+
+    <h2 id="what">2. What CLAUDE.md is</h2>
+    <p>It is exactly what the name says: a file called <code>CLAUDE.md</code>, written in markdown (the same simple format as a README). When Claude Code starts, it finds these files and adds their text to the context, ahead of your first message. The model then treats the contents as standing instructions.</p>
+    <div class="analogy"><strong>The sticky note on the monitor</strong>
+      <p>Imagine a contractor with perfect skills but no memory, who forgets everything overnight. You would not re-brief them every morning. You would leave a note on the monitor: &ldquo;Build with this command. Tests live here. We use tabs, not spaces. Never edit the generated folder.&rdquo; <code>CLAUDE.md</code> is that note, and Claude reads it first every day.</p>
+    </div>
+    <p>It is different from your <code>README.md</code>. A README is written for humans who might contribute. A CLAUDE.md is written for the assistant, and contains the things you would otherwise keep repeating in chat.</p>
+
+    <h2 id="remember">3. All the ways Claude &ldquo;remembers&rdquo;</h2>
+    <p>Before going further, one important fact: <strong>Claude does not remember anything on its own.</strong> The model is the same on day 10 as on day 1, and it forgets when a session ends. Everything that looks like memory is Claude Code putting saved text back into the context window. There are only a few ways that happens:</p>
+    <table>
+      <tr><th>Kind of memory</th><th>How it works</th><th>Lasts how long</th></tr>
+      <tr><td><strong>The conversation</strong></td><td>Everything said so far is re-sent with each message (the context window).</td><td>One session. <code>/clear</code> or closing it empties the window, though the transcript is saved and can be reopened with <code>/resume</code>.</td></tr>
+      <tr><td><strong>CLAUDE.md files</strong></td><td>Loaded automatically at the start of every session.</td><td>Permanent: they are files on disk.</td></tr>
+      <tr><td><strong>Imports and linked notes</strong></td><td><code>@docs/file.md</code> loads with CLAUDE.md; a feature or handoff note is read when Claude is told to.</td><td>Permanent while the file exists.</td></tr>
+      <tr><td><strong>Settings files</strong></td><td>Not knowledge, but saved behaviour: permissions, default model.</td><td>Permanent.</td></tr>
+      <tr><td><strong>Resumed sessions</strong></td><td><code>claude --continue</code> or <code>--resume</code> reloads an old conversation.</td><td>Brings the old text back, which costs tokens. On Pro and Max, resuming a large session after a long break offers to continue from a summary instead.</td></tr>
+      <tr><td><strong>Automatic memory</strong></td><td>Claude can write notes for itself in a <code>memory</code> folder under <code>~/.claude/projects/</code> (see below). Per the official docs it is on by default in local sessions. A <code>MEMORY.md</code> index is loaded at the start of each session; the first 200 lines or 25 KB of it.</td><td>Permanent until you or Claude edit or delete it. Still saved text read back in, not the model learning.</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Files on disk such as CLAUDE.md, notes and settings are loaded into the context window at the start of each session. The conversation exists only inside the window and is lost when the session ends.">
+        <rect class="boxp" x="10" y="14" width="250" height="150" rx="14"/><text class="b" x="26" y="42">Files on disk (lasting)</text>
+        <text class="sub" x="26" y="68">&#8226; CLAUDE.md (personal, project)</text><text class="sub" x="26" y="90">&#8226; imports and linked notes</text><text class="sub" x="26" y="112">&#8226; handoff and feature notes</text><text class="sub" x="26" y="134">&#8226; settings.json</text>
+        <path class="arrow" d="M262,90 L360,90"/><text class="sub c" x="311" y="80">loaded at</text><text class="sub c" x="311" y="116">session start</text>
+        <rect class="boxo" x="362" y="14" width="268" height="150" rx="14"/><text class="b" x="378" y="42">Context window (temporary)</text>
+        <text class="sub" x="378" y="68">&#8226; the notes above</text><text class="sub" x="378" y="90">&#8226; files Claude reads</text><text class="sub" x="378" y="112">&#8226; this conversation</text><text class="sub" x="378" y="134">&#8226; plans from plan mode</text>
+        <rect class="ghost" x="10" y="184" width="620" height="56" rx="12"/>
+        <text class="b" x="26" y="208">When the session ends, the right side is wiped.</text><text class="sub" x="26" y="228">Only what was saved to the left side comes back next time.</text>
+      </svg>
+      <figcaption>Files are the memory. The context window is just where they are shown to Claude.</figcaption>
+    </figure>
+    <p>This is also why plan mode (Part 1) does not remember anything: a plan lives in the conversation, so it is gone with it unless it is saved to a file.</p>
+
+    <h3>Where Claude Code stores things on your computer</h3>
+    <p>If you open <code>~/.claude/projects/</code> in Finder or a file manager, you will find one folder per project. According to the official <a href="https://code.claude.com/docs/en/sessions" target="_blank" rel="noopener">Manage sessions</a> page, each transcript is saved as <code>~/.claude/projects/&lt;project&gt;/&lt;session-id&gt;.jsonl</code>, where <code>&lt;project&gt;</code> is your working folder's path with every non-alphanumeric character replaced by <code>-</code>. So <code>/Users/me/work/my-app</code> becomes <code>-Users-me-work-my-app</code>, and a session started in <code>/</code> shows up as a folder called just <code>-</code>. Auto memory lives in a <code>memory</code> folder inside the same project folder, and per the memory docs it is shared by all sub-folders and git worktrees of one repository.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="A folder tree: ~/.claude/projects contains one folder per project path. Each holds jsonl session transcripts and a memory folder.">
+        <rect class="box" x="10" y="10" width="380" height="242" rx="12"/>
+        <text class="b" x="26" y="36">~/.claude/projects/</text>
+        <text class="sub" x="26" y="62">-Users-me-work-my-app/</text>
+        <rect class="boxo" x="44" y="72" width="330" height="26" rx="8"/><text class="c" x="209" y="90">12068aba-&hellip;.jsonl  (one session)</text>
+        <rect class="boxo" x="44" y="104" width="330" height="26" rx="8"/><text class="c" x="209" y="122">d110d31a-&hellip;.jsonl  (another session)</text>
+        <rect class="boxg" x="44" y="136" width="330" height="26" rx="8"/><text class="c" x="209" y="154">memory/  (automatic notes)</text>
+        <text class="sub" x="26" y="188">-Users-me-work-other-app/</text>
+        <text class="sub" x="44" y="212">&hellip; same layout for each project</text>
+        <text class="sub" x="26" y="238">-   (sessions started in /)</text>
+        <path class="arrow" d="M392,100 L452,100"/><path class="arrow" d="M392,150 L452,150"/>
+        <rect class="boxo" x="454" y="70" width="176" height="62" rx="12"/><text class="b c" x="542" y="96">Transcripts</text><text class="sub c" x="542" y="116">used by --resume</text>
+        <rect class="boxg" x="454" y="136" width="176" height="62" rx="12"/><text class="b c" x="542" y="162">Saved memory</text><text class="sub c" x="542" y="182">reloaded next session</text>
+      </svg>
+      <figcaption>One folder per project. Inside: a transcript per session, and a <code>memory</code> folder of notes.</figcaption>
+    </figure>
+    <table>
+      <tr><th>What you see</th><th>What it is</th></tr>
+      <tr><td><code>-Users-&hellip;-my-app/</code></td><td>One folder per project path where you ran <code>claude</code>.</td></tr>
+      <tr><td><code>&lt;long-id&gt;.jsonl</code></td><td>A <strong>session transcript</strong>: every message and tool call of one conversation, one JSON entry per line. This is what <code>--resume</code> and <code>--continue</code> reopen.</td></tr>
+      <tr><td><code>memory/</code></td><td><strong>Automatic memory</strong> for that project: a <code>MEMORY.md</code> index (one line per memory) plus one small topic file per memory. Only the start of the index is loaded each session; Claude reads the topic files on demand.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Treat these folders as private</strong>
+      <ul>
+        <li>Transcripts can contain everything you pasted or showed Claude, including code, tokens and customer data. Do not share or commit the folder.</li>
+        <li>You can open <code>memory/</code> and edit or delete a note. That is how you correct something Claude remembered wrongly.</li>
+        <li>Deleting a project folder removes that project's history and memory, and nothing else. You lose <code>--resume</code> and the saved notes for it.</li>
+        <li>Old transcripts are deleted automatically after a retention period, 30 days by default (the <code>cleanupPeriodDays</code> setting). Memory files are excluded from that clean-up, so they stay until you or Claude edit or delete them.</li>
+        <li>Auto memory is machine-local. It is not shared with teammates or other computers, so anything the team needs belongs in CLAUDE.md, which you commit.</li>
+      </ul>
+    </div>
+    <h3>What auto memory saves, and how to control it</h3>
+    <p>The official docs describe four kinds of notes Claude may save for itself:</p>
+    <table>
+      <tr><th>Type</th><th>What it holds</th></tr>
+      <tr><td><code>user</code></td><td>Your role, expertise and working preferences.</td></tr>
+      <tr><td><code>feedback</code></td><td>Corrections you gave and approaches you confirmed.</td></tr>
+      <tr><td><code>project</code></td><td>Ongoing work, deadlines and decisions that cannot be derived from the code or git history.</td></tr>
+      <tr><td><code>reference</code></td><td>Where to find things outside the project, such as a tracker or dashboard.</td></tr>
+    </table>
+    <ul>
+      <li><strong>It is selective.</strong> Claude skips anything it can derive from the codebase and anything your CLAUDE.md already says, and it does not save something every session.</li>
+      <li><strong>You can see it happen.</strong> Messages like &ldquo;Saved 2 memories&rdquo; or &ldquo;Recalled 2 memories&rdquo; appear in the interface.</li>
+      <li><strong>You can switch it off.</strong> Run <code>/memory</code> and use the auto memory toggle, set <code>"autoMemoryEnabled": false</code> in a project's settings, or set the environment variable <code>CLAUDE_CODE_DISABLE_AUTO_MEMORY=1</code>.</li>
+    </ul>
+    <p>It is still just text. It helps only if the notes are correct and short, and it takes up context like any other file, so review it from time to time just as you would CLAUDE.md. Details: <a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">auto memory in the official docs</a>.</p>
+
+    <h3>What happens if you say &ldquo;remember this session&rdquo;?</h3>
+    <p>By itself, nothing is guaranteed. Saying it does not change the model. Whether anything survives depends on whether Claude actually <em>writes a file</em>:</p>
+    <ul>
+      <li><strong>It edits a file</strong> (you see an <code>Update(CLAUDE.md)</code> or <code>Write(...)</code> line and a diff). That text loads next session.</li>
+      <li><strong>It only replies &ldquo;Okay, I'll remember&rdquo;</strong> and no file changes. Nothing is saved, and a fresh session will not know.</li>
+      <li><strong>Auto memory may save something</strong> if it is on. Claude decides what is worth remembering, so it is not guaranteed. You will see &ldquo;Saved N memories&rdquo; when it happens.</li>
+      <li><strong>Vague wording</strong> may give you a short note, a long summary or nothing.</li>
+    </ul>
+    <p>To check, look for the file write in the session or run <code>git diff</code>. Part 3 shows a better way, an explicit handoff note.</p>
+
+    <h2 id="where">4. Where the file can live</h2>
+    <p>You can have several, and Claude Code combines them. Each location has a different audience:</p>
+    <table>
+      <tr><th>Location</th><th>Who it is for</th><th>Typical content</th></tr>
+      <tr><td><code>~/.claude/CLAUDE.md</code></td><td>You, in every project</td><td>Personal preferences: &ldquo;explain simply&rdquo;, preferred language, how you like commit messages.</td></tr>
+      <tr><td><code>./CLAUDE.md</code> or <code>./.claude/CLAUDE.md</code></td><td>Everyone on the project (commit it to git)</td><td>Build and test commands, architecture, conventions.</td></tr>
+      <tr><td><code>./CLAUDE.local.md</code></td><td>You, in this project only. Add it to <code>.gitignore</code>.</td><td>Your sandbox URLs, preferred test data, personal habits for this repo.</td></tr>
+      <tr><td><code>CLAUDE.md</code> in a sub-folder</td><td>Work inside that folder</td><td>Rules for one module, such as <code>server/</code> or <code>app/</code>. Loaded once Claude reads or edits a file in that folder.</td></tr>
+      <tr><td>Managed policy file</td><td>Everyone in an organisation</td><td>Company standards set by IT, in a system folder (for example <code>/Library/Application Support/ClaudeCode/CLAUDE.md</code> on macOS).</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="A folder tree. The home folder has a personal CLAUDE.md, the project root has a shared CLAUDE.md, and the app and server sub-folders each have their own. All feed into the context window.">
+        <rect class="box" x="14" y="14" width="260" height="242" rx="12"/>
+        <text class="b" x="28" y="40">~/  (your computer)</text>
+        <text class="sub" x="28" y="62">.claude/</text><rect class="boxp" x="40" y="70" width="210" height="26" rx="8"/><text class="c" x="145" y="88">CLAUDE.md  (personal)</text>
+        <text class="sub" x="28" y="122">projects/my-app/</text><rect class="boxb" x="40" y="130" width="210" height="26" rx="8"/><text class="c" x="145" y="148">CLAUDE.md  (team)</text>
+        <text class="sub" x="40" y="180">app/</text><rect class="boxg" x="76" y="186" width="174" height="24" rx="8"/><text class="c" x="163" y="203">CLAUDE.md  (module)</text>
+        <text class="sub" x="40" y="226">server/</text><rect class="boxg" x="76" y="230" width="174" height="22" rx="8"/><text class="c" x="163" y="246">CLAUDE.md  (module)</text>
+        <path class="arrow" d="M276,83 L360,120"/><path class="arrow" d="M276,143 L360,140"/><path class="arrow" d="M276,198 L360,160"/>
+        <rect class="boxo" x="362" y="84" width="264" height="110" rx="16"/>
+        <text class="b c" x="494" y="122">Context window</text><text class="sub c" x="494" y="144">personal + team + module notes</text><text class="sub c" x="494" y="164">then your first message</text>
+      </svg>
+      <figcaption>Broad notes load for every session. Narrow notes load only when Claude is working in that part of the project.</figcaption>
+    </figure>
+    <p>A good split is: <strong>personal taste</strong> at the user level, <strong>how this project works</strong> at the root, and <strong>how this one area works</strong> in the sub-folder. Commit the root file so your whole team gets the same assistant behaviour.</p>
+    <p>How they combine, per the official docs: Claude Code loads the CLAUDE.md in your working folder <em>and in every folder above it</em> at launch, and files in sub-folders on demand. They are <strong>added together, not overridden</strong>, ordered from the filesystem root down, so the instructions closest to where you started are read last. If your repository already has an <code>AGENTS.md</code> for other coding tools, Claude Code can read that when there is no CLAUDE.md, or you can import it from one. See <a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">How Claude remembers your project</a>.</p>
+
+    <h2 id="init">5. Creating one with /init</h2>
+    <p>You do not have to start from a blank page. Run <code>/init</code> and Claude reads your project (build files, folders, existing docs) and drafts a CLAUDE.md.</p>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/init</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/init</span>
+
+<span class="t-o">&#9679;</span> Analyzing your codebase&hellip;
+  <span class="t-dim">Read(build.gradle.kts)</span>
+  <span class="t-dim">Read(README.md)</span>
+  <span class="t-dim">List(app/src)</span>
+
+<span class="t-o">&#9679;</span> Created <span class="t-g">CLAUDE.md</span>
+  <span class="t-dim">Build commands, module layout, and conventions found in the code.</span>
+  <span class="t-dim">Review it, then trim anything that is not useful.</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. Treat the generated file as a first draft that you review, not a finished product.</figcaption>
+    </figure>
+    <p>The draft is usually decent about commands and structure. It cannot know your team's unwritten rules or what has gone wrong before, so that part is yours to add. If a CLAUDE.md already exists, <code>/init</code> suggests improvements instead of overwriting it. To confirm a file really loaded, run <code>/context</code> and look under <strong>Memory files</strong>.</p>
+
+    <h2 id="write">6. What to put in it</h2>
+    <p>The test for every line is simple: <em>would Claude get this wrong, or waste time finding it, without being told?</em> If not, leave it out.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Left: things worth including such as commands, structure, conventions, gotchas. Right: things to leave out such as obvious facts, long docs, secrets and rules a linter enforces.">
+        <rect class="boxg" x="10" y="10" width="304" height="230" rx="14"/><text class="b" x="26" y="38">Put in</text>
+        <text class="sub" x="26" y="66">&#10003; How to build, run and test</text>
+        <text class="sub" x="26" y="92">&#10003; Folder map: what lives where</text>
+        <text class="sub" x="26" y="118">&#10003; Conventions that differ from defaults</text>
+        <text class="sub" x="26" y="144">&#10003; Gotchas and past mistakes</text>
+        <text class="sub" x="26" y="170">&#10003; Definition of done (tests, lint)</text>
+        <text class="sub" x="26" y="196">&#10003; Where to find deeper docs</text>
+        <rect class="boxr" x="326" y="10" width="304" height="230" rx="14"/><text class="b" x="342" y="38">Leave out</text>
+        <text class="sub" x="342" y="66">&#10007; What the code already shows clearly</text>
+        <text class="sub" x="342" y="92">&#10007; Whole manuals pasted in</text>
+        <text class="sub" x="342" y="118">&#10007; Passwords, keys, tokens</text>
+        <text class="sub" x="342" y="144">&#10007; Style a formatter already enforces</text>
+        <text class="sub" x="342" y="170">&#10007; Vague wishes like &ldquo;write good code&rdquo;</text>
+        <text class="sub" x="342" y="196">&#10007; Anything you will not keep updated</text>
+      </svg>
+      <figcaption>A short list of useful, true, specific lines beats a long list of everything.</figcaption>
+    </figure>
+    <p>Specific beats vague. Compare these two lines:</p>
+    <table>
+      <tr><th>Vague</th><th>Specific</th></tr>
+      <tr><td>Format code properly.</td><td>Run <code>./gradlew ktlintFormat</code> before committing.</td></tr>
+      <tr><td>Keep tests passing.</td><td>Run <code>./gradlew testDebugUnitTest</code>; all tests must pass before you say a task is done.</td></tr>
+      <tr><td>Follow our architecture.</td><td>UI calls a ViewModel, the ViewModel calls a Repository. Never touch the database from a screen.</td></tr>
+    </table>
+
+    <h2 id="example">7. A complete example</h2>
+    <p>Here is a realistic root file for the Android chat app from my earlier post. It is deliberately short.</p>
+    <div class="doc"><div class="doc-bar">CLAUDE.md</div>
+<pre><code># Private AI Chat (Android)
+
+Kotlin + Jetpack Compose app that chats with an on-device model
+(llama.cpp) or an online model, with fallback between them.
+
+## Commands
+- Build debug:   ./gradlew assembleDebug
+- Unit tests:    ./gradlew testDebugUnitTest
+- Lint/format:   ./gradlew ktlintFormat
+- Release bundle: ./gradlew :app:bundleRelease
+
+## Structure
+- app/ui/        Compose screens (no business logic)
+- app/chat/      ViewModels, builds the prompt
+- app/engine/    LlmEngine interface + local / online / rules impls
+- app/data/      Room database (chats, memories, settings)
+- native/        llama.cpp + JNI bridge (C++)
+
+## Conventions
+- Screens never call an engine directly: go through the ViewModel.
+- Every engine returns Flow&lt;String&gt; of text pieces.
+- All native calls run on the single dedicated native thread.
+- Use https only for online models; never log prompts or API keys.
+
+## Gotchas
+- The native build must target plain armv8-a, or older phones crash (SIGILL).
+- Test release builds on a real device: R8 can strip JNI classes.
+
+## Definition of done
+- Unit tests pass and ktlint is clean.
+- New user-visible strings are in strings.xml.</code></pre></div>
+    <p>It is about thirty lines. It answers the questions Claude would otherwise spend time on: how to build, where things live, and the two traps that already cost me a day each.</p>
+
+    <h2 id="imports">8. Splitting it up with imports</h2>
+    <p>A CLAUDE.md can pull in other files by writing <code>@</code> followed by a path. That keeps the main file small while still pointing at the detail.</p>
+    <div class="doc"><div class="doc-bar">CLAUDE.md</div>
+<pre><code>See @README.md for the project overview.
+
+Architecture details: @docs/architecture.md
+Release checklist:    @docs/release.md</code></pre></div>
+    <p>Imported files are expanded and loaded at launch along with the main file, so they count toward its size: imports help you organise a long file but do not make it cheaper. A few rules from the official docs:</p>
+    <ul>
+      <li>Relative paths resolve from the file that contains the import, not from your working folder.</li>
+      <li>Imported files can import others, up to four levels deep.</li>
+      <li>Imports inside backticks or code blocks are ignored, so write <code>`@README`</code> in backticks to mention a path without importing it.</li>
+      <li>The first time a project imports a file from outside the working folder (for example your home folder), Claude Code asks you to approve it.</li>
+    </ul>
+    <p>Use imports to organise, not to hide an enormous document. In Part 3 we will look at the cost side of this.</p>
+
+    <h2 id="claude-folder">9. Growing up: the .claude folder</h2>
+    <p>One CLAUDE.md is enough for a small project. As a project grows, a single file turns into a long list that is expensive to load and hard to maintain. Claude Code lets you spread the knowledge across a <code>.claude/</code> folder in the project, so each piece has a clear job and loads only when it is useful. A typical layout looks like this (the official reference for all of it is the <a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">memory documentation</a>):</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 300" role="img" aria-label="A .claude folder containing CLAUDE.md, a rules folder of topic files, a skills folder with a skill folder holding SKILL.md, settings.json and settings.local.json.">
+        <rect class="box" x="10" y="10" width="330" height="280" rx="12"/>
+        <text class="b" x="26" y="36">my-project/.claude/</text>
+        <rect class="boxp" x="26" y="48" width="296" height="24" rx="7"/><text x="38" y="65">CLAUDE.md</text>
+        <text class="sub" x="26" y="94">rules/</text>
+        <rect class="boxb" x="44" y="100" width="278" height="22" rx="7"/><text x="56" y="116">testing.md</text>
+        <rect class="boxb" x="44" y="126" width="278" height="22" rx="7"/><text x="56" y="142">build.md</text>
+        <rect class="boxb" x="44" y="152" width="278" height="22" rx="7"/><text x="56" y="168">modules/  (one file per module)</text>
+        <text class="sub" x="26" y="196">skills/create-release-notes/</text>
+        <rect class="boxg" x="44" y="202" width="278" height="22" rx="7"/><text x="56" y="218">SKILL.md</text>
+        <rect class="boxg" x="44" y="228" width="278" height="22" rx="7"/><text x="56" y="244">reference.md  (extra detail)</text>
+        <text class="sub" x="26" y="278">settings.json  &middot;  settings.local.json</text>
+        <text class="b" x="366" y="40">What each part is for</text>
+        <rect class="boxp" x="366" y="52" width="14" height="14" rx="3"/><text class="sub" x="388" y="64">Always-on notes for the whole project</text>
+        <rect class="boxb" x="366" y="80" width="14" height="14" rx="3"/><text class="sub" x="388" y="92">Topic rules, split by subject or area</text>
+        <rect class="boxg" x="366" y="108" width="14" height="14" rx="3"/><text class="sub" x="388" y="120">Skills: a recipe, loaded when relevant</text>
+        <rect class="box"  x="366" y="136" width="14" height="14" rx="3"/><text class="sub" x="388" y="148">Settings: permissions, model</text>
+        <rect class="ghost" x="366" y="176" width="264" height="110" rx="12"/>
+        <text class="b" x="380" y="202">Why split it up?</text>
+        <text class="sub" x="380" y="224">Smaller always-loaded file,</text><text class="sub" x="380" y="242">detail loaded only when needed,</text><text class="sub" x="380" y="260">and each file has one owner.</text>
+      </svg>
+      <figcaption>A generic example layout. Names are only examples; use whatever fits your project.</figcaption>
+    </figure>
+
+    <h3>The pieces, one by one</h3>
+    <table>
+      <tr><th>Piece</th><th>What it is</th><th>Loaded</th><th>Guaranteed?</th></tr>
+      <tr><td><code>CLAUDE.md</code></td><td>Core notes: commands, structure, key conventions.</td><td>Every session</td><td>No, it is guidance</td></tr>
+      <tr><td><code>rules/*.md</code></td><td>Topic files such as testing, build or CI. Easier to review than one giant file. In recent versions a rule can be limited to certain paths, so it applies only there.</td><td>Session start, or when the matching files are in play</td><td>No, it is guidance</td></tr>
+      <tr><td><code>skills/&lt;name&gt;/SKILL.md</code></td><td>A reusable recipe for one job, with optional extra files beside it.</td><td>Only its short description is always visible; the body loads when the task matches</td><td>No, Claude decides when to use it</td></tr>
+      <tr><td><code>settings.json</code></td><td>Team settings: permissions, default model. Committed.</td><td>Session start</td><td>Yes, enforced by the tool</td></tr>
+      <tr><td><code>settings.local.json</code></td><td>Your personal overrides for this project. Keep it out of git.</td><td>Session start</td><td>Yes, enforced by the tool</td></tr>
+    </table>
+    <p>The most useful distinction is the last column. CLAUDE.md, rules and skills <em>ask</em> Claude to behave a certain way. Settings <em>make</em> it happen. If Claude must never read a file, do not rely on a sentence in CLAUDE.md. Use a deny rule in <code>settings.json</code>.</p>
+
+    <h3>Rules: split by topic</h3>
+    <p>Move a long section out of CLAUDE.md into its own file and keep one line behind:</p>
+    <div class="doc"><div class="doc-bar">.claude/rules/testing.md</div>
+<pre><code># Testing rules
+- Unit tests live next to the code in src/test/.
+- Name tests: methodName_condition_expectedResult.
+- Run ./gradlew testDebugUnitTest before saying a task is done.
+- Do not mock the database; use the in-memory one.</code></pre></div>
+    <p>Each file stays short, has an obvious owner, and a pull request that changes testing rules touches only <code>testing.md</code>. A <code>modules/</code> sub-folder works well for one rule file per module. Official reference: <a href="https://code.claude.com/docs/en/memory#organize-rules-with-claude/rules/" target="_blank" rel="noopener">Organize rules with .claude/rules/</a>.</p>
+    <p>A rule can also be limited to certain files with a <code>paths</code> list at the top. It then loads only when Claude works on a matching file, so it costs nothing elsewhere:</p>
+    <div class="doc"><div class="doc-bar">.claude/rules/api.md</div>
+<pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+
+# API rules
+- Every endpoint validates its input.
+- Use the standard error response format.</code></pre></div>
+    <p>A rule without <code>paths</code> loads every session, like CLAUDE.md.</p>
+
+    <h3>Skills: a recipe that loads on demand</h3>
+    <p>A skill packages a procedure you would otherwise paste into chat again and again, such as &ldquo;how we write release notes&rdquo;. Claude sees only a short description until the task matches, then reads the full instructions. That is the token saving: long how-to text costs nothing on unrelated tasks.</p>
+    <div class="doc"><div class="doc-bar">.claude/skills/create-release-notes/SKILL.md</div>
+<pre><code>---
+name: create-release-notes
+description: Write release notes from merged changes. Use when asked to
+  prepare or draft release notes for a version.
+---
+
+1. List merged pull requests since the last tag.
+2. Group them: Features, Fixes, Internal.
+3. Write one plain-language line per change; no ticket numbers.
+4. Follow the layout in reference.md.</code></pre></div>
+    <p>Extra files beside <code>SKILL.md</code> (like <code>reference.md</code>) are read only if the skill points to them. Official reference: <a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Extend Claude with skills</a>.</p>
+
+    <h3>A fuller settings.json: a deny list</h3>
+    <p>Here is a more complete project <code>.claude/settings.json</code> with the thing I find most useful on a real project: a list of files Claude must not read. The file names are examples; replace them with your own.</p>
+    <div class="doc"><div class="doc-bar">.claude/settings.json</div>
+<pre><code>{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./secrets.properties)",
+      "Read(./**/*.keystore)",
+      "Read(./**/*.pem)",
+      "Read(./node_modules/**)",
+      "Read(./package-lock.json)",
+      "Read(./build/**)",
+      "Read(./.idea/**)"
+    ]
+  }
+}</code></pre></div>
+    <h4>The deny list does two jobs</h4>
+    <ul>
+      <li><strong>Protects secrets.</strong> Keystores, key files and local credential files are blocked by the tool itself, so Claude cannot read them even if asked. This is enforced by Claude Code, not by a sentence in CLAUDE.md.</li>
+      <li><strong>Saves tokens.</strong> Lock files, dependency folders, build output and IDE folders are huge and tell Claude almost nothing. Without a deny rule, one broad search can pull thousands of lines of <code>package-lock.json</code> into the context for no benefit.</li>
+    </ul>
+    <p>Treat the list as a guardrail, not a vault. The safest secret is one that is not in the project folder at all.</p>
+    <p>Exact rule syntax changes between versions, so confirm it against the official <a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noopener">settings</a> and <a href="https://code.claude.com/docs/en/permissions" target="_blank" rel="noopener">permissions</a> pages before copying it.</p>
+
+    <div class="callout">
+      <strong>Official documentation for this section</strong>
+      <ul>
+        <li><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">How Claude remembers your project</a>: CLAUDE.md locations, imports, <code>.claude/rules/</code>, path-scoped rules, <code>AGENTS.md</code> and auto memory.</li>
+        <li><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Extend Claude with skills</a>: <code>.claude/skills/&lt;name&gt;/SKILL.md</code> and how skills load.</li>
+        <li><a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noopener">Settings files and precedence</a>: <code>settings.json</code>, <code>settings.local.json</code> and which one wins.</li>
+        <li><a href="https://code.claude.com/docs/en/permissions" target="_blank" rel="noopener">Configure permissions</a>: <code>allow</code>, <code>ask</code> and <code>deny</code> rules.</li>
+      </ul>
+      <p>These pages move and grow as Claude Code changes. If a name or option here does not match your version, the docs are right and this post is out of date.</p>
+    </div>
+
+    <h3>What goes in git, and what does not</h3>
+    <ul>
+      <li><strong>Commit:</strong> <code>CLAUDE.md</code>, <code>rules/</code>, <code>skills/</code>, <code>settings.json</code>. The whole team gets the same assistant.</li>
+      <li><strong>Do not commit:</strong> <code>settings.local.json</code> and your personal <code>~/.claude/</code> folder. Add the local file to <code>.gitignore</code>.</li>
+      <li><strong>Never store</strong> keys, tokens or customer data in any of these files, committed or not.</li>
+      <li>Review changes to these files in pull requests like code, because a bad rule or setting affects every future session.</li>
+    </ul>
+    <div class="note"><p>Start small. Begin with one CLAUDE.md. Split out a rules file only when a section gets long, and add a skill when you paste the same instructions a third time.</p></div>
+
+    <h2 id="edit">10. Keeping it up to date</h2>
+    <p>Three easy ways to change the file:</p>
+    <ol class="steps">
+      <li><strong>Type <code>/memory</code></strong> to list your CLAUDE.md and memory files, open one in your editor, and toggle auto memory.</li>
+      <li><strong>Tell Claude in plain words</strong>: &ldquo;Add to CLAUDE.md that we always run ktlint before commits.&rdquo; It will edit the file for you.</li>
+      <li><strong>Edit it like any other file</strong> and review the change in a pull request.</li>
+    </ol>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>updating memory</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">Remember: the debug build needs JAVA_HOME set to JDK 17.
+  Add it to CLAUDE.md.</span>
+
+<span class="t-o">&#9679;</span> <span class="t-dim">Update(CLAUDE.md)</span>
+  <span class="t-g">+ - Needs JDK 17: set JAVA_HOME before running Gradle.</span>
+
+<span class="t-o">&#9679;</span> Added under <span class="t-p">## Commands</span>.</code></pre>
+      </div>
+      <figcaption>Illustrative mockup. When you correct Claude the same way twice, that is a signal to write the rule down.</figcaption>
+    </figure>
+    <p>Make this a habit: <strong>if you correct Claude twice, put the correction in the file.</strong> Equally, when a line stops being true, delete it. A wrong note is worse than none, because Claude will follow it with confidence.</p>
+    <p>Two more tips from the official docs. First, <code>/doctor prompt-audit</code> asks Claude to check your instruction files for outdated or conflicting content and proposes edits (it changes nothing until you agree, and it needs a recent version). Second, block-level HTML comments such as <code>&lt;!-- maintainer notes --&gt;</code> are stripped before CLAUDE.md is sent to Claude, so you can leave notes for people without spending tokens on them.</p>
+
+    <h2 id="limits">11. What it cannot do</h2>
+    <ul>
+      <li><strong>It is guidance, not enforcement.</strong> Claude usually follows it, but nothing guarantees it. For rules that must never break, use the permission settings from Part 1's settings file.</li>
+      <li><strong>It takes up space.</strong> The file sits in the context window for the whole session, using room that could hold your code or conversation.</li>
+      <li><strong>It is not learning.</strong> Claude does not get smarter from your usage. The model is fixed, and a new session on day 10 starts as blank as on day 1. Only what is written in the file carries over, so the file is your memory, not Claude's.</li>
+      <li><strong>It is not secret.</strong> It is plain text, usually committed to git. Never put credentials in it.</li>
+      <li><strong>It can go stale.</strong> Nobody updates what nobody owns. Treat it as code: review it, and prune it.</li>
+    </ul>
+    <p>That second point, the cost of space, is where Part 3 begins: how to make the file earn its tokens, and how it helps when you join a new project or start a new feature.</p>
+
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Context window</td><td>The fixed amount of text the model can read at once.</td></tr>
+      <tr><td>CLAUDE.md</td><td>A markdown file loaded into the context at the start of each session.</td></tr>
+      <tr><td>/init</td><td>Command that drafts a CLAUDE.md from your project.</td></tr>
+      <tr><td>/memory</td><td>Command that opens your memory files for editing.</td></tr>
+      <tr><td>Rules</td><td>Topic files in <code>.claude/rules/</code>, split out of CLAUDE.md.</td></tr>
+      <tr><td>Skill</td><td>A reusable recipe whose full text loads only when the task matches.</td></tr>
+      <tr><td>Import (<code>@path</code>)</td><td>Pulls another file's contents into CLAUDE.md.</td></tr>
+      <tr><td>Standing instruction</td><td>A rule present at the start of every session.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-1-setup.html"><small>&larr; Previous &middot; Part 1</small>Meet Claude and set it up</a>
+      <a class="next" href="claude-md-part-3-tokens-onboarding.html"><small>Next &middot; Part 3 &rarr;</small>Fewer tokens, faster onboarding</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

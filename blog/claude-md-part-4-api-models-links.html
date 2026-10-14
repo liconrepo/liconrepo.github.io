@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Claude API, every Claude model and official links — Claude Code series part 4</title>
+  <meta name="description" content="Claude Code vs the Claude API, a first API call, every Claude model published so far with API IDs and retirement status, how to choose between them, and the official links in one place. Part 4 of 8." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="4">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Series &middot; Part 4 of 8</p>
+    <h1>The Claude API, every model so far, and the official links</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~14 min read</span></div>
+    <div class="tags"><span class="tag">Claude API</span><span class="tag">Models</span><span class="tag">Reference</span><span class="tag">Official links</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a class="on" href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Parts 1 to 3 were about using Claude Code well. This part is the reference shelf at the end of the beginner level (Parts 5 to 8 go further): how Claude Code differs from the Claude API, a first API call you can run in five minutes, every Claude model published so far with its API ID and status, and the official pages I rely on, all in one place. Models and pages change often, so every table here is a dated snapshot and the linked docs are the source of truth.</p>
+
+    <div class="callout">
+      <strong>Part 4 in 60 seconds</strong>
+      <ul>
+        <li>Claude apps are for chatting, Claude Code works inside your project, and the Claude API is for building your own app on top of Claude.</li>
+        <li>The API needs a Claude Console account and an API key. Keep the key in an environment variable and never ship it inside an app.</li>
+        <li>Four models are current (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5). Older ones are legacy, deprecated or retired.</li>
+        <li>An alias like <code>sonnet</code> is a convenience; a full ID like <code>claude-sonnet-5-5</code> is a pinned snapshot you can rely on.</li>
+        <li>The official links are grouped at the end, so you can bookmark one section.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 4</strong>
+      <ol>
+        <li><a href="#which">Claude apps, Claude Code or the API?</a></li>
+        <li><a href="#api">The Claude API in five minutes</a></li>
+        <li><a href="#models">Every Claude model published so far</a></li>
+        <li><a href="#choose">Choosing between models</a></li>
+        <li><a href="#links">Official links</a></li>
+        <li><a href="#end">Series wrap-up and glossary</a></li>
+      </ol>
+    </div>
+
+    <h2 id="which">1. Claude apps, Claude Code or the API?</h2>
+    <p>The same models are reachable through different doors. Which one you want depends on what you are trying to do:</p>
+    <table>
+      <tr><th>Door</th><th>Use it to</th><th>You sign in with</th></tr>
+      <tr><td><strong>Claude apps</strong> (claude.ai, desktop, phone)</td><td>Chat, write, analyse files. Nothing to install in a project.</td><td>A claude.ai account</td></tr>
+      <tr><td><strong>Claude Code</strong></td><td>Work inside your own project: read the code, edit files, run commands.</td><td>Pro, Max, Team or Enterprise, or a Console account</td></tr>
+      <tr><td><strong>Claude API</strong></td><td>Build Claude into your own app, website or backend. You send messages and get replies as data.</td><td>A Console account and an API key; billed per token</td></tr>
+      <tr><td><strong>Agent SDK</strong></td><td>Build your own agents powered by Claude Code's tools, with control over orchestration and permissions.</td><td>See the <a href="https://code.claude.com/docs/en/agent-sdk/overview" target="_blank" rel="noopener">Agent SDK docs</a></td></tr>
+      <tr><td><strong>Cloud providers</strong> (Amazon Bedrock, Google Cloud, Microsoft Foundry)</td><td>Use Claude through a cloud account your organisation already has.</td><td>Your cloud account</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="One set of Claude models reached through chat apps, Claude Code, the Claude API and cloud providers.">
+        <rect class="boxp" x="216" y="86" width="208" height="66" rx="16"/><text class="b c" x="320" y="116">Claude models</text><text class="sub c" x="320" y="136">Fable &middot; Opus &middot; Sonnet &middot; Haiku</text>
+        <rect class="boxb" x="14" y="14" width="190" height="58" rx="12"/><text class="b c" x="109" y="38">Claude apps</text><text class="sub c" x="109" y="58">chat on web, desktop, phone</text>
+        <rect class="boxg" x="436" y="14" width="190" height="58" rx="12"/><text class="b c" x="531" y="38">Claude Code</text><text class="sub c" x="531" y="58">works in your project</text>
+        <rect class="boxo" x="14" y="170" width="190" height="58" rx="12"/><text class="b c" x="109" y="194">Claude API</text><text class="sub c" x="109" y="214">build your own app</text>
+        <rect class="box" x="436" y="170" width="190" height="58" rx="12"/><text class="b c" x="531" y="194">Cloud providers</text><text class="sub c" x="531" y="214">Bedrock, Google, Foundry</text>
+        <path class="arrow" d="M206,60 L230,90"/><path class="arrow" d="M434,60 L410,90"/><path class="arrow" d="M206,182 L230,150"/><path class="arrow" d="M434,182 L410,150"/>
+      </svg>
+      <figcaption>Same models, four doors. Pick the door for the job, not a different Claude.</figcaption>
+    </figure>
+
+    <h2 id="api">2. The Claude API in five minutes</h2>
+    <p>If you have read my <a href="private-ai-chat-android.html#online">Android post on online models</a>, this will look familiar: the API takes the whole conversation as JSON and returns the next message. It does not remember anything between calls, so you re-send the history every time (the same idea as the context window in Part 2).</p>
+    <ol class="steps">
+      <li><strong>Create a Console account</strong> at <a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a>. This is separate from a claude.ai chat plan and is billed by usage.</li>
+      <li><strong>Create an API key</strong> in the Console (see <a href="https://platform.claude.com/docs/en/get-api-key" target="_blank" rel="noopener">Get an API key</a>) and store it somewhere safe. Treat it like a password.</li>
+      <li><strong>Put the key in an environment variable</strong> so it never appears in your code:
+<pre><code>export ANTHROPIC_API_KEY="your-api-key-here"</code></pre></li>
+      <li><strong>Make a call.</strong> Here is the plain HTTP version from the official quickstart:
+<pre><code>curl https://api.anthropic.com/v1/messages \
+  -H "content-type: application/json" \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-opus-5-5",
+    "max_tokens": 1000,
+    "messages": [
+      { "role": "user", "content": "Explain what a token is in one sentence." }
+    ]
+  }'</code></pre></li>
+    </ol>
+    <p>The reply is JSON. The text is in <code>content</code>, <code>stop_reason</code> says why it stopped, and <code>usage</code> reports the <code>input_tokens</code> and <code>output_tokens</code> you were charged for. The same call with the official Python library is shorter:</p>
+    <div class="doc"><div class="doc-bar">quickstart.py (pip install anthropic)</div>
+<pre><code>import anthropic
+
+client = anthropic.Anthropic()   # reads ANTHROPIC_API_KEY
+
+message = client.messages.create(
+    model="claude-opus-5-5",
+    max_tokens=1000,
+    messages=[
+        {"role": "user", "content": "Explain what a token is in one sentence."}
+    ],
+)
+
+for block in message.content:
+    if block.type == "text":
+        print(block.text)</code></pre></div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="Your app sends a request containing the model name, max tokens and the messages. The API returns a message with content, stop reason and token usage.">
+        <rect class="boxb" x="10" y="20" width="170" height="130" rx="14"/><text class="b" x="26" y="48">Your app</text><text class="sub" x="26" y="72">holds the API key</text><text class="sub" x="26" y="92">keeps the conversation</text><text class="sub" x="26" y="112">re-sends it each time</text>
+        <path class="arrow" d="M182,60 L296,60"/><text class="sub c" x="239" y="50">request</text>
+        <path class="arrow" d="M296,112 L182,112"/><text class="sub c" x="239" y="132">reply</text>
+        <rect class="boxp" x="298" y="20" width="332" height="130" rx="14"/><text class="b" x="314" y="46">POST /v1/messages</text>
+        <text class="sub" x="314" y="70">in:  model, max_tokens, messages[ role, content ]</text>
+        <text class="sub" x="314" y="92">out: content[ text ], stop_reason,</text>
+        <text class="sub" x="314" y="112">       usage{ input_tokens, output_tokens }</text>
+        <text class="sub" x="314" y="136">headers: x-api-key, anthropic-version</text>
+      </svg>
+      <figcaption>One request in, one message out. Everything else (tools, streaming, caching) builds on this shape.</figcaption>
+    </figure>
+    <p>Official libraries exist for Python, TypeScript, C#, Go, Java, PHP and Ruby, plus a command-line tool, listed on the <a href="https://platform.claude.com/docs/en/cli-sdks-libraries/overview" target="_blank" rel="noopener">client SDKs page</a>. The next page to read is <a href="https://platform.claude.com/docs/en/build-with-claude/working-with-messages" target="_blank" rel="noopener">Working with the Messages API</a>: multi-turn conversations, system prompts and stop reasons.</p>
+    <div class="callout">
+      <strong>Never put your API key inside an app you ship</strong>
+      <p>Anyone can pull a key out of an app package or a web page. Keep it on a server you control, or have users supply their own, and use environment variables for local work. Do not commit it to git. (More in the <a href="private-ai-chat-android.html#online">Android post</a>.)</p>
+    </div>
+    <div class="note"><p>Claude Code can also use a Console account. Per the official quickstart, the first time you sign in with one, a &ldquo;Claude Code&rdquo; workspace is created in the Console to track that usage separately.</p></div>
+
+    <h2 id="models">3. Every Claude model published so far</h2>
+    <p>This is the full lineup as the official docs list it on 14 October 2026. Anthropic retires old models regularly, so treat it as a snapshot and check the <a href="https://platform.claude.com/docs/en/about-claude/models/overview" target="_blank" rel="noopener">models overview</a> and the <a href="https://platform.claude.com/docs/en/about-claude/model-deprecations" target="_blank" rel="noopener">model deprecations</a> page for the live status. &ldquo;MTok&rdquo; means a million tokens.</p>
+
+    <h3>Current lineup</h3>
+    <table>
+      <tr><th>Model</th><th>API ID</th><th>Docs describe it as</th><th>Speed</th><th>Price in / out per MTok</th></tr>
+      <tr><td>Claude Fable 5.1</td><td><code>claude-fable-5-1</code></td><td>For demanding reasoning and long-horizon agentic work</td><td>Slower</td><td>$10 / $50</td></tr>
+      <tr><td>Claude Opus 5.5</td><td><code>claude-opus-5-5</code></td><td>For long-running agentic coding and knowledge work. The docs suggest it as the starting point for most workloads.</td><td>Moderate</td><td>$4 / $20</td></tr>
+      <tr><td>Claude Sonnet 5.5</td><td><code>claude-sonnet-5-5</code></td><td>The best combination of speed and intelligence</td><td>Fast</td><td>$2 / $10</td></tr>
+      <tr><td>Claude Haiku 5.5</td><td><code>claude-haiku-5-5</code></td><td>For high-volume, latency-sensitive tasks such as classification, extraction and routing</td><td>Fastest</td><td>From $0.10 / $0.50</td></tr>
+    </table>
+    <p>All four accept text and image input, have a 1M-token context window and up to 128K tokens of output on the standard API, and are listed as not retiring sooner than September to October 2027. Prices are Claude API base prices and are separate from a Claude subscription. Two discounts from the pricing notes: batch requests are 50% off, and prompt-cache reads cost a fraction of the base input price (10% in general, and 2.5% to 5% on some of these models), which is why a stable CLAUDE.md is cheap to re-read (Part 3). See the <a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">pricing page</a> for cache writes, long-context and per-platform rates.</p>
+
+    <h3>Other models still active</h3>
+    <table>
+      <tr><th>Model</th><th>API ID</th><th>Not retiring sooner than</th></tr>
+      <tr><td>Claude Mythos 5.1</td><td><code>claude-mythos-5-1</code></td><td>1 Sep 2027</td></tr>
+      <tr><td>Claude Fable 5</td><td><code>claude-fable-5</code></td><td>9 Jun 2027</td></tr>
+      <tr><td>Claude Mythos 5</td><td><code>claude-mythos-5</code></td><td>9 Jun 2027</td></tr>
+      <tr><td>Claude Opus 5</td><td><code>claude-opus-5</code></td><td>24 Jul 2027</td></tr>
+      <tr><td>Claude Opus 4.8</td><td><code>claude-opus-4-8</code></td><td>28 May 2027</td></tr>
+      <tr><td>Claude Opus 4.7</td><td><code>claude-opus-4-7</code></td><td>16 Apr 2027</td></tr>
+      <tr><td>Claude Opus 4.6</td><td><code>claude-opus-4-6</code></td><td>5 Feb 2027</td></tr>
+      <tr><td>Claude Opus 4.5</td><td><code>claude-opus-4-5-20251101</code></td><td>24 Nov 2026</td></tr>
+      <tr><td>Claude Sonnet 5</td><td><code>claude-sonnet-5</code></td><td>30 Jun 2027</td></tr>
+      <tr><td>Claude Sonnet 4.6</td><td><code>claude-sonnet-4-6</code></td><td>17 Feb 2027</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td><code>claude-haiku-4-5-20251001</code></td><td>15 Oct 2026</td></tr>
+    </table>
+    <p>The overview page calls Fable 5, Opus 5 and 4.x, Sonnet 5 and 4.6 and Haiku 4.5 &ldquo;legacy&rdquo;: still available, but no longer receiving updates. The Mythos models are listed as active in the deprecations table, but I could not find a plain description of them, so see the docs before relying on them.</p>
+
+    <h3>Deprecated and retired</h3>
+    <table>
+      <tr><th>Model</th><th>API ID</th><th>Status</th></tr>
+      <tr><td>Claude Sonnet 4.5</td><td><code>claude-sonnet-4-5-20250929</code></td><td>Deprecated 30 Sep 2026, retires 30 Nov 2026 (replacement: Sonnet 5.5)</td></tr>
+      <tr><td>Claude Mythos Preview</td><td><code>claude-mythos-preview</code></td><td>Deprecated 9 Jun 2026, retirement date to be announced</td></tr>
+      <tr><td>Claude Opus 4.1</td><td><code>claude-opus-4-1-20250805</code></td><td>Retired 5 Aug 2026</td></tr>
+      <tr><td>Claude Opus 4 and Sonnet 4</td><td><code>claude-opus-4-20250514</code>, <code>claude-sonnet-4-20250514</code></td><td>Retired 15 Jun 2026</td></tr>
+      <tr><td>Claude Haiku 3</td><td><code>claude-3-haiku-20240307</code></td><td>Retired 20 Apr 2026</td></tr>
+      <tr><td>Claude Sonnet 3.7 and Haiku 3.5</td><td><code>claude-3-7-sonnet-20250219</code>, <code>claude-3-5-haiku-20241022</code></td><td>Retired 19 Feb 2026</td></tr>
+      <tr><td>Claude Opus 3</td><td><code>claude-3-opus-20240229</code></td><td>Retired 5 Jan 2026</td></tr>
+      <tr><td>Claude Sonnet 3.5 (two versions)</td><td><code>claude-3-5-sonnet-20240620</code>, <code>claude-3-5-sonnet-20241022</code></td><td>Retired 28 Oct 2025</td></tr>
+      <tr><td>Claude 2, 2.1 and Sonnet 3</td><td><code>claude-2.0</code>, <code>claude-2.1</code>, <code>claude-3-sonnet-20240229</code></td><td>Retired 21 Jul 2025</td></tr>
+      <tr><td>Claude 1.x and Instant 1.x</td><td><code>claude-1.0</code> to <code>claude-1.3</code><br><code>claude-instant-1.0</code> to <code>claude-instant-1.2</code></td><td>Retired 6 Nov 2024</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Lifecycle of a model: active, then legacy, then deprecated with a retirement date, then retired where requests fail.">
+        <rect class="boxg" x="6"   y="20" width="140" height="78" rx="12"/><text class="b c" x="76"  y="46">Active</text><text class="sub c" x="76"  y="66">supported,</text><text class="sub c" x="76"  y="82">recommended</text>
+        <rect class="boxb" x="170" y="20" width="140" height="78" rx="12"/><text class="b c" x="240" y="46">Legacy</text><text class="sub c" x="240" y="66">still available,</text><text class="sub c" x="240" y="82">no more updates</text>
+        <rect class="boxo" x="334" y="20" width="140" height="78" rx="12"/><text class="b c" x="404" y="46">Deprecated</text><text class="sub c" x="404" y="66">works, retirement</text><text class="sub c" x="404" y="82">date announced</text>
+        <rect class="boxr" x="498" y="20" width="136" height="78" rx="12"/><text class="b c" x="566" y="46">Retired</text><text class="sub c" x="566" y="66">no longer available,</text><text class="sub c" x="566" y="82">requests fail</text>
+        <path class="arrow" d="M148,59 L168,59"/><path class="arrow" d="M312,59 L332,59"/><path class="arrow" d="M476,59 L496,59"/>
+        <text class="sub c" x="320" y="138">Anthropic says it gives at least 60 days' notice before retiring a publicly released model.</text>
+      </svg>
+      <figcaption>The model lifecycle terms used by the docs. Check the deprecations page before you pin a model in production.</figcaption>
+    </figure>
+
+    <h3>IDs, aliases and other platforms</h3>
+    <ul>
+      <li><strong>Every Claude model ID is a pinned snapshot.</strong> From the 4.6 generation on, IDs have no date suffix (for example <code>claude-sonnet-5-5</code>) and are still a fixed snapshot. Older models have dated IDs such as <code>claude-haiku-4-5-20251001</code>.</li>
+      <li><strong>Claude Code aliases</strong> like <code>sonnet</code> or <code>opus</code> are shortcuts to the latest version (Part 1, section 7). Use a full ID when you need repeatable behaviour.</li>
+      <li><strong>Other platforms:</strong> Google Cloud, Microsoft Foundry and Claude Platform on AWS use the same IDs as the Claude API. Amazon Bedrock prefixes them, for example <code>anthropic.claude-opus-5-5</code>, and Bedrock and Google Cloud set their own retirement dates.</li>
+      <li><strong>Ask the API itself.</strong> The <a href="https://platform.claude.com/docs/en/api/models/list" target="_blank" rel="noopener">Models API</a> returns the models your key can use, with their token limits and capabilities, so you do not have to hard-code a list.</li>
+    </ul>
+
+    <h2 id="choose">4. Choosing between models</h2>
+    <p>The official guidance, put plainly:</p>
+    <table>
+      <tr><th>If you need&hellip;</th><th>Start with</th><th>Why</th></tr>
+      <tr><td>A sensible default for most work</td><td>Opus 5.5</td><td>The API docs name it the starting point for most workloads.</td></tr>
+      <tr><td>The hardest reasoning or very long agentic tasks</td><td>Fable 5.1</td><td>Described as for demanding reasoning and long-horizon agentic work, or when Opus 5.5 at higher effort still falls short.</td></tr>
+      <tr><td>Speed with strong intelligence, lower cost</td><td>Sonnet 5.5</td><td>The best combination of speed and intelligence. The Claude Code cost guide says Sonnet handles most coding tasks well.</td></tr>
+      <tr><td>Huge volume or very low latency</td><td>Haiku 5.5</td><td>For classification, extraction and routing.</td></tr>
+    </table>
+    <p>Two sources, two slightly different defaults: the API guide starts you at Opus 5.5, while the Claude Code cost guide suggests Sonnet for everyday coding and Opus for complex architecture. Both are consistent with one rule: <strong>start with the model your plan defaults to, move down to save time and money when the task is easy, and move up when you are stuck.</strong> Test on your own tasks, because a cheaper model that passes your checks is the better choice. The docs have a <a href="https://platform.claude.com/docs/en/about-claude/models/choosing-a-model" target="_blank" rel="noopener">choosing a model</a> guide, and the <a href="https://platform.claude.com/docs/en/about-claude/models/migration-guide" target="_blank" rel="noopener">migration guide</a> helps when you move to a newer generation.</p>
+
+    <h2 id="links">5. Official links</h2>
+    <p>All of these were reachable when I wrote this post. Anthropic reorganises its docs from time to time (the Claude Code docs, for example, moved to <code>code.claude.com</code>), so if a link breaks, search the docs index at <a href="https://code.claude.com/docs/llms.txt" target="_blank" rel="noopener">code.claude.com/docs/llms.txt</a>.</p>
+
+    <h3>Claude Code: getting started</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">Overview</a></td><td>What Claude Code is, install commands, every interface.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/quickstart" target="_blank" rel="noopener">Quickstart</a></td><td>Install, sign in, first questions and first change.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/terminal-guide" target="_blank" rel="noopener">Terminal guide for new users</a></td><td>Opening a terminal and installing, step by step.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/setup" target="_blank" rel="noopener">Advanced setup</a></td><td>System requirements, install methods, updates, uninstall.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/troubleshoot-install" target="_blank" rel="noopener">Troubleshoot installation</a></td><td>Matches install and login error messages to fixes.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/how-claude-code-works" target="_blank" rel="noopener">How Claude Code works</a></td><td>The agentic loop, built-in tools, how it uses your project.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noopener">Best practices</a></td><td>Prompting and project setup for better results.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/common-workflows" target="_blank" rel="noopener">Common workflows</a></td><td>Step-by-step guides for debugging, testing, refactoring.</td></tr>
+    </table>
+
+    <h3>Claude Code: memory, settings and control</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">How Claude remembers your project</a></td><td>CLAUDE.md, rules, imports, AGENTS.md, auto memory (Part 2).</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">Extend Claude with skills</a></td><td>SKILL.md and on-demand instructions.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noopener">Settings files and precedence</a></td><td>Which settings file wins.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/permissions" target="_blank" rel="noopener">Configure permissions</a></td><td>Allow, ask and deny rules.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/permission-modes" target="_blank" rel="noopener">Choose a permission mode</a></td><td>Manual, accept edits, plan, auto and more (Part 1).</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/model-config" target="_blank" rel="noopener">Model configuration</a></td><td>Aliases, <code>/model</code>, effort levels, priority order.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/commands" target="_blank" rel="noopener">Commands</a></td><td>Every slash command.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/sessions" target="_blank" rel="noopener">Manage sessions</a></td><td>Resume, name, branch, where transcripts are stored.</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/costs" target="_blank" rel="noopener">Manage costs effectively</a></td><td>Tracking usage and reducing tokens (Part 3).</td></tr>
+      <tr><td><a href="https://code.claude.com/docs/en/features-overview" target="_blank" rel="noopener">Extend Claude Code</a></td><td>How CLAUDE.md, skills, MCP and the rest fit together.</td></tr>
+    </table>
+
+    <h3>Claude API and models</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://platform.claude.com/" target="_blank" rel="noopener">Claude Console</a></td><td>Create an account, API keys, usage and billing.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/get-started" target="_blank" rel="noopener">Get started with Claude</a></td><td>Your first API call in several languages.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/build-with-claude/working-with-messages" target="_blank" rel="noopener">Working with the Messages API</a></td><td>Multi-turn chats, system prompts, stop reasons.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/about-claude/models/overview" target="_blank" rel="noopener">Models overview</a></td><td>The current lineup, IDs and limits.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/about-claude/models/choosing-a-model" target="_blank" rel="noopener">Choosing a model</a></td><td>Picking the right model for a use case.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/about-claude/model-deprecations" target="_blank" rel="noopener">Model deprecations</a></td><td>Status and retirement dates for every model.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">Pricing</a></td><td>Token prices, batch and caching rates.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/cli-sdks-libraries/overview" target="_blank" rel="noopener">Client SDKs</a></td><td>Official libraries for each language.</td></tr>
+      <tr><td><a href="https://platform.claude.com/docs/en/api/models/list" target="_blank" rel="noopener">Models API</a></td><td>List the models your key can use, with capabilities.</td></tr>
+    </table>
+
+    <h3>Plans, learning and help</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://claude.com/pricing" target="_blank" rel="noopener">Claude plans and pricing</a></td><td>Pro, Max, Team and Enterprise subscriptions.</td></tr>
+      <tr><td><a href="https://www.anthropic.com/supported-countries" target="_blank" rel="noopener">Supported countries</a></td><td>Where Claude is available.</td></tr>
+      <tr><td><a href="https://academy.claude.com/" target="_blank" rel="noopener">Claude Academy</a></td><td>Free self-paced courses, including Claude Code 101.</td></tr>
+      <tr><td><a href="https://support.claude.com/" target="_blank" rel="noopener">Support centre</a></td><td>Account, billing and plan help.</td></tr>
+      <tr><td><a href="https://www.anthropic.com/discord" target="_blank" rel="noopener">Community Discord</a></td><td>Tips and support from other users.</td></tr>
+    </table>
+
+    <h2 id="end">6. Beginner-level wrap-up and glossary</h2>
+    <ol>
+      <li><strong>Part 1:</strong> set up Claude Code safely, learn the modes, and pick a model.</li>
+      <li><strong>Part 2:</strong> give Claude lasting context with CLAUDE.md, rules and skills.</li>
+      <li><strong>Part 3:</strong> spend fewer tokens, hand work off between sessions and onboard faster.</li>
+      <li><strong>Part 4:</strong> use the API when you want Claude inside your own product, and keep the model list and links handy.</li>
+      <li><strong>Next (advanced):</strong> <a href="claude-md-part-5-daily-workflow.html">Part 5</a> covers day-to-day prompting, git and troubleshooting.</li>
+    </ol>
+    <p>The model forgets by design and the docs change often. Writing things down, and checking the official pages when something looks off, are the two habits that carry through all four parts.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>API</td><td>A way for one program to talk to another. The Claude API lets your code send messages to Claude and read the replies.</td></tr>
+      <tr><td>API key</td><td>A secret string that identifies your account when you call the API. Treat it like a password.</td></tr>
+      <tr><td>Console</td><td>Anthropic's web dashboard for API accounts: keys, usage and billing.</td></tr>
+      <tr><td>SDK</td><td>An official library that makes API calls easier in a given language.</td></tr>
+      <tr><td>Messages API</td><td>The main Claude API endpoint: you send a list of messages and get the next one back.</td></tr>
+      <tr><td>Model ID</td><td>The exact name of a model to request, such as <code>claude-sonnet-5-5</code>.</td></tr>
+      <tr><td>Snapshot</td><td>A fixed version of a model. A pinned ID always gives the same model.</td></tr>
+      <tr><td>MTok</td><td>One million tokens, the unit prices are quoted in.</td></tr>
+      <tr><td>Deprecated / retired</td><td>Deprecated models still work but have a retirement date; retired models no longer respond.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-3-tokens-onboarding.html"><small>&larr; Previous &middot; Part 3</small>Fewer tokens, faster onboarding</a>
+      <a class="next" href="claude-md-part-5-daily-workflow.html"><small>Next &middot; Part 5 (Advanced) &rarr;</small>Working with Claude Code day to day</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Working with Claude Code day to day: prompts, git and troubleshooting — Claude Code series part 5 (advanced)</title>
+  <meta name="description" content="Prompting patterns, the explore-plan-implement-commit workflow, git branches, commits and pull requests with Claude, steering, and fixing runtime problems. Part 5 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="5">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Advanced &middot; Part 5 of 8</p>
+    <h1>Working with Claude Code day to day: prompts, git, and fixing things when they go wrong</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~19 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">Prompting</span><span class="tag">Git</span><span class="tag">Pull requests</span><span class="tag">Troubleshooting</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a class="on" href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Parts 1 to 4 got you installed, safe, and set up with memory and cost control. This is where the advanced level starts. You can run Claude Code; now the question is how to get good results from it every day: what to type, how to ship a change with git, how to steer when it goes the wrong way, and what to do when something breaks. Everything here follows the official best-practices, common-workflows and troubleshooting pages, with my own advice marked as such.</p>
+
+    <div class="callout">
+      <strong>Part 5 in 60 seconds</strong>
+      <ul>
+        <li>Claude works in a loop: gather context, take action, verify the result. You can interrupt at any point.</li>
+        <li>Most good habits come from one fact: the context window fills up fast and quality drops as it fills.</li>
+        <li>Work in four phases: explore, plan, implement, commit. Skip the plan only when you could describe the change in one sentence.</li>
+        <li>Be specific, point at files with <code>@</code>, and give Claude a check it can run (tests, a build, a screenshot).</li>
+        <li>Ask Claude to branch, commit and open pull requests, then review the result yourself.</li>
+        <li>Correct early. After two failed corrections, <code>/clear</code> and write a better first prompt.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 5</strong>
+      <ol>
+        <li><a href="#loop">How Claude actually works: the loop</a></li>
+        <li><a href="#phases">Explore, plan, implement, commit</a></li>
+        <li><a href="#prompts">Writing prompts that work</a></li>
+        <li><a href="#recipes">Prompt recipes for everyday tasks</a></li>
+        <li><a href="#verify">Give Claude a way to check its work</a></li>
+        <li><a href="#interview">Big feature? Let Claude interview you</a></li>
+        <li><a href="#git">Git with Claude: branch, commit, pull request</a></li>
+        <li><a href="#steer">Steering: correct early, rewind, start clean</a></li>
+        <li><a href="#fix">When something goes wrong</a></li>
+        <li><a href="#end5">Wrap-up and glossary</a></li>
+      </ol>
+    </div>
+
+    <h2 id="loop">1. How Claude actually works: the loop</h2>
+    <p>The official docs describe three phases that blend together: <strong>gather context</strong>, <strong>take action</strong> and <strong>verify results</strong>. A question about your code might need only the first. A bug fix cycles through all three repeatedly. Claude decides what each step needs from what it learned in the previous one, and you can step in at any moment.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 224" role="img" aria-label="Your prompt leads to a loop of gather context, take action and verify results. The loop repeats until the task is done, and you can interrupt at any point.">
+        <rect class="boxb" x="6" y="62" width="104" height="60" rx="12"/><text class="b c" x="58" y="88">Your prompt</text><text class="sub c" x="58" y="106">what you want</text>
+        <path class="arrow" d="M112,92 L150,92"/>
+        <rect class="boxp" x="152" y="40" width="130" height="104" rx="14"/><text class="b c" x="217" y="70">1. Gather</text><text class="sub c" x="217" y="90">search, read files,</text><text class="sub c" x="217" y="106">check git state</text>
+        <path class="arrow" d="M284,92 L318,92"/>
+        <rect class="boxg" x="320" y="40" width="130" height="104" rx="14"/><text class="b c" x="385" y="70">2. Act</text><text class="sub c" x="385" y="90">edit files, run</text><text class="sub c" x="385" y="106">commands</text>
+        <path class="arrow" d="M452,92 L486,92"/>
+        <rect class="boxo" x="488" y="40" width="146" height="104" rx="14"/><text class="b c" x="561" y="70">3. Verify</text><text class="sub c" x="561" y="90">run tests, read the</text><text class="sub c" x="561" y="106">result, try again</text>
+        <path class="rule" d="M561,146 C561,176 217,176 217,146" style="marker-end:url(#arr)"/>
+        <text class="sub c" x="389" y="194">repeat until the task is done</text>
+        <text class="b c" x="320" y="20">You can press Esc and steer at any point</text>
+        <text class="sub c" x="320" y="214">Tools do the acting: file edits, search, shell commands, web, code intelligence.</text>
+      </svg>
+      <figcaption>The agentic loop, as the official docs describe it. Models reason and tools act; Claude Code is the layer that connects them.</figcaption>
+    </figure>
+    <p>One constraint explains most of the advice in this post. Per the official best-practices guide: <em>Claude's context window fills up fast, and performance degrades as it fills.</em> Everything in the conversation counts: every message, every file Claude reads, every command output. A single debugging session can use tens of thousands of tokens. Keeping that window clean is the skill to build.</p>
+
+    <h2 id="phases">2. Explore, plan, implement, commit</h2>
+    <p>Letting Claude jump straight to code can produce a neat solution to the wrong problem. The recommended workflow separates thinking from doing, using plan mode (Part 1) for the first two steps:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="Four phases: explore in plan mode, plan, implement with a verification step, and commit with a pull request. A note says to skip the plan if you could describe the change in one sentence.">
+        <rect class="boxg" x="6"   y="20" width="146" height="110" rx="14"/><text class="b c" x="79"  y="48">1. Explore</text><text class="sub c" x="79"  y="70">plan mode on:</text><text class="sub c" x="79"  y="86">read and ask,</text><text class="sub c" x="79"  y="102">change nothing</text>
+        <rect class="boxb" x="168" y="20" width="146" height="110" rx="14"/><text class="b c" x="241" y="48">2. Plan</text><text class="sub c" x="241" y="70">ask for a plan,</text><text class="sub c" x="241" y="86">edit it with</text><text class="sub c" x="241" y="102">Ctrl+G</text>
+        <rect class="boxo" x="330" y="20" width="146" height="110" rx="14"/><text class="b c" x="403" y="48">3. Implement</text><text class="sub c" x="403" y="70">leave plan mode,</text><text class="sub c" x="403" y="86">code, run the tests,</text><text class="sub c" x="403" y="102">fix failures</text>
+        <rect class="boxp" x="492" y="20" width="142" height="110" rx="14"/><text class="b c" x="563" y="48">4. Commit</text><text class="sub c" x="563" y="70">commit message,</text><text class="sub c" x="563" y="86">open a PR,</text><text class="sub c" x="563" y="102">you review</text>
+        <path class="arrow" d="M154,75 L166,75"/><path class="arrow" d="M316,75 L328,75"/><path class="arrow" d="M478,75 L490,75"/>
+        <rect class="ghost" x="6" y="150" width="628" height="50" rx="12"/><text class="b" x="22" y="172">When to skip steps 1 and 2</text><text class="sub" x="22" y="190">If you could describe the diff in one sentence (a typo, a log line, a rename), just ask for it directly.</text>
+      </svg>
+      <figcaption>Planning has a cost. It pays off when the approach is uncertain, several files change, or the code is unfamiliar.</figcaption>
+    </figure>
+    <p>Here are the four steps with the example prompts the docs use. The first two run in plan mode (press <kbd>Shift</kbd>+<kbd>Tab</kbd> until the status bar says plan mode, or start with <code>claude --permission-mode plan</code>):</p>
+<pre><code># 1. Explore (plan mode)
+read /src/auth and understand how we handle sessions and login.
+also look at how we manage environment variables for secrets.
+
+# 2. Plan (plan mode)
+I want to add Google OAuth. What files need to change?
+What's the session flow? Create a plan.
+
+# 3. Implement (approve the plan, or press Shift+Tab to leave plan mode)
+implement the OAuth flow from your plan. write tests for the
+callback handler, run the test suite and fix any failures.
+
+# 4. Commit
+commit with a descriptive message and open a PR</code></pre>
+    <p>In step 2, press <kbd>Ctrl</kbd>+<kbd>G</kbd> to open the plan in your text editor and change it before Claude proceeds. A wrong assumption fixed in the plan costs one sentence; the same assumption fixed after twenty edited files costs a lot more.</p>
+
+    <h2 id="prompts">3. Writing prompts that work</h2>
+    <p>Claude can infer intent, but it cannot read your mind. The more precise the instruction, the fewer corrections you need. These before-and-after pairs come straight from the official guide:</p>
+    <table>
+      <tr><th>Strategy</th><th>Weak prompt</th><th>Stronger prompt</th></tr>
+      <tr><td><strong>Scope the task</strong></td><td>add tests for foo.py</td><td>write a test for foo.py covering the edge case where the user is logged out. avoid mocks.</td></tr>
+      <tr><td><strong>Point to sources</strong></td><td>why does ExecutionFactory have such a weird api?</td><td>look through ExecutionFactory's git history and summarize how its api came to be</td></tr>
+      <tr><td><strong>Reference existing patterns</strong></td><td>add a calendar widget</td><td>look at how existing widgets are implemented on the home page. HotDogWidget.php is a good example. follow the pattern to implement a new calendar widget&hellip; build from scratch without libraries other than the ones already used</td></tr>
+      <tr><td><strong>Describe the symptom</strong></td><td>fix the login bug</td><td>users report that login fails after session timeout. check the auth flow in src/auth/, especially token refresh. write a failing test that reproduces the issue, then fix it</td></tr>
+    </table>
+    <p>A pattern worth copying from the last row: symptom, likely location, and what &ldquo;fixed&rdquo; looks like. Vague prompts are fine when you are exploring and can afford to course-correct; &ldquo;what would you improve in this file?&rdquo; can surface things you would not have asked about.</p>
+
+    <h3>Give Claude richer context</h3>
+    <ul>
+      <li><strong>Reference files with <code>@</code>.</strong> <code>Explain the logic in @src/utils/auth.js</code> includes the file's content when it fits the Read tool's limit (25,000 tokens by default). Type <code>@</code> to open a path menu. A directory reference shows a listing, not contents, and you can mention several files in one message.</li>
+      <li><strong>Paste or drag in images.</strong> Copy and paste with <kbd>Ctrl</kbd>+<kbd>V</kbd> (on Windows and WSL use <kbd>Alt</kbd>+<kbd>V</kbd>), drag a file into the window, or give an image path. Useful for error screenshots, designs and diagrams.</li>
+      <li><strong>Give URLs</strong> for docs or API references. Use <code>/permissions</code> to allow domains you use often.</li>
+      <li><strong>Pipe data in:</strong> <code>cat error.log | claude -p "explain this error"</code>.</li>
+      <li><strong>Let Claude fetch what it needs</strong> with shell commands, MCP tools or by reading files (Part 6).</li>
+    </ul>
+    <div class="note"><p>Tip from the docs: Claude is good at learning command-line tools it does not know. Try <code>Use 'foo-cli-tool --help' to learn about foo tool, then use it to solve A, B, C.</code> And install the <code>gh</code> CLI if you use GitHub: it is the most context-efficient way to work with issues and pull requests.</p></div>
+
+    <h2 id="recipes">4. Prompt recipes for everyday tasks</h2>
+    <p>These are prompts from the official common-workflows page, grouped by task. Adapt the wording to your project.</p>
+    <table>
+      <tr><th>Task</th><th>Prompts to try, in order</th></tr>
+      <tr><td><strong>Understand a new codebase</strong></td><td><code>give me an overview of this codebase</code><br><code>explain the main architecture patterns used here</code><br><code>what are the key data models?</code><br><code>how is authentication handled?</code><br>Tip: start broad, then narrow; ask for a glossary of project terms.</td></tr>
+      <tr><td><strong>Find the right code</strong></td><td><code>find the files that handle user authentication</code><br><code>how do these authentication files work together?</code><br><code>trace the login process from front-end to database</code></td></tr>
+      <tr><td><strong>Fix a bug</strong></td><td><code>I'm seeing an error when I run npm test</code><br><code>suggest a few ways to fix the @ts-ignore in user.ts</code><br><code>update user.ts to add the null check you suggested</code><br>Tip: give the reproduce command, the steps, and whether it is intermittent.</td></tr>
+      <tr><td><strong>Refactor</strong></td><td><code>find deprecated API usage in our codebase</code><br><code>refactor utils.js to use ES2024 features while maintaining the same behavior</code><br><code>run tests for the refactored code</code><br>Tip: do it in small, testable increments.</td></tr>
+      <tr><td><strong>Write tests</strong></td><td><code>find functions in NotificationsService.swift that are not covered by tests</code><br><code>add tests for the notification service</code><br><code>add test cases for edge conditions in the notification service</code><br><code>run the new tests and fix any failures</code></td></tr>
+      <tr><td><strong>Document code</strong></td><td><code>find functions without proper JSDoc comments in the auth module</code><br><code>add JSDoc comments to the undocumented functions in auth.js</code></td></tr>
+      <tr><td><strong>Ask about a design</strong></td><td>Paste a screenshot, then: <code>Generate CSS to match this design mockup</code> or <code>This is our current database schema. How should we modify it for the new feature?</code></td></tr>
+    </table>
+    <p>Notice how every recipe is a short conversation, not one giant prompt. You are not expected to get it perfect the first time: ask, read, refine. The docs also recommend asking Claude the questions you would ask a senior engineer (&ldquo;How does logging work?&rdquo;, &ldquo;What edge cases does this class handle?&rdquo;). That alone is an effective way to onboard onto a codebase.</p>
+
+    <h2 id="verify">5. Give Claude a way to check its work</h2>
+    <p>The official guide calls this the highest-leverage habit. Claude stops when the work <em>looks</em> done. Without a check it can run, looking done is the only signal, and you become the verification loop. Give it something that returns pass or fail and it iterates by itself.</p>
+    <table>
+      <tr><th>Strategy</th><th>Before</th><th>After</th></tr>
+      <tr><td><strong>Provide criteria</strong></td><td>implement a function that validates email addresses</td><td>write a validateEmail function. example test cases: user@example.com is true, invalid is false, user@.com is false. run the tests after implementing</td></tr>
+      <tr><td><strong>Check UI visually</strong></td><td>make the dashboard look better</td><td>[paste screenshot] implement this design. take a screenshot of the result and compare it to the original. list differences and fix them</td></tr>
+      <tr><td><strong>Fix root causes</strong></td><td>the build is failing</td><td>the build fails with this error: [paste error]. fix it and verify the build succeeds. address the root cause, don't suppress the error</td></tr>
+    </table>
+    <ul>
+      <li><strong>Ask for evidence, not claims:</strong> the test output, the command it ran and what it returned, or a screenshot. Reviewing evidence is faster than re-running the check yourself.</li>
+      <li><strong>A second opinion:</strong> have a fresh subagent review the diff (Part 6), or run the bundled <code>/code-review</code> skill. A reviewer that did not write the code is not biased toward it. The docs warn that a reviewer told to find gaps will usually find some, so ask for correctness and requirement gaps only, not style preferences.</li>
+      <li><strong>If you cannot verify it, do not ship it.</strong> This is the &ldquo;trust-then-verify gap&rdquo; the docs list as a classic failure.</li>
+    </ul>
+
+    <h2 id="interview">6. Big feature? Let Claude interview you</h2>
+    <p>For larger work, start with a minimal prompt and have Claude question <em>you</em> before it writes anything. This prompt is from the official guide (replace the bracketed part):</p>
+<pre><code>I want to build [brief description]. Interview me in detail using the AskUserQuestion tool.
+
+Ask about technical implementation, UI/UX, edge cases, concerns, and tradeoffs. Don't ask obvious questions, dig into the hard parts I might not have considered.
+
+Keep interviewing until we've covered everything, then write a complete spec to SPEC.md.</code></pre>
+    <p>When the spec is done, <strong>start a fresh session</strong> to build it. The new session has clean context focused on implementation, and the written spec is the shared reference. The most useful specs name the files and interfaces involved, state what is out of scope, and end with an end-to-end verification step. This pairs naturally with the feature notes and handoff notes from Part 3.</p>
+
+    <h2 id="git">7. Git with Claude: branch, commit, pull request</h2>
+    <p>Claude Code works directly with git. The official quickstart shows that you can drive it conversationally:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="A git flow: create a branch, make changes with Claude, verify with tests, commit, open a pull request, then a human reviews and merges. Claude does the middle steps and you review the diff and the pull request.">
+        <rect class="box" x="6"   y="30" width="96" height="70" rx="12"/><text class="b c" x="54"  y="58">Branch</text><text class="sub c" x="54"  y="78">new branch</text>
+        <rect class="boxb" x="114" y="30" width="96" height="70" rx="12"/><text class="b c" x="162" y="58">Change</text><text class="sub c" x="162" y="78">Claude edits</text>
+        <rect class="boxg" x="222" y="30" width="96" height="70" rx="12"/><text class="b c" x="270" y="58">Verify</text><text class="sub c" x="270" y="78">tests pass</text>
+        <rect class="boxo" x="330" y="30" width="96" height="70" rx="12"/><text class="b c" x="378" y="58">Commit</text><text class="sub c" x="378" y="78">clear message</text>
+        <rect class="boxp" x="438" y="30" width="96" height="70" rx="12"/><text class="b c" x="486" y="58">Pull request</text><text class="sub c" x="486" y="78">gh pr create</text>
+        <rect class="boxr" x="546" y="30" width="88" height="70" rx="12"/><text class="b c" x="590" y="58">Review</text><text class="sub c" x="590" y="78">you decide</text>
+        <path class="arrow" d="M104,65 L112,65"/><path class="arrow" d="M212,65 L220,65"/><path class="arrow" d="M320,65 L328,65"/><path class="arrow" d="M428,65 L436,65"/><path class="arrow" d="M536,65 L544,65"/>
+        <rect class="ghost" x="6" y="124" width="628" height="94" rx="12"/>
+        <text class="b" x="22" y="148">Where you stay in charge</text>
+        <text class="sub" x="22" y="170">&#8226; Read git diff before you accept a commit.   &#8226; Read the pull request description Claude writes.</text>
+        <text class="sub" x="22" y="190">&#8226; Never let a session push straight to a protected branch (my advice: use branch protection).</text>
+        <text class="sub" x="22" y="208">&#8226; Checkpoints are not a replacement for git: they only track Claude's file edits.</text>
+      </svg>
+      <figcaption>Claude can do the middle of the flow. The first and last steps are yours.</figcaption>
+    </figure>
+    <table>
+      <tr><th>You want to&hellip;</th><th>Say this</th></tr>
+      <tr><td>See what changed</td><td><code>what files have I changed?</code></td></tr>
+      <tr><td>Start a branch</td><td><code>create a new branch called feature/quickstart</code></td></tr>
+      <tr><td>Look at history</td><td><code>show me the last 5 commits</code></td></tr>
+      <tr><td>Commit</td><td><code>commit my changes with a descriptive message</code></td></tr>
+      <tr><td>Resolve conflicts</td><td><code>help me resolve merge conflicts</code></td></tr>
+      <tr><td>Open a pull request</td><td><code>create a pr</code> (or first: <code>summarize the changes I've made to the authentication module</code>)</td></tr>
+      <tr><td>Improve the description</td><td><code>enhance the PR description with more context about the security improvements</code></td></tr>
+      <tr><td>Find the session behind a PR</td><td>Run <code>claude --from-pr 1234</code> (use your own number) or paste the PR URL into the <code>/resume</code> search. Claude Code links a session to a PR when it creates one with <code>gh pr create</code>.</td></tr>
+    </table>
+    <p>Tips that make this smoother:</p>
+    <ul>
+      <li><strong>Install the GitHub CLI (<code>gh</code>) and sign in</strong> with <code>gh auth login</code>. Without it Claude can still use the GitHub API, but unauthenticated requests often hit rate limits.</li>
+      <li><strong>Put your repository etiquette in CLAUDE.md</strong> (Part 2): branch naming, commit message style, PR conventions. The docs list &ldquo;repository etiquette&rdquo; as something worth writing down.</li>
+      <li><strong>Pre-approve safe git commands</strong> instead of clicking through prompts. The docs' own example for scripts is <code>Bash(git diff *)</code>, <code>Bash(git log *)</code>, <code>Bash(git status *)</code> and <code>Bash(git commit *)</code>. Notice they do not allow <code>git push</code>.</li>
+      <li><strong>Ask Claude to highlight risks</strong> in a pull request it wrote before you submit it, and review the result yourself.</li>
+      <li><strong>Review before merging.</strong> The bundled <code>/code-review</code> skill reviews the current diff for bugs, and <code>/security-review</code> runs an on-demand security pass over the changes on your branch.</li>
+    </ul>
+
+    <h3>Two changes at once: worktrees</h3>
+    <p>If you want one session on a feature and another fixing a bug without their edits colliding, use a git worktree, a separate checkout on its own branch:</p>
+<pre><code>claude --worktree feature-auth</code></pre>
+    <p>Run the same command with a different name in a second terminal for a second isolated session. The repository needs at least one commit first. The docs also describe a Writer/Reviewer pattern: one session writes the code and a fresh session reviews it, so the reviewer is not biased toward code it just wrote.</p>
+
+    <h2 id="steer">8. Steering: correct early, rewind, start clean</h2>
+    <p>Conversations are persistent and reversible. The docs recommend tight feedback loops: correct Claude as soon as you notice it drifting.</p>
+    <table>
+      <tr><th>Do this</th><th>What happens</th></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Stops Claude mid-action. Context is kept, so you can redirect.</td></tr>
+      <tr><td><kbd>Esc</kbd> twice, or <code>/rewind</code></td><td>Opens the rewind menu to restore the conversation, the code, or both to an earlier checkpoint, or to summarise from a chosen message.</td></tr>
+      <tr><td>&ldquo;Undo that&rdquo;</td><td>Asks Claude to revert its changes.</td></tr>
+      <tr><td>Type while it works, then Enter</td><td>Queues a correction. Claude reads it when its current tool calls finish and adjusts.</td></tr>
+      <tr><td><code>/clear</code></td><td>Resets the context between unrelated tasks.</td></tr>
+      <tr><td><code>/btw</code></td><td>Asks a side question whose answer never enters the conversation history.</td></tr>
+    </table>
+    <p>Every prompt that starts a turn creates a checkpoint, and Claude snapshots files before it edits them. That means you can let Claude try something risky and rewind if it fails. The limits matter, though: checkpoints cover only edits made through Claude's file tools, not changes made by shell commands, and they are not a substitute for git.</p>
+    <h3>Five failure patterns to recognise</h3>
+    <table>
+      <tr><th>Pattern</th><th>Fix</th></tr>
+      <tr><td><strong>The kitchen-sink session:</strong> unrelated tasks pile up in one conversation.</td><td><code>/clear</code> between unrelated tasks.</td></tr>
+      <tr><td><strong>Correcting over and over:</strong> failed approaches pollute the context.</td><td>After two failed corrections, <code>/clear</code> and write a better first prompt using what you learned.</td></tr>
+      <tr><td><strong>An over-specified CLAUDE.md:</strong> rules get lost in the noise.</td><td>Prune it. If Claude already does something right, delete the line.</td></tr>
+      <tr><td><strong>Trust, then verify gap:</strong> plausible code that misses edge cases.</td><td>Always provide tests, scripts or screenshots.</td></tr>
+      <tr><td><strong>Infinite exploration:</strong> &ldquo;investigate X&rdquo; with no scope fills the window.</td><td>Scope it narrowly, or use a subagent so the reading stays out of your main context (Part 6).</td></tr>
+    </table>
+    <p>The docs end this topic with a reminder worth quoting: these are starting points, not rules. Sometimes you <em>should</em> let context accumulate because you are deep in one hard problem, and sometimes a vague prompt is exactly right. Notice what works and build your own intuition.</p>
+
+    <h2 id="fix">9. When something goes wrong</h2>
+    <p>Install and login problems were covered in Part 1. These are the problems you can hit once Claude Code is running. Start with the built-in checkups: run <code>/doctor</code> inside a session for an automated check of your installation, settings, extensions and context usage, or <code>claude doctor</code> from your shell if <code>claude</code> will not start. <code>/mcp</code> shows MCP server status, and <code>/feedback</code> reports a problem to Anthropic.</p>
+    <table>
+      <tr><th>Symptom</th><th>What to try</th></tr>
+      <tr><td>Permission prompts keep appearing for safe commands</td><td>Add a narrow allow rule (Part 1, section 8), or review rules with <code>/permissions</code>. If you are in Manual mode this is expected for anything not pre-approved.</td></tr>
+      <tr><td>Claude edits or runs things without asking</td><td>Check the status bar. Recent versions may start in auto mode (Part 1, section 6). Press <kbd>Shift</kbd>+<kbd>Tab</kbd> to cycle to Manual.</td></tr>
+      <tr><td>The wrong model is being used</td><td>Run <code>/model</code> to see and switch it, and <code>/status</code> to see what is active. The priority order is <code>/model</code>, then <code>--model</code>, then <code>ANTHROPIC_MODEL</code>, then your settings (Part 1, section 7).</td></tr>
+      <tr><td>Settings, rules or MCP servers are not taking effect</td><td>Use the official <a href="https://code.claude.com/docs/en/debug-your-config" target="_blank" rel="noopener">Debug your configuration</a> page. <code>/context</code> shows what loaded, and <code>claude --safe-mode</code> starts with all customisations off so you can tell whether a plugin or server is the cause.</td></tr>
+      <tr><td>High CPU or memory, slow responses</td><td>Run <code>/compact</code> regularly, restart between big tasks, and add large build folders to <code>.gitignore</code>. If a critical memory warning appears (heap past 2.5&nbsp;GB), restart and run <code>claude --continue</code> to resume in a fresh process.</td></tr>
+      <tr><td>It hangs or freezes</td><td>Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to cancel. If it is unresponsive, close the terminal. Restarting does not lose your conversation: run <code>claude --resume</code> in the same folder.</td></tr>
+      <tr><td>&ldquo;Autocompact is thrashing&rdquo; error</td><td>A file or tool output keeps refilling the window. Ask Claude to read big files in smaller chunks, run <code>/compact</code> with a focus that drops the large output, move the work to a subagent, or <code>/clear</code>.</td></tr>
+      <tr><td>Search or <code>@file</code> mentions find nothing</td><td>The bundled <code>ripgrep</code> may not run on your system. Install ripgrep and set <code>USE_BUILTIN_RIPGREP</code> to <code>0</code>, then check <code>claude doctor</code>. On WSL, keep the project on the Linux filesystem for better search.</td></tr>
+      <tr><td>Garbled characters in an editor's terminal</td><td>Run <code>/terminal-setup</code> in Claude Code, which turns off the terminal's GPU renderer setting.</td></tr>
+      <tr><td>Errors like 429, 529 or &ldquo;model not found&rdquo;</td><td>See the official <a href="https://code.claude.com/docs/en/errors" target="_blank" rel="noopener">error reference</a>.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>A general rule for debugging a bad session</strong>
+      <p>If Claude is going in circles, the cause is usually context, not intelligence. Run <code>/context</code>, look at what is using the space, then either <code>/compact</code> with a focus, move noisy work to a subagent, or <code>/clear</code> and restate the task with what you learned. A clean session with a better prompt almost always beats a long session full of corrections.</p>
+    </div>
+
+    <h2 id="end5">10. Wrap-up and glossary</h2>
+    <ol>
+      <li>Work in a loop you can interrupt, and keep the context window clean.</li>
+      <li>Explore and plan before you implement, unless the change is one sentence.</li>
+      <li>Be specific, use <code>@</code> for files, and always give Claude a check to run.</li>
+      <li>Let Claude handle branching, commits and pull requests, then review the result yourself.</li>
+      <li>Correct early, rewind when needed, and <code>/clear</code> after two failed corrections.</li>
+      <li>When something breaks, run <code>/doctor</code> and <code>/context</code> first.</li>
+    </ol>
+    <p>Next, Part 6 extends Claude Code: connecting external tools with MCP, delegating to subagents, installing plugins, and using it from your editor, the desktop app or the web.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Agentic loop</td><td>Gather context, act, verify, repeat, with you able to interrupt.</td></tr>
+      <tr><td>Checkpoint</td><td>A snapshot of your files before Claude edits them, so you can rewind. Not a substitute for git.</td></tr>
+      <tr><td><code>@</code> reference</td><td>Typing <code>@</code> and a path to put a file or folder listing into the conversation.</td></tr>
+      <tr><td>Worktree</td><td>A separate checkout of a git repository on its own branch, for parallel work.</td></tr>
+      <tr><td>Pull request (PR)</td><td>A request to merge your branch, with a description and review.</td></tr>
+      <tr><td>Spec</td><td>A written description of what to build, which a fresh session can implement.</td></tr>
+      <tr><td><code>/doctor</code></td><td>A built-in checkup for your install, settings and context.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-4-api-models-links.html"><small>&larr; Previous &middot; Part 4</small>Claude API, models and official links</a>
+      <a class="next" href="claude-md-part-6-extend-and-surfaces.html"><small>Next &middot; Part 6 &rarr;</small>Extending Claude Code and choosing a surface</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

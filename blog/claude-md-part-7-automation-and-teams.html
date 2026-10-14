@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Automation and teams: claude -p, GitHub Actions and managed settings — series part 7 (advanced)</title>
+  <meta name="description" content="Run Claude Code non-interactively, in scripts and CI and GitHub Actions, then set it up for a team or organisation with shared files and managed settings. Part 7 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="7">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Advanced &middot; Part 7 of 8</p>
+    <h1>Automation and teams: scripts, CI, GitHub Actions, and organisation-wide setup</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~21 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">Automation</span><span class="tag">CI/CD</span><span class="tag">GitHub Actions</span><span class="tag">Teams</span><span class="tag">Managed settings</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a class="on" href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Everything so far assumed you, a terminal and a conversation. The next step is Claude Code without the conversation: running from a script, a scheduled job or a pull request, and then rolling it out to a whole team with shared conventions and organisation rules. This part covers non-interactive mode, GitHub Actions, scheduling, and team and admin setup. Automation means Claude acts with nobody watching, so the safety advice here matters more than anywhere else in the series.</p>
+
+    <div class="callout">
+      <strong>Part 7 in 60 seconds</strong>
+      <ul>
+        <li><code>claude -p "prompt"</code> runs Claude once, non-interactively, and prints the result. It works with pipes, JSON output and CI.</li>
+        <li>In unattended runs, pre-approve only the tools the job needs, and make everything else fail instead of prompt.</li>
+        <li>The GitHub Action lets you mention <code>@claude</code> on an issue or pull request, or run a prompt on any GitHub event.</li>
+        <li>For a team: commit shared conventions, keep personal overrides local, and let admins enforce policy with managed settings.</li>
+        <li>Never put keys in a repository, and treat any untrusted input as a potential prompt injection.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 7</strong>
+      <ol>
+        <li><a href="#headless">Non-interactive mode: claude -p</a></li>
+        <li><a href="#unattended">Running unattended safely</a></li>
+        <li><a href="#scripts">Scripts, pipes and fan-out</a></li>
+        <li><a href="#schedule">Running on a schedule</a></li>
+        <li><a href="#gha">GitHub Actions</a></li>
+        <li><a href="#team">Setting up a team</a></li>
+        <li><a href="#admin">For admins: managed settings and oversight</a></li>
+        <li><a href="#rollout">A rollout checklist</a></li>
+        <li><a href="#end7">Wrap-up and glossary</a></li>
+      </ol>
+    </div>
+
+    <h2 id="headless">1. Non-interactive mode: claude -p</h2>
+    <p>Add <code>-p</code> (or <code>--print</code>) to any <code>claude</code> command and it runs once without an interactive prompt, prints the answer, and exits. Under the hood it is the same engine as the Agent SDK, available as a command-line tool for scripts and CI.</p>
+<pre><code>claude -p "What does the auth module do?"
+claude -p "Find and fix the bug in auth.py" --allowedTools "Read,Edit,Bash"</code></pre>
+    <ul>
+      <li><strong>Exit code:</strong> 0 on success and non-zero on failure, so scripts can branch on it.</li>
+      <li><strong>Sessions:</strong> a <code>-p</code> run still creates a resumable session unless you pass <code>--no-session-persistence</code>.</li>
+      <li><strong>Some commands differ:</strong> user-invoked skills work (put <code>/skill-name</code> in the prompt), but terminal-only built-ins such as <code>/login</code> do not.</li>
+    </ul>
+    <h3>Choose an output format</h3>
+    <table>
+      <tr><th>Flag</th><th>You get</th><th>Use it for</th></tr>
+      <tr><td><code>--output-format text</code> (default)</td><td>Plain text</td><td>Humans, simple scripts</td></tr>
+      <tr><td><code>--output-format json</code></td><td>One JSON object with the <code>result</code> text, session ID and metadata (including <code>total_cost_usd</code> as a client-side estimate)</td><td>Scripts that parse the answer</td></tr>
+      <tr><td><code>--output-format stream-json</code></td><td>One JSON event per line, ending with a result message. Add <code>--verbose --include-partial-messages</code> for token-by-token output.</td><td>Live progress displays, real-time pipelines</td></tr>
+      <tr><td><code>--json-schema '{...}'</code> with <code>json</code></td><td>The answer in a structure you define, in the <code>structured_output</code> field</td><td>Extracting data reliably</td></tr>
+    </table>
+<pre><code># Plain answer to a file
+cat build-error.txt | claude -p 'concisely explain the root cause of this build error' &gt; output.txt
+
+# Get the text result with jq
+claude -p "Summarize this project" --output-format json | jq -r '.result'
+
+# Structured output
+claude -p "Extract the main function names from auth.py" \
+  --output-format json \
+  --json-schema '{"type":"object","properties":{"functions":{"type":"array","items":{"type":"string"}}},"required":["functions"]}' \
+  | jq '.structured_output'</code></pre>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="A script or CI job pipes input into claude -p, which returns text or JSON that goes to the next tool or a file, with an exit code the script can check.">
+        <rect class="box" x="6" y="30" width="130" height="70" rx="12"/><text class="b c" x="71" y="58">Input</text><text class="sub c" x="71" y="78">log, diff, file</text>
+        <path class="arrow" d="M138,65 L168,65"/>
+        <rect class="boxp" x="170" y="30" width="150" height="70" rx="12"/><text class="b c" x="245" y="58">claude -p</text><text class="sub c" x="245" y="78">one non-interactive run</text>
+        <path class="arrow" d="M322,65 L352,65"/>
+        <rect class="boxg" x="354" y="30" width="140" height="70" rx="12"/><text class="b c" x="424" y="58">Output</text><text class="sub c" x="424" y="78">text or JSON</text>
+        <path class="arrow" d="M496,65 L526,65"/>
+        <rect class="boxo" x="528" y="30" width="106" height="70" rx="12"/><text class="b c" x="581" y="58">Next step</text><text class="sub c" x="581" y="78">jq, file, CI</text>
+        <text class="sub c" x="320" y="136">The exit code (0 = success) lets a script decide what to do next.</text>
+      </svg>
+      <figcaption>Claude becomes one more command-line tool in a pipeline.</figcaption>
+    </figure>
+    <div class="note"><p>Piped input is capped at 10&nbsp;MB. For larger inputs, write the content to a file and mention the path in your prompt.</p></div>
+
+    <h3>Start faster and more predictably: --bare</h3>
+    <p>By default a <code>-p</code> run loads the same context an interactive session would: your CLAUDE.md, auto memory, plugins and MCP servers. <code>--bare</code> skips all of that auto-discovery, so the run behaves the same on every machine. The docs recommend it for scripted and CI use and say it will become the default for <code>-p</code> in a future release. It does not use your subscription login, so set <code>ANTHROPIC_API_KEY</code> first, and pass any context you need explicitly:</p>
+<pre><code>claude --bare -p "Summarize README.md" --allowedTools "Read"</code></pre>
+    <p>With <code>--bare</code>, you load extras on purpose: <code>--append-system-prompt</code>, <code>--settings</code>, <code>--mcp-config</code>, <code>--agents</code> or <code>--plugin-dir</code>.</p>
+
+    <h3>Continuing a conversation across runs</h3>
+<pre><code>claude -p "Review this codebase for performance issues"
+claude -p "Now focus on the database queries" --continue
+
+# Capture the session ID to resume a specific one
+session_id=$(claude -p "Start a review" --output-format json | jq -r '.session_id')
+claude -p "Continue that review" --resume "$session_id"</code></pre>
+
+    <h2 id="unattended">2. Running unattended safely</h2>
+    <p>In an interactive session you are the safety net. In a script nobody is watching, so decide in advance what Claude may do. There are three layers, from broad to narrow:</p>
+    <table>
+      <tr><th>Layer</th><th>Flag or setting</th><th>What it does</th></tr>
+      <tr><td><strong>Permission mode</strong></td><td><code>--permission-mode dontAsk</code></td><td>Denies anything that would otherwise prompt. File reads in your working folders and pre-approved tools still work. Suited to locked-down CI.</td></tr>
+      <tr><td></td><td><code>--permission-mode acceptEdits</code></td><td>Lets Claude write files and run common file commands without asking. Other shell commands still need an allow rule.</td></tr>
+      <tr><td></td><td><code>--permission-mode auto</code></td><td>A classifier reviews actions. Convenient for long jobs; see the docs for what it blocks.</td></tr>
+      <tr><td><strong>Allowed tools</strong></td><td><code>--allowedTools "Bash(git diff *),Read"</code></td><td>Pre-approves exactly the tools and command patterns the job needs. The trailing <code> *</code> enables prefix matching.</td></tr>
+      <tr><td><strong>No prompts</strong></td><td><code>--permission-prompts none</code></td><td>For runs with nobody to answer: anything that would prompt is denied, and Claude is told not to retry. Requires a recent version (v2.1.259 or later).</td></tr>
+    </table>
+    <p>The exact combination depends on the job. Two examples from the docs:</p>
+<pre><code># A job that reviews staged changes and commits (note: no git push is allowed)
+claude -p "Look at my staged changes and create an appropriate commit" \
+  --allowedTools "Bash(git diff *),Bash(git log *),Bash(git status *),Bash(git commit *)"
+
+# Unattended auto-mode run where anything needing approval is denied
+claude -p "Update the dependency pins and run the tests" \
+  --permission-mode auto --permission-prompts none</code></pre>
+    <div class="callout">
+      <strong>Safety rules for automation</strong>
+      <ul>
+        <li><strong>Least privilege:</strong> allow only the commands the job needs. A bare <code>Bash</code> allow is very broad.</li>
+        <li><strong>Always set a permission mode on purpose.</strong> A run where nothing sets one takes the built-in starting mode, which can be auto.</li>
+        <li><strong>Cap the work:</strong> <code>--max-turns</code> and, where supported, <code>--max-budget-usd</code> limit runaway jobs; add timeouts in your CI system.</li>
+        <li><strong>Untrusted input is dangerous:</strong> text from issues, comments, web pages or logs can contain hidden instructions (prompt injection). Do not give a job that reads untrusted input broad write or network permissions.</li>
+        <li><strong>Without <code>--bare</code>, a <code>-p</code> run still loads the project's own configuration and connects the MCP servers in its <code>.mcp.json</code></strong>, even for a folder you have never trusted, and shows no trust dialog. Use <code>--bare</code> in CI, or only run it on code you trust.</li>
+        <li><strong>Review what it produced.</strong> Unattended does not mean unreviewed: use pull requests, not direct pushes.</li>
+      </ul>
+    </div>
+
+    <h2 id="scripts">3. Scripts, pipes and fan-out</h2>
+    <h3>Pipe anything in</h3>
+<pre><code>git log --oneline -20 | claude -p "summarize these recent commits"
+
+# Review a pull request with a custom role (save as review.sh, run: bash review.sh 123)
+gh pr diff "$1" | claude -p \
+  --append-system-prompt "You are a security engineer. Review for vulnerabilities." \
+  --output-format json</code></pre>
+    <h3>Use Claude as a project-specific linter</h3>
+    <p>This <code>package.json</code> script pipes the diff against <code>main</code> into Claude and asks only for typos. Piping the diff means Claude does not need shell permission to read it:</p>
+<pre><code>{
+  "scripts": {
+    "lint:claude": "git diff main | claude -p \"you are a typo linter. for each typo in this diff, report filename:line on one line and the issue on the next. return nothing else.\""
+  }
+}</code></pre>
+    <h3>Fan out across many files</h3>
+    <p>For a large migration, the docs describe two approaches. The built-in one is <code>/batch &lt;instruction&gt;</code>, which splits the change across 5 to 30 subagents, each in its own worktree. To drive it yourself, loop over <code>claude -p</code>:</p>
+<pre><code>for file in $(cat files.txt); do
+  claude -p "Migrate $file from Python 2 to Python 3. Return OK or FAIL." \
+    --allowedTools "Edit,Bash(git commit *)" \
+    --permission-mode dontAsk
+done</code></pre>
+    <p>The docs' advice: ask Claude to write the list of files first, test the prompt on two or three files, fix what goes wrong, then run it on everything. <code>--permission-mode dontAsk</code> matters here because nobody can answer prompts.</p>
+
+    <h2 id="schedule">4. Running on a schedule</h2>
+    <p>If you want Claude to do something repeatedly, such as reviewing open pull requests each morning, the common-workflows guide offers four places to run it:</p>
+    <table>
+      <tr><th>Option</th><th>Where it runs</th><th>Best for</th></tr>
+      <tr><td><strong>Routines</strong></td><td>The cloud (Anthropic-managed by default)</td><td>Tasks that should run even when your computer is off; can also trigger on API calls or GitHub events.</td></tr>
+      <tr><td><strong>Desktop scheduled tasks</strong></td><td>Your machine, via the desktop app</td><td>Tasks that need your local files, tools or uncommitted changes.</td></tr>
+      <tr><td><strong>GitHub Actions</strong></td><td>Your CI pipeline</td><td>Tasks tied to repository events, or cron schedules that live beside your workflow config.</td></tr>
+      <tr><td><strong><code>/loop</code></strong></td><td>The current CLI session</td><td>Quick polling while a session is open.</td></tr>
+    </table>
+    <p>A tip straight from the docs: a scheduled task runs autonomously and cannot ask clarifying questions, so write the prompt with success in mind. Say what done looks like and what to do with the results, for example: &ldquo;Review open PRs labeled <code>needs-review</code>, leave inline comments on any issues, and post a summary in the <code>#eng-reviews</code> Slack channel.&rdquo;</p>
+
+    <h2 id="gha">5. GitHub Actions</h2>
+    <p><strong>Claude Code GitHub Actions</strong> runs Claude Code inside your repository's workflows. Mention <code>@claude</code> in a pull request or issue comment and it can analyse code, implement changes and push commits. You can also give it a prompt to run automatically on any GitHub event, to turn issues into pull requests or automate recurring tasks. It is built on the same SDK as <code>claude -p</code>.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="A person comments @claude on an issue or pull request. A GitHub workflow starts, runs Claude Code on a runner with the repository checked out, and Claude replies in the comment and may push commits to a branch. A person reviews.">
+        <rect class="box" x="6" y="40" width="120" height="76" rx="12"/><text class="b c" x="66" y="68">Comment</text><text class="sub c" x="66" y="88">&ldquo;@claude fix&hellip;&rdquo;</text><text class="sub c" x="66" y="104">on issue or PR</text>
+        <path class="arrow" d="M128,78 L156,78"/>
+        <rect class="boxb" x="158" y="40" width="130" height="76" rx="12"/><text class="b c" x="223" y="68">Workflow</text><text class="sub c" x="223" y="88">starts on a</text><text class="sub c" x="223" y="104">GitHub runner</text>
+        <path class="arrow" d="M290,78 L318,78"/>
+        <rect class="boxp" x="320" y="40" width="150" height="76" rx="12"/><text class="b c" x="395" y="68">Claude Code</text><text class="sub c" x="395" y="88">reads your repo,</text><text class="sub c" x="395" y="104">edits, runs checks</text>
+        <path class="arrow" d="M472,78 L500,78"/>
+        <rect class="boxg" x="502" y="40" width="132" height="76" rx="12"/><text class="b c" x="568" y="68">Result</text><text class="sub c" x="568" y="88">comment and/or</text><text class="sub c" x="568" y="104">commits to a PR</text>
+        <rect class="ghost" x="6" y="140" width="628" height="58" rx="12"/><text class="b" x="22" y="164">A human reviews and merges.</text><text class="sub" x="22" y="184">Grant the workflow only the permissions it needs, and keep the API key in GitHub Secrets.</text>
+      </svg>
+      <figcaption>The @claude loop on GitHub, as the docs describe it.</figcaption>
+    </figure>
+
+    <h3>Set it up</h3>
+    <ol class="steps">
+      <li><strong>Quick setup:</strong> in the repository, run <code>claude</code>, then <code>/install-github-app</code> and follow the prompts. It installs the Claude GitHub App, saves your credential as a repository secret and opens a pull request with the workflow files. It needs admin access to the repository, the GitHub CLI signed in with <code>gh auth login</code>, and a github.com repository. For GitLab, see the GitLab CI/CD page.</li>
+      <li><strong>Or set it up by hand:</strong> install the <a href="https://github.com/apps/claude" target="_blank" rel="noopener">Claude GitHub App</a>, add a secret named <code>ANTHROPIC_API_KEY</code> (an API key from the Console) or <code>CLAUDE_CODE_OAUTH_TOKEN</code> (a token for your Claude subscription, created by running <code>claude setup-token</code>), and copy a workflow file into <code>.github/workflows/</code>.</li>
+      <li><strong>Test it:</strong> comment <code>@claude</code> on an issue or pull request.</li>
+    </ol>
+
+    <h3>The @claude workflow</h3>
+    <p>This is the docs' example. It runs in <em>interactive</em> mode: with no <code>prompt</code> input, Claude waits for the trigger phrase and replies in a comment.</p>
+    <div class="doc"><div class="doc-bar">.github/workflows/claude.yml</div>
+<pre><code>name: Claude Code
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+jobs:
+  claude:
+    if: contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}</code></pre></div>
+    <p>Then comment things like <code>@claude implement this feature based on the issue description</code> or <code>@claude fix the TypeError in the user dashboard component</code>.</p>
+
+    <h3>Automation mode and who can trigger it</h3>
+    <ul>
+      <li><strong>Automation mode:</strong> add a <code>prompt</code> input and Claude runs on any event you choose (a pull request opening, a cron schedule) without waiting for a mention. Results go to the workflow log unless the prompt tells Claude to post a comment and it has a tool that can.</li>
+      <li><strong>Who can trigger it:</strong> by default the triggering user needs write access to the repository, and bot actors are rejected unless you list them in <code>allowed_bots</code>, which stops bots from triggering Claude in a loop.</li>
+      <li><strong>Pass options</strong> with <code>claude_args</code>, for example <code>--max-turns 5 --model claude-sonnet-5</code>. Without a model argument the action uses the Claude Code default model.</li>
+      <li><strong>Standards live in CLAUDE.md.</strong> Claude follows your repository's CLAUDE.md when it creates pull requests and answers requests (Part 2).</li>
+      <li><strong>Automatic review:</strong> if you want pull request review without maintaining a workflow, the docs point to the separate <em>Code Review</em> feature.</li>
+    </ul>
+    <h3>Costs and credentials</h3>
+    <ul>
+      <li><strong>Two costs:</strong> GitHub Actions minutes (the action runs on GitHub-hosted runners) and API tokens, unless you authenticate with a subscription token.</li>
+      <li><strong>Keep it cheap:</strong> write specific <code>@claude</code> requests, use issue templates for context, keep CLAUDE.md concise (it is read on every run), set <code>--max-turns</code>, add workflow timeouts and use GitHub's concurrency controls.</li>
+      <li><strong>Never commit keys.</strong> Store them as GitHub Secrets and reference them, and grant the workflow only the permissions it needs.</li>
+      <li><strong>CI not running on Claude's commits?</strong> GitHub does not trigger workflows on commits made with the default <code>GITHUB_TOKEN</code>. Remove an explicit <code>github_token</code> input so the action authenticates as the Claude GitHub App.</li>
+      <li><strong>Cloud providers:</strong> there are options to route the action through Amazon Bedrock, Google Cloud or Microsoft Foundry using identity federation, covered on a separate docs page.</li>
+    </ul>
+
+    <h2 id="team">6. Setting up a team</h2>
+    <p>A team gets the most from Claude Code when everyone starts from the same baseline and each person can still personalise. The building blocks are all things you have met already:</p>
+    <table>
+      <tr><th>What</th><th>Where</th><th>Committed?</th><th>Who it affects</th></tr>
+      <tr><td>Project conventions, commands, gotchas</td><td><code>CLAUDE.md</code> (and <code>.claude/rules/</code>)</td><td>Yes</td><td>Everyone on the repository</td></tr>
+      <tr><td>Shared workflows and know-how</td><td><code>.claude/skills/</code></td><td>Yes</td><td>Everyone</td></tr>
+      <tr><td>Shared helpers</td><td><code>.claude/agents/</code></td><td>Yes</td><td>Everyone</td></tr>
+      <tr><td>Shared permissions and defaults</td><td><code>.claude/settings.json</code></td><td>Yes</td><td>Everyone</td></tr>
+      <tr><td>Shared MCP servers</td><td><code>.mcp.json</code> (project scope)</td><td>Yes</td><td>Everyone (each approves it)</td></tr>
+      <tr><td>Shared plugins</td><td>Project-scope plugin entry in <code>.claude/settings.json</code></td><td>Yes</td><td>Everyone, after each runs the install once</td></tr>
+      <tr><td>Personal preferences</td><td><code>~/.claude/CLAUDE.md</code>, <code>CLAUDE.local.md</code>, <code>settings.local.json</code></td><td>No (gitignore the local files)</td><td>Only you</td></tr>
+    </table>
+    <p>Habits that work, mostly from the docs and Part 3:</p>
+    <ul>
+      <li><strong>Treat these files like code.</strong> Review changes in pull requests, because a bad rule or permission affects every future session.</li>
+      <li><strong>Turn mistakes into lines.</strong> When Claude gets something wrong that a teammate would also get wrong, add one line to CLAUDE.md. The official guide lists a repeated code-review comment as exactly that trigger.</li>
+      <li><strong>Pre-approve safe commands</strong> (tests, lint, <code>git status</code>) in the shared settings so nobody clicks through the same prompt all day.</li>
+      <li><strong>Agree on what Claude may not touch.</strong> Use deny rules for secrets and generated folders (Part 2).</li>
+      <li><strong>Pick a default surface and mode,</strong> and write down when to use plan mode and when to review manually.</li>
+      <li><strong>Use Claude to onboard people.</strong> The docs call asking a codebase the questions you'd ask another engineer &ldquo;an effective onboarding workflow&rdquo; that cuts ramp-up time and the load on other engineers.</li>
+    </ul>
+
+    <h2 id="admin">7. For admins: managed settings and oversight</h2>
+    <p>Shared files are conventions. If your organisation needs rules that cannot be overridden, the tool for it is <strong>managed settings</strong>: settings your organisation deploys to every developer's machine, applied above every other level. Per the docs, no user, project, local or <code>--settings</code> value overrides them, apart from a few security-sensitive exceptions where a stricter lower-level value still counts.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Settings precedence from highest to lowest: managed settings from your organisation, command line, project local, shared project, user. A higher level overrides a lower one.">
+        <rect class="boxr" x="70"  y="12"  width="500" height="38" rx="9"/><text class="b c" x="320" y="36">1. Managed settings: your organisation (cannot be overridden)</text>
+        <rect class="boxo" x="90"  y="56"  width="460" height="34" rx="9"/><text class="c" x="320" y="78">2. Command line (claude --settings &hellip;): you, this session</text>
+        <rect class="boxg" x="110" y="96"  width="420" height="34" rx="9"/><text class="c" x="320" y="118">3. Project local (.claude/settings.local.json): you, this project</text>
+        <rect class="boxb" x="130" y="136" width="380" height="34" rx="9"/><text class="c" x="320" y="158">4. Shared project (.claude/settings.json): the team</text>
+        <rect class="box"  x="150" y="176" width="340" height="34" rx="9"/><text class="c" x="320" y="198">5. User (~/.claude/settings.json): you</text>
+      </svg>
+      <figcaption>Higher levels win. This is the full order from the settings docs; Part 1 showed the three you use most.</figcaption>
+    </figure>
+    <h3>How it is delivered</h3>
+    <table>
+      <tr><th>Mechanism</th><th>How</th><th>Use it when</th></tr>
+      <tr><td><strong>Server-managed settings</strong></td><td>Set in the claude.ai admin console; fetched at startup and polled hourly</td><td>You want one place to change policy for a claude.ai organisation without touching machines</td></tr>
+      <tr><td><strong>MDM or OS-level policy</strong></td><td>A macOS configuration profile or a Windows registry value, pushed with a tool such as Jamf, Intune or Group Policy</td><td>You already manage devices that way</td></tr>
+      <tr><td><strong>A file on each machine</strong></td><td><code>managed-settings.json</code> in a system folder</td><td>No MDM, Linux hosts or images you build yourself</td></tr>
+    </table>
+    <p>The file locations are: macOS <code>/Library/Application Support/ClaudeCode/managed-settings.json</code>, Linux and WSL <code>/etc/claude-code/managed-settings.json</code>, and Windows <code>C:\Program Files\ClaudeCode\managed-settings.json</code>. The file uses the same shape as a normal <code>settings.json</code>. To check a machine, run <code>/status</code> in Claude Code: the &ldquo;Setting sources&rdquo; line shows <code>Enterprise managed settings (file)</code> when it applies. The docs offer starter templates for Jamf, Intune and Group Policy in an examples repository, and recommend testing on one machine before rolling out to the fleet.</p>
+    <h3>What admins commonly control</h3>
+    <ul>
+      <li><strong>Permissions:</strong> allow, ask and deny rules for tools and files, and which permission modes are available. For example, an admin can turn auto mode off with a managed setting, which also removes it from the Shift+Tab cycle.</li>
+      <li><strong>MCP servers:</strong> restrict which servers may run, using managed MCP configuration. Reviewing <code>.mcp.json</code> is not enough on its own, because servers can also come from other scopes, claude.ai connectors and plugins.</li>
+      <li><strong>Plugins and marketplaces:</strong> which plugins users may install, and plugins that are required.</li>
+      <li><strong>Model and update behaviour:</strong> for example a minimum version, or which models are available.</li>
+    </ul>
+    <h3>Seeing usage and cost across a team</h3>
+    <table>
+      <tr><th>Your setup</th><th>See spend</th><th>Cap spend</th></tr>
+      <tr><td>Claude Team or Enterprise</td><td>Spend report and an analytics dashboard in the claude.ai admin area</td><td>Seat allowance by default; usage credits with limits at organisation, group or member level</td></tr>
+      <tr><td>Claude Console (API)</td><td>The Console usage page and a Claude Code dashboard</td><td>Workspace spend limits</td></tr>
+      <tr><td>Amazon Bedrock, Google Cloud or Microsoft Foundry</td><td>Your cloud billing console</td><td>Your cloud's budget controls</td></tr>
+    </table>
+    <p>OpenTelemetry export works on every setup and is the only option that streams per-user token and cost metrics into your own monitoring stack in near real time. Remember from Part 3 that the official average is around $13 per developer per active day, with wide variation, so measure a small pilot before extrapolating.</p>
+    <h3>Security basics for a team</h3>
+    <ul>
+      <li>Claude Code starts with read-only permissions in Manual mode and asks before it edits or runs commands. You are responsible for reviewing what you approve.</li>
+      <li>Use managed settings to enforce standards, share approved permission configurations through version control, and audit your permissions with <code>/permissions</code>.</li>
+      <li>For sensitive work, run Claude Code in a sandbox or a dev container, and follow the docs' advice for untrusted content: review suggested commands, avoid piping untrusted content straight to Claude, and verify changes to critical files.</li>
+      <li>Sandboxing (<code>/sandbox</code>) restricts file and network access for shell commands so Claude can work more freely inside defined boundaries.</li>
+      <li>Report suspicious behaviour with <code>/feedback</code>. Anthropic's Trust Center lists its compliance certifications for security reviews.</li>
+    </ul>
+
+    <h2 id="rollout">8. A rollout checklist</h2>
+    <p>This list is my own suggestion, built from the docs above:</p>
+    <ol class="steps">
+      <li><strong>Pilot with a few people</strong> and a small project, and measure cost and time saved before widening.</li>
+      <li><strong>Commit a shared baseline:</strong> a short CLAUDE.md, shared settings with safe allow rules and secret deny rules, and the skills your team actually repeats.</li>
+      <li><strong>Choose a delivery route for policy</strong> (admin console, MDM or file) and test it on one machine with <code>/status</code>.</li>
+      <li><strong>Decide the guardrails:</strong> which modes, which MCP servers, which plugins, and whether auto mode is allowed.</li>
+      <li><strong>Set up cost visibility</strong> before launch: dashboards, spend limits or OpenTelemetry.</li>
+      <li><strong>Automate carefully:</strong> start with a read-only review job before any job that writes, and keep humans in the merge step.</li>
+      <li><strong>Review and prune monthly:</strong> CLAUDE.md, skills, plugins and permissions all drift.</li>
+    </ol>
+
+    <h2 id="end7">9. Wrap-up and glossary</h2>
+    <ol>
+      <li><code>claude -p</code> turns Claude into a command-line tool with text or JSON output.</li>
+      <li>Unattended runs need explicit, narrow permissions and a way to fail rather than prompt.</li>
+      <li>GitHub Actions brings <code>@claude</code> to issues and pull requests, with humans reviewing the result.</li>
+      <li>Teams share conventions in committed files and enforce policy with managed settings.</li>
+      <li>Track cost from day one, and keep keys out of repositories.</li>
+    </ol>
+    <p>Part 8, the last in the series, steps back from code: using the Claude apps for everyday work, plus a first-week learning plan and where to keep learning.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td><code>-p</code> / print mode</td><td>Run Claude once without a conversation and print the answer.</td></tr>
+      <tr><td><code>--bare</code></td><td>Skip auto-loading of plugins, memory, MCP servers and CLAUDE.md for repeatable runs.</td></tr>
+      <tr><td><code>dontAsk</code></td><td>A permission mode that denies anything that would prompt.</td></tr>
+      <tr><td>Runner</td><td>The machine (for example a GitHub-hosted one) that executes a CI job.</td></tr>
+      <tr><td>Workflow</td><td>A GitHub Actions file describing when and how a job runs.</td></tr>
+      <tr><td>Managed settings</td><td>Organisation-deployed settings that users cannot override.</td></tr>
+      <tr><td>MDM</td><td>Mobile device management: tools that push policy to company computers.</td></tr>
+      <tr><td>OpenTelemetry</td><td>An open standard for exporting usage and performance data to monitoring tools.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-6-extend-and-surfaces.html"><small>&larr; Previous &middot; Part 6</small>Extending Claude Code and choosing a surface</a>
+      <a class="next" href="claude-md-part-8-beyond-code-learning-path.html"><small>Next &middot; Part 8 &rarr;</small>Beyond code and your learning path</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Extending Claude Code: MCP, subagents, plugins, VS Code, JetBrains, desktop and web — series part 6 (advanced)</title>
+  <meta name="description" content="How to choose between CLAUDE.md, skills, MCP, subagents and plugins, plus a guide to VS Code, JetBrains, the desktop app and cloud sessions. Part 6 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="6">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Advanced &middot; Part 6 of 8</p>
+    <h1>Extending Claude Code: MCP, subagents, plugins, and using it in your editor</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~21 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">MCP</span><span class="tag">Subagents</span><span class="tag">Plugins</span><span class="tag">VS Code</span><span class="tag">JetBrains</span><span class="tag">Desktop</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a class="on" href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">So far Claude Code has worked inside your project folder with the tools it ships with. Real projects also live in issue trackers, databases and monitoring dashboards, and real developers live in editors. This part covers the extension layer: how to connect Claude to outside tools with MCP, how to delegate work to subagents, how to bundle and share setups as plugins, and how Claude Code behaves in VS Code, JetBrains, the desktop app and the web. As before, details come from the official docs and my own advice is marked.</p>
+
+    <div class="callout">
+      <strong>Part 6 in 60 seconds</strong>
+      <ul>
+        <li>Pick the extension by the problem: always-on rules go in CLAUDE.md, repeatable know-how in a skill, outside systems in MCP, noisy side work in a subagent, shared setups in a plugin.</li>
+        <li>MCP connects Claude to external services. Add a server with <code>claude mcp add</code>, check it with <code>/mcp</code>, and trust only servers you can vouch for.</li>
+        <li>A subagent is a helper with its own context window. It does the reading and returns only a summary, which keeps your main conversation clean.</li>
+        <li>A plugin bundles skills, subagents and MCP servers into one installable unit. Install with <code>/plugin</code>, and read what it adds first.</li>
+        <li>The terminal, VS Code, JetBrains, desktop app and web all run the same engine, with different strengths.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 6</strong>
+      <ol>
+        <li><a href="#match">Which extension for which problem?</a></li>
+        <li><a href="#mcp">MCP: connecting Claude to outside tools</a></li>
+        <li><a href="#agents">Subagents: helpers with their own context</a></li>
+        <li><a href="#plugins">Plugins: bundle and share a setup</a></li>
+        <li><a href="#surfaces">Your editor, desktop app or browser</a></li>
+        <li><a href="#pick">Choosing a surface</a></li>
+        <li><a href="#end6">Wrap-up and glossary</a></li>
+      </ol>
+    </div>
+
+    <h2 id="match">1. Which extension for which problem?</h2>
+    <p>The official guide to extending Claude Code makes a useful point: you do not need to configure everything up front. Each feature has a recognisable trigger, and most teams add them in roughly this order:</p>
+    <table>
+      <tr><th>You notice&hellip;</th><th>Add&hellip;</th></tr>
+      <tr><td>Claude gets a convention or command wrong twice</td><td>A line in <a href="claude-md-part-2-memory.html">CLAUDE.md</a></td></tr>
+      <tr><td>You keep asking Claude to be shorter or answer in the same format</td><td>An <strong>output style</strong></td></tr>
+      <tr><td>You paste the same playbook into chat for the third time</td><td>A <strong>skill</strong></td></tr>
+      <tr><td>You keep copying data from a browser tab Claude cannot see</td><td>An <strong>MCP server</strong> for that system</td></tr>
+      <tr><td>Claude reads many files to find where a symbol is defined</td><td>A <strong>code intelligence plugin</strong> for your language</td></tr>
+      <tr><td>A side task floods your conversation with output you will not reuse</td><td>A <strong>subagent</strong></td></tr>
+      <tr><td>A second repository needs the same setup</td><td>A <strong>plugin</strong></td></tr>
+    </table>
+    <p>And this is how the main ones differ in what they cost your context window, which connects back to Part 3:</p>
+    <table>
+      <tr><th>Feature</th><th>Good for</th><th>When it loads</th><th>Context cost</th></tr>
+      <tr><td><strong>CLAUDE.md</strong></td><td>&ldquo;Always do X&rdquo; rules, project conventions</td><td>Every session</td><td>Every request</td></tr>
+      <tr><td><strong>Skill</strong></td><td>Reusable knowledge and workflows</td><td>Description at start; full text when used</td><td>Low until used</td></tr>
+      <tr><td><strong>MCP server</strong></td><td>External data or actions</td><td>Tool names at start; full details on demand</td><td>Low until a tool is used</td></tr>
+      <tr><td><strong>Subagent</strong></td><td>Context isolation, parallel or specialised work</td><td>When spawned</td><td>Isolated from your main session</td></tr>
+    </table>
+    <p>They also combine. The docs give examples: MCP provides the connection while a skill teaches Claude how to use it well (for instance, MCP connects to your database and a skill documents your schema and query patterns); CLAUDE.md holds the always-on rules while skills hold the reference material loaded on demand; and a skill can spawn subagents for parallel work. For the rest of this post I will skip automation scripts that run on events (the series leaves those out) and focus on the four tools above.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 260" role="img" aria-label="Claude Code in the centre. Around it: CLAUDE.md for always-on rules, skills for on-demand know-how, MCP for outside systems, subagents for isolated side work, and plugins that package them.">
+        <rect class="boxp" x="240" y="94" width="160" height="72" rx="16"/><text class="b c" x="320" y="124">Claude Code</text><text class="sub c" x="320" y="144">the agentic loop</text>
+        <rect class="boxb" x="14" y="14" width="190" height="62" rx="12"/><text class="b c" x="109" y="40">CLAUDE.md</text><text class="sub c" x="109" y="60">always-on rules</text>
+        <rect class="boxg" x="436" y="14" width="190" height="62" rx="12"/><text class="b c" x="531" y="40">Skills</text><text class="sub c" x="531" y="60">know-how on demand</text>
+        <rect class="boxo" x="14" y="184" width="190" height="62" rx="12"/><text class="b c" x="109" y="210">MCP servers</text><text class="sub c" x="109" y="230">outside systems</text>
+        <rect class="boxr" x="436" y="184" width="190" height="62" rx="12"/><text class="b c" x="531" y="210">Subagents</text><text class="sub c" x="531" y="230">isolated helpers</text>
+        <path class="arrow" d="M206,58 L246,98"/><path class="arrow" d="M434,58 L394,98"/><path class="arrow" d="M206,202 L246,162"/><path class="arrow" d="M434,202 L394,162"/>
+        <rect class="ghost" x="236" y="190" width="168" height="50" rx="12"/><text class="b c" x="320" y="212">Plugins</text><text class="sub c" x="320" y="230">package the rest</text>
+      </svg>
+      <figcaption>Each extension solves a different problem. Plugins are the packaging layer on top.</figcaption>
+    </figure>
+
+    <h2 id="mcp">2. MCP: connecting Claude to outside tools</h2>
+    <p>The <strong>Model Context Protocol (MCP)</strong> is, in the docs' words, &ldquo;an open source standard for AI-tool integrations.&rdquo; In plain terms: an MCP <em>server</em> is a small program or web service that offers Claude a set of tools for one outside system, such as an issue tracker, a design tool, a monitoring service or a database. Once connected, you can say things like these (the official examples):</p>
+<pre><code>Add the feature described in JIRA issue ENG-4521 and create a PR on GitHub.
+Check Sentry and Statsig to check the usage of the feature described in ENG-4521.
+Find emails of 10 random users who used feature ENG-4521, based on our PostgreSQL database.</code></pre>
+    <div class="analogy"><strong>Think of it like a power strip with standard sockets</strong>
+      <p>Without a standard, every tool needs its own custom cable. MCP is the standard socket: any service that offers an MCP server can be plugged into Claude Code the same way, and the server handles the connection and sign-in details.</p>
+    </div>
+
+    <h3>Adding a server</h3>
+    <p>There are different ways a server can be reached. HTTP is the recommended one for remote servers; <code>stdio</code> runs a program on your own machine; SSE is deprecated in favour of HTTP.</p>
+<pre><code># Remote server over HTTP (recommended for remote)
+claude mcp add --transport http notion https://mcp.notion.com/mcp
+
+# Remote server that needs a token header
+claude mcp add --transport http secure-api https://api.example.com/mcp \
+  --header "Authorization: Bearer your-token"
+
+# Local program over stdio. The -- separates Claude's flags from the server command
+claude mcp add --env AIRTABLE_API_KEY=YOUR_KEY --transport stdio airtable \
+  -- npx -y airtable-mcp-server</code></pre>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Claude Code connects to MCP servers over HTTP or stdio. Each server fronts an outside system such as an issue tracker, a monitoring service or a database. Claude asks for tools by name and the server runs them.">
+        <rect class="boxp" x="10" y="70" width="150" height="90" rx="14"/><text class="b c" x="85" y="106">Claude Code</text><text class="sub c" x="85" y="126">asks for a tool</text>
+        <path class="arrow" d="M162,100 L250,60"/><path class="arrow" d="M162,115 L250,115"/><path class="arrow" d="M162,130 L250,170"/>
+        <rect class="boxo" x="252" y="32" width="160" height="52" rx="12"/><text class="b c" x="332" y="55">MCP server</text><text class="sub c" x="332" y="73">HTTP (remote)</text>
+        <rect class="boxo" x="252" y="90" width="160" height="52" rx="12"/><text class="b c" x="332" y="113">MCP server</text><text class="sub c" x="332" y="131">HTTP (remote)</text>
+        <rect class="boxo" x="252" y="148" width="160" height="52" rx="12"/><text class="b c" x="332" y="171">MCP server</text><text class="sub c" x="332" y="189">stdio (local)</text>
+        <path class="arrow" d="M414,58 L470,58"/><path class="arrow" d="M414,116 L470,116"/><path class="arrow" d="M414,174 L470,174"/>
+        <rect class="box" x="472" y="32" width="156" height="52" rx="12"/><text class="b c" x="550" y="62">Issue tracker</text>
+        <rect class="box" x="472" y="90" width="156" height="52" rx="12"/><text class="b c" x="550" y="120">Monitoring</text>
+        <rect class="box" x="472" y="148" width="156" height="52" rx="12"/><text class="b c" x="550" y="178">Database</text>
+        <text class="sub c" x="320" y="222">You decide which servers to trust; the server does the work.</text>
+      </svg>
+      <figcaption>Claude asks for a tool by name. The MCP server turns that into a call to the real system.</figcaption>
+    </figure>
+
+    <h3>Where the configuration lives</h3>
+    <p>Add <code>--scope</code> (or <code>-s</code>) to choose who gets the server:</p>
+    <table>
+      <tr><th>Scope</th><th>Available in</th><th>Shared with team?</th><th>Stored in</th></tr>
+      <tr><td><code>local</code> (default)</td><td>This project, for you</td><td>No</td><td>Your <code>~/.claude.json</code></td></tr>
+      <tr><td><code>project</code></td><td>This project, for everyone</td><td>Yes, through version control</td><td><code>.mcp.json</code> in the project root</td></tr>
+      <tr><td><code>user</code></td><td>All your projects</td><td>No</td><td>Your <code>~/.claude.json</code></td></tr>
+    </table>
+    <p>When the same server name exists at several levels, local wins over project, and project over user. Claude Code asks you to approve servers from a project's <code>.mcp.json</code> before using them, which protects you from servers a teammate (or a stranger's repository) committed.</p>
+
+    <h3>Managing and signing in</h3>
+<pre><code>claude mcp list            # all servers, with health status
+claude mcp get notion      # details for one server
+claude mcp remove notion   # remove it (also deletes stored sign-in tokens)
+
+# Inside a session
+/mcp                       # check status, sign in, reconnect, toggle</code></pre>
+    <p>For servers that use OAuth sign-in, add the server, run <code>/mcp</code> in a session, and follow the browser steps. Tokens are stored and refreshed automatically. From a shell, <code>claude mcp login &lt;name&gt;</code> does the same. Non-interactive runs (<code>claude -p</code>) cannot do the OAuth step, so sign in interactively first.</p>
+
+    <h3>Safety and cost</h3>
+    <div class="callout">
+      <strong>Trust each server before you connect it</strong>
+      <ul>
+        <li>The docs warn: verify you trust each server. Servers that fetch external content can expose you to <strong>prompt injection</strong>, where text in a web page or ticket tries to give Claude instructions.</li>
+        <li>Anthropic reviews connectors in its directory but does not security-audit or manage any MCP server. Prefer servers you wrote or that come from providers you trust.</li>
+        <li>Use a <strong>read-only</strong> database user for database servers (the docs' own example connects as a user named <code>readonly</code>).</li>
+        <li>You can set Claude Code permissions for MCP tools, just like built-in ones.</li>
+      </ul>
+    </div>
+    <ul>
+      <li><strong>Token cost:</strong> tool search is on by default, so idle MCP tools use little context: only tool names load at the start and full details load when a tool is needed. Run <code>/context all</code> to see how many tokens each loaded MCP tool uses, and disable servers you are not using.</li>
+      <li><strong>CLI first when one exists:</strong> the cost guide notes that tools like <code>gh</code>, <code>aws</code>, <code>gcloud</code> and <code>sentry-cli</code> are more context-efficient than MCP servers because they add no per-tool listing.</li>
+      <li><strong>Large outputs:</strong> Claude Code warns when a tool returns more than 10,000 tokens and caps output at 25,000 by default.</li>
+    </ul>
+
+    <h2 id="agents">3. Subagents: helpers with their own context</h2>
+    <p>The best-practices guide says context is your fundamental constraint, and subagents are the main tool for protecting it. The docs define them like this: a subagent is a specialised assistant you use when a side task would flood your main conversation with search results, logs or file contents you will not reference again. It does the work in its own context window and returns only the summary.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Without a subagent the main conversation fills with many file reads. With a subagent the many reads happen in a separate window and only a short summary comes back to the main conversation.">
+        <text class="b" x="14" y="22">Without a subagent</text>
+        <rect class="box" x="14" y="32" width="290" height="70" rx="12"/><text class="sub" x="28" y="56">Your conversation also holds</text><text class="sub" x="28" y="74">every file read and every log line</text>
+        <rect class="bar-o" x="14" y="108" width="290" height="12" rx="5"/><text class="sub" x="14" y="138">window fills quickly</text>
+        <text class="b" x="336" y="22">With a subagent</text>
+        <rect class="boxr" x="336" y="32" width="150" height="70" rx="12"/><text class="b c" x="411" y="58">Subagent</text><text class="sub c" x="411" y="78">reads 40 files</text><text class="sub c" x="411" y="92">in its own window</text>
+        <path class="arrow" d="M488,67 L528,67"/>
+        <rect class="boxg" x="530" y="32" width="96" height="70" rx="12"/><text class="b c" x="578" y="58">Summary</text><text class="sub c" x="578" y="78">comes back</text>
+        <rect class="bar-g" x="336" y="108" width="40" height="12" rx="5"/><text class="sub" x="336" y="138">your window barely grows</text>
+        <rect class="ghost" x="14" y="162" width="612" height="76" rx="12"/><text class="b" x="30" y="188">Also good for</text><text class="sub" x="30" y="208">&#8226; independent review of a diff by a fresh context   &#8226; parallel research   &#8226; cheaper models for easy work</text><text class="sub" x="30" y="226">Subagent requests still count toward your usage limits.</text>
+      </svg>
+      <figcaption>Illustrative. The saving is in your main window; the subagent still uses tokens of its own.</figcaption>
+    </figure>
+
+    <h3>Built-in subagents</h3>
+    <table>
+      <tr><th>Subagent</th><th>What it is for</th></tr>
+      <tr><td><strong>Explore</strong></td><td>Read-only file discovery and code search, with thoroughness levels quick, medium and very thorough. It skips CLAUDE.md and git status for speed.</td></tr>
+      <tr><td><strong>Plan</strong></td><td>Read-only research while in plan mode.</td></tr>
+      <tr><td><strong>General-purpose</strong></td><td>Complex multi-step tasks that need both exploration and action.</td></tr>
+    </table>
+    <p>Claude uses these on its own when it makes sense, and you can ask directly:</p>
+<pre><code>Use subagents to investigate how our authentication system handles token
+refresh, and whether we have any existing OAuth utilities I should reuse.
+
+use a subagent to investigate how our auth system handles token refresh</code></pre>
+
+    <h3>Making your own</h3>
+    <p>A custom subagent is a markdown file with a short header. Put it in <code>.claude/agents/</code> to share it with your project, or in <code>~/.claude/agents/</code> to use it everywhere. Only <code>name</code> and <code>description</code> are required. This is the docs' own example:</p>
+    <div class="doc"><div class="doc-bar">.claude/agents/code-reviewer.md</div>
+<pre><code>---
+name: code-reviewer
+description: Reviews code for quality and best practices
+tools: Read, Glob, Grep
+model: sonnet
+---
+
+You are a code reviewer. When invoked, analyze the code and provide
+specific, actionable feedback on quality, security, and best practices.</code></pre></div>
+    <ul>
+      <li><strong><code>tools</code></strong> limits what the helper may do. A reviewer that can only read cannot change your code.</li>
+      <li><strong><code>model</code></strong> can be <code>sonnet</code>, <code>opus</code>, <code>haiku</code>, <code>inherit</code> or a full ID. Routing simple work to a cheaper model is a real cost saving (Part 3).</li>
+      <li><strong>The description matters:</strong> Claude uses it to decide when to delegate. Phrases like &ldquo;use proactively&rdquo; encourage it.</li>
+      <li><strong>Invoking it:</strong> ask in plain words (<code>Use the test-runner subagent to fix failing tests</code>), @-mention it with <code>@"code-reviewer (agent)" look at the auth changes</code>, or run the whole session as that agent with <code>claude --agent code-reviewer</code>.</li>
+      <li><strong>Where it wins:</strong> when the same name exists in several places, managed settings win, then the <code>--agents</code> flag, then <code>.claude/agents/</code>, then <code>~/.claude/agents/</code>, then plugins.</li>
+      <li><strong>Note on <code>/agents</code>:</strong> on current versions the command just prints a reminder to ask Claude or edit the folders directly; older versions (v2.1.197 and earlier) opened a wizard.</li>
+    </ul>
+
+    <h3>Good to know</h3>
+    <ul>
+      <li><strong>Foreground or background:</strong> foreground subagents block your conversation and pass permission prompts through. Background ones run alongside; press <kbd>Ctrl</kbd>+<kbd>B</kbd> to send a running task to the background.</li>
+      <li><strong>What a subagent does not see:</strong> your conversation history (except a &ldquo;fork&rdquo;, started with <code>/subtask</code>), your output style, or your main auto memory. Put what it needs in the prompt.</li>
+      <li><strong>Limits:</strong> by default up to 3 layers of nesting and 20 running at once, both adjustable with environment variables.</li>
+      <li><strong>Permissions:</strong> if your session is in auto, accept edits or bypass mode, a subagent's own permission mode is ignored.</li>
+      <li><strong>A review pattern from the docs:</strong> &ldquo;Use a subagent to review the rate limiter diff against PLAN.md. Check that every requirement is implemented, the listed edge cases have tests, and nothing outside the task's scope changed. Report gaps, not style preferences.&rdquo;</li>
+    </ul>
+
+    <h2 id="plugins">4. Plugins: bundle and share a setup</h2>
+    <p>A <strong>plugin</strong> packages skills, subagents, MCP servers (and other pieces) into a single installable unit. A <strong>marketplace</strong> is a catalogue of plugins. Use plugins when you want the same setup across repositories or to share it with others. Plugin skills are namespaced like <code>/commit-commands:commit</code> so several plugins can coexist.</p>
+    <div class="note"><p>Skim this section if you work alone on one project: you can get far with CLAUDE.md, skills and a couple of MCP servers. Plugins matter most when you maintain the same setup in several places.</p></div>
+    <ol class="steps">
+      <li><strong>Open the browser.</strong> Run <code>/plugin</code> in a session. It opens a panel with a Discover tab listing plugins from your marketplaces.
+<pre><code>/plugin</code></pre></li>
+      <li><strong>Or install one by name.</strong> This example from the docs adds commands for committing, pushing and opening pull requests; it opens the plugin's details so you can review it first.
+<pre><code>/plugin install commit-commands@claude-plugins-official</code></pre></li>
+      <li><strong>Read what it adds.</strong> The details pane lists the skills, agents and servers it installs, and for plugins in Anthropic's official marketplace it shows token estimates: one for every turn and one for when its skills are invoked.</li>
+      <li><strong>Choose a scope.</strong> User (every project on this machine), project (everyone on the repository, recorded in the committed <code>.claude/settings.json</code>) or local (you, this repository only).</li>
+      <li><strong>Check it worked.</strong> Type <code>/</code> and look for <code>/&lt;plugin&gt;:&lt;skill&gt;</code>, or run <code>claude plugin list</code> in your shell.</li>
+    </ol>
+    <table>
+      <tr><th>Task</th><th>Command</th></tr>
+      <tr><td>Add a marketplace (GitHub repo, git URL, local folder or hosted file)</td><td><code>/plugin marketplace add owner/repo</code></td></tr>
+      <tr><td>Install from your shell</td><td><code>claude plugin install formatter@your-org --scope project</code></td></tr>
+      <tr><td>Turn off or remove</td><td><code>claude plugin disable name@marketplace</code>, <code>claude plugin uninstall name@marketplace</code></td></tr>
+      <tr><td>Update one plugin</td><td><code>claude plugin update name@marketplace</code></td></tr>
+      <tr><td>See what a plugin costs you</td><td><code>claude plugin details &lt;name&gt;</code>: the &ldquo;Always-on&rdquo; line is tokens added to every session.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Read before you install</strong>
+      <ul>
+        <li>The docs warn that a plugin can run code and MCP servers, so read its details pane first and see the plugin security page for marketplaces you do not know.</li>
+        <li>Committing a project-scope plugin turns it on for teammates but does not download it for them; each runs <code>claude plugin install &lt;name&gt;@&lt;marketplace&gt; --scope project</code> once.</li>
+        <li>Plugins you no longer use still add startup and context cost. The Installed tab shows a &ldquo;Not used recently&rdquo; group so you can prune.</li>
+        <li>If you work in a typed language, a <strong>code intelligence plugin</strong> gives Claude precise &ldquo;go to definition&rdquo; and &ldquo;find references&rdquo; and reports type errors after edits, which can replace broad file reads.</li>
+      </ul>
+    </div>
+
+    <h2 id="surfaces">5. Your editor, desktop app or browser</h2>
+    <p>The agentic loop, tools and settings are the same everywhere. What changes is where the code runs and how you interact with it. In the official words, each surface connects to the same Claude Code engine, so your repository's CLAUDE.md, settings and MCP servers work across all of them.</p>
+
+    <h3>VS Code (and Cursor)</h3>
+    <ul>
+      <li><strong>Needs:</strong> VS Code 1.94.0 or later and a paid Claude plan (Pro, Max, Team or Enterprise) or a Console account. Install from the Extensions view (search &ldquo;Claude Code&rdquo;), or use the install link for Cursor.</li>
+      <li><strong>Open it:</strong> click the Spark icon in the editor toolbar, the Activity Bar or the status bar, or use the Command Palette and type &ldquo;Claude Code&rdquo;.</li>
+      <li><strong>What it adds over the terminal:</strong> a graphical panel with inline diffs, the plan opened as a markdown document you can comment on, <code>@</code>-mentions of files with line ranges from your selection, conversation history, multiple conversations in tabs, and a mode indicator under the prompt (Manual, Plan, Auto, Edit automatically).</li>
+      <li><strong>Rewind:</strong> hover over any message for the rewind button: fork the conversation, rewind code, or both.</li>
+      <li><strong>What differs:</strong> only a subset of commands and skills are available (type <code>/</code> to see them); the <code>!</code> shell shortcut and tab completion are CLI-only. Installing the extension does not put <code>claude</code> on your PATH; for CLI features, install the CLI and run <code>claude</code> in the integrated terminal, which connects to the editor automatically.</li>
+      <li><strong>Same history:</strong> the extension and CLI share conversations. Continue an extension conversation in the terminal with <code>claude --resume</code>.</li>
+    </ul>
+
+    <h3>JetBrains IDEs (IntelliJ, PyCharm, Android Studio and more)</h3>
+    <ul>
+      <li><strong>Two pieces:</strong> install the Claude Code CLI, <em>and</em> the Claude Code plugin from the JetBrains Marketplace, then restart the IDE. The plugin runs <code>claude</code> in the IDE's terminal and connects to it; it does not bundle its own CLI.</li>
+      <li><strong>Open it:</strong> <kbd>Cmd</kbd>+<kbd>Esc</kbd> on Mac or <kbd>Ctrl</kbd>+<kbd>Esc</kbd> on Windows/Linux, or the Claude Code button. From an external terminal, run <code>/ide</code> to connect.</li>
+      <li><strong>What you get:</strong> changes open in the IDE's diff viewer, your current selection and tab are shared automatically, <kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>K</kbd> (Mac) or <kbd>Alt</kbd>+<kbd>Ctrl</kbd>+<kbd>K</kbd> inserts file references like <code>@src/auth.ts#L1-99</code>, and Claude can read the IDE's inspection diagnostics.</li>
+      <li><strong>Gotchas:</strong> if <kbd>Esc</kbd> does not interrupt Claude, untick &ldquo;Move focus to the editor with Escape&rdquo; in the terminal settings. For JetBrains Remote Development, install the plugin on the remote host. WSL2 may need a firewall rule or mirrored networking.</li>
+      <li><strong>Security note from the docs:</strong> in accept-edits mode Claude may be able to modify IDE configuration files that the IDE can execute automatically, so the docs suggest Manual mode in JetBrains.</li>
+      <li><strong>Privacy:</strong> a <code>Read</code> deny rule (Part 2) stops the IDE from sharing a matching file's selection with Claude, for example <code>.env</code>.</li>
+    </ul>
+
+    <h3>The desktop app</h3>
+    <ul>
+      <li><strong>What it is:</strong> the Claude desktop app with three tabs: <strong>Chat</strong> (general conversation with no file access), <strong>Cowork</strong> (an autonomous background agent for tasks) and <strong>Code</strong> (Claude Code with a graphical interface). It needs a Pro, Max, Team or Enterprise plan for Code.</li>
+      <li><strong>No terminal needed.</strong> The app includes Claude Code, so you do not install Node.js or the CLI.</li>
+      <li><strong>Start:</strong> open the Code tab, choose <strong>Local</strong> (your machine), <strong>Cloud</strong>, <strong>SSH</strong> or <strong>WSL</strong>, select a folder, pick a model and describe the task.</li>
+      <li><strong>Why people like it:</strong> a visual diff view with Accept and Reject, comments on specific lines, several sessions side by side (optionally each in its own worktree), a built-in preview of your running app, scheduled tasks, and PR monitoring that can fix CI failures.</li>
+    </ul>
+
+    <h3>Claude Code on the web (cloud sessions)</h3>
+    <ul>
+      <li><strong>What it is:</strong> a session that runs on cloud infrastructure instead of your computer, started from claude.ai/code, the mobile app, the desktop app or the terminal. It keeps running after you close your laptop. Available on Pro, Max and Team plans, and for Enterprise users with premium seats.</li>
+      <li><strong>It needs GitHub:</strong> connect GitHub (the Claude GitHub App or <code>/web-setup</code> from your terminal) so the session can clone your code and push branches.</li>
+      <li><strong>Move work between terminal and cloud:</strong> <code>claude --cloud "Fix the authentication bug in src/auth/login.ts"</code> starts a cloud session for your current repository (push first: it clones your GitHub remote, not your local checkout). <code>claude --teleport</code> pulls a cloud session into your terminal.</li>
+      <li><strong>Review:</strong> each session shows a diff indicator such as <code>+42 -18</code>; open it, comment on lines and send feedback.</li>
+      <li><strong>Auto-fix:</strong> Claude can watch a pull request and respond to CI failures and review comments. Run <code>/autofix-pr</code> on the PR's branch. The docs warn it replies using your GitHub account, and to review repository automations triggered by comments before turning it on.</li>
+      <li><strong>Isolation:</strong> each session runs in an isolated VM with limited network access by default, and your GitHub credentials stay outside the VM.</li>
+      <li><strong>Limits:</strong> cloud sessions share your plan's usage limits, GitHub is required for cloning and pull requests, and <code>/clear</code> is not available (start a new session instead).</li>
+    </ul>
+
+    <h2 id="pick">6. Choosing a surface</h2>
+    <table>
+      <tr><th>Surface</th><th>Runs on</th><th>Choose it when&hellip;</th></tr>
+      <tr><td><strong>Terminal (CLI)</strong></td><td>Your machine</td><td>You want every feature, scripting, and the fullest control.</td></tr>
+      <tr><td><strong>VS Code / Cursor</strong></td><td>Your machine</td><td>You live in the editor and want inline diffs, @-mentions with line ranges and plan review.</td></tr>
+      <tr><td><strong>JetBrains / Android Studio</strong></td><td>Your machine</td><td>You use a JetBrains IDE and want diffs in the IDE diff viewer and shared selection.</td></tr>
+      <tr><td><strong>Desktop app</strong></td><td>Your machine, or cloud, SSH, WSL</td><td>You prefer a graphical app, visual diffs, parallel sessions or scheduled tasks, without a terminal.</td></tr>
+      <tr><td><strong>Web / cloud</strong></td><td>Anthropic-managed VMs</td><td>You want long tasks to continue while your laptop is off, or to start work from your phone.</td></tr>
+    </table>
+    <p>You can mix them. Because the extension and CLI share history and the engine is identical, a common pattern is to explore in the editor, run a heavy job in the cloud, and teleport the result back to the terminal to finish. My own advice: pick one surface and get fluent in it first; extra surfaces are easy to add later.</p>
+
+    <h2 id="end6">7. Wrap-up and glossary</h2>
+    <ol>
+      <li>Add extensions when a recurring problem appears, not before.</li>
+      <li>MCP connects outside systems; trust servers carefully, and prefer a CLI tool when one exists.</li>
+      <li>Subagents protect your main context and can use cheaper models.</li>
+      <li>Plugins package and share a setup; read what they add and prune the ones you do not use.</li>
+      <li>The surface changes how you interact, not what Claude can do.</li>
+    </ol>
+    <p>Part 7 moves from one developer to many: running Claude Code in scripts and CI, and setting it up for a team or organisation.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>MCP</td><td>Model Context Protocol, an open standard for connecting AI tools to outside systems.</td></tr>
+      <tr><td>MCP server</td><td>A program or service that offers Claude a set of tools for one outside system.</td></tr>
+      <tr><td>Transport</td><td>How Claude reaches an MCP server: HTTP for remote, stdio for a local program.</td></tr>
+      <tr><td>Prompt injection</td><td>Hidden instructions in content (a web page, a ticket) that try to steer an AI.</td></tr>
+      <tr><td>Subagent</td><td>A helper with its own context window that returns only a summary.</td></tr>
+      <tr><td>Plugin / marketplace</td><td>A bundle of skills, agents and servers, and a catalogue of such bundles.</td></tr>
+      <tr><td>Cloud session</td><td>A Claude Code session running on cloud infrastructure instead of your computer.</td></tr>
+      <tr><td>Teleport</td><td>Pulling a cloud session and its branch into your terminal.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-5-daily-workflow.html"><small>&larr; Previous &middot; Part 5</small>Working with Claude Code day to day</a>
+      <a class="next" href="claude-md-part-7-automation-and-teams.html"><small>Next &middot; Part 7 &rarr;</small>Automation and teams</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

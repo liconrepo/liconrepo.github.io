@@ -526,10 +526,32 @@
       transition: color .2s, border-color .2s;
     }
     .view-all-link:hover { color: var(--text); border-color: var(--border-h); }
-    .blog-grid.new-grid { grid-template-columns: 1fr; }
-    .blog-card .blog-new { display: inline-block; background: #3b82f6; color: #fff; border-radius: 5px; padding: 1px 7px; margin-left: 8px; letter-spacing: .8px; }
+    .blog-card .blog-new, .series-card .blog-new { display: inline-block; background: #3b82f6; color: #fff; border-radius: 5px; padding: 1px 7px; margin-left: 8px; letter-spacing: .8px; }
     .blog-summary { font-size: calc(13px * var(--fs, 1)); color: var(--sub); margin-top: 8px; line-height: 1.6; }
     .blog-card.featured .blog-title { font-size: calc(17px * var(--fs, 1)); }
+    .blog-grid.new-grid .series-card { grid-column: 1 / -1; }
+    .series-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; color: inherit; position: relative; overflow: hidden;
+    }
+    .series-card .series-title { font-size: calc(17px * var(--fs, 1)); }
+    .series-level { grid-column: 1 / -1; font-size: calc(11px * var(--fs, 1)); font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text); margin-top: 6px; }
+    .series-level span { font-weight: 400; letter-spacing: .6px; color: var(--muted); text-transform: none; margin-left: 6px; }
+    .series-parts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+    .series-part {
+      display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: inherit;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+      transition: border-color .18s, background .18s, transform .18s;
+    }
+    .series-part:hover { background: var(--card-h); border-color: var(--border-h); transform: translateY(-2px); }
+    .sp-num {
+      flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; background: #3b82f6; color: #fff;
+      font-size: calc(12px * var(--fs, 1)); font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+    .sp-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .sp-title { font-size: calc(13px * var(--fs, 1)); font-weight: 600; line-height: 1.4; color: var(--text); }
+    .sp-desc { font-size: calc(12px * var(--fs, 1)); line-height: 1.5; color: var(--sub); }
+    .sp-meta { flex: 0 0 auto; font-size: calc(11px * var(--fs, 1)); color: var(--muted); white-space: nowrap; margin-top: 2px; }
     .archive-btn {
       display: inline-flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 28px;
       font: inherit; font-size: calc(13px * var(--fs, 1)); font-weight: 500; color: var(--sub);
@@ -641,6 +663,7 @@
       .skills-grid { grid-template-columns: 1fr; }
       .skills-grid .skill-group[style] { grid-column: span 1; }
       .blog-grid { grid-template-columns: 1fr; }
+      .series-parts { grid-template-columns: 1fr; }
       .lead-grid { grid-template-columns: 1fr; }
       .edu-card { flex-direction: column; text-align: center; }
       .exp-list { gap: 40px; }
@@ -779,7 +802,7 @@
       <div class="stat-label">Companies</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" data-count="24">0</div>
+      <div class="stat-num" data-count="32">0</div>
       <div class="stat-label">Technical Blogs</div>
     </div>
     <div class="stat-card">
@@ -976,8 +999,59 @@
     <p class="section-label">Technical Writing</p>
 
     <div class="blog-grid new-grid">
+      <div class="series-card reveal">
+        <div class="blog-idx">Series &middot; 8 parts<span class="blog-new">NEW</span></div>
+        <div class="blog-title series-title">Claude Code, from first install to a project that remembers</div>
+        <div class="blog-summary">A two-level series. Beginner: getting started safely, giving Claude lasting memory with CLAUDE.md, spending fewer tokens, and finding the official docs, models and API. Advanced: day-to-day prompting and git, MCP, subagents and plugins, automation and teams, and a learning path. Reading time only: the exercises and the first-week plan add 20 to 40 minutes of hands-on practice a day.</div>
+        <div class="series-parts">
+          <div class="series-level">Beginner <span>Parts 1 to 4 &middot; start here</span></div>
+          <a class="series-part" href="blog/claude-md-part-1-setup.html">
+            <span class="sp-num">1</span>
+            <span class="sp-body"><span class="sp-title">Meet Claude and set it up</span><span class="sp-desc">What Claude is, installing it on any system, a first-15-minutes checklist, staying safe, manual and plan modes, and choosing a model.</span></span>
+            <span class="sp-meta">~28 min</span>
+          </a>
+          <a class="series-part" href="blog/claude-md-part-2-memory.html">
+            <span class="sp-num">2</span>
+            <span class="sp-body"><span class="sp-title">CLAUDE.md: the project memory</span><span class="sp-desc">Why Claude forgets, what CLAUDE.md is, where it lives, how to write one, and growing into rules and skills.</span></span>
+            <span class="sp-meta">~26 min</span>
+          </a>
+          <a class="series-part" href="blog/claude-md-part-3-tokens-onboarding.html">
+            <span class="sp-num">3</span>
+            <span class="sp-body"><span class="sp-title">Fewer tokens, faster onboarding</span><span class="sp-desc">How to check what you spend, how the file saves tokens, handoff notes, and onboarding a project or feature.</span></span>
+            <span class="sp-meta">~26 min</span>
+          </a>
+          <a class="series-part" href="blog/claude-md-part-4-api-models-links.html">
+            <span class="sp-num">4</span>
+            <span class="sp-body"><span class="sp-title">The Claude API, models and official links</span><span class="sp-desc">Claude Code vs the API, a first API call, every Claude model so far, how to choose, and the official docs.</span></span>
+            <span class="sp-meta">~14 min</span>
+          </a>
+          <div class="series-level">Advanced <span>Parts 5 to 8 &middot; go deeper</span></div>
+          <a class="series-part" href="blog/claude-md-part-5-daily-workflow.html">
+            <span class="sp-num">5</span>
+            <span class="sp-body"><span class="sp-title">Working with Claude Code day to day</span><span class="sp-desc">Prompt patterns, explore-plan-implement-commit, git branches and pull requests, steering, and fixing problems.</span></span>
+            <span class="sp-meta">~19 min</span>
+          </a>
+          <a class="series-part" href="blog/claude-md-part-6-extend-and-surfaces.html">
+            <span class="sp-num">6</span>
+            <span class="sp-body"><span class="sp-title">Extending Claude Code</span><span class="sp-desc">MCP, subagents and plugins, plus VS Code, JetBrains, the desktop app and cloud sessions.</span></span>
+            <span class="sp-meta">~21 min</span>
+          </a>
+          <a class="series-part" href="blog/claude-md-part-7-automation-and-teams.html">
+            <span class="sp-num">7</span>
+            <span class="sp-body"><span class="sp-title">Automation and teams</span><span class="sp-desc">claude -p in scripts and CI, GitHub Actions, shared team setup, managed settings and cost oversight.</span></span>
+            <span class="sp-meta">~21 min</span>
+          </a>
+          <a class="series-part" href="blog/claude-md-part-8-beyond-code-learning-path.html">
+            <span class="sp-num">8</span>
+            <span class="sp-body"><span class="sp-title">Beyond code and your learning path</span><span class="sp-desc">The Claude apps, Claude Code for non-developers, a first-week plan, exercises, courses and a cheat sheet.</span></span>
+            <span class="sp-meta">~15 min</span>
+          </a>
+        </div>
+        <div class="blog-tags"><span class="blog-tag">Claude Code</span><span class="blog-tag">CLAUDE.md</span><span class="blog-tag">Tokens</span><span class="blog-tag">MCP</span><span class="blog-tag">GitHub Actions</span><span class="blog-tag">Claude API</span></div>
+        <div class="blog-footer"><span class="views-badge">~3 hours of reading</span><span class="blog-date">Oct 2026</span></div>
+      </div>
       <a href="blog/private-ai-chat-android.html" class="blog-card featured reveal">
-        <div class="blog-idx">Latest<span class="blog-new">NEW</span></div>
+        <div class="blog-idx">Earlier</div>
         <div class="blog-title">Building a private AI chat app for Android: local models, online models, and shipping to Google Play</div>
         <div class="blog-summary">How a chat app can run a language model on the phone, call an online model, fall back between them, and reach the Play Store: the theory, the architecture, a tiny model of your own, and the pitfalls.</div>
         <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">On-device AI</span><span class="blog-tag">llama.cpp</span><span class="blog-tag">Google Play</span></div>
@@ -1233,6 +1307,8 @@
     { sel: '.exp-card',           section: 'Experience', title: el => el.querySelector('.exp-title').textContent },
     { sel: '.skill-group',        section: 'Skills',     title: el => (el.querySelector('h3,h4,.skill-title,.skill-label') || el.firstElementChild).textContent },
     { sel: '.skill-group .tag',   section: 'Skills',     title: el => el.textContent },
+    { sel: '.series-card',        section: 'Writing',    title: el => el.querySelector('.series-title').textContent },
+    { sel: '.series-part',        section: 'Writing',    title: el => 'Claude Code series, Part ' + el.querySelector('.sp-num').textContent + ': ' + el.querySelector('.sp-title').textContent, link: true },
     { sel: '.blog-card',          section: 'Writing',    title: el => el.querySelector('.blog-title').textContent, link: true },
     { sel: '.lead-item',          section: 'Leadership', title: el => el.querySelector('p').textContent },
     { sel: '.edu-card',           section: 'Education',  title: el => el.querySelector('.edu-degree').textContent },

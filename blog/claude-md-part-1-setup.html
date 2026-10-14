@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Meet Claude and set it up: interfaces, first session, models — Claude Code series part 1</title>
+  <meta name="description" content="What Claude is, the official ways to use it, how to install Claude Code, run a first session, change the model and use settings files. Part 1 of a series on CLAUDE.md." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="1">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Series &middot; Part 1 of 8</p>
+    <h1>Meet Claude and set it up: the interfaces, the first session, and choosing a model</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~28 min read</span></div>
+    <div class="tags"><span class="tag">Claude</span><span class="tag">Claude Code</span><span class="tag">Setup</span><span class="tag">Models</span><span class="tag">Settings</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a class="on" href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Every time I start work on a project with an AI assistant, I catch myself explaining the same things again: how to build it, which folders matter, which style we follow. This eight-part series is about ending that habit with one small file called <code>CLAUDE.md</code>. Before the file makes sense, though, you need the basics, so Part 1 covers what Claude is, the official ways to use it, how to install it, how much freedom to give it, and how to pick a model.</p>
+
+    <div class="callout">
+      <strong>Start here: your first 15 minutes</strong>
+      <ol>
+        <li><strong>Check your account.</strong> Claude Code needs a Claude Pro, Max, Team or Enterprise subscription, or a Claude Console account. The free claude.ai plan does not include it. It also has to be available in your country.</li>
+        <li><strong>Open a terminal.</strong> Never used one? Follow the official <a href="https://code.claude.com/docs/en/terminal-guide" target="_blank" rel="noopener">terminal guide for new users</a>, or use the desktop app, which needs no terminal.</li>
+        <li><strong>Install and check it.</strong> One command from <a href="#install">section 3</a>, then <code>claude --version</code>.</li>
+        <li><strong>Pick a small project in git</strong> and create a branch first (<code>git switch -c try-claude</code>), so anything Claude changes can be undone.</li>
+        <li><strong>Start it.</strong> Run <code>cd your-project</code>, then <code>claude</code>, and sign in when the browser opens.</li>
+        <li><strong>Ask before you change.</strong> Try &ldquo;what does this project do?&rdquo; and read the answer.</li>
+        <li><strong>Try one tiny change</strong>, such as &ldquo;add a comment to the main file&rdquo;. Read the permission prompt, then choose Yes.</li>
+        <li><strong>Know how to stop.</strong> <kbd>Esc</kbd> interrupts Claude while it works. <code>/exit</code>, or <kbd>Ctrl</kbd>+<kbd>D</kbd> twice on an empty prompt, quits.</li>
+      </ol>
+      <p><a href="#install">Section 3</a> and <a href="#first">section 4</a> explain each step, and the <a href="#safe">&ldquo;Stay safe on day one&rdquo;</a> list is worth reading before you approve anything.</p>
+    </div>
+
+    <h3>Words you will see</h3>
+    <table class="gloss">
+      <tr><th>Word</th><th>In plain words</th></tr>
+      <tr><td>Prompt</td><td>The message you type to Claude.</td></tr>
+      <tr><td>Token</td><td>A small chunk of text, roughly three-quarters of a word. Limits and costs are counted in tokens.</td></tr>
+      <tr><td>Context window</td><td>The amount of text Claude can look at at once: your messages, the files it read, and its own replies. When you start a new session it is empty.</td></tr>
+      <tr><td>Session</td><td>One conversation with Claude Code, from when you run <code>claude</code> until you exit or clear it.</td></tr>
+      <tr><td>CLAUDE.md</td><td>A text file in your project that Claude reads at the start of every session, so you do not have to repeat yourself.</td></tr>
+      <tr><td>Model</td><td>The AI behind Claude. Bigger ones think harder but are slower and cost more.</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>The series at a glance (Parts 1 to 4 are the beginner level)</strong>
+      <ul>
+        <li><strong>Part 1 (this one):</strong> what Claude is, the official interfaces, setup, first session, safety, manual and plan modes, changing the model and settings.</li>
+        <li><strong>Part 2:</strong> why Claude forgets, what <code>CLAUDE.md</code> is, where it lives, how to write a good one, and the <code>.claude</code> folder.</li>
+        <li><strong>Part 3:</strong> how the file saves tokens, helps you onboard onto a new project or feature, and the mistakes to avoid.</li>
+        <li><strong>Part 4:</strong> the Claude API, every model published so far, and the official links in one place.</li>
+        <li><strong>Parts 5 to 8 (advanced):</strong> day-to-day prompting, git and troubleshooting; extending Claude with MCP, subagents and plugins and choosing a surface; automation, CI and team setup; and Claude beyond code with a learning path.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 1</strong>
+      <ol>
+        <li><a href="#what">What is Claude?</a></li>
+        <li><a href="#interfaces">The official ways to use it</a></li>
+        <li><a href="#install">Installing Claude Code</a></li>
+        <li><a href="#first">Your first session</a></li>
+        <li><a href="#commands">Slash commands worth knowing</a></li>
+        <li><a href="#modes">Manual, auto-accept and plan mode</a></li>
+        <li><a href="#model">Changing the model</a></li>
+        <li><a href="#settings">Settings files and where they live</a></li>
+        <li><a href="#next">What comes next</a></li>
+      </ol>
+    </div>
+
+    <h2 id="what">1. What is Claude?</h2>
+    <p><strong>Claude</strong> is a family of AI models made by Anthropic. You give it text (and, for some uses, images or files), and it writes text back: answers, explanations, summaries, and code. Under the hood it is a large language model, the same kind of &ldquo;very fancy autocomplete&rdquo; I described in my <a href="private-ai-chat-android.html">Android AI chat post</a>. It reads your input as tokens, and writes a reply one token at a time.</p>
+    <p>Two names get mixed up, so let me separate them:</p>
+    <table>
+      <tr><th>Name</th><th>What it is</th></tr>
+      <tr><td><strong>Claude</strong></td><td>The model family, the &ldquo;brain&rdquo;. It comes in several sizes, from small and quick to large and capable.</td></tr>
+      <tr><td><strong>Claude Code</strong></td><td>A coding assistant built on those models. It can read your project, edit files, and run commands, with your permission. This series is about it.</td></tr>
+    </table>
+    <div class="analogy"><strong>A chat helper versus a teammate</strong>
+      <p>A normal chat window is like texting a smart friend: they only know what you paste in. Claude Code is more like a teammate sitting at your computer: it can open the files itself, search the code, run the tests and show you the result. The catch is that this teammate arrives with a blank memory every morning. Fixing that is the whole point of this series.</p>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="The Claude model sits in the middle. Around it are the chat apps, Claude Code, and the API for developers.">
+        <rect class="boxp" x="236" y="80" width="168" height="70" rx="16"/><text class="b c" x="320" y="110">Claude models</text><text class="sub c" x="320" y="130">the &ldquo;brain&rdquo;</text>
+        <rect class="boxb" x="14" y="16" width="190" height="62" rx="12"/><text class="b c" x="109" y="42">Claude apps</text><text class="sub c" x="109" y="62">web, desktop, phone chat</text>
+        <rect class="boxg" x="436" y="16" width="190" height="62" rx="12"/><text class="b c" x="531" y="42">Claude Code</text><text class="sub c" x="531" y="62">works inside your project</text>
+        <rect class="boxo" x="225" y="164" width="190" height="56" rx="12"/><text class="b c" x="320" y="188">The API</text><text class="sub c" x="320" y="208">to build your own apps</text>
+        <path class="arrow" d="M236,104 L170,80"/><path class="arrow" d="M404,104 L470,80"/><path class="arrow" d="M320,152 L320,162"/>
+      </svg>
+      <figcaption>One family of models, reached through different doors. Claude Code is the door for software work.</figcaption>
+    </figure>
+
+    <h2 id="interfaces">2. The official ways to use it</h2>
+    <p>Claude Code is not tied to one window. Anthropic ships it in several places, and they share the same engine, so a habit you learn in one carries over to the others.</p>
+    <table>
+      <tr><th>Interface</th><th>Good for</th></tr>
+      <tr><td>Terminal (CLI)</td><td>The original and most complete experience. Type <code>claude</code> inside your project folder.</td></tr>
+      <tr><td>VS Code and JetBrains extensions</td><td>Stay in your editor, see proposed changes as diffs next to your code.</td></tr>
+      <tr><td>Desktop app</td><td>A standalone window if you prefer not to live in a terminal.</td></tr>
+      <tr><td>Web (claude.ai/code)</td><td>Start work from a browser, no local setup for quick tasks.</td></tr>
+    </table>
+    <div class="note"><p>Features and install steps change often. Treat the <a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">official Claude Code documentation</a> (also see the <a href="https://code.claude.com/docs/en/quickstart" target="_blank" rel="noopener">quickstart</a>) as the source of truth, and use this post for the ideas behind it.</p></div>
+
+    <h2 id="install">3. Installing Claude Code</h2>
+    <h3>Before you install</h3>
+    <ul>
+      <li><strong>An account that includes Claude Code:</strong> a Claude Pro, Max, Team or Enterprise subscription, or a Claude Console account billed by usage. Cloud accounts on Amazon Bedrock, Google Cloud or Microsoft Foundry also work. The free claude.ai plan does not include Claude Code. See <a href="https://claude.com/pricing" target="_blank" rel="noopener">Claude pricing</a> for current plans.</li>
+      <li><strong>A supported computer:</strong> macOS 13 or later, Windows 10 (1809) or later, Ubuntu 20.04+, Debian 10+ or Alpine 3.19+, with at least 4 GB of RAM and an internet connection.</li>
+      <li><strong>A supported country.</strong> If the installer says the app is unavailable in your region, see Anthropic's <a href="https://www.anthropic.com/supported-countries" target="_blank" rel="noopener">supported countries</a>.</li>
+      <li><strong>A project folder</strong> to work in, ideally one under git.</li>
+    </ul>
+    <div class="note"><p>New to the terminal? The official <a href="https://code.claude.com/docs/en/terminal-guide" target="_blank" rel="noopener">terminal guide for new users</a> shows how to open one on macOS, Linux and Windows and paste a command. If you would rather skip it altogether, the Claude Code desktop app runs Claude Code without a terminal (see the <a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener">overview</a>).</p></div>
+
+    <h3>Pick the install command for your system</h3>
+    <table>
+      <tr><th>System</th><th>Command</th><th>Notes</th></tr>
+      <tr><td>macOS, Linux, WSL</td><td><code>curl -fsSL https://claude.ai/install.sh | bash</code></td><td>The recommended native installer. It updates itself in the background.</td></tr>
+      <tr><td>Windows, PowerShell</td><td><code>irm https://claude.ai/install.ps1 | iex</code></td><td>Your prompt starts with <code>PS C:\</code>. Press <kbd>Win</kbd>+<kbd>X</kbd> and pick Windows PowerShell or Terminal.</td></tr>
+      <tr><td>Windows, CMD</td><td><code>curl -fsSL https://claude.ai/install.cmd -o install.cmd &amp;&amp; install.cmd &amp;&amp; del install.cmd</code></td><td>Your prompt starts with <code>C:\</code> (no <code>PS</code>). Running the PowerShell command here fails with &ldquo;irm is not recognized&rdquo;.</td></tr>
+      <tr><td>Homebrew (macOS)</td><td><code>brew install --cask claude-code</code></td><td>Follows the stable channel. Does not auto-update: run <code>brew upgrade claude-code</code>.</td></tr>
+      <tr><td>WinGet (Windows)</td><td><code>winget install Anthropic.ClaudeCode</code></td><td>Does not auto-update: run <code>winget upgrade Anthropic.ClaudeCode</code>.</td></tr>
+      <tr><td>npm</td><td><code>npm install -g @anthropic-ai/claude-code</code></td><td>Needs Node.js 22 or later. Never use <code>sudo</code> with it.</td></tr>
+    </table>
+    <p>Debian, Ubuntu, Fedora, RHEL and Alpine users can also install through apt, dnf or apk; the steps are in the official <a href="https://code.claude.com/docs/en/setup#install-with-linux-package-managers" target="_blank" rel="noopener">setup guide</a>. On native Windows, <a href="https://git-scm.com/downloads/win" target="_blank" rel="noopener">Git for Windows</a> is recommended but optional: without it, Claude Code uses PowerShell as its shell tool. The installer shows no progress while it downloads, so leave the window open until it says Claude Code was installed.</p>
+
+    <h3>Check that it worked</h3>
+    <p>Open a <em>new</em> terminal window and run:</p>
+<pre><code>claude --version</code></pre>
+    <p>It prints a version number followed by <code>(Claude Code)</code>. For a fuller health check of your install and settings, run <code>claude doctor</code>. To update by hand later, run <code>claude update</code>.</p>
+
+    <h3>If you see &ldquo;command not found: claude&rdquo;</h3>
+    <p>This is the most common first-day problem. It means the folder where the installer put <code>claude</code> is not on your PATH yet (the list of folders your terminal searches for commands). The installer prints the exact fix under &ldquo;Setup notes&rdquo;; otherwise use the one for your shell, then open a new terminal and try again:</p>
+<pre><code># macOS (zsh)
+echo 'export PATH="$HOME/.local/bin:$PATH"' &gt;&gt; ~/.zshrc
+source ~/.zshrc
+
+# Linux (bash)
+echo 'export PATH="$HOME/.local/bin:$PATH"' &gt;&gt; ~/.bashrc
+source ~/.bashrc
+
+# Windows (PowerShell)
+$currentPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+[Environment]::SetEnvironmentVariable('PATH', "$currentPath;$env:USERPROFILE\.local\bin", 'User')</code></pre>
+    <p>If it still is not found, check that the file <code>~/.local/bin/claude</code> exists; if not, the install did not finish. Two other common messages: <code>syntax error near unexpected token '&lt;'</code> means the installer address returned a web page instead of a script, so retry or install with Homebrew; and on Windows <code>'irm' is not recognized</code> means you are in CMD rather than PowerShell. The official <a href="https://code.claude.com/docs/en/troubleshoot-install" target="_blank" rel="noopener">installation troubleshooting guide</a> matches every error message to a fix.</p>
+
+    <h3>Start it and sign in</h3>
+    <ol class="steps">
+      <li><strong>Go to your project.</strong> Claude Code works relative to the folder you start it in, so this matters.
+<pre><code>cd ~/projects/my-app</code></pre></li>
+      <li><strong>Start it.</strong>
+<pre><code>claude</code></pre></li>
+      <li><strong>Sign in.</strong> The first run opens your browser to log in with your Claude or Console account. Your credentials are stored, so you will not need to do this again. Type <code>/login</code> inside a session to switch accounts.</li>
+    </ol>
+    <figure class="fig">
+      <svg viewBox="0 0 640 120" role="img" aria-label="Setup flow: install, open the project folder, run claude, sign in, start working.">
+        <rect class="boxb" x="6"   y="26" width="108" height="62" rx="12"/><text class="b c" x="60"  y="52">Install</text><text class="sub c" x="60"  y="72">one command</text>
+        <rect class="boxp" x="140" y="26" width="108" height="62" rx="12"/><text class="b c" x="194" y="52">cd project</text><text class="sub c" x="194" y="72">pick a folder</text>
+        <rect class="boxg" x="274" y="26" width="108" height="62" rx="12"/><text class="b c" x="328" y="52">claude</text><text class="sub c" x="328" y="72">start session</text>
+        <rect class="boxo" x="408" y="26" width="108" height="62" rx="12"/><text class="b c" x="462" y="52">Sign in</text><text class="sub c" x="462" y="72">first run only</text>
+        <rect class="box"  x="542" y="26" width="92"  height="62" rx="12"/><text class="b c" x="588" y="52">Ask</text><text class="sub c" x="588" y="72">start working</text>
+        <path class="arrow" d="M116,57 L138,57"/><path class="arrow" d="M250,57 L272,57"/><path class="arrow" d="M384,57 L406,57"/><path class="arrow" d="M518,57 L540,57"/>
+      </svg>
+      <figcaption>Five steps from nothing to your first question.</figcaption>
+    </figure>
+
+    <h2 id="first">4. Your first session</h2>
+    <p>Once you run <code>claude</code>, you get a prompt. You type in plain language. A good first message is not &ldquo;write me a feature&rdquo;, it is a question that lets Claude look around:</p>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>~/projects/my-app &mdash; claude</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">What does this project do, and how do I run it?</span>
+
+<span class="t-o">&#9679;</span> I'll look at the project files first.
+  <span class="t-dim">Read(README.md)</span>
+  <span class="t-dim">Read(app/build.gradle.kts)</span>
+  <span class="t-dim">Search(pattern: "MainActivity")</span>
+
+<span class="t-o">&#9679;</span> This is an Android app that shows a list of notes.
+  <span class="t-g">&#8226;</span> UI is in <span class="t-p">app/src/main/java/.../ui/</span> (Jetpack Compose)
+  <span class="t-g">&#8226;</span> Data is stored with Room in <span class="t-p">.../data/</span>
+  <span class="t-g">&#8226;</span> Run it with <span class="t-b">./gradlew installDebug</span>
+
+<span class="t-dim">&gt;</span> <span class="t-dim">_</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup, not a live capture. Claude reads files itself, then summarises. Wording and layout vary by version.</figcaption>
+    </figure>
+    <p>Notice what happened. You did not paste any code. Claude chose which files to read. In Manual mode, whenever it wants to edit a file or run a command, it asks for your permission first. Other modes ask less, and you can change mode at any time.</p>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>permission request</span></div>
+<pre><code><span class="t-o">Claude wants to run a command</span>
+
+  <span class="t-b">./gradlew testDebugUnitTest</span>
+
+  <span class="t-g">1.</span> Yes
+  <span class="t-g">2.</span> Yes, and don't ask again for this command
+  <span class="t-r">3.</span> No, and tell Claude what to do differently</code></pre>
+      </div>
+      <figcaption>Illustrative mockup of a Manual-mode prompt. The exact options vary by version.</figcaption>
+    </figure>
+
+    <h3>How to stop, interrupt and quit</h3>
+    <table>
+      <tr><th>You want to</th><th>Do this</th></tr>
+      <tr><td>Stop Claude while it is working</td><td>Press <kbd>Esc</kbd>. Double-tap <kbd>Esc</kbd> or type <code>/rewind</code> to go back to an earlier point in the conversation and code.</td></tr>
+      <tr><td>Leave Claude Code</td><td>Type <code>/exit</code>, or press <kbd>Ctrl</kbd>+<kbd>D</kbd> twice on an empty prompt.</td></tr>
+      <tr><td>Start a fresh conversation</td><td>Type <code>/clear</code>.</td></tr>
+      <tr><td>Come back to the last conversation</td><td>Run <code>claude -c</code> (most recent) or <code>claude -r</code> (pick one).</td></tr>
+    </table>
+    <p>You cannot click in the terminal. Use the arrow keys to move around and press Enter to choose an option.</p>
+
+    <h3 id="safe">Stay safe on day one</h3>
+    <div class="callout">
+      <strong>A short checklist before you approve anything</strong>
+      <ul>
+        <li><strong>Work on a git branch.</strong> Run <code>git switch -c try-claude</code> first and commit anything you care about. Then every change Claude makes can be reviewed with <code>git diff</code> and undone.</li>
+        <li><strong>Stay in Manual mode while you learn.</strong> Check the status bar under the prompt. Newer versions may start in auto mode, so press Shift+Tab until it says manual.</li>
+        <li><strong>Read each permission prompt.</strong> Look especially at shell commands. Choose &ldquo;No&rdquo; and tell Claude what to do differently if you are not sure.</li>
+        <li><strong>Be careful with &ldquo;don&rsquo;t ask again&rdquo;.</strong> Allow narrow, safe commands such as your test command, never broad ones.</li>
+        <li><strong>Start with questions or plan mode,</strong> not edits, in a project you do not know.</li>
+        <li><strong>Keep secrets out of reach.</strong> Do not paste passwords or keys into chat, and add deny rules for files like <code>.env</code> (Part 2).</li>
+        <li><strong>Avoid &ldquo;skip all permission checks&rdquo; options</strong> such as <code>--dangerously-skip-permissions</code>. The docs reserve them for isolated containers and virtual machines.</li>
+        <li><strong>Check your workplace rules.</strong> What Claude reads is sent to Anthropic's servers to be processed. If the code is your employer's, make sure using an AI tool on it is allowed.</li>
+      </ul>
+    </div>
+
+    <h2 id="commands">5. Slash commands worth knowing</h2>
+    <p>Typing <code>/</code> at the prompt opens a menu of commands that control the session itself rather than talk to the model. These are the ones I use most. The full list is in the official <a href="https://code.claude.com/docs/en/commands" target="_blank" rel="noopener">commands reference</a>:</p>
+    <table>
+      <tr><th>Command</th><th>What it does</th></tr>
+      <tr><td><code>/help</code></td><td>Shows help and the available commands.</td></tr>
+      <tr><td><code>/init</code></td><td>Creates a starter <code>CLAUDE.md</code> for the project.</td></tr>
+      <tr><td><code>/memory</code></td><td>Edit your CLAUDE.md files, turn auto memory on or off, and view its entries.</td></tr>
+      <tr><td><code>/model</code></td><td>Switches the model. It also saves your choice as the default for new sessions; with no argument it opens a picker, where <code>s</code> switches for this session only.</td></tr>
+      <tr><td><code>/plan</code></td><td>Enters plan mode straight from the prompt, for example <code>/plan fix the login bug</code>.</td></tr>
+      <tr><td><code>/clear</code></td><td>Starts a new conversation with an empty context. The old one is saved and can be reopened with <code>/resume</code>.</td></tr>
+      <tr><td><code>/compact</code></td><td>Summarises the conversation so far to free up space. You can add focus instructions.</td></tr>
+      <tr><td><code>/context</code></td><td>Shows what is using your context window, including which memory files loaded.</td></tr>
+      <tr><td><code>/resume</code></td><td>Reopens an earlier conversation by name or from a picker.</td></tr>
+      <tr><td><code>/usage</code></td><td>Shows session cost and plan usage. <code>/cost</code> is an alias. How to read it is in <a href="claude-md-part-3-tokens-onboarding.html#spend">Part 3</a>.</td></tr>
+      <tr><td><code>/config</code></td><td>Opens settings: theme, model and other preferences.</td></tr>
+    </table>
+
+    <h2 id="modes">6. Manual, auto-accept and plan mode</h2>
+    <p>Earlier you saw Claude ask before running a command. That is one of several <strong>permission modes</strong>, which decide how much Claude may do without asking. The official documentation lists six: <strong>Manual</strong> (config value <code>default</code>), <strong>accept edits</strong> (<code>acceptEdits</code>), <strong>plan</strong>, <strong>auto</strong> (a second model reviews actions instead of you), <strong>dontAsk</strong> (for locked-down CI) and <strong>bypassPermissions</strong> (for isolated containers only). This section covers the three you will switch between most, plus where auto fits. Full reference: <a href="https://code.claude.com/docs/en/permission-modes" target="_blank" rel="noopener">Choose a permission mode</a>.</p>
+    <div class="callout">
+      <strong>Which mode do you start in?</strong>
+      <p>It depends on your version. According to the docs, from Claude Code v2.1.283 the built-in starting mode for interactive terminal and VS Code sessions is <strong>auto</strong>; on earlier versions it was Manual (or auto on some plans). The status bar under the prompt always shows the current mode, for example &ldquo;manual mode on&rdquo;, &ldquo;accept edits on&rdquo; or &ldquo;plan mode on&rdquo;. If you want to review every action, switch to Manual with Shift+Tab or start with <code>claude --permission-mode default</code>.</p>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Three modes: Manual asks before most actions, accept edits applies file edits and common file commands in your project without asking, plan mode explores and proposes a plan and does not edit your source until you approve it.">
+        <rect class="boxb" x="10" y="14" width="196" height="150" rx="14"/><text class="b" x="26" y="42">Manual</text>
+        <text class="sub" x="26" y="68">Asks before most actions that</text><text class="sub" x="26" y="88">edit files, run commands or</text><text class="sub" x="26" y="108">use the network.</text>
+        <text class="sub" x="26" y="138">Reading is allowed.</text>
+        <rect class="boxo" x="222" y="14" width="196" height="150" rx="14"/><text class="b" x="238" y="42">Accept edits</text>
+        <text class="sub" x="238" y="68">Edits files in your project</text><text class="sub" x="238" y="88">and runs common file</text><text class="sub" x="238" y="108">commands (mkdir, mv, cp&hellip;)</text><text class="sub" x="238" y="128">without asking. Other</text><text class="sub" x="238" y="148">commands still ask.</text>
+        <rect class="boxg" x="434" y="14" width="196" height="150" rx="14"/><text class="b" x="450" y="42">Plan</text>
+        <text class="sub" x="450" y="68">Reads and explores, then</text><text class="sub" x="450" y="88">proposes a plan. Does not edit</text><text class="sub" x="450" y="108">your source until you</text><text class="sub" x="450" y="128">approve the plan.</text>
+        <path class="arrow" d="M14,196 L626,196"/>
+        <text class="sub" x="14" y="218">you decide every step</text><text class="sub" x="626" y="218" style="text-anchor:end">Claude moves faster on its own</text>
+        <text class="sub c" x="320" y="240">Plan is the odd one out: it is about thinking first, not about autonomy.</text>
+      </svg>
+      <figcaption>Three common modes. In the terminal, Shift+Tab cycles manual &rarr; accept edits &rarr; plan (auto, when available, comes last).</figcaption>
+    </figure>
+
+    <h3>Manual mode: you approve each action</h3>
+    <p>Reading files is allowed, but most actions that change your project or machine, or reach the network, need a yes. It is slower, but you see every edit before it lands. It is the right choice for your first sessions, for production code, and whenever you do not yet trust the task.</p>
+    <p>If a prompt keeps repeating for something safe, such as running your tests, add it to the <code>allow</code> list in your settings (section 8) instead of switching everything off.</p>
+
+    <h3>Accept edits: fewer interruptions</h3>
+    <p>Claude creates and edits files in your working folder without asking, and also runs common file commands such as <code>mkdir</code>, <code>touch</code>, <code>mv</code>, <code>cp</code> and <code>sed</code> there. Anything else, including other shell commands and paths outside the project, still prompts. You review the result afterwards in your editor or with <code>git diff</code>. It suits well-defined work on a git branch where everything can be undone.</p>
+
+    <h3>Plan mode: think first, change nothing</h3>
+    <p>In plan mode Claude researches and proposes changes without making them. It reads files, can run shell commands to explore, and writes a plan, but it does not edit your source. Edits stay blocked until you approve the plan.</p>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>plan mode</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">Add an offline fallback when the online model is unreachable.</span>
+
+<span class="t-o">&#9679;</span> <span class="t-dim">Read(app/engine/EngineSelector.kt)</span>
+  <span class="t-dim">Read(app/chat/ChatViewModel.kt)</span>
+
+<span class="t-o">&#9679;</span> <span class="t-g">Proposed plan</span>
+  <span class="t-g">1.</span> Add a reachability check in EngineSelector
+  <span class="t-g">2.</span> If online fails before any text arrives, switch to local
+  <span class="t-g">3.</span> Show a one-line notice in the chat
+  <span class="t-g">4.</span> Add unit tests for the three cases
+
+  <span class="t-g">1.</span> Yes, and use auto mode
+  <span class="t-g">2.</span> Yes, manually approve edits
+  <span class="t-g">3.</span> No, keep planning   <span class="t-dim">(tell Claude what to change)</span>
+
+<span class="t-dim">&#9208; plan mode on (shift+tab to cycle)</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. The approval options follow the official docs, but wording varies by version and by whether auto mode is available to you. Nothing has been changed yet at this point.</figcaption>
+    </figure>
+    <p>Why it matters: a plan is cheap to correct, and code is not. Catching a wrong assumption in step 2 of a plan costs you one sentence. Catching it after twenty edited files costs a lot of tokens and time. It is my default for anything touching several files, for new features, and for any code I do not know well. Two handy extras from the docs: press <code>Ctrl+G</code> to open the plan in your text editor and edit it before Claude proceeds, and use the <code>opusplan</code> model alias (section 7) to plan with the largest Opus model and then execute with Sonnet.</p>
+    <p>Ways to enter it:</p>
+<pre><code># press Shift+Tab until the status bar says "plan mode on"
+
+# or type /plan, optionally with a task
+/plan fix the login bug
+
+# or start there
+claude --permission-mode plan</code></pre>
+    <p>To make plan mode the default for a project's terminal sessions, set <code>"defaultMode": "plan"</code> under <code>permissions</code> in <code>.claude/settings.json</code>.</p>
+    <div class="callout">
+      <strong>Plan mode does not remember anything</strong>
+      <p>Plan mode controls what Claude may <em>do</em>, not what it <em>remembers</em>. The plan lives in the conversation and is gone when you close the session or run <code>/clear</code>. If tomorrow continues the work, ask Claude to save the plan to a file such as <code>docs/features/my-feature.md</code> and link it from CLAUDE.md (Part 3).</p>
+    </div>
+    <div class="note"><p><strong>Where is the switch?</strong> In the terminal it is Shift+Tab (⇧ + Tab on a Mac). In the VS Code extension you click the mode indicator at the bottom of the prompt box, where the labels are Manual, Edit automatically, Plan, Auto and Bypass permissions. The desktop app has its own mode selector. If a shortcut does nothing in your terminal, see the official docs on <a href="https://code.claude.com/docs/en/keybindings" target="_blank" rel="noopener">customizing keyboard shortcuts</a>.</p></div>
+
+    <h3>And auto mode?</h3>
+    <p>In auto mode a separate classifier model reviews each action and blocks the risky ones, so you get far fewer prompts without switching checks off completely. It needs a supported model and can be turned off by an organisation. It is convenient for long tasks, but while you are learning, Manual or accept edits teach you more about what Claude is doing.</p>
+    <table>
+      <tr><th>Situation</th><th>Mode I would pick</th></tr>
+      <tr><td>First day with Claude Code, or unfamiliar project</td><td>Manual</td></tr>
+      <tr><td>Big or vague change across many files</td><td>Plan, then Manual or accept edits</td></tr>
+      <tr><td>Small, clear edit with tests to catch mistakes</td><td>Accept edits</td></tr>
+      <tr><td>Exploring or reviewing code, no changes wanted</td><td>Plan</td></tr>
+      <tr><td>Long, well-defined task you will check at the end</td><td>Auto, if available</td></tr>
+    </table>
+    <div class="note"><p>Plan mode and CLAUDE.md work well together. The notes tell Claude your commands and conventions, so the plan it writes matches how your project actually works (Part 2).</p></div>
+
+    <h2 id="model">7. Changing the model</h2>
+    <p>Claude comes in different sizes. A larger model reasons better about hard problems but is slower and uses more of your usage allowance. A smaller one is quick and cheap, and is plenty for simple edits, renames and questions. Matching the model to the job is one of the easiest ways to work faster and spend less. The official cost guidance says Sonnet handles most coding tasks well and costs less than Opus, so keep Opus for complex architectural decisions and multi-step reasoning.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="A scale from fast and light to slow and strong, with small models for simple jobs and large models for hard design problems.">
+        <text class="sub" x="14" y="22">Trade-off</text>
+        <rect class="bar-g" x="14" y="36" width="190" height="34" rx="8"/><text class="c" x="109" y="58" style="fill:#fff">Small model</text>
+        <rect class="bar-b" x="224" y="36" width="190" height="34" rx="8"/><text class="c" x="319" y="58" style="fill:#fff">Mid-size model</text>
+        <rect class="bar-o" x="434" y="36" width="192" height="34" rx="8"/><text class="c" x="530" y="58" style="fill:#fff">Top-tier model</text>
+        <text class="sub c" x="109" y="96">fast, cheap</text><text class="sub c" x="319" y="96">balanced</text><text class="sub c" x="530" y="96">strongest, slower</text>
+        <text class="sub c" x="109" y="124">rename a variable,</text><text class="sub c" x="109" y="142">explain a file</text>
+        <text class="sub c" x="319" y="124">most daily coding,</text><text class="sub c" x="319" y="142">fix a bug, write tests</text>
+        <text class="sub c" x="530" y="124">design a feature,</text><text class="sub c" x="530" y="142">tricky debugging</text>
+        <path class="arrow" d="M14,172 L626,172"/><text class="sub" x="14" y="186">more capability and cost &#8594;</text>
+      </svg>
+      <figcaption>A rule of thumb, not a law. Start in the middle, step down for easy work, step up when stuck.</figcaption>
+    </figure>
+    <p>There are four ways to choose. They are listed in priority order, so if two disagree, the earlier one wins:</p>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/model</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/model</span>
+
+ Select model
+ <span class="t-g">&#10003;</span> 1. Default   <span class="t-dim">(recommended for your plan)</span>
+   2. Opus      <span class="t-dim">long-running coding and knowledge work</span>
+   3. Sonnet    <span class="t-dim">best mix of speed and intelligence</span>
+   4. Haiku     <span class="t-dim">fastest, high-volume tasks</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. The exact choices shown depend on your plan and version. In the real picker, Enter switches and saves your choice as the default; press <code>s</code> to switch for this session only.</figcaption>
+    </figure>
+<pre><code># 1. Inside a session (also saved as your default for new sessions)
+/model sonnet
+
+# 2. When you start Claude Code (this launch only)
+claude --model sonnet
+
+# 3. Environment variable (sessions started with it)
+export ANTHROPIC_MODEL=sonnet
+
+# 4. Saved in a settings file (see section 8)
+{ "model": "sonnet" }</code></pre>
+    <p>Short <strong>aliases</strong> save you from remembering long model IDs. According to the official <a href="https://code.claude.com/docs/en/model-config" target="_blank" rel="noopener">model configuration docs</a>:</p>
+    <table>
+      <tr><th>Alias</th><th>Meaning</th></tr>
+      <tr><td><code>sonnet</code>, <code>opus</code>, <code>haiku</code></td><td>The latest version of each family. On the Anthropic API today that is Sonnet 5.5, Opus 5.5 and Haiku 5.5.</td></tr>
+      <tr><td><code>fable</code></td><td>The Fable family (currently Fable 5.1). It is never the default model.</td></tr>
+      <tr><td><code>best</code></td><td>The most capable model available to you: Fable where available, otherwise Opus.</td></tr>
+      <tr><td><code>opusplan</code></td><td>Opus while in plan mode, Sonnet while executing the plan. A good fit for section 6.</td></tr>
+      <tr><td><code>sonnet[1m]</code>, <code>opus[1m]</code></td><td>Variants with a 1M-token context window.</td></tr>
+      <tr><td><code>default</code></td><td>Clears your override and goes back to your account's default.</td></tr>
+    </table>
+    <p>&ldquo;Latest&rdquo; depends on where you run Claude: on Amazon Bedrock, Google's platform or Microsoft Foundry the aliases can point to older versions. To pin an exact version for repeatable results, use a full model name such as <code>claude-opus-5-5</code>. Model names change often, so run <code>/model</code> to see what your account offers today.</p>
+    <div class="callout">
+      <strong>Want the full list of models?</strong>
+      <p>The current lineup, every model still available, and the retired ones, with their API IDs and retirement dates, are in <a href="claude-md-part-4-api-models-links.html#models">Part 4, section 3</a>. For Claude Code, you mostly need the aliases above and the <code>/model</code> picker.</p>
+    </div>
+
+    <p>Two related controls: the <strong>effort level</strong> (adjustable in <code>/model</code> or with <code>/effort</code>) trades reasoning depth for speed and cost on models that support it, and the model you pick also applies to subagents that inherit your session's model.</p>
+
+    <h2 id="settings">8. Settings files and where they live</h2>
+    <p>Beyond the model, you can save preferences such as permissions, the default model and environment variables in <code>settings.json</code> files. The three levels you will use most are below, and the more specific one wins. (The docs also describe settings from the command line and organisation-managed settings, which sit above all three.)</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="Three nested settings levels: user settings for all projects, project settings shared with the team, and local settings only for you in this project.">
+        <rect class="box" x="10" y="10" width="620" height="200" rx="16"/><text class="b" x="28" y="36">User &mdash; ~/.claude/settings.json</text><text class="sub" x="28" y="56">Your defaults for every project on this computer</text>
+        <rect class="boxb" x="40" y="72" width="560" height="128" rx="14"/><text class="b" x="58" y="98">Project &mdash; .claude/settings.json</text><text class="sub" x="58" y="118">Shared with your team through git</text>
+        <rect class="boxg" x="70" y="132" width="500" height="58" rx="12"/><text class="b" x="88" y="158">Local &mdash; .claude/settings.local.json</text><text class="sub" x="88" y="178">Only you, only this project, not committed. Wins over the others.</text>
+      </svg>
+      <figcaption>Think of it as layers: your global habits, the team's agreed rules, then your personal override.</figcaption>
+    </figure>
+    <div class="doc"><div class="doc-bar">.claude/settings.json</div>
+<pre><code>{
+  "model": "sonnet",
+  "permissions": {
+    "allow": ["Bash(./gradlew test *)"],
+    "deny":  ["Read(./.env)"]
+  }
+}</code></pre></div>
+    <p>That small file says: use Sonnet by default, let Claude run the Gradle tests without asking each time, and never read the <code>.env</code> file. The <code>/config</code> command can edit many of these for you. The full list of keys and the precedence order are in the official <a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noopener">settings documentation</a>.</p>
+    <p>Notice that settings configure <em>behaviour</em>. They do not tell Claude anything about <em>your project</em>. For that, we need a different kind of file.</p>
+
+    <h2 id="next">9. What comes next</h2>
+    <p>You can now install Claude Code, talk to it, approve its actions, and switch models. But close the session and open a new one, and Claude has forgotten everything you taught it. That is not a bug; it is how language models work. In Part 2 we fix it with <code>CLAUDE.md</code>. Part 3 shows how that saves tokens and speeds up onboarding, and Part 4 covers the Claude API, the full model list and the official links.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Claude</td><td>Anthropic's family of AI models.</td></tr>
+      <tr><td>Claude Code</td><td>A coding assistant that works inside your project folder.</td></tr>
+      <tr><td>CLI</td><td>Command-line interface: using a program by typing in a terminal.</td></tr>
+      <tr><td>PATH</td><td>The list of folders your terminal searches for commands. &ldquo;command not found&rdquo; usually means the install folder is missing from it.</td></tr>
+      <tr><td>Slash command</td><td>A <code>/something</code> command that controls the session.</td></tr>
+      <tr><td>Model alias</td><td>A short name like <code>sonnet</code> that points to the current version.</td></tr>
+      <tr><td>Permission mode</td><td>How much Claude may do without asking: manual, accept edits, plan, auto and others.</td></tr>
+      <tr><td>Plan mode</td><td>A mode where Claude explores and proposes a plan, and does not edit your source until you approve.</td></tr>
+      <tr><td>settings.json</td><td>A file that stores your preferences, at user, project or local level.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="next" href="claude-md-part-2-memory.html"><small>Next &middot; Part 2 &rarr;</small>CLAUDE.md: the project memory</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

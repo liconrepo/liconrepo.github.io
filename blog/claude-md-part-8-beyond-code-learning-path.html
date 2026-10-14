@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Beyond code: Claude apps, a first-week plan and where to keep learning — series part 8 (advanced)</title>
+  <meta name="description" content="The Claude apps, Claude Code for non-developers, a day-by-day first-week plan, practice exercises, official courses and a one-page cheat sheet. Part 8 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="8">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Claude Code &middot; Advanced &middot; Part 8 of 8</p>
+    <h1>Beyond code: Claude for everyday work, a first-week plan, and where to keep learning</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~15 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">Claude apps</span><span class="tag">Non-developers</span><span class="tag">Learning path</span><span class="tag">Cheat sheet</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="claude-md-part-1-setup.html"><small>Part 1</small>Meet Claude and set it up</a>
+      <a href="claude-md-part-2-memory.html"><small>Part 2</small>CLAUDE.md: the project memory</a>
+      <a href="claude-md-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="claude-md-part-4-api-models-links.html"><small>Part 4</small>Claude API, models and official links</a>
+      <a href="claude-md-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Claude Code day to day</a>
+      <a href="claude-md-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Claude Code and choosing a surface</a>
+      <a href="claude-md-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a class="on" href="claude-md-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">The series so far has been about Claude Code. But many people who start with Claude are not writing software at all, and many developers use the chat apps more than they admit. This final part does two jobs. First, it covers the parts of Claude that are not Claude Code: the chat apps and how a non-developer can use Claude Code too. Second, it gives you a learning path: a first-week plan, practice exercises, the official courses and docs, a way to stay current, and a one-page cheat sheet of everything in the series.</p>
+
+    <div class="callout">
+      <strong>Part 8 in 60 seconds</strong>
+      <ul>
+        <li>The Claude apps (web, desktop, phone) are for conversation and everyday work. Claude Code is for working inside folders of files, and you do not need to be a programmer to use it.</li>
+        <li>The desktop app has three tabs: Chat, Cowork and Code.</li>
+        <li>A week of 20-minute steps is enough to build a solid foundation. The plan below links every step to a part of this series.</li>
+        <li>Anthropic publishes free courses, interactive lessons inside Claude Code (<code>/powerup</code>), release notes and a docs index. Use them to stay current.</li>
+        <li>This series is a snapshot from October 2026. When something differs, trust the official docs.</li>
+      </ul>
+    </div>
+
+    <div class="toc" role="navigation" aria-label="Contents">
+      <strong>Contents of Part 8</strong>
+      <ol>
+        <li><a href="#apps">The Claude apps</a></li>
+        <li><a href="#help">What the apps can do, and where it is explained</a></li>
+        <li><a href="#nondev">Claude Code for people who do not code</a></li>
+        <li><a href="#which">Chat, Cowork or Code?</a></li>
+        <li><a href="#week">Your first week: a day-by-day plan</a></li>
+        <li><a href="#practice">Ten practice exercises</a></li>
+        <li><a href="#courses">Courses, lessons and official resources</a></li>
+        <li><a href="#current">Staying current</a></li>
+        <li><a href="#cheat">One-page cheat sheet</a></li>
+        <li><a href="#end8">Series wrap-up</a></li>
+      </ol>
+    </div>
+
+    <h2 id="apps">1. The Claude apps</h2>
+    <p>Back in Part 1 I separated <strong>Claude</strong> (the models) from <strong>Claude Code</strong> (a coding assistant that works in your project). The consumer door to the same models is the <strong>Claude apps</strong>: claude.ai in a browser, the desktop app, and the mobile apps. You sign in with a Claude account and chat. Anthropic's Help Center has a short "Get started with Claude" collection that covers the basics, including <a href="https://support.claude.com/en/articles/8461763-where-can-i-access-claude" target="_blank" rel="noopener">where you can access Claude</a>, <a href="https://support.claude.com/en/articles/8114487-what-interfaces-can-i-use-to-access-claude" target="_blank" rel="noopener">what interfaces you can use</a>, and <a href="https://support.claude.com/en/articles/7996845-what-are-some-things-i-can-use-claude-for" target="_blank" rel="noopener">what you can use Claude for</a>.</p>
+    <p>The desktop app is where the two worlds meet. It has three tabs, described in the official desktop quickstart:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="The Claude desktop app has three tabs: Chat for general conversation with no file access, Cowork for an autonomous background agent, and Code for an interactive coding assistant with access to local files.">
+        <rect class="box" x="10" y="14" width="620" height="192" rx="16"/>
+        <text class="b" x="28" y="42">Claude desktop app</text>
+        <rect class="boxb" x="28" y="56" width="188" height="134" rx="12"/><text class="b c" x="122" y="84">Chat</text><text class="sub c" x="122" y="106">General conversation.</text><text class="sub c" x="122" y="124">No file access.</text><text class="sub c" x="122" y="142">Similar to claude.ai.</text>
+        <rect class="boxo" x="226" y="56" width="188" height="134" rx="12"/><text class="b c" x="320" y="84">Cowork</text><text class="sub c" x="320" y="106">An autonomous</text><text class="sub c" x="320" y="124">background agent that</text><text class="sub c" x="320" y="142">works on tasks for you.</text>
+        <rect class="boxg" x="424" y="56" width="188" height="134" rx="12"/><text class="b c" x="518" y="84">Code</text><text class="sub c" x="518" y="106">Claude Code with a</text><text class="sub c" x="518" y="124">graphical interface and</text><text class="sub c" x="518" y="142">access to local files.</text>
+      </svg>
+      <figcaption>Three ways to work in one app. The official docs say the desktop app includes Claude Code, so no terminal or separate install is needed for the Code tab.</figcaption>
+    </figure>
+
+    <h2 id="help">2. What the apps can do, and where it is explained</h2>
+    <p>The apps change faster than the developer tools, so I will not try to document every feature here. Instead, here is a map of the official Help Center articles for the things people ask about most. (I am listing them by their titles; read the article for the details and current limits.)</p>
+    <table>
+      <tr><th>If you want to&hellip;</th><th>Read this Help Center article</th></tr>
+      <tr><td>Keep related chats and files together</td><td><a href="https://support.claude.com/en/articles/9517075-what-are-projects" target="_blank" rel="noopener">What are projects?</a></td></tr>
+      <tr><td>Give Claude a document or image</td><td><a href="https://support.claude.com/en/articles/8241126-upload-files-to-claude" target="_blank" rel="noopener">Upload files to Claude</a></td></tr>
+      <tr><td>Have Claude produce a file</td><td><a href="https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude" target="_blank" rel="noopener">Create and edit files with Claude</a></td></tr>
+      <tr><td>Build something interactive or shareable</td><td><a href="https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them" target="_blank" rel="noopener">What are artifacts and how do I use them?</a> and <a href="https://support.claude.com/en/articles/9547008-share-artifacts" target="_blank" rel="noopener">Share artifacts</a></td></tr>
+      <tr><td>Decide when to search the web, think longer or research</td><td><a href="https://support.claude.com/en/articles/11095361-when-should-i-use-web-search-extended-thinking-and-research" target="_blank" rel="noopener">When should I use web search, extended thinking, and research?</a></td></tr>
+      <tr><td>Save a repeatable way of working</td><td><a href="https://support.claude.com/en/articles/12512176-what-are-skills" target="_blank" rel="noopener">What are skills?</a> and <a href="https://support.claude.com/en/articles/12512198-how-to-create-custom-skills" target="_blank" rel="noopener">How to create custom skills</a></td></tr>
+      <tr><td>Connect other apps and add-ons</td><td><a href="https://support.claude.com/en/articles/14328846-browse-skills-connectors-and-plugins-in-one-directory" target="_blank" rel="noopener">Browse skills, connectors, and plugins in one directory</a></td></tr>
+      <tr><td>Use Claude inside Docs, Sheets and Slides</td><td><a href="https://support.claude.com/en/articles/16951679-use-claude-in-google-docs-sheets-and-slides" target="_blank" rel="noopener">Use Claude in Google Docs, Sheets, and Slides</a></td></tr>
+      <tr><td>See what is new or in preview</td><td><a href="https://support.claude.com/en/articles/14503520-available-beta-and-research-preview-features" target="_blank" rel="noopener">Available beta and research preview features</a></td></tr>
+    </table>
+    <p>Notice a family resemblance with the developer side: <em>skills</em> and <em>plugins</em> appear in both Claude Code (Part 2 and Part 6) and the apps. The same idea, a reusable set of instructions Claude can load when relevant, works in both places.</p>
+
+    <h2 id="nondev">3. Claude Code for people who do not code</h2>
+    <p>This is the part most people miss. The official terminal guide for new users says plainly that you can use Claude Code even if you have never used a terminal, and that <em>you do not need to know how to code</em>: describe what you want in plain English and Claude writes the code for you. It also works in any folder, not only code. The docs say you can run it in a notes vault or a documentation folder to search, edit and reorganise content the same way you would code.</p>
+    <p>The docs suggest three starting ideas. Here are their own prompts:</p>
+    <table>
+      <tr><th>Idea</th><th>Example prompt from the docs</th></tr>
+      <tr><td><strong>Build something small</strong></td><td><code>make me a simple webpage that says hello world</code> (then double-click the HTML file to open it in your browser)</td></tr>
+      <tr><td><strong>Work with files you already have</strong></td><td><code>look at the screenshots on my Desktop and rename them based on what's in each image</code></td></tr>
+      <tr><td><strong>Ask questions and plan</strong></td><td><code>I want to build a personal budget tracker. What would I need?</code></td></tr>
+    </table>
+    <div class="callout">
+      <strong>A gentle way to start without a terminal</strong>
+      <ol>
+        <li>Download the desktop app, sign in, and open the <strong>Code</strong> tab.</li>
+        <li>Pick a small folder you can afford to experiment in (a <em>copy</em> of important files, not the originals: my advice).</li>
+        <li>Start with a question, not a change: <code>explain what is in this folder</code>.</li>
+        <li>Stay in Manual mode. When Claude asks before creating or changing files, read the prompt and choose Yes (in the terminal, pressing Enter chooses Yes).</li>
+        <li>Look at the result, then ask for the next small step.</li>
+      </ol>
+    </div>
+    <p>Everything in Parts 1 to 3 still applies: the safety checklist, plan mode for anything big, and a short CLAUDE.md file to tell Claude how you like things done. For a non-developer, the CLAUDE.md might say <em>who you are, what this folder is for, and how you want results formatted</em>, rather than build commands.</p>
+
+    <h2 id="which">4. Chat, Cowork or Code?</h2>
+    <table>
+      <tr><th>You want to&hellip;</th><th>Use</th></tr>
+      <tr><td>Think something through, draft, or ask questions, without giving Claude your files</td><td><strong>Chat</strong> (the Chat tab, claude.ai or the phone app)</td></tr>
+      <tr><td>Hand off a task and come back to the result while you do other work</td><td><strong>Cowork</strong> (the Cowork tab)</td></tr>
+      <tr><td>Work together inside a folder of files, and review each change</td><td><strong>Code</strong> (the Code tab or the terminal)</td></tr>
+      <tr><td>Have long coding tasks keep running when your laptop is off</td><td><strong>Cloud sessions</strong> (Part 6)</td></tr>
+      <tr><td>Run something repeatedly without you</td><td><strong>Automation</strong> (Part 7)</td></tr>
+    </table>
+    <p>Because plans, features and limits for the apps change often, check <a href="https://claude.com/pricing" target="_blank" rel="noopener">the pricing page</a> and the Help Center's <em>Usage and limits</em> articles for what your plan includes.</p>
+
+    <h2 id="week">5. Your first week: a day-by-day plan</h2>
+    <p>This plan is my own suggestion, not an official curriculum. It uses short sessions that build on each other, and every day links to the part of the series that explains it. Aim for 20 to 40 minutes a day on a small project you know well.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Seven days: install and ask questions; plan mode and prompts; CLAUDE.md; git branch and commit; check cost; try one extension; review and write a handoff note.">
+        <rect class="boxb" x="6"   y="18" width="84" height="94" rx="10"/><text class="b c" x="48" y="42">Day 1</text><text class="sub c" x="48" y="64">install,</text><text class="sub c" x="48" y="80">ask 5</text><text class="sub c" x="48" y="96">questions</text>
+        <rect class="boxp" x="96"  y="18" width="84" height="94" rx="10"/><text class="b c" x="138" y="42">Day 2</text><text class="sub c" x="138" y="64">plan mode</text><text class="sub c" x="138" y="80">and good</text><text class="sub c" x="138" y="96">prompts</text>
+        <rect class="boxg" x="186" y="18" width="84" height="94" rx="10"/><text class="b c" x="228" y="42">Day 3</text><text class="sub c" x="228" y="64">write your</text><text class="sub c" x="228" y="80">CLAUDE.md</text>
+        <rect class="boxo" x="276" y="18" width="84" height="94" rx="10"/><text class="b c" x="318" y="42">Day 4</text><text class="sub c" x="318" y="64">branch,</text><text class="sub c" x="318" y="80">commit,</text><text class="sub c" x="318" y="96">pull request</text>
+        <rect class="boxr" x="366" y="18" width="84" height="94" rx="10"/><text class="b c" x="408" y="42">Day 5</text><text class="sub c" x="408" y="64">check cost,</text><text class="sub c" x="408" y="80">use /clear</text>
+        <rect class="boxb" x="456" y="18" width="84" height="94" rx="10"/><text class="b c" x="498" y="42">Day 6</text><text class="sub c" x="498" y="64">try one</text><text class="sub c" x="498" y="80">extension</text>
+        <rect class="boxg" x="546" y="18" width="88" height="94" rx="10"/><text class="b c" x="590" y="42">Day 7</text><text class="sub c" x="590" y="64">review,</text><text class="sub c" x="590" y="80">prune, write</text><text class="sub c" x="590" y="96">a handoff</text>
+        <path class="arrow" d="M8,134 L632,134"/>
+        <text class="sub" x="8" y="156">Each day builds on the one before. Keep the same small project all week.</text>
+        <rect class="ghost" x="6" y="172" width="628" height="68" rx="12"/><text class="b" x="22" y="196">Rule for the whole week</text><text class="sub" x="22" y="216">Work on a git branch, stay in Manual mode, and finish each day by writing one line in CLAUDE.md</text><text class="sub" x="22" y="232">about something that surprised you.</text>
+      </svg>
+      <figcaption>A seven-day on-ramp. Everything is small enough to finish in one sitting.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Day</th><th>Do</th><th>Done when&hellip;</th><th>Read</th></tr>
+      <tr><td><strong>1</strong></td><td>Install, sign in, open a small project. Ask five questions: what it does, how to run it, where the main entry point is, what technologies it uses, how the folders are organised.</td><td>You can explain the project to a friend using only Claude's answers, and you know how to interrupt and quit.</td><td><a href="claude-md-part-1-setup.html">Part 1</a></td></tr>
+      <tr><td><strong>2</strong></td><td>Switch to plan mode. Ask for a plan for a small change. Edit the plan with <kbd>Ctrl</kbd>+<kbd>G</kbd>, approve it, and ask for tests to be run.</td><td>The change works and a test or check proved it.</td><td><a href="claude-md-part-5-daily-workflow.html">Part 5, sections 2 to 5</a></td></tr>
+      <tr><td><strong>3</strong></td><td>Run <code>/init</code>, then trim the result to what Claude would get wrong without it. Run <code>/context</code> to confirm it loaded.</td><td>CLAUDE.md is short (the docs' ceiling is about 200 lines) and every line is specific.</td><td><a href="claude-md-part-2-memory.html">Part 2</a></td></tr>
+      <tr><td><strong>4</strong></td><td>On a new branch, ask Claude to make a change, commit it, and write a pull request description. Read <code>git diff</code> first.</td><td>You reviewed the diff and the PR text before sending anything.</td><td><a href="claude-md-part-5-daily-workflow.html#git">Part 5, section 7</a></td></tr>
+      <tr><td><strong>5</strong></td><td>Run <code>/usage</code> after a long chat, then <code>/clear</code>, redo a small task, and compare. Try the same task on a smaller model.</td><td>You can say roughly what a session cost and what changed the number.</td><td><a href="claude-md-part-3-tokens-onboarding.html#spend">Part 3, section 2</a></td></tr>
+      <tr><td><strong>6</strong></td><td>Add one extension: a skill for something you repeat, one MCP server you trust, or a read-only subagent for review.</td><td>You used it once and can say what it saved.</td><td><a href="claude-md-part-6-extend-and-surfaces.html">Part 6</a></td></tr>
+      <tr><td><strong>7</strong></td><td>Review the week. Delete stale CLAUDE.md lines. Ask Claude to write a handoff note for the next session and start a fresh session from it.</td><td>The new session picks up where you stopped without you retelling the story.</td><td><a href="claude-md-part-3-tokens-onboarding.html#learn">Part 3, section 4</a></td></tr>
+    </table>
+    <p><strong>After week one:</strong> add automation only when you have a repeatable job (Part 7), and bring teammates in with a shared baseline of committed files rather than telling everyone to copy your setup.</p>
+
+    <h2 id="practice">6. Ten practice exercises</h2>
+    <p>Learning sticks when you do things. These are my own exercises, written around prompts the official docs recommend. Do them on a throwaway branch or a practice project.</p>
+    <table>
+      <tr><th>#</th><th>Exercise</th><th>Skill practised</th></tr>
+      <tr><td>1</td><td>Ask for an overview, then trace how one feature works from the UI to storage, using the prompts in Part 5.</td><td>Reading a codebase</td></tr>
+      <tr><td>2</td><td>Introduce a small bug on purpose. Describe only the symptom and the likely location, and ask Claude to write a failing test first, then fix it.</td><td>Symptom-based prompts, verification</td></tr>
+      <tr><td>3</td><td>Pick a function and ask for a refactor that keeps behaviour the same, then have it run the tests.</td><td>Small, verified increments</td></tr>
+      <tr><td>4</td><td>Ask Claude to find untested functions, add tests, and run them.</td><td>Test-driven helpers</td></tr>
+      <tr><td>5</td><td>Use the interview prompt to turn a vague idea into a SPEC.md, then build it in a <em>fresh</em> session.</td><td>Specs and clean context</td></tr>
+      <tr><td>6</td><td>Make Claude go wrong on purpose (a vague prompt), correct it twice, then use <code>/clear</code> and restate it. Compare.</td><td>Knowing when to start clean</td></tr>
+      <tr><td>7</td><td>Create a read-only reviewer subagent and ask it to review your last diff against your plan.</td><td>Subagents, independent review</td></tr>
+      <tr><td>8</td><td>Run one task on two different models and compare quality, time and the <code>/usage</code> figure.</td><td>Model choice and cost</td></tr>
+      <tr><td>9</td><td>Write a three-line CLAUDE.md rule for a mistake Claude keeps making, and see if the mistake stops.</td><td>Turning corrections into memory</td></tr>
+      <tr><td>10</td><td>Write a one-line script around <code>claude -p</code> that summarises <code>git log</code> or explains a log file, then ask for JSON output and parse it with <code>jq</code>.</td><td>Non-interactive mode</td></tr>
+    </table>
+
+    <h2 id="courses">7. Courses, lessons and official resources</h2>
+    <h3>Inside Claude Code</h3>
+    <ul>
+      <li><strong><code>/powerup</code></strong> opens interactive lessons with animated demos, according to the common-workflows guide.</li>
+      <li><strong>Ask Claude about itself.</strong> Questions such as <code>how do I create custom skills in Claude Code?</code> or <code>can Claude Code work with Docker?</code> are answered from the current documentation, so they are not limited to the version you run.</li>
+      <li><strong><code>/help</code></strong> lists commands, and <code>/doctor</code> checks your setup.</li>
+    </ul>
+    <h3>Claude Academy (free, self-paced)</h3>
+    <p>The official <a href="https://academy.claude.com/" target="_blank" rel="noopener">Claude Academy</a> lists courses you can take at your own pace. When I looked, its home page listed these, none of which require coding:</p>
+    <table>
+      <tr><th>Course</th><th>What it covers</th><th>Size</th></tr>
+      <tr><td><strong>AI Fluency: Framework and foundations</strong></td><td>Working with AI using the &ldquo;4D&rdquo; framework: Delegation, Description, Discernment and Diligence.</td><td>14 lessons, about 4 hours</td></tr>
+      <tr><td><strong>AI capabilities and limitations</strong></td><td>A realistic picture of what large language models can and cannot do.</td><td>13 lessons, about 3.5 hours</td></tr>
+      <tr><td><strong>Building effective human-agent teams</strong> (beta)</td><td>Moving from solo use to team use of AI, and getting a team ready.</td><td>5 lessons, about 45 minutes</td></tr>
+    </table>
+    <p>The official quickstart and overview also link two Claude Code courses: <a href="https://academy.claude.com/courses/claude-code-101" target="_blank" rel="noopener">Claude Code 101</a> and <a href="https://academy.claude.com/courses/claude-code-in-action" target="_blank" rel="noopener">Claude Code in Action</a>. Both pages load today, though the Academy home page did not list them when I checked, so look for them from the links rather than the front page. Course lists change, so use the Academy site for the current catalogue.</p>
+    <h3>Documentation and community</h3>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noopener">Best practices</a>, <a href="https://code.claude.com/docs/en/common-workflows" target="_blank" rel="noopener">common workflows</a> and <a href="https://code.claude.com/docs/en/how-claude-code-works" target="_blank" rel="noopener">how Claude Code works</a>: the three pages I used most for Part 5.</li>
+      <li><a href="https://code.claude.com/docs/en/features-overview" target="_blank" rel="noopener">Extend Claude Code</a>: how to choose between memory, skills, subagents and MCP.</li>
+      <li>The <a href="https://www.anthropic.com/discord" target="_blank" rel="noopener">community Discord</a> for tips and support, and the <a href="https://github.com/anthropics/claude-code/issues" target="_blank" rel="noopener">GitHub issues</a> page for known problems.</li>
+      <li>The <a href="https://support.claude.com/" target="_blank" rel="noopener">Help Center</a> for account, billing and plan questions. Part 4 lists every official link in one place.</li>
+    </ul>
+
+    <h2 id="current">8. Staying current</h2>
+    <p>Claude Code, the models and the docs all change quickly. A few habits keep you from being surprised:</p>
+    <ul>
+      <li><strong>Keep Claude Code updated.</strong> Native installs update themselves in the background; Homebrew, WinGet and Linux package installs do not, so run the upgrade command from Part 1 or <code>claude update</code>. <code>claude --version</code> shows what you have.</li>
+      <li><strong>Read the release notes.</strong> The Help Center keeps a <a href="https://support.claude.com/en/articles/12138966-release-notes" target="_blank" rel="noopener">release notes</a> article for the apps.</li>
+      <li><strong>Check model status before you pin one.</strong> The <a href="https://platform.claude.com/docs/en/about-claude/model-deprecations" target="_blank" rel="noopener">deprecations page</a> shows retirement dates (Part 4). Anthropic says it gives at least 60 days' notice for publicly released models.</li>
+      <li><strong>Prefer the docs index to memory.</strong> The docs publish an index at <a href="https://code.claude.com/docs/llms.txt" target="_blank" rel="noopener">code.claude.com/docs/llms.txt</a>, which you can also hand to Claude: ask it to read the current docs before answering.</li>
+      <li><strong>Re-audit your own setup now and then.</strong> Run <code>/doctor</code>, prune CLAUDE.md, and delete plugins you no longer use.</li>
+      <li><strong>Remember this series is a dated snapshot.</strong> Every figure and command here was checked against the official pages in October 2026. When your version behaves differently, believe the docs.</li>
+    </ul>
+
+    <h2 id="cheat">9. One-page cheat sheet</h2>
+    <h3>Keys</h3>
+    <table>
+      <tr><th>Key</th><th>Does</th></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Cycle permission modes (manual, accept edits, plan, and auto where available).</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Interrupt Claude. Press twice to open the rewind menu.</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>G</kbd></td><td>Open the proposed plan in your text editor.</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd> twice</td><td>Exit on an empty prompt.</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Send a running subagent task to the background.</td></tr>
+      <tr><td><code>@</code> then a path</td><td>Put a file or folder listing into the conversation.</td></tr>
+    </table>
+    <h3>Commands</h3>
+    <table>
+      <tr><th>Command</th><th>Does</th><th>Part</th></tr>
+      <tr><td><code>/init</code>, <code>/memory</code></td><td>Create and edit CLAUDE.md and memory.</td><td>2</td></tr>
+      <tr><td><code>/context</code>, <code>/usage</code></td><td>See what fills the window; see cost and plan usage.</td><td>3</td></tr>
+      <tr><td><code>/clear</code>, <code>/compact</code>, <code>/rewind</code></td><td>Start fresh, summarise, or go back.</td><td>3, 5</td></tr>
+      <tr><td><code>/model</code>, <code>/plan</code></td><td>Switch model; enter plan mode.</td><td>1</td></tr>
+      <tr><td><code>/resume</code>, <code>claude -c</code>, <code>claude -r</code></td><td>Reopen a conversation.</td><td>1, 3</td></tr>
+      <tr><td><code>/mcp</code>, <code>/plugin</code></td><td>Manage servers and plugins.</td><td>6</td></tr>
+      <tr><td><code>/permissions</code>, <code>/doctor</code></td><td>Review rules; check your setup.</td><td>1, 5</td></tr>
+      <tr><td><code>claude -p "..."</code></td><td>Run once, non-interactively.</td><td>7</td></tr>
+      <tr><td><code>claude --worktree name</code></td><td>Start an isolated parallel session.</td><td>5</td></tr>
+    </table>
+    <h3>Ten rules to remember</h3>
+    <ol>
+      <li>The context window is the scarce resource. Keep it clean.</li>
+      <li>Claude does not learn from your usage. Your notes do.</li>
+      <li>Explore and plan before you implement, unless the change is one sentence.</li>
+      <li>Give Claude a check it can run, and ask for evidence.</li>
+      <li>Work on a branch and read the diff.</li>
+      <li>Stay in Manual mode until you trust the task.</li>
+      <li>Keep secrets out of reach, and treat untrusted content as hostile.</li>
+      <li>Correct early; after two failed corrections, <code>/clear</code>.</li>
+      <li>Prune CLAUDE.md, skills, plugins and permissions regularly.</li>
+      <li>When in doubt, check the official docs.</li>
+    </ol>
+
+    <h2 id="end8">10. Series wrap-up</h2>
+    <table>
+      <tr><th>Level</th><th>Part</th><th>Question it answers</th></tr>
+      <tr><td rowspan="4"><strong>Beginner</strong></td><td><a href="claude-md-part-1-setup.html">1. Meet Claude and set it up</a></td><td>How do I get started safely?</td></tr>
+      <tr><td><a href="claude-md-part-2-memory.html">2. CLAUDE.md: the project memory</a></td><td>How does Claude remember my project?</td></tr>
+      <tr><td><a href="claude-md-part-3-tokens-onboarding.html">3. Fewer tokens, faster onboarding</a></td><td>How do I spend less and ramp up faster?</td></tr>
+      <tr><td><a href="claude-md-part-4-api-models-links.html">4. The Claude API, models and links</a></td><td>What models exist and where are the docs?</td></tr>
+      <tr><td rowspan="4"><strong>Advanced</strong></td><td><a href="claude-md-part-5-daily-workflow.html">5. Working day to day</a></td><td>How do I prompt, use git, and fix problems?</td></tr>
+      <tr><td><a href="claude-md-part-6-extend-and-surfaces.html">6. Extending Claude Code</a></td><td>How do I connect tools, delegate, and choose a surface?</td></tr>
+      <tr><td><a href="claude-md-part-7-automation-and-teams.html">7. Automation and teams</a></td><td>How do I run it in scripts and CI, and roll it out?</td></tr>
+      <tr><td>8. Beyond code and your learning path</td><td>What else is there, and what do I do next?</td></tr>
+    </table>
+    <p>If you remember one thing from all eight parts, make it this: the model forgets by design and the tooling changes constantly, so the durable skills are the ones that do not depend on either. Keep your context small, write down what matters, verify what Claude produces, and read the official docs when something looks different. Thank you for reading.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Claude apps</td><td>The chat products for everyday use: claude.ai, the desktop app and the mobile apps.</td></tr>
+      <tr><td>Cowork</td><td>A desktop-app tab where an autonomous agent works on a task in the background.</td></tr>
+      <tr><td>Project (in the apps)</td><td>A way to keep related chats and files together in the Claude apps; see the Help Center.</td></tr>
+      <tr><td>Artifact</td><td>Interactive or shareable content Claude creates alongside a chat; see the Help Center.</td></tr>
+      <tr><td><code>/powerup</code></td><td>Interactive lessons with animated demos inside Claude Code.</td></tr>
+      <tr><td>Claude Academy</td><td>Anthropic's free, self-paced online courses.</td></tr>
+      <tr><td>Release notes</td><td>A changelog of what is new in the Claude apps.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="claude-md-part-7-automation-and-teams.html"><small>&larr; Previous &middot; Part 7</small>Automation and teams</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'claude-md', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>
