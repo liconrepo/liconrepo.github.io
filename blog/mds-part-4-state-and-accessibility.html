@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>State and accessibility in Android components: text field, chip and alert — Design system series part 4</title>
+  <meta name="description" content="Saved state for compound views, constructor-order traps, labels, errors and live regions, selection without colour, and reduced motion, shown in a real component library. Part 4 of 6." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  
+    .phones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .phones img { width: calc(50% - 8px); max-width: 190px; height: auto; border-radius: 14px; border: 1px solid var(--border-h); }
+    .fig img { max-width: 100%; height: auto; }
+    .repo { border-left: 3px solid #10b981; background: color-mix(in srgb, #10b981 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 22px 0; }
+    .repo p { margin: 4px 0; }
+    .repo ul { margin: 6px 0 4px 20px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="4">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Design systems on Android &middot; Series &middot; Part 4 of 6</p>
+    <h1>State and accessibility in Android components: text field, chip and alert</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~8 min read</span></div>
+    <div class="tags"><span class="tag">Accessibility</span><span class="tag">Saved state</span><span class="tag">Custom views</span><span class="tag">TalkBack</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="mds-part-1-what-and-tour.html"><small>Part 1 &middot; Foundations</small>What a design system is, and a tour</a>
+      <a href="mds-part-2-design-tokens.html"><small>Part 2 &middot; Foundations</small>Design tokens: tiers, dark mode, brands</a>
+      <a href="mds-part-3-building-a-component.html"><small>Part 3 &middot; Build</small>Building a component: MdsButton</a>
+      <a class="on" href="mds-part-4-state-and-accessibility.html"><small>Part 4 &middot; Build</small>State and accessibility</a>
+      <a href="mds-part-5-layers-and-templates.html"><small>Part 5 &middot; Build</small>Layers, templates and pages</a>
+      <a href="mds-part-6-shipping-and-lessons.html"><small>Part 6 &middot; Build</small>Shipping it, and lessons learned</a>
+    </div>
+
+<p class="lede">A button is stateless enough to be forgiving. Inputs, toggles and messages are not: they hold what the user typed, they must survive rotation and process death, and they have to make sense to someone who cannot see them. This part opens the text field, chip and alert in the example library and shows the Android details that decide whether such components feel solid or fragile.</p>
+
+<div class="repo"><p><strong>Working code.</strong> Everything in this post exists and runs in the reference repository: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Clone it and follow along; the docs are also published at <a href="https://liconrepo.github.io/MobileDesignSystem/" target="_blank" rel="noopener">liconrepo.github.io/MobileDesignSystem</a>.</p><p>Files for this part:</p><ul><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/functional/molecules/MdsTextField.kt" target="_blank" rel="noopener"><code>functional/molecules/MdsTextField.kt</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/functional/atoms/MdsChip.kt" target="_blank" rel="noopener"><code>functional/atoms/MdsChip.kt</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/functional/molecules/MdsAlert.kt" target="_blank" rel="noopener"><code>functional/molecules/MdsAlert.kt</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/perceptual/MdsMotion.kt" target="_blank" rel="noopener"><code>perceptual/MdsMotion.kt</code></a></li></ul></div>
+
+<div class="toc"><strong>In this part</strong><ol><li><a href="#textfield">The text field is three views in a trench coat</a></li><li><a href="#state">Saving state: why two fields collided</a></li><li><a href="#ready">Constructors that call you before you exist</a></li><li><a href="#a11y">Making it usable without sight</a></li><li><a href="#chip">The chip: selection you can see without colour</a></li><li><a href="#motion">Motion that can be switched off</a></li><li><a href="#listener">A bug in the sample, not the library</a></li></ol></div>
+
+<div class="callout">
+  <strong>Part 4 in 60 seconds</strong>
+  <ul>
+    <li>A compound view that owns child views must save its <strong>own</strong> state, or two instances on one screen will clobber each other.</li>
+    <li>Superclass constructors call overridable methods early. Guard them with a <code>ready</code> flag.</li>
+    <li>A text field is accessible when it has a <strong>visible label</strong>, an <strong>error with text and icon</strong>, and a <strong>live region</strong>.</li>
+    <li>Selection and error are never colour alone: a chip shows a check mark, an error shows an icon and a prefix.</li>
+    <li>Motion respects the system's animation setting through one function, <code>MdsMotion.isReduced</code>.</li>
+  </ul>
+</div>
+
+<h2 id="textfield">The text field is three views in a trench coat</h2>
+<p><code>MdsTextField</code> looks like one control but is a vertical <code>LinearLayout</code> with a label, a rounded box containing an <code>EditText</code>, and a line of helper or error text. Composition keeps each piece simple. The cost is that you now own behaviour a single view would give you for free.</p>
+<figure class="fig">
+  <svg viewBox="0 0 700 240" role="img" aria-label="Structure of the text field: label, input box with focus and error border states, and helper or error text below.">
+    <rect class="ghost" x="150" y="10" width="400" height="214" rx="14"/>
+    <text class="sub" x="164" y="30">MdsTextField (LinearLayout)</text>
+    <rect class="box" x="170" y="42" width="360" height="34" rx="8"/><text class="b" x="184" y="64">Label  (always visible)</text>
+    <rect class="boxb" x="170" y="86" width="360" height="56" rx="12"/><text class="b" x="184" y="112">Input box</text><text class="sub" x="184" y="130">border: normal / focus / error / disabled</text>
+    <rect class="boxr" x="170" y="152" width="360" height="56" rx="10"/><text class="b" x="184" y="176">Support line</text><text class="sub" x="184" y="194">helper text, or error: icon + "Error: ..." (live region)</text>
+  </svg>
+  <figcaption>The border state is derived from three facts: enabled, has error, has focus. One function, <code>updateBox()</code>, applies them.</figcaption>
+</figure>
+<div class="doc"><div class="doc-bar">functional/molecules/MdsTextField.kt (excerpt)</div>
+<pre><code>private fun updateBox() {
+    val c = context
+    val thin = c.mdsPx(R.dimen.mds_stroke_thin)
+    val thick = c.mdsPx(R.dimen.mds_stroke_thick)
+    val (width, strokeColor) = when {
+        !isEnabled -&gt; thin to c.mdsColor(R.attr.mdsColorOutline)
+        !errorText.isNullOrEmpty() -&gt; thick to c.mdsColor(R.attr.mdsColorDanger)
+        focused -&gt; thick to c.mdsColor(R.attr.mdsColorPrimary)
+        else -&gt; thin to c.mdsColor(R.attr.mdsColorOutlineStrong)
+    }
+    ...
+}</code></pre></div>
+<p>The order of the <code>when</code> branches is the priority order: disabled wins over error, and error wins over focus. A field that is both focused and in error should look like an error.</p>
+
+<h2 id="state">Saving state: why two fields collided</h2>
+<p>Android saves the state of views by their <code>id</code>. When a view group has children with the <em>same</em> id as another instance of the same group, their saved states collide in one shared array. This is the classic custom-view bug: two <code>MdsTextField</code>s on a screen swap or lose their text after a rotation, because each contains an <code>EditText</code> with the same id.</p>
+<p>The fix is to stop the framework from saving the children individually, and save the whole component's state yourself:</p>
+<div class="doc"><div class="doc-bar">functional/molecules/MdsTextField.kt (excerpt)</div>
+<pre><code>// Children share generated ids across instances, so save our own state
+// instead of the default per-child state.
+override fun dispatchSaveInstanceState(container: SparseArray&lt;Parcelable&gt;) {
+    dispatchFreezeSelfOnly(container)
+}
+
+override fun dispatchRestoreInstanceState(container: SparseArray&lt;Parcelable&gt;) {
+    dispatchThawSelfOnly(container)
+}
+
+override fun onSaveInstanceState(): Parcelable {
+    val state = SavedState(super.onSaveInstanceState())
+    state.text = editText.text?.toString()
+    state.error = errorText?.toString()
+    return state
+}</code></pre></div>
+<p><code>dispatchFreezeSelfOnly</code> means "save me, not my children". The component then writes what matters (the text and the current error) into a small <code>BaseSavedState</code> subclass with a manual <code>CREATOR</code>. It is a few dozen lines, and it is the difference between a demo and a component you can put on a form.</p>
+
+<h2 id="ready">Constructors that call you before you exist</h2>
+<p>Here is a trap that is easy to hit in Kotlin. The <code>View</code> constructor reads XML attributes. For some of them it calls overridable methods. If your class overrides one, the call arrives <em>before</em> your own properties have been initialised, and a non-null field is, at that moment, null.</p>
+<div class="doc"><div class="doc-bar">functional/molecules/MdsTextField.kt (excerpt)</div>
+<pre><code>private var ready = false      // a primitive boolean defaults to false in the JVM, even this early
+
+override fun setEnabled(enabled: Boolean) {
+    super.setEnabled(enabled)
+    if (ready) {
+        editText.isEnabled = enabled
+        updateBox()
+    }
+}
+
+init {
+    ...
+    ready = true
+    editText.isEnabled = isEnabled
+    updateBox()
+    updateSupportText()
+}</code></pre></div>
+<p>The guard keeps the early call harmless, and the end of <code>init</code> catches up by applying the current state once. <code>MdsChip</code> uses the same pattern, because <code>AppCompatCheckBox</code> may call <code>setChecked</code> while it is still being constructed.</p>
+<div class="callout">
+  <strong>An honest note about <code>android:enabled</code></strong>
+  <p>In the sample, a field declared with <code>android:enabled="false"</code> was rendering as enabled. Rather than chase which part of the construction order lost the flag, the component now declares <code>android:enabled</code> in its own styleable and applies it explicitly at the end of <code>init</code>. That made the behaviour deterministic and it is verified in the running sample, but I did not isolate the framework reason, so treat the explanation as incomplete.</p>
+</div>
+
+<h2 id="a11y">Making it usable without sight</h2>
+<p>Three small choices do most of the accessibility work for a text field.</p>
+<h3>1. A label that is always there</h3>
+<p>Placeholders disappear when you type, so they cannot be the label. The field has a real label view, linked to the input with <code>labelFor</code>, so a screen reader announces "Email, edit box" when focus lands:</p>
+<pre><code>labelView.labelFor = View.generateViewId().also { editText.id = it }</code></pre>
+<h3>2. Errors that are more than red</h3>
+<p>When an error is set, the support line shows the message with an icon and a localisable prefix (<code>"Error: %1$s"</code>), in the danger colour. Someone who cannot distinguish red from the neutral grey still gets the icon and the word.</p>
+<h3>3. A live region</h3>
+<p>The support line is marked as a polite live region, so when validation fails after a tap, assistive technology announces the new text without stealing focus:</p>
+<pre><code>ViewCompat.setAccessibilityLiveRegion(
+    supportView, ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE,
+)</code></pre>
+<p>The alert component applies the same idea to the whole message, and its dismiss button is a full 48dp target with a content description from a string resource, so it can be translated.</p>
+<div class="callout">
+  <strong>What I have and have not verified</strong>
+  <p>I checked the visual states in the running sample (light, dark, error, disabled) and the structure through the view hierarchy. I did not run a complete TalkBack pass. The accessibility choices above follow the platform guidance, but always test with TalkBack on a device before you rely on them.</p>
+</div>
+
+<h2 id="chip">The chip: selection you can see without colour</h2>
+<p>A chip is a checkbox wearing a pill. <code>MdsChip</code> extends <code>AppCompatCheckBox</code> (so toggling, state, accessibility role and keyboard behaviour are inherited), removes the box with <code>buttonDrawable = null</code>, and draws its own background from state lists keyed on <code>state_checked</code>. When checked it shows a check icon as a start compound drawable, so selection is not colour alone. It uses the same 36dp-drawn, 48dp-touchable inset as the button.</p>
+<pre><code>val checked = intArrayOf(android.R.attr.state_checked)
+val fill = ColorStateList(
+    arrayOf(checked, intArrayOf()),
+    intArrayOf(c.mdsColor(R.attr.mdsColorPrimaryContainer), c.mdsColor(R.attr.mdsColorSurface)),
+)</code></pre>
+
+<h2 id="motion">Motion that can be switched off</h2>
+<p>The skeleton placeholder shimmers while content loads. Some people turn animations off, for comfort or battery, and the system exposes that as a global scale of zero. One tiny object centralises the check so every animated component asks the same question:</p>
+<div class="doc"><div class="doc-bar">perceptual/MdsMotion.kt</div>
+<pre><code>public object MdsMotion {
+    public fun isReduced(context: Context): Boolean =
+        Settings.Global.getFloat(
+            context.contentResolver,
+            Settings.Global.ANIMATOR_DURATION_SCALE, 1f,
+        ) == 0f
+}</code></pre></div>
+<p>The skeleton still draws its grey shape when motion is reduced. It simply does not animate. The shimmer also starts and stops with visibility (<code>onVisibilityAggregated</code>) and detach, so it is not running on a screen the user cannot see.</p>
+
+<h2 id="listener">A bug in the sample, not the library</h2>
+<p>One more state story, from the gallery app. The dark-mode switch wrote the user's choice to preferences from its checked-change listener. After a configuration change, Android restored the switch's saved state, which flipped it to a stale value and fired the listener, which overwrote the preference. The app then showed light mode even though the system was dark.</p>
+<p>Two fixes, both in <code>MainActivity</code>: only react to user-driven changes, and do not let Android restore a control whose state is derived from somewhere else.</p>
+<pre><code>binding.switchDark.isSaveEnabled = false
+binding.switchDark.setOnCheckedChangeListener { button, checked -&gt;
+    if (!button.isPressed) return@setOnCheckedChangeListener // ignore programmatic changes
+    ...
+}</code></pre>
+<p>The lesson for design-system authors: be careful with listeners that fire on programmatic changes, and document whether your components do.</p>
+
+<h3>Try it yourself</h3>
+<ol class="steps">
+  <li>Put two <code>MdsTextField</code>s in a layout, type different text, and rotate the device. Both keep their text.</li>
+  <li>Temporarily remove the two <code>dispatch*SelfOnly</code> overrides and repeat. Watch what happens.</li>
+  <li>Turn on TalkBack, focus the email field in the sign-in page, submit an empty form and listen to the announcement.</li>
+  <li>Turn off animations in developer options and open the Molecules and Atoms tabs. The skeleton stays still.</li>
+</ol>
+
+<table class="gloss">
+  <tr><th>Term</th><th>In plain words</th></tr>
+  <tr><td>Compound view</td><td>A view made of other views, behaving as one control.</td></tr>
+  <tr><td>Saved instance state</td><td>Data Android keeps so a screen can be rebuilt after rotation or process death.</td></tr>
+  <tr><td>Live region</td><td>A view whose changes screen readers announce automatically.</td></tr>
+  <tr><td>labelFor</td><td>Links a label to the field it describes.</td></tr>
+  <tr><td>Content description</td><td>The text a screen reader reads for a non-text control.</td></tr>
+  <tr><td>Reduced motion</td><td>The user setting that asks apps to cut or stop animation.</td></tr>
+</table>
+
+
+    <div class="pager"><a class="prev" href="mds-part-3-building-a-component.html"><small>&larr; Previous &middot; Part 3</small>Building a component: MdsButton</a><a class="next" href="mds-part-5-layers-and-templates.html"><small>Next &middot; Part 5 &rarr;</small>Layers, templates and pages</a></div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'mds-android', part: part }, params || {})); };
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

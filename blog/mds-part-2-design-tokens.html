@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Design tokens on Android: three tiers, dark mode and swappable brands — Design system series part 2</title>
+  <meta name="description" content="Primitive, semantic and theme-attribute tokens implemented with Android resources, with dark mode, a brand overlay and a contrast check done with arithmetic. Part 2 of 6." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  
+    .phones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .phones img { width: calc(50% - 8px); max-width: 190px; height: auto; border-radius: 14px; border: 1px solid var(--border-h); }
+    .fig img { max-width: 100%; height: auto; }
+    .repo { border-left: 3px solid #10b981; background: color-mix(in srgb, #10b981 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 22px 0; }
+    .repo p { margin: 4px 0; }
+    .repo ul { margin: 6px 0 4px 20px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="2">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Design systems on Android &middot; Series &middot; Part 2 of 6</p>
+    <h1>Design tokens on Android: three tiers, dark mode and swappable brands</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~7 min read</span></div>
+    <div class="tags"><span class="tag">Design tokens</span><span class="tag">Theming</span><span class="tag">Dark mode</span><span class="tag">Accessibility</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="mds-part-1-what-and-tour.html"><small>Part 1 &middot; Foundations</small>What a design system is, and a tour</a>
+      <a class="on" href="mds-part-2-design-tokens.html"><small>Part 2 &middot; Foundations</small>Design tokens: tiers, dark mode, brands</a>
+      <a href="mds-part-3-building-a-component.html"><small>Part 3 &middot; Build</small>Building a component: MdsButton</a>
+      <a href="mds-part-4-state-and-accessibility.html"><small>Part 4 &middot; Build</small>State and accessibility</a>
+      <a href="mds-part-5-layers-and-templates.html"><small>Part 5 &middot; Build</small>Layers, templates and pages</a>
+      <a href="mds-part-6-shipping-and-lessons.html"><small>Part 6 &middot; Build</small>Shipping it, and lessons learned</a>
+    </div>
+
+<p class="lede">Tokens are the part of a design system that nobody sees and everybody depends on. Get them right and a dark mode, a second brand and a contrast fix each become a small edit. Get them wrong and every component grows its own colour logic. This part shows a three-tier token design, the exact Android resources that implement it, and the small traps that catch people on the way.</p>
+
+<div class="repo"><p><strong>Working code.</strong> Everything in this post exists and runs in the reference repository: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Clone it and follow along; the docs are also published at <a href="https://liconrepo.github.io/MobileDesignSystem/" target="_blank" rel="noopener">liconrepo.github.io/MobileDesignSystem</a>.</p><p>Files for this part:</p><ul><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_palette.xml" target="_blank" rel="noopener"><code>res/values/mds_palette.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_colors.xml" target="_blank" rel="noopener"><code>res/values/mds_colors.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values-night/mds_colors.xml" target="_blank" rel="noopener"><code>res/values-night/mds_colors.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_themes.xml" target="_blank" rel="noopener"><code>res/values/mds_themes.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/perceptual/Theming.kt" target="_blank" rel="noopener"><code>perceptual/Theming.kt</code></a></li></ul></div>
+
+<div class="toc"><strong>In this part</strong><ol><li><a href="#problem">The problem tokens solve</a></li><li><a href="#tier1">Tier 1: primitive tokens</a></li><li><a href="#tier2">Tier 2: semantic tokens</a></li><li><a href="#tier3">Tier 3: theme attributes</a></li><li><a href="#brands">A second brand in five lines</a></li><li><a href="#contrast">Checking contrast with arithmetic</a></li><li><a href="#pitfalls">Two traps worth knowing</a></li></ol></div>
+
+<div class="callout">
+  <strong>Part 2 in 60 seconds</strong>
+  <ul>
+    <li>Three tiers: <strong>primitive</strong> (raw values), <strong>semantic</strong> (roles), <strong>theme attributes</strong> (what components read).</li>
+    <li>A tier may only reference the tier directly above it. Components never see a hex code.</li>
+    <li>Dark mode is the same semantic names with different values in <code>values-night</code>.</li>
+    <li>A brand is a short theme overlay that re-points a few roles.</li>
+    <li>Check contrast with arithmetic, not by eye. A brand colour that looked fine failed at 4.09:1 and had to be darkened.</li>
+  </ul>
+</div>
+
+<h2 id="problem">The problem tokens solve</h2>
+<p>Imagine a button that sets its fill to <code>#4040D8</code>. Now the designer wants dark mode, then a second brand, then a bit more contrast. Every place that typed the hex has to change, and every one has to remember a dark variant. Tokens add a layer of names between "what it means" and "what it looks like", so only the second changes.</p>
+
+<figure class="fig">
+  <svg viewBox="0 0 700 250" role="img" aria-label="Token flow: primitive colour, semantic colour resource, theme attribute, component. Dark mode swaps the semantic value.">
+    <rect class="boxg" x="10" y="20" width="150" height="80" rx="14"/><text class="b" x="24" y="48">1. Primitive</text><text class="sub" x="24" y="70">ocean_600</text><text class="sub" x="24" y="88">#4040D8</text>
+    <rect class="boxb" x="185" y="20" width="160" height="80" rx="14"/><text class="b" x="199" y="48">2. Semantic</text><text class="sub" x="199" y="70">mds_color_primary</text><text class="sub" x="199" y="88">light / night</text>
+    <rect class="boxp" x="370" y="20" width="150" height="80" rx="14"/><text class="b" x="384" y="48">3. Theme attr</text><text class="sub" x="384" y="70">?attr/mdsColorPrimary</text>
+    <rect class="boxo" x="545" y="20" width="145" height="80" rx="14"/><text class="b" x="559" y="48">Component</text><text class="sub" x="559" y="70">MdsButton</text>
+    <path class="arrow" d="M160,60 L183,60"/><path class="arrow" d="M345,60 L368,60"/><path class="arrow" d="M520,60 L543,60"/>
+    <rect class="ghost" x="165" y="130" width="200" height="96" rx="14"/>
+    <text class="sub" x="179" y="156">values/       -> ocean_600</text><text class="sub" x="179" y="178">values-night/ -> ocean_400</text><text class="sub" x="179" y="206">same name, two values</text>
+    <path class="arrow" d="M265,102 L265,128"/>
+  </svg>
+  <figcaption>Each tier points only at the one before it. Dark mode lives entirely in tier 2.</figcaption>
+</figure>
+
+<h2 id="tier1">Tier 1: primitive tokens</h2>
+<p>Primitives are raw values with no meaning attached: a ramp of neutrals, a ramp for the brand, and a ramp for each status colour. They live in <code>mds_palette.xml</code> and nothing outside the semantic tier may reference them.</p>
+<div class="doc"><div class="doc-bar">designsystem/src/main/res/values/mds_palette.xml</div>
+<pre><code>&lt;color name="mds_palette_neutral_900"&gt;#171A23&lt;/color&gt;
+&lt;color name="mds_palette_neutral_950"&gt;#0E1017&lt;/color&gt;
+
+&lt;color name="mds_palette_ocean_400"&gt;#7783FB&lt;/color&gt;
+&lt;color name="mds_palette_ocean_600"&gt;#4040D8&lt;/color&gt;
+&lt;color name="mds_palette_ocean_700"&gt;#3330B0&lt;/color&gt;</code></pre></div>
+<p>The names carry a number (the step in the ramp), never a purpose. "Ocean 600" can become the primary colour today and a link colour tomorrow without the name lying.</p>
+
+<h2 id="tier2">Tier 2: semantic tokens</h2>
+<p>Semantic tokens are named for the job they do. This is the tier designers and developers talk in: <em>primary</em>, <em>surface</em>, <em>on surface muted</em>, <em>danger container</em>. The same names exist twice, once for light and once for dark, and only the values differ.</p>
+<div class="doc"><div class="doc-bar">values/mds_colors.xml (light)</div>
+<pre><code>&lt;color name="mds_color_surface"&gt;@color/mds_palette_neutral_0&lt;/color&gt;
+&lt;color name="mds_color_on_surface"&gt;@color/mds_palette_neutral_900&lt;/color&gt;
+&lt;color name="mds_color_primary"&gt;@color/mds_palette_ocean_600&lt;/color&gt;
+&lt;color name="mds_color_on_primary"&gt;@color/mds_palette_neutral_0&lt;/color&gt;</code></pre></div>
+<div class="doc"><div class="doc-bar">values-night/mds_colors.xml (dark)</div>
+<pre><code>&lt;color name="mds_color_surface"&gt;@color/mds_palette_neutral_900&lt;/color&gt;
+&lt;color name="mds_color_on_surface"&gt;@color/mds_palette_neutral_50&lt;/color&gt;
+&lt;color name="mds_color_primary"&gt;@color/mds_palette_ocean_400&lt;/color&gt;
+&lt;color name="mds_color_on_primary"&gt;@color/mds_palette_neutral_950&lt;/color&gt;</code></pre></div>
+<p>Notice the pairing. Every role that is a <em>fill</em> has an <code>on_</code> partner for the content that sits on it. That pairing is what makes contrast a property you can verify per pair, instead of a feeling you have per screen.</p>
+<p>Dark mode is not "invert everything". The primary shifts from step 600 to step 400, and the text on it flips from white to near-black, because a dark theme needs lighter accents to stay readable against a dark surface.</p>
+
+<h2 id="tier3">Tier 3: theme attributes</h2>
+<p>Components should not read colour resources directly, because the resource can change when a brand overlay is applied. They read <em>theme attributes</em>, which resolve against whatever theme the view is inflated with. Declare the attribute once, map it in the theme:</p>
+<div class="doc"><div class="doc-bar">values/mds_attrs.xml and values/mds_themes.xml</div>
+<pre><code>&lt;attr name="mdsColorPrimary" format="color" /&gt;
+
+&lt;style name="Theme.Mds" parent="Theme.AppCompat.DayNight.NoActionBar"&gt;
+    &lt;item name="mdsColorPrimary"&gt;@color/mds_color_primary&lt;/item&gt;
+    &lt;item name="mdsColorOnPrimary"&gt;@color/mds_color_on_primary&lt;/item&gt;
+    ...
+&lt;/style&gt;</code></pre></div>
+<p>Then one tiny helper resolves an attribute to a colour in Kotlin. It is the only door components use:</p>
+<div class="doc"><div class="doc-bar">perceptual/Theming.kt</div>
+<pre><code>@ColorInt
+public fun Context.mdsColor(@AttrRes attr: Int): Int {
+    val value = TypedValue()
+    check(theme.resolveAttribute(attr, value, true)) {
+        "Theme attribute ${resources.getResourceName(attr)} is not set. " +
+            "Apply Theme.Mds (or a child) to this context."
+    }
+    return value.data
+}</code></pre></div>
+<p>The <code>check</code> is deliberate. If an app forgets to use <code>Theme.Mds</code>, you want a message that says exactly that, not a silent black button.</p>
+<p>The theme also maps the same attributes onto the framework ones (<code>colorPrimary</code>, <code>android:textColorPrimary</code>, <code>android:windowBackground</code>), so an unstyled <code>TextView</code> or <code>EditText</code> agrees with the system without any extra work.</p>
+
+<h2 id="brands">A second brand in five lines</h2>
+<p>Because components read roles through the theme, a brand is a handful of overridden attributes. This is the complete Sunset brand:</p>
+<div class="doc"><div class="doc-bar">values/mds_themes.xml</div>
+<pre><code>&lt;style name="ThemeOverlay.Mds.Sunset" parent=""&gt;
+    &lt;item name="mdsColorPrimary"&gt;@color/mds_sunset_primary&lt;/item&gt;
+    &lt;item name="mdsColorPrimaryPressed"&gt;@color/mds_sunset_primary_pressed&lt;/item&gt;
+    &lt;item name="mdsColorOnPrimary"&gt;@color/mds_sunset_on_primary&lt;/item&gt;
+    &lt;item name="mdsColorPrimaryContainer"&gt;@color/mds_sunset_primary_container&lt;/item&gt;
+    &lt;item name="mdsColorOnPrimaryContainer"&gt;@color/mds_sunset_on_primary_container&lt;/item&gt;
+&lt;/style&gt;</code></pre></div>
+<p>The <code>mds_sunset_*</code> colours also exist in <code>values-night</code>, so the brand has a dark variant too. Applying it takes one line, before <code>super.onCreate()</code>:</p>
+<pre><code>theme.applyStyle(R.style.ThemeOverlay_Mds_Sunset, true)</code></pre>
+<figure class="fig">
+  <div class="phones">
+    <img src="img/mds-light-1.png" alt="Ocean brand, light" />
+    <img src="img/mds-dark-1.png" alt="Ocean brand, dark" />
+    <img src="img/mds-sunset-1.png" alt="Sunset brand, light" />
+  </div>
+  <figcaption>Same layouts and same component code. Only the primary role changed between the first two and the third.</figcaption>
+</figure>
+<p>Status colours (danger, success, warning, info) are deliberately <em>not</em> part of the brand overlay. A red error should stay red whatever the brand, so people do not have to relearn what a colour means.</p>
+
+<h2 id="contrast">Checking contrast with arithmetic</h2>
+<p>The Web Content Accessibility Guidelines (WCAG) define contrast as a ratio of relative luminances: <code>(L1 + 0.05) / (L2 + 0.05)</code>, where L is computed from the sRGB channels. Normal text should reach 4.5:1, and non-text parts such as input borders 3:1. You can compute it in a few lines of Python, and it is worth doing for every pair of roles:</p>
+<pre><code>def lin(c):
+    c /= 255
+    return c / 12.92 if c &lt;= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+def lum(hexcode):
+    r, g, b = (int(hexcode[i:i+2], 16) for i in (1, 3, 5))
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+
+def contrast(a, b):
+    hi, lo = sorted((lum(a), lum(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)</code></pre>
+<p>Running it on the pairs used here gave these numbers:</p>
+<table>
+  <tr><th>Pair</th><th>Ratio</th><th>Verdict</th></tr>
+  <tr><td>White on Ocean 600 (primary button, light)</td><td>7.14</td><td>Passes</td></tr>
+  <tr><td>Near-black on Ocean 400 (primary button, dark)</td><td>5.81</td><td>Passes</td></tr>
+  <tr><td>White on first Sunset try <code>#D9502A</code></td><td>4.09</td><td>Fails for text</td></tr>
+  <tr><td>White on final Sunset <code>#B8401D</code></td><td>5.54</td><td>Passes</td></tr>
+  <tr><td>Muted text (Neutral 600) on white</td><td>6.81</td><td>Passes</td></tr>
+  <tr><td>Input border (Neutral 500) on white</td><td>4.43</td><td>Passes non-text 3:1</td></tr>
+  <tr><td>White on Danger 600</td><td>5.63</td><td>Passes</td></tr>
+</table>
+<p>The Sunset story is the point. The first orange looked lively and failed on the numbers, so it was darkened until it passed. A designer's eye would have shipped it. One caveat: this checks the colour pairs. It does not replace testing with real users and assistive technology.</p>
+
+<h2 id="pitfalls">Two traps worth knowing</h2>
+<h3>A qualified style replaces the whole style</h3>
+<p>You might expect <code>values-night/themes.xml</code> to override only the items it lists. It does not: the night version of <code>Theme.Mds</code> would replace the whole style, silently dropping every other item. The fix is to keep a single complete theme and move per-mode differences into <em>resources</em> that the theme references. For example, the light or dark status bar icons come from a boolean:</p>
+<div class="doc"><div class="doc-bar">values/mds_bools.xml and values-night/mds_bools.xml</div>
+<pre><code>&lt;bool name="mds_is_light"&gt;true&lt;/bool&gt;     &lt;!-- values --&gt;
+&lt;bool name="mds_is_light"&gt;false&lt;/bool&gt;    &lt;!-- values-night --&gt;
+
+&lt;item name="android:windowLightStatusBar"&gt;@bool/mds_is_light&lt;/item&gt;</code></pre></div>
+<h3>Colours that mean something stay put</h3>
+<p>It is tempting to let brands recolour everything. Resist it. The five attributes in the overlay above are the whole brand contract. Everything else, especially status colours, is shared.</p>
+
+<h3>Try it yourself</h3>
+<ol class="steps">
+  <li>Run <code>./gradlew :sample:installDebug</code> and open the Perceptual tab. Compare light and dark.</li>
+  <li>Change <code>mds_sunset_primary</code> to a colour of your own, run again, and check it with the Python function above.</li>
+  <li>Add a new role end to end: palette entry, semantic entry in both folders, attribute, theme mapping. Follow <code>docs/tokens.md</code> in the repo.</li>
+</ol>
+
+<table class="gloss">
+  <tr><th>Term</th><th>In plain words</th></tr>
+  <tr><td>Primitive token</td><td>A raw value in a ramp, with no meaning attached.</td></tr>
+  <tr><td>Semantic token</td><td>A value named for its job, such as primary or surface.</td></tr>
+  <tr><td>Theme attribute</td><td>An <code>?attr/</code> name resolved against the current theme.</td></tr>
+  <tr><td>On-colour</td><td>The content colour that sits on a fill, such as <code>on_primary</code>.</td></tr>
+  <tr><td>Theme overlay</td><td>A small style layered over a theme to change a few attributes.</td></tr>
+  <tr><td>Contrast ratio</td><td>How different two colours are in brightness, from 1:1 to 21:1.</td></tr>
+</table>
+
+
+    <div class="pager"><a class="prev" href="mds-part-1-what-and-tour.html"><small>&larr; Previous &middot; Part 1</small>What a design system is, and a tour</a><a class="next" href="mds-part-3-building-a-component.html"><small>Next &middot; Part 3 &rarr;</small>Building a component: MdsButton</a></div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'mds-android', part: part }, params || {})); };
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

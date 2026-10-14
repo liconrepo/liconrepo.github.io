@@ -538,6 +538,17 @@
     .series-level { grid-column: 1 / -1; font-size: calc(11px * var(--fs, 1)); font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text); margin-top: 6px; }
     .series-level span { font-weight: 400; letter-spacing: .6px; color: var(--muted); text-transform: none; margin-left: 6px; }
     .series-parts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+    .series-parts[hidden] { display: none; }
+    .archive-btn.series-toggle {
+      margin-top: 16px; color: #1d4ed8;
+      background: color-mix(in srgb, #2563eb 7%, var(--card));
+      border-color: color-mix(in srgb, #2563eb 28%, var(--border));
+    }
+    .archive-btn.series-toggle:hover {
+      color: #1d4ed8; background: color-mix(in srgb, #2563eb 13%, var(--card));
+      border-color: color-mix(in srgb, #2563eb 45%, var(--border));
+    }
+    [data-theme="dark"] .archive-btn.series-toggle, [data-theme="dark"] .archive-btn.series-toggle:hover { color: #93c5fd; }
     .series-part {
       display: flex; align-items: flex-start; gap: 12px; text-decoration: none; color: inherit;
       background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
@@ -802,7 +813,7 @@
       <div class="stat-label">Companies</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" data-count="32">0</div>
+      <div class="stat-num" data-count="38">0</div>
       <div class="stat-label">Technical Blogs</div>
     </div>
     <div class="stat-card">
@@ -1000,10 +1011,53 @@
 
     <div class="blog-grid new-grid">
       <div class="series-card reveal">
+        <div class="blog-idx">Series &middot; 6 parts<span class="blog-new">NEW</span></div>
+        <div class="blog-title series-title">Building a design system for Android Views, with working code</div>
+        <div class="blog-summary">How to design tokens, components, screen templates and documentation for an Android app without Jetpack Compose, with every claim backed by a running open-source example: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Reading time only: cloning the repo and trying each part's exercises adds 15 to 30 minutes.</div>
+        <button type="button" class="archive-btn series-toggle" aria-expanded="false" aria-controls="series-mds" data-count="6"><span class="st-label">Show all 6 parts</span><span class="chev">&#9662;</span></button>
+        <div class="series-parts" id="series-mds" hidden>
+          <div class="series-level">Foundations <span>Parts 1 to 2 &middot; start here</span></div>
+          <a class="series-part" href="blog/mds-part-1-what-and-tour.html">
+            <span class="sp-num">1</span>
+            <span class="sp-body"><span class="sp-title">What a design system is, and a tour</span><span class="sp-desc">What it is made of, why teams build one, and a guided tour of a working Android example with tokens, components, a sample app and docs.</span></span>
+            <span class="sp-meta">~6 min</span>
+          </a>
+          <a class="series-part" href="blog/mds-part-2-design-tokens.html">
+            <span class="sp-num">2</span>
+            <span class="sp-body"><span class="sp-title">Design tokens: tiers, dark mode, brands</span><span class="sp-desc">Primitive, semantic and theme-attribute tokens as Android resources, dark mode, a five-line brand overlay, and contrast checked with arithmetic.</span></span>
+            <span class="sp-meta">~7 min</span>
+          </a>
+          <div class="series-level">Build and ship <span>Parts 3 to 6 &middot; go deeper</span></div>
+          <a class="series-part" href="blog/mds-part-3-building-a-component.html">
+            <span class="sp-num">3</span>
+            <span class="sp-body"><span class="sp-title">Building a component: MdsButton</span><span class="sp-desc">Theme-driven defaults, variants and sizes, a 48dp touch target inside a smaller shape, loading state, and two traps that quietly break custom views.</span></span>
+            <span class="sp-meta">~8 min</span>
+          </a>
+          <a class="series-part" href="blog/mds-part-4-state-and-accessibility.html">
+            <span class="sp-num">4</span>
+            <span class="sp-body"><span class="sp-title">State and accessibility</span><span class="sp-desc">Saved state for compound views, constructor-order traps, labels, errors and live regions, selection without colour, and reduced motion.</span></span>
+            <span class="sp-meta">~8 min</span>
+          </a>
+          <a class="series-part" href="blog/mds-part-5-layers-and-templates.html">
+            <span class="sp-num">5</span>
+            <span class="sp-body"><span class="sp-title">Layers, templates and pages</span><span class="sp-desc">Atoms to pages as packages, and a screen template with named slots built with custom LayoutParams.</span></span>
+            <span class="sp-meta">~7 min</span>
+          </a>
+          <a class="series-part" href="blog/mds-part-6-shipping-and-lessons.html">
+            <span class="sp-num">6</span>
+            <span class="sp-body"><span class="sp-title">Shipping it, and lessons learned</span><span class="sp-desc">Explicit API mode, publishing, CI, docs, a table of real bugs, and how to adopt a design system in a company.</span></span>
+            <span class="sp-meta">~9 min</span>
+          </a>
+        </div>
+        <div class="blog-tags"><span class="blog-tag">Design system</span><span class="blog-tag">Android</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Design tokens</span><span class="blog-tag">Accessibility</span><span class="blog-tag">Open source</span></div>
+        <div class="blog-footer"><span class="views-badge">~45 min of reading</span><span class="blog-date">Oct 2026</span></div>
+      </div>
+      <div class="series-card reveal">
         <div class="blog-idx">Series &middot; 8 parts<span class="blog-new">NEW</span></div>
         <div class="blog-title series-title">Claude Code, from first install to a project that remembers</div>
         <div class="blog-summary">A two-level series. Beginner: getting started safely, giving Claude lasting memory with CLAUDE.md, spending fewer tokens, and finding the official docs, models and API. Advanced: day-to-day prompting and git, MCP, subagents and plugins, automation and teams, and a learning path. Reading time only: the exercises and the first-week plan add 20 to 40 minutes of hands-on practice a day.</div>
-        <div class="series-parts">
+        <button type="button" class="archive-btn series-toggle" aria-expanded="false" aria-controls="series-claude" data-count="8"><span class="st-label">Show all 8 parts</span><span class="chev">&#9662;</span></button>
+        <div class="series-parts" id="series-claude" hidden>
           <div class="series-level">Beginner <span>Parts 1 to 4 &middot; start here</span></div>
           <a class="series-part" href="blog/claude-md-part-1-setup.html">
             <span class="sp-num">1</span>
@@ -1299,6 +1353,18 @@
   }
   archiveBtn.addEventListener('click', () => setArchive(archiveBox.hidden));
 
+  /* Collapsible series: keeps the Writing section short as more series are added */
+  function setSeries(box, open) {
+    box.hidden = !open;
+    const b = document.querySelector('.series-toggle[aria-controls="' + box.id + '"]');
+    b.setAttribute('aria-expanded', String(open));
+    b.querySelector('.st-label').textContent = open ? 'Hide parts' : 'Show all ' + b.dataset.count + ' parts';
+  }
+  document.querySelectorAll('.series-toggle').forEach(b => b.addEventListener('click', () => {
+    const box = document.getElementById(b.getAttribute('aria-controls'));
+    setSeries(box, box.hidden);
+  }));
+
   /* Site search — indexes the page content itself */
   const SEARCH_SOURCES = [
     { sel: '.hero-text',          section: 'About',      title: () => 'About Khairul Alam' },
@@ -1414,6 +1480,8 @@
   function goTo(it) {
     closeSearch();
     if (it.el.closest('#archive')) setArchive(true);
+    const seriesBox = it.el.closest('.series-parts');
+    if (seriesBox) setSeries(seriesBox, true);
     it.el.classList.add('visible');
     it.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     it.el.classList.add('search-hit');

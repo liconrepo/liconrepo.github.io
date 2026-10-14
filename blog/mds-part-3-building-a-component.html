@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Building a themeable Android component: MdsButton, line by line — Design system series part 3</title>
+  <meta name="description" content="How a custom Android View takes defaults from the theme, models variants and sizes, keeps a 48dp touch target, and handles loading, with two traps explained. Part 3 of 6." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  
+    .phones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .phones img { width: calc(50% - 8px); max-width: 190px; height: auto; border-radius: 14px; border: 1px solid var(--border-h); }
+    .fig img { max-width: 100%; height: auto; }
+    .repo { border-left: 3px solid #10b981; background: color-mix(in srgb, #10b981 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 22px 0; }
+    .repo p { margin: 4px 0; }
+    .repo ul { margin: 6px 0 4px 20px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="3">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Design systems on Android &middot; Series &middot; Part 3 of 6</p>
+    <h1>Building a themeable Android component: MdsButton, line by line</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~8 min read</span></div>
+    <div class="tags"><span class="tag">Custom views</span><span class="tag">Kotlin</span><span class="tag">Android</span><span class="tag">Accessibility</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="mds-part-1-what-and-tour.html"><small>Part 1 &middot; Foundations</small>What a design system is, and a tour</a>
+      <a href="mds-part-2-design-tokens.html"><small>Part 2 &middot; Foundations</small>Design tokens: tiers, dark mode, brands</a>
+      <a class="on" href="mds-part-3-building-a-component.html"><small>Part 3 &middot; Build</small>Building a component: MdsButton</a>
+      <a href="mds-part-4-state-and-accessibility.html"><small>Part 4 &middot; Build</small>State and accessibility</a>
+      <a href="mds-part-5-layers-and-templates.html"><small>Part 5 &middot; Build</small>Layers, templates and pages</a>
+      <a href="mds-part-6-shipping-and-lessons.html"><small>Part 6 &middot; Build</small>Shipping it, and lessons learned</a>
+    </div>
+
+<p class="lede">Part 2 gave us tokens. This part spends them. We build one component, the button, in plain Views and read every important line of the real <code>MdsButton</code>: how it takes its defaults from the theme, how variants and sizes are modelled, how touch feedback and loading work, and the two quiet Android traps that make custom views look subtly wrong.</p>
+
+<div class="repo"><p><strong>Working code.</strong> Everything in this post exists and runs in the reference repository: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Clone it and follow along; the docs are also published at <a href="https://liconrepo.github.io/MobileDesignSystem/" target="_blank" rel="noopener">liconrepo.github.io/MobileDesignSystem</a>.</p><p>Files for this part:</p><ul><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/functional/atoms/MdsButton.kt" target="_blank" rel="noopener"><code>functional/atoms/MdsButton.kt</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/functional/atoms/MdsSpinnerDrawable.kt" target="_blank" rel="noopener"><code>functional/atoms/MdsSpinnerDrawable.kt</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_attrs.xml" target="_blank" rel="noopener"><code>res/values/mds_attrs.xml</code></a></li></ul></div>
+
+<div class="toc"><strong>In this part</strong><ol><li><a href="#shape">The public shape of the button</a></li><li><a href="#defstyle">Defaults from the theme</a></li><li><a href="#state">One source of truth: refresh()</a></li><li><a href="#touch">Visual size versus touch size</a></li><li><a href="#ripple">Touch feedback that respects the corners</a></li><li><a href="#loading">The loading state</a></li><li><a href="#init">Initialisation order</a></li></ol></div>
+
+<div class="callout">
+  <strong>Part 3 in 60 seconds</strong>
+  <ul>
+    <li>A themeable view takes a default style from a <strong>theme attribute</strong> (<code>mdsButtonStyle</code>), not a fixed style.</li>
+    <li>Variants and sizes are <strong>enums</strong> in XML and in Kotlin. One <code>refresh()</code> rebuilds the look from tokens.</li>
+    <li>Visual height and touch target are separate: a 36dp button still gets a 48dp hit area, using an <code>InsetDrawable</code>.</li>
+    <li>Set the background <em>before</em> padding when using an <code>InsetDrawable</code>, or your padding silently disappears.</li>
+    <li>Custom <code>Drawable</code>s ignore tint. Give a spinner its colour directly.</li>
+  </ul>
+</div>
+
+<h2 id="shape">The public shape of the button</h2>
+<p>Before any drawing code, decide what consumers see. A button needs an importance level (variant), a density (size) and a busy state. In XML that reads like this:</p>
+<pre><code>&lt;io.github.liconrepo.mds.functional.atoms.MdsButton
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Save"
+    app:mdsButtonVariant="primary"
+    app:mdsButtonSize="large" /&gt;
+
+&lt;!-- or use a named style --&gt;
+&lt;io.github.liconrepo.mds.functional.atoms.MdsButton
+    style="@style/Mds.Widget.Button.Destructive"
+    android:text="Delete account" /&gt;</code></pre>
+<p>And in Kotlin:</p>
+<pre><code>button.variant = MdsButton.Variant.Secondary
+button.isLoading = true</code></pre>
+<p>Declaring the attributes is the first piece of work. Enums keep the XML readable and typo-proof:</p>
+<div class="doc"><div class="doc-bar">designsystem/src/main/res/values/mds_attrs.xml</div>
+<pre><code>&lt;declare-styleable name="MdsButton"&gt;
+    &lt;attr name="mdsButtonVariant" format="enum"&gt;
+        &lt;enum name="primary" value="0" /&gt;
+        &lt;enum name="secondary" value="1" /&gt;
+        &lt;enum name="outline" value="2" /&gt;
+        &lt;enum name="ghost" value="3" /&gt;
+        &lt;enum name="destructive" value="4" /&gt;
+    &lt;/attr&gt;
+    &lt;attr name="mdsButtonSize" format="enum"&gt; ... &lt;/attr&gt;
+    &lt;attr name="mdsButtonLoading" format="boolean" /&gt;
+&lt;/declare-styleable&gt;</code></pre></div>
+
+<h2 id="defstyle">Defaults from the theme</h2>
+<p>Every Android view constructor takes a <code>defStyleAttr</code>: a theme attribute whose value is a style to use when the layout does not say otherwise. Most custom views leave it as <code>0</code>. A design system should point it at its own attribute:</p>
+<div class="doc"><div class="doc-bar">functional/atoms/MdsButton.kt</div>
+<pre><code>public class MdsButton @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.mdsButtonStyle,
+) : AppCompatButton(context, attrs, defStyleAttr) {</code></pre></div>
+<p>And <code>Theme.Mds</code> sets <code>mdsButtonStyle</code> to <code>@style/Mds.Widget.Button</code>. The result is a hook that costs nothing today and pays off later: an app can restyle every button without touching a layout, by pointing the same attribute at its own style.</p>
+<pre><code>&lt;style name="Theme.MyApp" parent="Theme.Mds"&gt;
+    &lt;item name="mdsButtonStyle"&gt;@style/MyApp.Button&lt;/item&gt;
+&lt;/style&gt;</code></pre>
+<p>Extending <code>AppCompatButton</code>, rather than <code>View</code>, keeps text rendering, fonts, accessibility and compound drawables working for free.</p>
+
+<h2 id="state">One source of truth: refresh()</h2>
+<p>The button has three inputs that change its look: variant, size and loading. A common mistake is to react to each change with a small patch. That works until two changes interact. A simpler design is one function that rebuilds everything from the current inputs:</p>
+<div class="doc"><div class="doc-bar">functional/atoms/MdsButton.kt</div>
+<pre><code>public var variant: Variant = Variant.Primary
+    set(value) {
+        if (field != value) { field = value; refresh() }
+    }
+
+public var size: Size = Size.Medium
+    set(value) {
+        if (field != value) { field = value; refresh() }
+    }
+
+public var isLoading: Boolean = false
+    set(value) {
+        if (field != value) { field = value; refresh() }
+    }</code></pre></div>
+<p>It is slightly wasteful (a few drawables are rebuilt), but a button changes state rarely, and the code can be read top to bottom with no hidden ordering rules. Inside <code>refresh()</code>, a <code>when</code> picks colours for each variant, and every colour comes from a theme attribute:</p>
+<div class="doc"><div class="doc-bar">functional/atoms/MdsButton.kt (excerpt)</div>
+<pre><code>when (variant) {
+    Variant.Primary -&gt; {
+        fill = stateColors(
+            c.mdsColor(R.attr.mdsColorPrimary),
+            disabledFill,
+            c.mdsColor(R.attr.mdsColorPrimaryPressed),
+        )
+        foreground = c.mdsColor(R.attr.mdsColorOnPrimary)
+        rippleBase = foreground
+    }
+    Variant.Secondary -&gt; {
+        fill = stateColors(c.mdsColor(R.attr.mdsColorPrimaryContainer), disabledFill)
+        foreground = c.mdsColor(R.attr.mdsColorOnPrimaryContainer)
+        rippleBase = foreground
+    }
+    ...
+}</code></pre></div>
+<p><code>stateColors(normal, disabled, pressed)</code> is a four-line helper that builds a <code>ColorStateList</code> for the three states every control has. Because the fill and text colours are state lists, the disabled look is automatic: you never write <code>if (!isEnabled)</code>.</p>
+
+<h2 id="touch">Visual size versus touch size</h2>
+<p>Material guidance, and the Android accessibility documentation, recommend touch targets of at least 48dp. But a 36dp-tall "small" button is a real and common design. The two can both be true if the <em>drawn</em> shape is smaller than the <em>tappable</em> area. The trick is to wrap the shape in an <code>InsetDrawable</code> that adds transparent space above and below:</p>
+<div class="doc"><div class="doc-bar">functional/atoms/MdsButton.kt (excerpt)</div>
+<pre><code>val visualHeight = c.mdsPx(heightRes)                       // 36, 44 or 52dp
+val touchHeight = maxOf(visualHeight, c.mdsPx(R.dimen.mds_touch_target))   // at least 48dp
+val inset = (touchHeight - visualHeight) / 2
+
+minimumHeight = touchHeight
+
+val shape = roundedRect(radius, fill, strokeWidth, stroke)
+val ripple = rippleOf(rippleBase.withAlpha(0.16f), radius, shape)
+background = InsetDrawable(ripple, 0, inset, 0, inset)
+// Set padding after the background: an InsetDrawable reports its own padding and would override ours.
+setPadding(c.dp(hPadDp), inset, c.dp(hPadDp), inset)</code></pre></div>
+<figure class="fig">
+  <svg viewBox="0 0 700 190" role="img" aria-label="A 36dp tall button drawn inside a 48dp tall touch area, with 6dp of transparent inset above and below.">
+    <rect class="ghost" x="60" y="20" width="360" height="150" rx="10"/>
+    <rect class="boxb" x="60" y="48" width="360" height="94" rx="20"/>
+    <text class="b c" x="240" y="102">Save</text>
+    <text class="b" x="450" y="44">Touch area: 48dp</text><text class="sub" x="450" y="62">the dashed box</text>
+    <text class="b" x="450" y="104">Drawn: 36dp</text><text class="sub" x="450" y="122">the filled shape</text>
+    <text class="b" x="450" y="156">Inset: 6dp</text><text class="sub" x="450" y="174">above and below</text>
+  </svg>
+  <figcaption>The dashed box is what a finger can hit. The filled box is what you see. Sizes shown are not to scale.</figcaption>
+</figure>
+
+<div class="callout">
+  <strong>The trap: padding vanishes</strong>
+  <p>The first version of the button set <code>setPadding(...)</code> and <em>then</em> assigned the background. The buttons looked correct when they stretched across the screen, but a wrap-content "Small" button had its label touching the edges. The reason: <code>setBackground</code> asks the drawable for its padding, and an <code>InsetDrawable</code> always reports one (its inset), which overwrites whatever you set before. Setting the background first and the padding second fixes it. The same ordering is used in <code>MdsChip</code>.</p>
+</div>
+
+<h2 id="ripple">Touch feedback that respects the corners</h2>
+<p>A <code>RippleDrawable</code> without a mask draws its wave across the whole rectangle, which pokes out of rounded corners. The helper gives it a mask that has the same corner radius as the shape:</p>
+<div class="doc"><div class="doc-bar">perceptual/Theming.kt</div>
+<pre><code>internal fun rippleOf(@ColorInt color: Int, radius: Float, content: Drawable? = null): RippleDrawable {
+    val mask = GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        cornerRadius = radius
+        setColor(Color.BLACK)
+    }
+    return RippleDrawable(ColorStateList.valueOf(color), content, mask)
+}</code></pre></div>
+<p>The ripple colour is the foreground colour at 16 percent opacity, so it is visible on a filled button (white on blue) and on an outline button (dark on white) alike.</p>
+
+<h2 id="loading">The loading state</h2>
+<p>Loading must do three things: show progress, stop duplicate taps, and tell assistive technology. The button does all three, and keeps the label visible so context is not lost:</p>
+<div class="doc"><div class="doc-bar">functional/atoms/MdsButton.kt (excerpt)</div>
+<pre><code>override fun performClick(): Boolean = if (isLoading) false else super.performClick()
+
+...
+ViewCompat.setStateDescription(
+    this,
+    if (isLoading) c.getString(R.string.mds_state_loading) else null,
+)</code></pre></div>
+<p>Overriding <code>performClick</code> blocks every route to a click: touch, keyboard and accessibility actions. The spinner is a small custom <code>Drawable</code> that implements <code>Animatable</code>, with a <code>ValueAnimator</code> that rotates a 270-degree arc. The button starts it when attached to a window and stops it when detached, so it never animates off screen.</p>
+<div class="callout">
+  <strong>The trap: custom drawables ignore tint</strong>
+  <p>The base <code>Drawable.setTintList</code> does nothing. A vector drawable honours it because it overrides it; your own class does not unless you write that code. The spinner therefore receives its colour in the constructor (<code>MdsSpinnerDrawable(foreground, size, stroke)</code>) rather than being tinted by the TextView.</p>
+</div>
+
+<h2 id="init">Initialisation order</h2>
+<p>One more detail that bites in Kotlin: the view's superclass constructor runs <em>before</em> your property initialisers. If it calls something you override, your fields are not ready yet. In the button the order is therefore deliberate: read any icon set in XML first, then read the styled attributes, then apply the one-off settings, and call <code>refresh()</code> last:</p>
+<div class="doc"><div class="doc-bar">functional/atoms/MdsButton.kt (excerpt)</div>
+<pre><code>init {
+    restingIcon = compoundDrawablesRelative[0]   // capture before loading can replace it
+    context.withStyledAttributes(attrs, R.styleable.MdsButton, defStyleAttr, 0) {
+        variant = Variant.entries[getInt(R.styleable.MdsButton_mdsButtonVariant, 0)]
+        size = Size.entries[getInt(R.styleable.MdsButton_mdsButtonSize, 1)]
+        isLoading = getBoolean(R.styleable.MdsButton_mdsButtonLoading, false)
+    }
+    isAllCaps = false
+    stateListAnimator = null
+    elevation = 0f
+    refresh()
+}</code></pre></div>
+<p>Capturing <code>restingIcon</code> first matters: if the button starts in the loading state, the compound drawable has already been replaced by the spinner by the time you ask for it.</p>
+
+<h3>Try it yourself</h3>
+<ol class="steps">
+  <li>Open the Atoms tab in the sample. Press and hold each button and watch the ripple stay inside the corners.</li>
+  <li>In <code>MdsButton.kt</code>, swap the order of <code>background =</code> and <code>setPadding(...)</code>. Rebuild and compare the "Small" button.</li>
+  <li>Add a sixth variant, "Link", by following <code>docs/adding-a-component.md</code>.</li>
+</ol>
+
+<table class="gloss">
+  <tr><th>Term</th><th>In plain words</th></tr>
+  <tr><td>defStyleAttr</td><td>A theme attribute that names the default style for a view.</td></tr>
+  <tr><td>declare-styleable</td><td>The list of custom XML attributes a view understands.</td></tr>
+  <tr><td>ColorStateList</td><td>A colour that depends on state: pressed, disabled, checked.</td></tr>
+  <tr><td>RippleDrawable</td><td>The touch wave; a mask clips it to the shape.</td></tr>
+  <tr><td>InsetDrawable</td><td>Wraps a drawable with transparent margins around it.</td></tr>
+  <tr><td>Touch target</td><td>The area that responds to a tap, which can be larger than what is drawn.</td></tr>
+  <tr><td>State description</td><td>Text that screen readers announce for a control's current state.</td></tr>
+</table>
+
+
+    <div class="pager"><a class="prev" href="mds-part-2-design-tokens.html"><small>&larr; Previous &middot; Part 2</small>Design tokens: tiers, dark mode, brands</a><a class="next" href="mds-part-4-state-and-accessibility.html"><small>Next &middot; Part 4 &rarr;</small>State and accessibility</a></div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'mds-android', part: part }, params || {})); };
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

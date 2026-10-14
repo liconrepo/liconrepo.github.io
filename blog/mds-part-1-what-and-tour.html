@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>What a design system is, and a tour of a working one for Android — Design system series part 1</title>
+  <meta name="description" content="What a design system is made of, why teams build one, and a guided tour of a real View-based Android example with tokens, components, a sample app and docs. Part 1 of 6." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  
+    .phones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .phones img { width: calc(50% - 8px); max-width: 190px; height: auto; border-radius: 14px; border: 1px solid var(--border-h); }
+    .fig img { max-width: 100%; height: auto; }
+    .repo { border-left: 3px solid #10b981; background: color-mix(in srgb, #10b981 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 22px 0; }
+    .repo p { margin: 4px 0; }
+    .repo ul { margin: 6px 0 4px 20px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="1">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Design systems on Android &middot; Series &middot; Part 1 of 6</p>
+    <h1>What a design system is, and a tour of a working one for Android</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~6 min read</span></div>
+    <div class="tags"><span class="tag">Design system</span><span class="tag">Android</span><span class="tag">Kotlin</span><span class="tag">Atomic design</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a class="on" href="mds-part-1-what-and-tour.html"><small>Part 1 &middot; Foundations</small>What a design system is, and a tour</a>
+      <a href="mds-part-2-design-tokens.html"><small>Part 2 &middot; Foundations</small>Design tokens: tiers, dark mode, brands</a>
+      <a href="mds-part-3-building-a-component.html"><small>Part 3 &middot; Build</small>Building a component: MdsButton</a>
+      <a href="mds-part-4-state-and-accessibility.html"><small>Part 4 &middot; Build</small>State and accessibility</a>
+      <a href="mds-part-5-layers-and-templates.html"><small>Part 5 &middot; Build</small>Layers, templates and pages</a>
+      <a href="mds-part-6-shipping-and-lessons.html"><small>Part 6 &middot; Build</small>Shipping it, and lessons learned</a>
+    </div>
+
+<p class="lede">A design system is easy to admire and hard to build, because the finished product hides the decisions. This series builds one for Android in plain Views and Kotlin, with no Jetpack Compose, and points at real, running code for every claim. In this first part you will learn what a design system is made of, why teams build them, and how the working example is laid out so you can find your way around it.</p>
+
+<div class="repo"><p><strong>Working code.</strong> Everything in this post exists and runs in the reference repository: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Clone it and follow along; the docs are also published at <a href="https://liconrepo.github.io/MobileDesignSystem/" target="_blank" rel="noopener">liconrepo.github.io/MobileDesignSystem</a>.</p><p>Files for this part:</p><ul><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/README.md" target="_blank" rel="noopener"><code>README.md</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/docs/layers.md" target="_blank" rel="noopener"><code>docs/layers.md</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/docs/principles.md" target="_blank" rel="noopener"><code>docs/principles.md</code></a></li></ul></div>
+
+<div class="toc"><strong>In this part</strong><ol><li><a href="#what">What a design system actually is</a></li><li><a href="#why">Why teams build one</a></li><li><a href="#ideas">Two ideas that organise the example</a></li><li><a href="#tour">A tour of the working repo</a></li><li><a href="#principles">The ground rules this series follows</a></li><li><a href="#next">What comes next</a></li></ol></div>
+
+<div class="callout">
+  <strong>Part 1 in 60 seconds</strong>
+  <ul>
+    <li>A design system is a shared language: <strong>tokens</strong> (named decisions), <strong>components</strong> (reusable parts) and <strong>guidance</strong> (when to use what).</li>
+    <li>It pays off through consistency, speed and accessibility that is fixed once and inherited everywhere.</li>
+    <li>Two ideas organise the example: <strong>functional vs perceptual</strong> patterns, and <strong>atoms to pages</strong>.</li>
+    <li>The repo has a library module, a gallery app and a docs folder. You can run it in about five minutes.</li>
+  </ul>
+</div>
+
+<h2 id="what">What a design system actually is</h2>
+<p>Ask five people and you will get five answers: a Figma file, a component library, a style guide, a team. They are all pieces of the same thing. A useful working definition for engineers is:</p>
+<div class="analogy">
+  <p><strong>Analogy.</strong> Think of a city's building code and its catalogue of approved parts. The code says how wide a door must be (rules). The catalogue offers doors that already comply (components). The measurements everyone agrees on, such as metres and standard sizes, are the tokens. A builder who uses them does not re-argue every decision, and the buildings still feel like one city.</p>
+</div>
+<p>In an app, that becomes three layers of material:</p>
+<table class="gloss">
+  <tr><th>Piece</th><th>What it is</th><th>Example in the repo</th></tr>
+  <tr><td>Tokens</td><td>Named design decisions: colours, spacing, radius, type sizes</td><td><code>mds_color_primary</code>, <code>mds_space_lg</code></td></tr>
+  <tr><td>Components</td><td>Reusable UI built from tokens</td><td><code>MdsButton</code>, <code>MdsTextField</code></td></tr>
+  <tr><td>Guidance</td><td>Principles and usage rules, written down</td><td><code>docs/principles.md</code>, <code>docs/components.md</code></td></tr>
+</table>
+<p>Without the third row you have a library, not a system. Rules like "one primary button per region" are what stop a good set of parts from producing an inconsistent product.</p>
+
+<h2 id="why">Why teams build one</h2>
+<ul>
+  <li><strong>Consistency.</strong> Two screens written by two people on two different days still look like one product.</li>
+  <li><strong>Speed.</strong> Nobody rebuilds a button. Designers and developers discuss "a destructive button", not "a red rounded rectangle".</li>
+  <li><strong>One-place changes.</strong> A rebrand, a dark mode or a contrast fix is edited in one place and inherited by every screen.</li>
+  <li><strong>Accessibility by default.</strong> Touch-target size, focus, labels and announcements are built into the part, so every screen gets them for free.</li>
+</ul>
+<p>It is not free. A system has a maintenance cost, a versioning story and a risk of becoming a bottleneck. The practical advice in this series is to keep it <em>small</em>: every component must justify itself, and the public surface stays deliberate.</p>
+
+<h2 id="ideas">Two ideas that organise the example</h2>
+<h3>Functional and perceptual patterns</h3>
+<p>Alla Kholmatova's book <em>Design Systems: A Practical Guide to Creating Design Languages for Digital Products</em> (Smashing Magazine, 2017) separates two kinds of pattern. <strong>Functional</strong> patterns are about what something does: a button triggers an action, a text field collects text. <strong>Perceptual</strong> patterns are about how it feels: the corner radius, the type scale, the way a success message looks compared with an error. The book also argues for a shared vocabulary and for written, testable principles. This series paraphrases those ideas in its own words and does not reproduce the book.</p>
+<p>In code, the split is practical. Perceptual decisions live in resource files (<code>res/values</code>) and a few helpers. Functional behaviour lives in Kotlin classes. A rebrand touches the first; a bug fix touches the second.</p>
+
+<h3>Atoms, molecules, organisms, templates, pages</h3>
+<p>Brad Frost's <em>Atomic Design</em> describes growing an interface from small parts to whole screens. The example library uses the same names for its packages, so a newcomer can predict where a file lives.</p>
+<figure class="fig">
+  <svg viewBox="0 0 700 250" role="img" aria-label="Layers of the library from perceptual tokens at the bottom up through atoms, molecules, organisms, templates and pages.">
+    <rect class="boxg" x="10" y="190" width="680" height="48" rx="12"/><text class="b" x="28" y="219">Perceptual: tokens, tone, motion, theme helpers</text>
+    <rect class="boxb" x="40" y="140" width="620" height="42" rx="12"/><text class="b" x="58" y="166">Atoms: MdsButton, MdsBadge, MdsChip, MdsAvatar, MdsSkeleton</text>
+    <rect class="boxb" x="70" y="92" width="560" height="42" rx="12"/><text class="b" x="88" y="118">Molecules: MdsTextField, MdsAlert, MdsListItem</text>
+    <rect class="boxp" x="100" y="46" width="500" height="40" rx="12"/><text class="b" x="118" y="71">Organisms: MdsCard</text>
+    <rect class="boxo" x="130" y="4" width="440" height="36" rx="12"/><text class="b" x="148" y="27">Templates: MdsScreenTemplate  &#183;  Pages: your app</text>
+  </svg>
+  <figcaption>Each layer is built from the ones below it. Pages are app code, not library code.</figcaption>
+</figure>
+
+<h2 id="tour">A tour of the working repo</h2>
+<p>Clone it and look around. Every later part of this series points back to files in here.</p>
+<pre><code>git clone https://github.com/liconrepo/MobileDesignSystem.git
+cd MobileDesignSystem
+./gradlew :sample:installDebug      # run the gallery on a device or emulator
+./gradlew :designsystem:test        # unit tests</code></pre>
+<p>You need JDK 17 and the Android SDK (compileSdk 36, minSdk 24). The layout is:</p>
+<pre><code>MobileDesignSystem/
+  designsystem/                       the library (what you would publish)
+    src/main/java/io/github/liconrepo/mds/
+      perceptual/                     MdsTone, MdsMotion, theme helpers
+      functional/atoms/               MdsButton, MdsBadge, MdsChip, MdsAvatar, MdsSkeleton
+      functional/molecules/           MdsTextField, MdsAlert, MdsListItem
+      functional/organisms/           MdsCard
+      templates/                      MdsScreenTemplate
+    src/main/res/
+      values/                         palette, semantic colours, dimens, attrs, themes, type
+      values-night/                   the dark-mode values
+  sample/                             a gallery app that consumes the library
+  docs/                               principles, tokens, theming, layers, component guidelines</code></pre>
+
+<figure class="fig">
+  <div class="phones">
+    <img src="img/mds-light-1.png" alt="The gallery app in the light theme" />
+    <img src="img/mds-dark-1.png" alt="The gallery app in the dark theme" />
+    <img src="img/mds-sunset-1.png" alt="The gallery app with the Sunset brand" />
+    <img src="img/mds-light-2.png" alt="The gallery showing alerts, avatars and list items" />
+  </div>
+  <figcaption>The sample app: light, dark, an alternate brand, and a component page. The same components, three looks.</figcaption>
+</figure>
+
+<h3>Why a sample app belongs in the repo</h3>
+<p>A component you cannot see is a component you cannot trust. The gallery has one tab per layer, and the foundations tables (colours, type scale, spacing) are drawn from the live theme, so the documentation cannot drift away from the code. It is also the consumer-side test: if the sample is awkward to write, the API is wrong.</p>
+
+<h2 id="principles">The ground rules this series follows</h2>
+<ol>
+  <li><strong>Roles, not values.</strong> Code asks for "primary" or "danger", never for <code>#4040D8</code>.</li>
+  <li><strong>Never colour alone.</strong> Errors have an icon and a prefix, selected chips have a check mark.</li>
+  <li><strong>48dp touch targets</strong>, even when the control looks smaller.</li>
+  <li><strong>Small public API.</strong> Kotlin's <code>explicitApi()</code> is switched on, so nothing is public by accident.</li>
+  <li><strong>Everything original.</strong> Colours, icons and code were written for this project from public documentation. It is not affiliated with any company, and the credits in the README name the public systems whose <em>ideas</em> informed it: Material Design, IBM Carbon, Shopify Polaris, GitHub Primer, Atlassian and Microsoft Fluent.</li>
+</ol>
+
+<h2 id="next">What comes next</h2>
+<table>
+  <tr><th>Part</th><th>You will learn</th></tr>
+  <tr><td>2</td><td>Tokens in three tiers, dark mode, and swapping brands</td></tr>
+  <tr><td>3</td><td>Building a themeable component, using the button</td></tr>
+  <tr><td>4</td><td>State and accessibility in the text field, chip and alert</td></tr>
+  <tr><td>5</td><td>Layers, and a screen template with named regions</td></tr>
+  <tr><td>6</td><td>Publishing, CI, docs, and the bugs I hit along the way</td></tr>
+</table>
+
+<h3>Try it yourself</h3>
+<ol class="steps">
+  <li>Run the sample and flip dark mode and the Sunset brand. Notice what changes and what does not.</li>
+  <li>Open <code>designsystem/src/main/res/values/mds_colors.xml</code> and its twin in <code>values-night</code>. Find the same name in both files.</li>
+  <li>Open <code>MdsButton.kt</code> and search for a hex colour. There is not one.</li>
+</ol>
+
+<table class="gloss">
+  <tr><th>Term</th><th>In plain words</th></tr>
+  <tr><td>Design system</td><td>Tokens, components and guidance that a product team shares.</td></tr>
+  <tr><td>Token</td><td>A named design decision, such as a colour or a spacing step.</td></tr>
+  <tr><td>Component</td><td>A reusable UI part built from tokens.</td></tr>
+  <tr><td>Functional pattern</td><td>What a part does.</td></tr>
+  <tr><td>Perceptual pattern</td><td>How a part looks and feels.</td></tr>
+  <tr><td>Atom / molecule / organism</td><td>Small standalone part / atoms working as one unit / a whole section of a screen.</td></tr>
+  <tr><td>Template / page</td><td>A screen layout with no content / that layout filled with real content.</td></tr>
+</table>
+
+
+    <div class="pager"><a class="next" href="mds-part-2-design-tokens.html"><small>Next &middot; Part 2 &rarr;</small>Design tokens: tiers, dark mode, brands</a></div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'mds-android', part: part }, params || {})); };
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>
