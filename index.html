@@ -195,6 +195,22 @@
     .search-box > .search-hint { display: none; }
     @media(max-width:480px){ .sp-grid { grid-template-columns: 1fr; } }
 
+    /* Mobile: keep the panel inside the visible viewport (dvh follows the on-screen keyboard) */
+    @media(max-width:720px){
+      .search-overlay { padding: max(env(safe-area-inset-top), 12px) 10px 0; }
+      .search-box { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; border-radius: 14px; }
+      .sp-top { flex: 0 0 auto; padding: 10px; }
+      /* 16px minimum stops iOS Safari zooming the page when the field is focused */
+      .sp-input input { font-size: max(16px, calc(14px * var(--fs, 1))); }
+      .search-box .sp-body, .search-box .search-results { flex: 1 1 auto; min-height: 0; max-height: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+      .search-box .sp-body { padding: 0 10px calc(14px + env(safe-area-inset-bottom)); }
+      .search-box .search-results { padding: 6px 6px calc(10px + env(safe-area-inset-bottom)); }
+      .sp-chip { min-height: 44px; }
+      .search-item { padding: 12px; }
+      .search-item .si-top { flex-wrap: wrap; gap: 2px 12px; }
+      .search-item .si-title { overflow-wrap: anywhere; }
+    }
+
     .settings-btn { padding: 6px 8px; }
     .settings-box { max-width: 420px; }
     .settings-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: calc(15px * var(--fs, 1)); font-weight: 600; }
