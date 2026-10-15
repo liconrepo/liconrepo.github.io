@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clean Code, Distilled: What I Learned from Robert C. Martin — Khairul Alam</title>
+  <meta name="description" content="A personal summary of Clean Code by Robert C. Martin: the rules about names, functions, comments, objects and tests, each with a bad and a clean Kotlin example, plus where to get the book." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+
+
+
+<main>
+  <article>
+    <p class="kicker">Book summary &middot; Software craftsmanship &middot; Kotlin</p>
+    <h1>Clean Code, Distilled: What I Learned from Robert C. Martin&rsquo;s Classic</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~40 min read</span></div>
+    <div class="tags"><span class="tag">Clean Code</span><span class="tag">Book summary</span><span class="tag">Kotlin</span><span class="tag">Refactoring</span></div>
+
+    <p class="lede">I read <em>Clean Code</em> by Robert C. Martin (&ldquo;Uncle Bob&rdquo;) and it changed how I name things, how long I let functions grow, and how I feel about comments. This post is my own summary of the ideas that stuck with me. For each one I show a <em>bad</em> and a <em>clean</em> version in Kotlin, because the book&rsquo;s examples are in Java and a principle is easier to remember when you can see the difference.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>Code is read far more often than it is written, so write for the reader.</li>
+        <li>Names should say what a thing is or does. Magic numbers get names too.</li>
+        <li>Functions should be small, do one thing, and avoid flag arguments and hidden side effects.</li>
+        <li>Prefer clear code over comments. Keep comments for intent and warnings.</li>
+        <li>Hide internals, and tell objects what to do instead of reaching through them.</li>
+        <li>Tests are code too: keep them readable, fast, independent and focused.</li>
+        <li>Use exceptions with context, wrap third-party code, keep classes focused, build objects in one place, and share as little mutable state as you can.</li>
+        <li>Leave every file a little cleaner than you found it.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#book">About the book and where to get it</a></li>
+        <li><a href="#big-idea">The big idea: write for the reader (Chapter 1)</a></li>
+        <li><a href="#names">Meaningful names (Chapter 2)</a></li>
+        <li><a href="#functions">Functions (Chapter 3)</a></li>
+        <li><a href="#comments">Comments (Chapter 4)</a></li>
+        <li><a href="#format">Formatting (Chapter 5)</a></li>
+        <li><a href="#objects">Objects, data and the Law of Demeter (Chapter 6)</a></li>
+        <li><a href="#errors">Error handling (Chapter 7)</a></li>
+        <li><a href="#boundaries">Boundaries (Chapter 8)</a></li>
+        <li><a href="#tests">Unit tests (Chapter 9)</a></li>
+        <li><a href="#classes">Classes (Chapter 10)</a></li>
+        <li><a href="#systems">Systems (Chapter 11)</a></li>
+        <li><a href="#emergence">Emergence (Chapter 12)</a></li>
+        <li><a href="#concurrency">Concurrency (Chapter 13)</a></li>
+        <li><a href="#refinement">Successive refinement (Chapter 14)</a></li>
+        <li><a href="#junit">JUnit internals (Chapter 15)</a></li>
+        <li><a href="#serialdate">Refactoring SerialDate (Chapter 16)</a></li>
+        <li><a href="#smells">Smells and heuristics (Chapter 17)</a></li>
+        <li><a href="#conditionals">Conditionals and understandability (from Chapter 17)</a></li>
+        <li><a href="#caveats">Where I use judgement</a></li>
+        <li><a href="#takeaways">Takeaways, checklist and references</a></li>
+      </ol>
+    </details>
+
+    <h2 id="book">1. About the book and where to get it</h2>
+    <p><em>Clean Code: A Handbook of Agile Software Craftsmanship</em> was written by Robert C. Martin with contributions from several co-authors and published by Prentice Hall (Pearson) in 2008. It has three parts: principles and patterns for writing good code, long case studies that clean up real code step by step, and a final catalogue of &ldquo;smells&rdquo; and heuristics. The examples are in Java.</p>
+    <table>
+      <tr><th>Detail</th><th>Value</th></tr>
+      <tr><td>Title</td><td>Clean Code: A Handbook of Agile Software Craftsmanship</td></tr>
+      <tr><td>Author</td><td>Robert C. Martin</td></tr>
+      <tr><td>ISBN-10 / ISBN-13</td><td>0132350882 / 978-0132350884</td></tr>
+      <tr><td>Buy the book</td><td><a href="https://www.amazon.com/dp/0132350882" target="_blank" rel="noopener">Amazon</a> &middot; <a href="https://www.informit.com/store/clean-code-a-handbook-of-agile-software-craftsmanship-9780132350884" target="_blank" rel="noopener">InformIT (publisher&rsquo;s store)</a></td></tr>
+    </table>
+    <div class="note"><p><strong>About &ldquo;downloading&rdquo;:</strong> the book is under copyright, so the official ways to get it are to buy a print copy or an authorised e-book from the links above. I do not link to free copies. If you want a short checklist of the rules first, the community <a href="https://gist.github.com/wojteklu/73c6914cc446146b8b533c0988cf8d29" target="_blank" rel="noopener">Clean Code summary on GitHub</a> by wojteklu is a good outline, and it shaped the order of this post.</p></div>
+    <p>This is my own retelling in my own words, with my own Kotlin examples. It is a map, not a substitute: the book&rsquo;s long refactoring walk-throughs are where most of the learning happens.</p>
+
+    <h3>Where each chapter is in this post</h3>
+    <table>
+      <tr><th>Book chapter</th><th>Section here</th></tr>
+      <tr><td>1. Clean Code</td><td><a href="#big-idea">The big idea</a></td></tr>
+      <tr><td>2. Meaningful Names</td><td><a href="#names">Meaningful names</a></td></tr>
+      <tr><td>3. Functions</td><td><a href="#functions">Functions</a></td></tr>
+      <tr><td>4. Comments</td><td><a href="#comments">Comments</a></td></tr>
+      <tr><td>5. Formatting</td><td><a href="#format">Formatting</a></td></tr>
+      <tr><td>6. Objects and Data Structures</td><td><a href="#objects">Objects, data and the Law of Demeter</a></td></tr>
+      <tr><td>7. Error Handling</td><td><a href="#errors">Error handling</a></td></tr>
+      <tr><td>8. Boundaries</td><td><a href="#boundaries">Boundaries</a></td></tr>
+      <tr><td>9. Unit Tests</td><td><a href="#tests">Unit tests</a></td></tr>
+      <tr><td>10. Classes</td><td><a href="#classes">Classes</a></td></tr>
+      <tr><td>11. Systems</td><td><a href="#systems">Systems</a></td></tr>
+      <tr><td>12. Emergence</td><td><a href="#emergence">Emergence</a></td></tr>
+      <tr><td>13. Concurrency</td><td><a href="#concurrency">Concurrency</a></td></tr>
+      <tr><td>14. Successive Refinement</td><td><a href="#refinement">Successive refinement</a></td></tr>
+      <tr><td>15. JUnit Internals</td><td><a href="#junit">JUnit internals</a></td></tr>
+      <tr><td>16. Refactoring SerialDate</td><td><a href="#serialdate">Refactoring SerialDate</a></td></tr>
+      <tr><td>17. Smells and Heuristics</td><td><a href="#smells">Smells and heuristics</a>, <a href="#conditionals">Conditionals and understandability</a></td></tr>
+    </table>
+
+    <h2 id="big-idea">2. The big idea: write for the reader (Chapter 1)</h2>
+    <p>The book&rsquo;s starting point is a simple observation: we spend much more time <em>reading</em> code than writing it, because every change begins with reading what is already there. Martin puts the ratio at well over ten to one. So anything that makes code quicker to understand pays off many times over.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Two horizontal bars: reading code is about ten times longer than writing code.">
+        <text class="b" x="14" y="40">Reading code</text>
+        <rect class="bar-b" x="150" y="22" width="470" height="26" rx="6"/>
+        <text class="b" x="14" y="92">Writing code</text>
+        <rect class="bar-o" x="150" y="74" width="47" height="26" rx="6"/>
+        <text class="sub c" x="320" y="132">The book&rsquo;s rule of thumb: roughly ten parts reading for every one part writing</text>
+      </svg>
+      <figcaption>An illustration of the ratio the book describes, not a measurement.</figcaption>
+    </figure>
+    <p>Three general rules follow, and I keep them in my head more than any other:</p>
+    <ul>
+      <li><strong>Follow the team&rsquo;s conventions.</strong> Consistency beats personal taste.</li>
+      <li><strong>Keep it simple.</strong> If two designs work, take the one that is easier to explain.</li>
+      <li><strong>The Boy Scout rule:</strong> leave the code a little cleaner than you found it. No giant clean-ups, just one better name or one extracted function each time you pass through.</li>
+      <li><strong>Find the root cause.</strong> A patch that hides a symptom will come back.</li>
+    </ul>
+
+    <h2 id="names">3. Meaningful names (Chapter 2)</h2>
+    <p>A name is a tiny comment that cannot go out of date, if you choose it well. The book asks for names that reveal intent, are pronounceable and searchable, and do not make the reader decode abbreviations. It also asks for real differences: <code>data</code> and <code>info</code>, or <code>getAccount</code> and <code>getAccountInfo</code>, tell the reader nothing about how they differ.</p>
+    <h3>Bad</h3>
+<pre><code>fun calc(d: List&lt;Int&gt;, t: Int): Int {
+    var r = 0
+    for (x in d) {
+        if (x &gt; t) r += x
+    }
+    return r
+}</code></pre>
+    <h3>Clean</h3>
+<pre><code>fun totalOfOrdersAbove(minimum: Int, orderTotals: List&lt;Int&gt;): Int =
+    orderTotals.filter { it &gt; minimum }.sum()</code></pre>
+    <p>Same behaviour. The second version tells you what it computes before you read a line of the body. Short names are fine in tiny scopes (a loop index, a lambda&rsquo;s <code>it</code>), but the wider the scope, the more descriptive the name should be.</p>
+    <h3>Magic numbers get names</h3>
+<pre><code>// Bad
+if (user.age &gt;= 18 &amp;&amp; user.status == 2) { allowPurchase() }
+
+// Clean
+const val ADULT_AGE = 18
+enum class Status { PENDING, ACTIVE, SUSPENDED }
+
+if (user.age &gt;= ADULT_AGE &amp;&amp; user.status == Status.ACTIVE) { allowPurchase() }</code></pre>
+
+    <h2 id="functions">4. Functions (Chapter 3)</h2>
+    <p>The book&rsquo;s rules for functions are short and strict: <strong>small</strong>, <strong>do one thing</strong>, a <strong>descriptive name</strong>, <strong>few arguments</strong>, <strong>no side effects</strong>, and <strong>no flag arguments</strong>. A boolean flag is a sign the function does two things, one for each value.</p>
+    <h3>Bad</h3>
+<pre><code>fun processOrder(order: Order, sendEmail: Boolean) {
+    if (order.items.isEmpty()) throw IllegalArgumentException("Empty order")
+    var total = 0.0
+    for (item in order.items) total += item.price * item.quantity
+    order.total = total                       // hidden change to the input
+    database.save(order)
+    if (sendEmail) {
+        mailer.send(order.customerEmail, "Thanks! You paid $total")
+    }
+}</code></pre>
+    <p>This function validates, calculates, mutates its argument, saves, and sometimes emails. The flag <code>sendEmail</code> tells you it has two modes.</p>
+    <h3>Clean</h3>
+<pre><code>fun placeOrder(order: Order): PlacedOrder {
+    requireNotEmpty(order)
+    val placed = PlacedOrder(order, total = totalOf(order))
+    orders.save(placed)
+    return placed
+}
+
+fun sendReceipt(placed: PlacedOrder) {
+    mailer.send(placed.customerEmail, "Thanks! You paid ${placed.total}")
+}
+
+private fun requireNotEmpty(order: Order) =
+    require(order.items.isNotEmpty()) { "Empty order" }
+
+private fun totalOf(order: Order): Double =
+    order.items.sumOf { it.price * it.quantity }</code></pre>
+    <p>Each function now fits in your head, has a name that says what it does, and the caller decides whether to send a receipt. The original <code>order</code> is not changed behind your back.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="One large function box on the left splits into four small named functions on the right.">
+        <rect class="boxr" x="20" y="30" width="170" height="110" rx="14"/><text class="b c" x="105" y="62">processOrder</text><text class="sub c" x="105" y="86">validate, sum, save,</text><text class="sub c" x="105" y="104">mutate, maybe email</text>
+        <path class="arrow" d="M200,85 L270,85"/>
+        <rect class="boxg" x="290" y="12"  width="150" height="34" rx="9"/><text class="c" x="365" y="34">requireNotEmpty</text>
+        <rect class="boxg" x="290" y="56"  width="150" height="34" rx="9"/><text class="c" x="365" y="78">totalOf</text>
+        <rect class="boxg" x="290" y="100" width="150" height="34" rx="9"/><text class="c" x="365" y="122">placeOrder</text>
+        <rect class="boxg" x="470" y="56"  width="150" height="34" rx="9"/><text class="c" x="545" y="78">sendReceipt</text>
+        <text class="sub c" x="440" y="160">Small, named steps that each do one thing</text>
+      </svg>
+      <figcaption>The goal is not tiny functions for their own sake, but names that tell the story.</figcaption>
+    </figure>
+
+    <h2 id="comments">5. Comments (Chapter 4)</h2>
+    <p>The book&rsquo;s attitude is that a comment is often an apology for code that is not clear enough. Before writing one, try to put the idea into a name or a small function. Comments that repeat the code, closing-brace markers, and commented-out code (which version control already remembers) are all noise. Good comments explain <em>why</em>, give a warning, or note a decision that the code cannot show.</p>
+    <h3>Bad</h3>
+<pre><code>// check if the employee is eligible for full benefits
+if (employee.flags and HOURLY_FLAG != 0 &amp;&amp; employee.age &gt; 65) {
+    i++   // increment i
+}
+
+// val oldRate = 0.08
+// applyRate(oldRate)</code></pre>
+    <h3>Clean</h3>
+<pre><code>if (employee.isEligibleForFullBenefits()) {
+    benefitsGranted++
+}
+
+// The payment provider rejects more than 5 requests per second,
+// so we pause between calls. Remove when we move to the batch API.
+Thread.sleep(250)</code></pre>
+    <p>The first comment disappeared because the function name says it. The last one stays because no name could explain a rule that lives in someone else&rsquo;s system.</p>
+
+    <h2 id="format">6. Formatting (Chapter 5)</h2>
+    <p>Formatting is communication. The book&rsquo;s advice is practical:</p>
+    <ul>
+      <li>Keep related code close and separate unrelated ideas with a blank line.</li>
+      <li>Declare variables near where they are used.</li>
+      <li>Put a function below the code that calls it, so a file reads top to bottom like a newspaper story.</li>
+      <li>Keep lines short and do not align things in columns.</li>
+      <li>Agree on one style with your team and let a formatter enforce it. In Kotlin that means <code>ktlint</code> or the IDE formatter, so nobody argues about it in review.</li>
+    </ul>
+
+    <h2 id="objects">7. Objects, data and the Law of Demeter (Chapter 6)</h2>
+    <p>Objects should hide their insides and expose behaviour. Data structures should expose their data and have little behaviour. The trouble starts with hybrids: classes with public fields <em>and</em> logic, where every caller edits the fields and the rules end up scattered.</p>
+    <h3>Bad</h3>
+<pre><code>class Account { var balance: Double = 0.0 }
+
+// Somewhere else, and again somewhere else:
+if (account.balance &gt;= 50.0) {
+    account.balance -= 50.0
+}</code></pre>
+    <h3>Clean</h3>
+<pre><code>class Account(balance: Double) {
+    var balance: Double = balance
+        private set
+
+    fun withdraw(amount: Double) {
+        require(amount &gt; 0) { "Amount must be positive" }
+        check(balance &gt;= amount) { "Insufficient funds" }
+        balance -= amount
+    }
+}
+
+account.withdraw(50.0)</code></pre>
+    <p>The rule &ldquo;you cannot overdraw&rdquo; now lives in one place. Callers tell the account what to do; they do not reach in and decide for it.</p>
+    <h3>The Law of Demeter</h3>
+    <p>A method should talk to its direct collaborators, not to the collaborators of its collaborators. A long chain of calls means your code knows too much about how other classes are built.</p>
+<pre><code>// Bad: the caller knows the whole structure
+val city = order.customer.address.city.name
+
+// Clean: ask the object that owns the knowledge
+val city = order.shippingCity()</code></pre>
+
+    <h2 id="errors">8. Error handling (Chapter 7)</h2>
+    <p>Error handling should not bury the real logic. The book&rsquo;s advice: use exceptions instead of return codes, give them enough context to be useful, define exception types around what the caller needs, and do not return or pass <code>null</code> to represent &ldquo;something went wrong&rdquo;.</p>
+    <h3>Bad</h3>
+<pre><code>// 0 = ok, 1 = insufficient funds, 2 = unknown account
+fun withdraw(id: String, amount: Double): Int {
+    val account = accounts[id] ?: return 2
+    if (account.balance &lt; amount) return 1
+    account.balance -= amount
+    return 0
+}
+
+when (withdraw("A-1", 50.0)) {      // every caller must remember the codes
+    1 -&gt; showMessage("Not enough money")
+    2 -&gt; showMessage("No such account")
+}</code></pre>
+    <h3>Clean</h3>
+<pre><code>class AccountNotFoundException(id: String) : Exception("No account with id $id")
+class InsufficientFundsException(val needed: Double, val available: Double) :
+    Exception("Needed $needed but only $available available")
+
+fun withdraw(id: String, amount: Double) {
+    val account = accounts[id] ?: throw AccountNotFoundException(id)
+    account.withdraw(amount)        // throws InsufficientFundsException
+}
+
+try {
+    withdraw("A-1", 50.0)
+} catch (e: InsufficientFundsException) {
+    showMessage("Short by ${e.needed - e.available}")
+} catch (e: AccountNotFoundException) {
+    showMessage("No such account")
+}</code></pre>
+    <h3>Do not return null for &ldquo;nothing special&rdquo;: use a Special Case object</h3>
+    <p>Kotlin makes <code>null</code> visible in the type (<code>User?</code>), which already helps a lot. Still, forcing every caller to check can be avoided when there is a sensible default behaviour:</p>
+<pre><code>// Bad: every caller must handle null
+val discount: Discount? = customer.discount
+val price = if (discount != null) discount.apply(total) else total
+
+// Clean: a Special Case object with the same interface
+object NoDiscount : Discount { override fun apply(total: Double) = total }
+val discount: Discount = customer.discount ?: NoDiscount
+val price = discount.apply(total)</code></pre>
+    <p>Other points from the chapter: start by writing the <code>try</code> block (and its tests) so you decide what the operation guarantees, and avoid passing <code>null</code> into functions. In Kotlin, simply avoid nullable parameters unless <code>null</code> truly means something.</p>
+
+    <h2 id="boundaries">9. Boundaries (Chapter 8)</h2>
+    <p>A boundary is where your code meets code you do not control: a library, an SDK, another team&rsquo;s service. The advice is to keep that third-party code at arm&rsquo;s length. Wrap it behind a small interface you own, so only one class knows the vendor&rsquo;s details, and a vendor change touches one file.</p>
+    <h3>Bad</h3>
+<pre><code>// Vendor details leak into business code, in many places
+fun checkout(order: Order) {
+    val response = VendorClient(API_KEY).charges.create(
+        mapOf("amount" to (order.total * 100).toInt(), "currency" to "usd")
+    )
+    if (response["status"] != "succeeded") error("Payment failed")
+}</code></pre>
+    <h3>Clean</h3>
+<pre><code>interface PaymentGateway { fun charge(amount: Money): PaymentResult }
+
+class VendorPaymentGateway(private val client: VendorClient) : PaymentGateway {
+    override fun charge(amount: Money): PaymentResult {
+        val response = client.charges.create(
+            mapOf("amount" to amount.inCents(), "currency" to amount.currency)
+        )
+        return if (response["status"] == "succeeded") PaymentResult.Paid else PaymentResult.Declined
+    }
+}
+
+fun checkout(order: Order, payments: PaymentGateway) {
+    check(payments.charge(order.total) == PaymentResult.Paid) { "Payment failed" }
+}</code></pre>
+    <p>Two more ideas in this chapter:</p>
+    <ul>
+      <li><strong>Learning tests.</strong> Write small tests that check how a third-party library behaves, as you learn it. They cost little and turn into an alarm when a library upgrade changes behaviour.</li>
+      <li><strong>Code that does not exist yet.</strong> If another team has not built their part, define the interface <em>you wish</em> they offered and code against it, then adapt it later.</li>
+    </ul>
+<pre><code>@Test
+fun `the library parses ISO dates`() {
+    assertEquals(LocalDate.of(2026, 10, 15), LocalDate.parse("2026-10-15"))
+}</code></pre>
+
+    <h2 id="tests">10. Unit tests (Chapter 9)</h2>
+    <p>The book treats test code as first-class code. Tests should be <strong>F.I.R.S.T.</strong>: Fast, Independent, Repeatable, Self-validating, and Timely. A test should check one concept, and its name should read like a sentence about the behaviour.</p>
+    <h3>Bad</h3>
+<pre><code>@Test
+fun test1() {
+    val cart = Cart()
+    cart.add(Item("pen", 10))
+    assertEquals(10, cart.total())
+    cart.add(Item("book", 20))
+    assertEquals(30, cart.total())
+    cart.clear()
+    assertEquals(0, cart.total())
+}</code></pre>
+    <p>If this fails, which of three behaviours is broken? The name does not say.</p>
+    <h3>Clean</h3>
+<pre><code>@Test
+fun `an empty cart has a total of zero`() {
+    assertEquals(0, Cart().total())
+}
+
+@Test
+fun `total is the sum of all item prices`() {
+    val cart = Cart().apply { add(Item("pen", 10)); add(Item("book", 20)) }
+    assertEquals(30, cart.total())
+}
+
+@Test
+fun `clearing the cart resets the total`() {
+    val cart = Cart().apply { add(Item("pen", 10)) }
+    cart.clear()
+    assertEquals(0, cart.total())
+}</code></pre>
+    <p>&ldquo;One assert per test&rdquo; is a guideline, not a law. What matters is <em>one concept per test</em>, so a failure points to one cause.</p>
+
+    <h2 id="classes">11. Classes (Chapter 10)</h2>
+    <p>Functions should be small, and so should classes, but the book measures a class by <em>responsibilities</em>, not lines. A class should have one reason to change (the Single Responsibility Principle), and its methods should use its fields, which is called <em>cohesion</em>. When a few methods use a few fields and ignore the rest, there is a second class trying to get out.</p>
+    <h3>Bad</h3>
+<pre><code>class UserManager {
+    fun logIn(name: String, password: String): Boolean { /* ... */ return true }
+    fun monthlyReport(): String { /* builds a report */ return "" }
+    fun sendWelcomeEmail(user: User) { /* talks to SMTP */ }
+}</code></pre>
+    <h3>Clean</h3>
+<pre><code>class Authenticator { fun logIn(name: String, password: String): Boolean { /* ... */ return true } }
+class UserReport    { fun monthly(): String { /* ... */ return "" } }
+class WelcomeMailer { fun send(user: User) { /* ... */ } }</code></pre>
+    <ul>
+      <li><strong>Organise a class top to bottom:</strong> constants, then properties, then public functions, then the private helpers each public function uses.</li>
+      <li><strong>Organise for change.</strong> Make adding a feature mean adding a class, not editing several (Open/Closed).</li>
+      <li><strong>Isolate from change.</strong> Depend on interfaces, not concrete details (Dependency Inversion), so a change elsewhere does not ripple into you.</li>
+    </ul>
+    <p>I wrote about these two principles with exercises in <a href="solid-principles-explained.html">the SOLID post</a>.</p>
+
+    <h2 id="systems">12. Systems (Chapter 11)</h2>
+    <p>Clean code at the scale of a whole application starts with one separation: <strong>building things</strong> is a different job from <strong>using them</strong>. If a class creates its own collaborators, it is welded to them. Create objects in one place at startup and hand them in.</p>
+    <h3>Bad</h3>
+<pre><code>class OrderService {
+    private val repository = SqlOrderRepository()   // hard-wired, hard to test
+}</code></pre>
+    <h3>Clean</h3>
+<pre><code>class OrderService(private val repository: OrderRepository)
+
+// One place builds the object graph (the "composition root")
+fun main() {
+    val service = OrderService(SqlOrderRepository())
+    // ...
+}</code></pre>
+    <p>The same chapter covers a few related ideas:</p>
+    <ul>
+      <li><strong>Dependency injection</strong> is how the pieces are handed in. You can do it by hand, as above, or with a framework.</li>
+      <li><strong>Grow the system incrementally.</strong> Build for today&rsquo;s requirements and keep the design clean enough to extend, rather than designing everything upfront.</li>
+      <li><strong>Cross-cutting concerns</strong> such as logging, transactions and security should not be tangled into business code. Frameworks offer proxies or aspects for this.</li>
+      <li><strong>Postpone decisions</strong> until the last responsible moment, when you know more.</li>
+      <li><strong>Use standards wisely,</strong> when they add real value, not just because they are popular.</li>
+      <li><strong>Domain-specific languages</strong> can let domain experts read code. Kotlin&rsquo;s builder syntax is a good example.</li>
+    </ul>
+
+    <h2 id="emergence">13. Emergence (Chapter 12)</h2>
+    <p>This short chapter passes on Kent Beck&rsquo;s four rules of simple design. In priority order, a design is simple when it:</p>
+    <ol>
+      <li><strong>Runs all the tests.</strong> A system that cannot be verified cannot be trusted.</li>
+      <li><strong>Contains no duplication.</strong></li>
+      <li><strong>Expresses the intent of the programmer.</strong> Good names, small functions, and tests that read as examples.</li>
+      <li><strong>Minimises classes and methods.</strong> Do not split things so far that it becomes ceremony.</li>
+    </ol>
+    <p>With tests in place, you can refactor freely to satisfy rules two to four. Removing duplication is often the first step:</p>
+<pre><code>// Before: the same idea twice
+fun priceWithMemberDiscount(p: Double) = p - p * 0.10
+fun priceWithStudentDiscount(p: Double) = p - p * 0.15
+
+// After: the idea once, the difference as a parameter
+fun priceAfterDiscount(price: Double, rate: Double) = price * (1 - rate)</code></pre>
+
+    <h2 id="concurrency">14. Concurrency (Chapter 13)</h2>
+    <p>Concurrency is hard because bugs depend on timing: they appear rarely and are hard to reproduce. The book lists defensive habits: keep concurrent code separate from other code, limit shared data, use copies of data where possible, keep threads as independent as you can, keep synchronised sections small, know your library&rsquo;s tools, and test threaded code deliberately (run it many times, on different machines and loads).</p>
+    <h3>Bad</h3>
+<pre><code>var count = 0
+repeat(1000) {
+    thread { count++ }   // read, add, write: two threads can overwrite each other
+}
+// count is often less than 1000</code></pre>
+    <h3>Clean</h3>
+<pre><code>val count = AtomicInteger()
+coroutineScope {
+    repeat(1000) {
+        launch(Dispatchers.Default) { count.incrementAndGet() }
+    }
+}
+// count is always 1000</code></pre>
+    <p>The book&rsquo;s examples use Java threads; in Kotlin, coroutines and structured concurrency give you cleaner tools for the same ideas. The common patterns it names are still worth knowing: <em>producer-consumer</em>, <em>readers-writers</em> and <em>dining philosophers</em>. The most reliable defence is to share as little mutable state as possible.</p>
+
+    <h2 id="refinement">15. Successive refinement (Chapter 14)</h2>
+    <p>This is the first of the three case studies. It follows the author as they build a small command-line argument parser, a class that reads flags such as <code>-l -p 8080 -d /logs</code>. The first version works and looks fine while it handles two kinds of argument. Then more kinds arrive (numbers, then text, then lists), and the code grows <code>if</code> chains and special cases until it becomes hard to touch. The chapter is mostly about what to do at that moment: <strong>stop adding features, and clean up first</strong>, in many tiny steps, running the tests after each one.</p>
+    <p>The lesson I took from it is that clean code is rarely written clean the first time. It is like writing an essay: the first draft makes it work, and the next drafts make it right. The mistake is shipping the first draft and moving on.</p>
+    <h3>Before: every new type adds another branch</h3>
+<pre><code>fun parseArg(schema: Char, value: String?): Any = when (schema) {
+    'b' -&gt; true
+    'i' -&gt; value?.toIntOrNull() ?: throw IllegalArgumentException("Expected a number")
+    's' -&gt; value ?: throw IllegalArgumentException("Expected text")
+    else -&gt; throw IllegalArgumentException("Unknown type $schema")
+}
+// A new type means editing this function, and every other function that switches on the letter</code></pre>
+    <h3>After: one small type per kind of argument</h3>
+<pre><code>interface ArgumentMarshaler { fun parse(value: String?): Any }
+
+object BooleanMarshaler : ArgumentMarshaler { override fun parse(value: String?) = true }
+object IntMarshaler : ArgumentMarshaler {
+    override fun parse(value: String?) =
+        value?.toIntOrNull() ?: throw IllegalArgumentException("Expected a number")
+}
+object StringMarshaler : ArgumentMarshaler {
+    override fun parse(value: String?) =
+        value ?: throw IllegalArgumentException("Expected text")
+}
+
+val marshalers = mapOf('b' to BooleanMarshaler, 'i' to IntMarshaler, 's' to StringMarshaler)</code></pre>
+    <p>The change is not done in one big jump. The book takes it a step at a time: introduce the new type beside the old code, move one kind across, run the tests, then the next. Adding a list type later means adding one object, not editing everything.</p>
+
+    <h2 id="junit">16. JUnit internals (Chapter 15)</h2>
+    <p>The second case study takes a small class from the JUnit testing framework, the one that builds the &ldquo;expected X but was Y&rdquo; message and trims it to the part that differs. It was written by respected programmers, it has tests, and it is good code. The author then shows that it can still be improved, by applying the rules of the earlier chapters one by one: encapsulate conditions, rename things, remove awkward prefixes, extract small methods, and make hidden ordering between steps explicit.</p>
+    <p>The lesson is the Boy Scout rule in action. You do not need broken code to justify a small improvement, and you do not need a rewrite. You need tests to protect each small change.</p>
+    <h3>Before: a negative condition and a vague name</h3>
+<pre><code>class Compactor(private val fExpected: String?, private val fActual: String?) {
+    fun compact(message: String): String {
+        if (shouldNotCompact()) return format(message, fExpected, fActual)
+        // ... build the shortened strings ...
+        return format(message, shortExpected(), shortActual())
+    }
+    private fun shouldNotCompact() = fExpected == null || fActual == null || fExpected == fActual
+}</code></pre>
+    <h3>After: a positive condition that names the case</h3>
+<pre><code>class Compactor(private val expected: String?, private val actual: String?) {
+    fun compact(message: String): String =
+        if (canBeCompacted()) format(message, shortExpected(), shortActual())
+        else format(message, expected, actual)
+
+    private fun canBeCompacted() =
+        expected != null &amp;&amp; actual != null &amp;&amp; expected != actual
+}</code></pre>
+    <p>Small changes: no <code>f</code> prefix on fields (the IDE already shows what is a field), one positive condition instead of a negated one, and the main path reads top to bottom.</p>
+
+    <h2 id="serialdate">17. Refactoring SerialDate (Chapter 16)</h2>
+    <p>The third case study is a review of a date class from a widely used open-source library. The author does not begin by changing code. They begin with the tests: measure how much of the class they cover, add the missing ones, and only then start improving the design. After that come many findings, such as unclear names, unused code, comments that repeat the code, and numbers standing in for concepts, like <code>1</code> for January or <code>2</code> for Monday.</p>
+    <p>The lesson is the order of work: <strong>tests first, then refactor</strong>. A clean-up without a safety net is just a risky edit. The chapter also shows that even a heavily used library can hide design weaknesses, and that reviewing code is a skill worth practising.</p>
+    <h3>Before: numbers that stand for months</h3>
+<pre><code>fun daysInMonth(month: Int, isLeapYear: Boolean): Int = when (month) {
+    2 -&gt; if (isLeapYear) 29 else 28
+    4, 6, 9, 11 -&gt; 30
+    else -&gt; 31          // what if month is 13?
+}</code></pre>
+    <h3>After: a type that makes invalid values impossible</h3>
+<pre><code>enum class Month(private val days: Int) {
+    JANUARY(31), FEBRUARY(28), MARCH(31), APRIL(30), MAY(31), JUNE(30),
+    JULY(31), AUGUST(31), SEPTEMBER(30), OCTOBER(31), NOVEMBER(30), DECEMBER(31);
+
+    fun length(isLeapYear: Boolean) =
+        if (this == FEBRUARY &amp;&amp; isLeapYear) 29 else days
+}
+
+val days = Month.FEBRUARY.length(isLeapYear = true)   // 29</code></pre>
+    <p>The numeric version needs a comment and a default branch to be safe. The enum version cannot be called with month 13 at all. (In real Kotlin code you would normally use <code>java.time.Month</code> or <code>YearMonth</code> rather than writing your own.)</p>
+
+    <h2 id="smells">18. Smells and heuristics (Chapter 17)</h2>
+    <p>The last chapter is a reference catalogue of more than sixty &ldquo;smells&rdquo;: signs that code may be wrong. It is grouped by area, and it is meant for looking things up during review rather than reading straight through. First, the six big symptoms of a rotting design:</p>
+    <table>
+      <tr><th>Smell</th><th>What it feels like</th></tr>
+      <tr><td>Rigidity</td><td>A small change forces changes in many other places.</td></tr>
+      <tr><td>Fragility</td><td>You change one thing and something unrelated breaks.</td></tr>
+      <tr><td>Immobility</td><td>You cannot reuse a piece without dragging half the system along.</td></tr>
+      <tr><td>Needless complexity</td><td>Machinery for a future that never came.</td></tr>
+      <tr><td>Needless repetition</td><td>The same logic copied in several places, so fixes must be repeated.</td></tr>
+      <tr><td>Opacity</td><td>Code that is hard to understand, even for its author after a month.</td></tr>
+    </table>
+    <p>Then the catalogue, with a few examples from each group:</p>
+    <table>
+      <tr><th>Group</th><th>Examples of smells</th></tr>
+      <tr><td>Comments</td><td>Outdated comments, redundant comments, commented-out code.</td></tr>
+      <tr><td>Environment</td><td>A build or a test run that needs more than one step.</td></tr>
+      <tr><td>Functions</td><td>Too many arguments, output arguments, flag arguments, dead functions.</td></tr>
+      <tr><td>General</td><td>Duplication, dead code, inconsistency, clutter, feature envy (a method more interested in another class&rsquo;s data), hidden dependencies between steps, magic numbers, code at the wrong level of abstraction, artificial coupling.</td></tr>
+      <tr><td>Names</td><td>Non-descriptive names, names at the wrong level of abstraction, ambiguous names, names that hide side effects.</td></tr>
+      <tr><td>Tests</td><td>Insufficient tests, skipped trivial tests, ignored tests, untested boundary conditions, slow tests.</td></tr>
+    </table>
+    <p>The book also ships a Java-specific group (wildcard imports, constants versus enums, and so on), which I leave out here. The next section covers the heuristics from this chapter that I use most.</p>
+
+    <h2 id="conditionals">19. Conditionals and understandability (from Chapter 17)</h2>
+    <h3>Prefer polymorphism to long type checks</h3>
+    <p>A <code>when</code> over a type code has to be edited every time a new type arrives, and it is repeated everywhere the type matters. Let each type carry its own behaviour. (This is the same idea as the Open/Closed principle in my SOLID post.)</p>
+<pre><code>// Bad
+fun area(shape: Shape): Double = when (shape.type) {
+    "circle"    -&gt; Math.PI * shape.radius * shape.radius
+    "rectangle" -&gt; shape.width * shape.height
+    else        -&gt; throw IllegalArgumentException("Unknown shape")
+}
+
+// Clean
+sealed interface Shape { fun area(): Double }
+
+class Circle(private val radius: Double) : Shape {
+    override fun area() = Math.PI * radius * radius
+}
+class Rectangle(private val width: Double, private val height: Double) : Shape {
+    override fun area() = width * height
+}</code></pre>
+    <div class="note"><p>Kotlin adds a nuance: a <code>when</code> over a <em>sealed</em> type is checked by the compiler, so a missing case is a compile error. For a closed set of shapes that is also a clean design. Use polymorphism when behaviour belongs to the type, and a sealed <code>when</code> when you are adding operations rather than types.</p></div>
+    <h3>Explain with variables, and avoid negative conditions</h3>
+<pre><code>// Bad
+if (!(order.items.isEmpty() || !customer.isActive)) { ship(order) }
+
+// Clean
+val hasItems = order.items.isNotEmpty()
+val canOrder = customer.isActive
+if (hasItems &amp;&amp; canOrder) { ship(order) }</code></pre>
+    <p>Other tips from this part of the book: be consistent (if you call it <code>fetch</code> in one place, do not call it <code>retrieve</code> in another), wrap boundary conditions in a named value, and prefer a small value type like <code>Money</code> or <code>EmailAddress</code> over a bare <code>Double</code> or <code>String</code>. Kotlin&rsquo;s <code>@JvmInline value class</code> makes that cheap.</p>
+
+    <h2 id="caveats">20. Where I use judgement</h2>
+    <p>The book is influential and also debated, and it is worth reading with a critical eye. These are the places where I apply it with care:</p>
+    <ul>
+      <li><strong>Function size.</strong> Splitting everything into three-line functions can hide the flow. I split when a name improves understanding, not to hit a number.</li>
+      <li><strong>Comments.</strong> &ldquo;No comments&rdquo; is too strong. Public APIs, non-obvious decisions and workarounds deserve a sentence or two.</li>
+      <li><strong>Age.</strong> It was written in 2008 for Java. Kotlin features such as data classes, sealed types, extension functions, default arguments and immutability remove some of the problems the book works around.</li>
+      <li><strong>Rules are heuristics.</strong> Use them to start a conversation in review, not to end one.</li>
+      <li><strong>Do not rewrite for its own sake.</strong> Clean the code you are already changing, which is the Boy Scout rule again.</li>
+      <li><strong>Chapters I could only sketch.</strong> The three case studies (chapters 14 to 16) are best read in the book itself, where you can follow every step, and the Java-specific smells do not all carry over to Kotlin.</li>
+    </ul>
+
+    <h2 id="takeaways">21. Takeaways, checklist and references</h2>
+    <p>Before I open a pull request, I run through this list:</p>
+    <ul>
+      <li>Could a new teammate say what each name means without asking me?</li>
+      <li>Does each function do one thing, with no flag argument?</li>
+      <li>Can a comment be replaced by a better name?</li>
+      <li>Did I name every magic number and avoid double negatives?</li>
+      <li>Are internals hidden, with no long <code>a.b.c.d</code> chains?</li>
+      <li>Does each test check one concept and read like a sentence?</li>
+      <li>Is the file a little cleaner than it was when I opened it?</li>
+    </ul>
+    <h3>References</h3>
+    <ul>
+      <li>Robert C. Martin, <em>Clean Code: A Handbook of Agile Software Craftsmanship</em>, Prentice Hall, 2008. <a href="https://www.amazon.com/dp/0132350882" target="_blank" rel="noopener">Amazon</a> &middot; <a href="https://www.informit.com/store/clean-code-a-handbook-of-agile-software-craftsmanship-9780132350884" target="_blank" rel="noopener">InformIT</a></li>
+      <li>wojteklu, <a href="https://gist.github.com/wojteklu/73c6914cc446146b8b533c0988cf8d29" target="_blank" rel="noopener">Clean Code summary (GitHub Gist)</a></li>
+      <li>My post <a href="solid-principles-explained.html">Designing for Change: The SOLID Principles</a>, which covers several of the same ideas with runnable exercises.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Clean code</td><td>Code that is easy to read, understand and change safely.</td></tr>
+      <tr><td>Boy Scout rule</td><td>Leave the code cleaner than you found it.</td></tr>
+      <tr><td>Magic number</td><td>A bare value in code whose meaning is not obvious.</td></tr>
+      <tr><td>Flag argument</td><td>A boolean parameter that switches a function between two behaviours.</td></tr>
+      <tr><td>Side effect</td><td>A hidden change a function makes beyond returning a value.</td></tr>
+      <tr><td>Law of Demeter</td><td>Talk to your direct neighbours, not to their neighbours.</td></tr>
+      <tr><td>Code smell</td><td>A surface sign that something deeper in the design may be wrong.</td></tr>
+      <tr><td>F.I.R.S.T.</td><td>Fast, Independent, Repeatable, Self-validating, Timely: qualities of good tests.</td></tr>
+    </table>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

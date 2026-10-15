@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clean Architecture, Chapter by Chapter: A Kotlin Companion — Khairul Alam</title>
+  <meta name="description" content="A chapter-by-chapter summary of Clean Architecture by Robert C. Martin, including his 2012 article, with diagrams and Kotlin examples for the Dependency Rule, boundaries, components and details." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+
+
+
+
+<main>
+  <article>
+    <p class="kicker">Book summary &middot; Software architecture &middot; Kotlin</p>
+    <h1>Clean Architecture, Chapter by Chapter: A Kotlin Companion to Uncle Bob&rsquo;s Guide</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~45 min read</span></div>
+    <div class="tags"><span class="tag">Clean Architecture</span><span class="tag">Book summary</span><span class="tag">Kotlin</span><span class="tag">Software design</span></div>
+
+    <p class="lede"><em>Clean Architecture: A Craftsman&rsquo;s Guide to Software Structure and Design</em> by Robert C. Martin asks one question at great length: how do you structure software so that it stays cheap to change? This post walks through the book part by part and chapter by chapter, in my own words, with diagrams and Kotlin examples. It also covers Martin&rsquo;s 2012 article &ldquo;The Clean Architecture&rdquo;, which is where the famous circle diagram comes from.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>Software has two values: what it <em>does</em> and how <em>easy it is to change</em>. Architecture protects the second one.</li>
+        <li>Good architecture keeps <strong>business rules</strong> in the middle and pushes <strong>details</strong> (database, web, frameworks) to the edge.</li>
+        <li><strong>The Dependency Rule:</strong> source code may only point inward, toward higher-level policy.</li>
+        <li>Draw <strong>boundaries</strong> between things that change for different reasons, and cross them with interfaces.</li>
+        <li>Group classes into <strong>components</strong> that change together, avoid cycles, and depend toward stability.</li>
+        <li>The database, the web and the framework are <strong>details</strong>. Put off those decisions as long as you can.</li>
+        <li>Do not over-build: the cost of a boundary is real, so add them where change is likely.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#book">About the book and where to get it</a></li>
+        <li><a href="#part1">Part I: Introduction (Chapters 1 and 2)</a></li>
+        <li><a href="#part2">Part II: Programming paradigms (Chapters 3 to 6)</a></li>
+        <li><a href="#part3">Part III: Design principles (Chapters 7 to 11)</a></li>
+        <li><a href="#part4">Part IV: Component principles (Chapters 12 to 14)</a></li>
+        <li><a href="#part5">Part V: Architecture (Chapters 15 to 29)</a></li>
+        <li><a href="#article">The 2012 article: The Clean Architecture</a></li>
+        <li><a href="#part6">Part VI: Details (Chapters 30 to 34)</a></li>
+        <li><a href="#appendix">Appendix: Architecture archaeology</a></li>
+        <li><a href="#example">Putting it together: a small example in Kotlin</a></li>
+        <li><a href="#judgement">Where I use judgement</a></li>
+        <li><a href="#takeaways">Takeaways, checklist and references</a></li>
+      </ol>
+    </details>
+
+    <h2 id="book">1. About the book and where to get it</h2>
+    <p>Published by Pearson (Prentice Hall) in 2017, the book is about 430 pages in seven parts: an introduction, three parts on principles (programming paradigms, design principles, component principles), a long part on architecture itself, a part on &ldquo;details&rdquo;, and an appendix. Its code samples are mostly Java, C and C++. It is a companion to the author&rsquo;s earlier <em>Clean Code</em>, which I summarised <a href="clean-code-summary.html">in another post</a>: that book is about code, and this one is about structure.</p>
+    <table>
+      <tr><th>Detail</th><th>Value</th></tr>
+      <tr><td>Title</td><td>Clean Architecture: A Craftsman&rsquo;s Guide to Software Structure and Design</td></tr>
+      <tr><td>Author</td><td>Robert C. Martin</td></tr>
+      <tr><td>ISBN-10 / ISBN-13</td><td>0134494164 / 978-0134494166</td></tr>
+      <tr><td>Buy the book</td><td><a href="https://www.amazon.com/dp/0134494164" target="_blank" rel="noopener">Amazon</a> &middot; <a href="https://www.informit.com/store/clean-architecture-a-craftsmans-guide-to-software-structure-9780134494166" target="_blank" rel="noopener">InformIT (publisher&rsquo;s store)</a></td></tr>
+      <tr><td>Free article</td><td><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank" rel="noopener">The Clean Architecture (2012)</a>, by the same author</td></tr>
+    </table>
+    <div class="note"><p><strong>About &ldquo;downloading&rdquo;:</strong> the book is under copyright, so the official way to get it is to buy it from the links above. I do not link to free copies. The 2012 article is free to read on the author&rsquo;s blog.</p></div>
+    <p>This is a summary in my own words, with my own Kotlin examples, not a replacement for the book. The chapters are short and there is a lot of history and storytelling that a summary cannot carry.</p>
+
+    <h2 id="part1">2. Part I: Introduction</h2>
+    <h3>Chapter 1: What is design and architecture?</h3>
+    <p>The author argues that there is no real difference between the two. Architecture is the shape of the system, and design is the details of that shape; both are one continuum of decisions from the highest level to the lowest. The goal of both is the same: <strong>minimise the human effort needed to build and maintain the system</strong>.</p>
+    <p>The chapter shows a case study of a company whose engineering staff grew many times over while the productivity of each new engineer fell. Each release took more people and delivered less, and the cost per line of code climbed. The cause was a mess that nobody had time to clean, caused by the belief that you can go fast by going sloppy. The author&rsquo;s reply is blunt: the only way to go fast is to go well.</p>
+    <h3>Chapter 2: A tale of two values</h3>
+    <p>Every piece of software offers two values. <strong>Behaviour</strong> is what it does for users. <strong>Structure</strong> is how easily it can change. Business people tend to push for behaviour, and developers are often too shy to defend structure. The author uses the urgent and important grid to explain why this is a mistake: architecture is <em>important</em> but rarely <em>urgent</em>, so it gets pushed aside by features that feel urgent but are often not very important.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="A two-by-two grid with urgent and important axes. Architecture sits in important but not urgent. Features sit in urgent.">
+        <rect class="box" x="120" y="20" width="240" height="95" rx="6"/><rect class="box" x="360" y="20" width="240" height="95" rx="6"/>
+        <rect class="box" x="120" y="115" width="240" height="95" rx="6"/><rect class="box" x="360" y="115" width="240" height="95" rx="6"/>
+        <text class="b c" x="240" y="42">Important, not urgent</text><text class="sub c" x="240" y="72">Architecture, structure</text><text class="sub c" x="240" y="90">Easy to postpone</text>
+        <text class="b c" x="480" y="42">Important and urgent</text><text class="sub c" x="480" y="72">Real emergencies</text>
+        <text class="b c" x="240" y="137">Not important, not urgent</text>
+        <text class="b c" x="480" y="137">Urgent, not important</text><text class="sub c" x="480" y="167">Many feature requests</text><text class="sub c" x="480" y="185">Feel pressing, change little</text>
+        <text class="sub c" x="360" y="236">&larr; less urgent &nbsp;&nbsp;&nbsp;&nbsp; more urgent &rarr;</text>
+      </svg>
+      <figcaption>Architecture lives in the top-left box, which is why it is so easily crowded out.</figcaption>
+    </figure>
+    <p>The author&rsquo;s argument: if the software works but is impossible to change, it will not work tomorrow when the requirements change. If it does not work but is easy to change, you can make it work. So it is the developer&rsquo;s job to fight for the architecture, as part of the job and not as a favour.</p>
+
+    <h2 id="part2">3. Part II: Programming paradigms</h2>
+    <h3>Chapter 3: Paradigm overview</h3>
+    <p>There are three major paradigms, and the interesting fact is that each one <em>takes something away</em> from the programmer. Structured programming removes unrestricted jumps (<code>goto</code>). Object-oriented programming removes indirect control transfer through function pointers, by making it disciplined. Functional programming removes assignment. None added a new power; each added a discipline. These three restrictions are the base on which architecture sits.</p>
+    <h3>Chapter 4: Structured programming</h3>
+    <p>Edsger Dijkstra showed that unrestricted jumps made programs hard to reason about, and that every program can be built from three structures: sequence, selection (if) and iteration (loops). These can be broken down into provable pieces. In practice we do not prove programs mathematically; instead we test. But tests can only show the <em>presence</em> of bugs, not their absence, much like experiments in science that can only disprove a theory. The architectural takeaway is <strong>functional decomposition</strong>: break big things into small, testable pieces.</p>
+    <h3>Chapter 5: Object-oriented programming</h3>
+    <p>The author skips the usual slogans (encapsulation, inheritance) and finds the real value in <strong>polymorphism</strong>, because it gives you control over the <em>direction of source-code dependencies</em>. Normally, a caller depends on what it calls. With an interface, the caller depends on an abstraction and the implementation depends on the same abstraction, so the dependency arrow can point against the flow of control. This is called <strong>dependency inversion</strong>, and it allows <em>plugin architecture</em>: high-level policy can stay unaware of low-level details.</p>
+<pre><code>// The flow of control goes from the policy to the device, but the
+// source dependency points the other way: the device implements the policy's interface.
+interface Notifier { fun send(message: String) }          // owned by the high-level code
+
+class OrderPolicy(private val notifier: Notifier) {
+    fun complete(orderId: String) = notifier.send("Order $orderId is complete")
+}
+
+class EmailNotifier : Notifier {                          // low-level detail, depends inward
+    override fun send(message: String) { /* talk to the mail server */ }
+}</code></pre>
+    <h3>Chapter 6: Functional programming</h3>
+    <p>Functional programming removes assignment. Variables never change, so there are no race conditions, deadlocks or concurrent-update bugs. Real systems cannot be fully immutable, so the architectural lesson is to <strong>separate the parts of the system that mutate from those that do not</strong>, and to protect the mutable parts with strict rules (such as transactions). The chapter also introduces <strong>event sourcing</strong>: instead of storing the current state, store the list of changes and compute the state when needed, just as a bank keeps transactions, not only balances.</p>
+<pre><code>sealed interface AccountEvent
+data class Deposited(val amount: Int) : AccountEvent
+data class Withdrew(val amount: Int) : AccountEvent
+
+// The balance is never stored or mutated; it is derived from the history.
+fun balance(events: List&lt;AccountEvent&gt;): Int = events.fold(0) { total, event -&gt;
+    when (event) {
+        is Deposited -&gt; total + event.amount
+        is Withdrew  -&gt; total - event.amount
+    }
+}</code></pre>
+
+    <h2 id="part3">4. Part III: Design principles</h2>
+    <p>The SOLID principles are the building blocks for the middle layer of the book: how to arrange functions and data into classes, and how to join classes together. I wrote a longer post with runnable exercises on them (<a href="solid-principles-explained.html">Designing for Change</a>), so here I only note what the book adds.</p>
+    <h3>Chapter 7: SRP, the Single Responsibility Principle</h3>
+    <p>The book corrects a common misreading. SRP does not mean &ldquo;a function does one thing&rdquo;. It means <strong>a module should be responsible to one, and only one, actor</strong>: one group of people who ask for changes. In the book&rsquo;s example, an <code>Employee</code> class has <code>calculatePay()</code> (used by finance), <code>reportHours()</code> (used by operations) and <code>save()</code> (used by the database team). Two of those methods share a helper, and when one team changes the helper, the other team&rsquo;s feature silently breaks.</p>
+<pre><code>// Bad: three actors share one class (and a hidden shared helper)
+class Employee {
+    fun calculatePay(): Money = /* uses regularHours() */ TODO()
+    fun reportHours(): Hours  = /* also uses regularHours() */ TODO()
+    fun save() { /* database */ }
+}
+
+// Clean: separate classes per actor, with plain data in the middle
+data class EmployeeData(val id: String, val rate: Money)
+class PayCalculator { fun calculatePay(e: EmployeeData): Money = TODO() }
+class HourReporter  { fun reportHours(e: EmployeeData): Hours = TODO() }
+class EmployeeSaver { fun save(e: EmployeeData) { /* database */ } }</code></pre>
+    <h3>Chapter 8: OCP, the Open-Closed Principle</h3>
+    <p>A system should be easy to extend without modifying existing code. The chapter applies this at architecture scale with a financial summary that is shown on a web page and also printed. Split the work into steps (gather data, calculate, present), and arrange the dependencies so that the most important component (the calculation) is protected from changes in the less important ones (the presentation). <strong>Higher-level components should be protected from lower-level ones</strong>, and the arrows between components should point toward the thing you want to protect.</p>
+    <h3>Chapter 9: LSP, the Liskov Substitution Principle</h3>
+    <p>Anything that uses a base type should work with any subtype. The classic failure is <code>Square</code> extending <code>Rectangle</code>: setting a square&rsquo;s width also changes its height, which breaks code that assumed the two are independent. The chapter lifts this to architecture: if a set of services is meant to be interchangeable (such as several taxi dispatch services behind one REST interface), then each must honour the same contract, or the calling code fills up with special cases for each service.</p>
+    <h3>Chapter 10: ISP, the Interface Segregation Principle</h3>
+    <p>Do not depend on things you do not use. In code this means small interfaces. At architecture level it means not depending on a framework or module that drags in extras. If your system depends on a framework that depends on a database you do not use, a change in that database can force you to rebuild and redeploy.</p>
+    <h3>Chapter 11: DIP, the Dependency Inversion Principle</h3>
+    <p>Code that implements high-level policy should not depend on low-level details; both should depend on abstractions. The chapter turns this into working rules:</p>
+    <ul>
+      <li>Prefer depending on abstract interfaces over volatile concrete classes.</li>
+      <li>Do not derive from volatile concrete classes.</li>
+      <li>Do not override concrete functions.</li>
+      <li>Never mention the name of anything concrete and volatile.</li>
+    </ul>
+    <p>Stable things such as the standard library can be used directly. Creating concrete objects is handled by factories, and a small number of concrete classes are unavoidable; they live in the main component (see chapter 26).</p>
+
+    <h2 id="part4">5. Part IV: Component principles</h2>
+    <p>If the SOLID principles tell you how to arrange bricks, the component principles tell you how to arrange rooms. A <em>component</em> is a unit you can deploy independently: a jar, a Gradle module, a library, a service.</p>
+    <h3>Chapter 12: Components</h3>
+    <p>A short history: in the early days programmers had to place their programs at fixed memory addresses, and then relocatable code and linkers let them split programs into pieces. As programs grew, linking got slow, and eventually plug-in components, such as shared libraries and jars, became the norm. Today the units of deployment (a module, a package) are the basic components of an architecture.</p>
+    <h3>Chapter 13: Component cohesion</h3>
+    <p>Which classes belong in which component? Three principles pull against each other:</p>
+    <table>
+      <tr><th>Principle</th><th>In plain words</th><th>It is the component version of</th></tr>
+      <tr><td><strong>REP</strong>, Reuse/Release Equivalence</td><td>The unit of reuse is the unit of release. Things you release together should be useful together, with a version number and release notes.</td><td>(the basis for everything else)</td></tr>
+      <tr><td><strong>CCP</strong>, Common Closure</td><td>Gather classes that change for the same reason and at the same time. Separate those that change at different times.</td><td>SRP</td></tr>
+      <tr><td><strong>CRP</strong>, Common Reuse</td><td>Do not force users to depend on things they do not need. Classes used together go together.</td><td>ISP</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="A triangle with REP, CCP and CRP at the corners, and the consequence of ignoring each edge.">
+        <path class="rule" d="M320,30 L110,170 L530,170 Z"/>
+        <rect class="boxb" x="260" y="12" width="120" height="34" rx="10"/><text class="b c" x="320" y="34">REP: reusable</text>
+        <rect class="boxg" x="20" y="156" width="180" height="34" rx="10"/><text class="b c" x="110" y="178">CCP: easy to change</text>
+        <rect class="boxo" x="450" y="156" width="160" height="34" rx="10"/><text class="b c" x="530" y="178">CRP: no extras</text>
+        <text class="sub c" x="320" y="214">You cannot maximise all three. Early on favour CCP; as others reuse your code, lean toward REP and CRP.</text>
+      </svg>
+      <figcaption>The tension triangle. Where you stand on it shifts as a project matures.</figcaption>
+    </figure>
+    <h3>Chapter 14: Component coupling</h3>
+    <p>Now the relationships between components. Three principles:</p>
+    <ul>
+      <li><strong>ADP, Acyclic Dependencies Principle.</strong> The component dependency graph must have no cycles. With a cycle, no component can be built, tested or released alone. Break a cycle by applying dependency inversion (introduce an interface) or by extracting a new component both sides depend on. The author also notes that the structure drifts over time, so it needs to be watched and not designed once.</li>
+      <li><strong>SDP, Stable Dependencies Principle.</strong> Depend in the direction of stability. A component that many others depend on is hard to change, so it should be stable, and volatile components should not be depended on.</li>
+      <li><strong>SAP, Stable Abstractions Principle.</strong> A stable component should be abstract, so it can be extended without being modified. A component that is both stable and concrete is a pain.</li>
+    </ul>
+    <p>The chapter gives a simple measure of stability: <strong>I = Fan-out / (Fan-in + Fan-out)</strong>. Fan-in is how many other components depend on this one; fan-out is how many it depends on. I = 0 is maximally stable (everyone depends on it, it depends on nothing); I = 1 is maximally unstable. A similar ratio, <strong>A = abstract elements / all elements</strong>, measures how abstract a component is. Plot components with I and A and the good ones sit near the line A + I = 1, called the <em>main sequence</em>. Components in the corner of low abstraction and high stability (the &ldquo;zone of pain&rdquo;) and those of high abstraction and low stability (the &ldquo;zone of uselessness&rdquo;) are the ones to worry about.</p>
+    <table>
+      <tr><th>Example component</th><th>Fan-in</th><th>Fan-out</th><th>I</th><th>Reading</th></tr>
+      <tr><td><code>domain</code> (business rules)</td><td>4</td><td>0</td><td>0.0</td><td>Very stable, so keep it abstract and free of details.</td></tr>
+      <tr><td><code>web</code> (UI)</td><td>0</td><td>3</td><td>1.0</td><td>Unstable, and that is fine: it is easy to change.</td></tr>
+      <tr><td><code>database</code></td><td>1</td><td>2</td><td>0.67</td><td>Leans unstable. Nothing important should depend on it.</td></tr>
+    </table>
+
+    <h2 id="part5">6. Part V: Architecture</h2>
+    <p>This is the longest part and the heart of the book. Chapters 15 to 29 cover what architecture is, how to draw boundaries, and how the pieces of a clean architecture fit.</p>
+    <h3>Chapter 15: What is architecture?</h3>
+    <p>The architecture of a system is the shape given to it by those who build it. That shape exists to make the system easy to <em>develop, deploy, operate and maintain</em>. The most important job of the architect is to <strong>keep options open</strong>: leave decisions about databases, frameworks and servers as late as possible, because the longer you wait, the more you know. A good architecture lets you build and test the business rules without choosing any of them yet. The author illustrates this with the idea that devices should be independent of the policy, so you can swap hardware or UI without touching the rules.</p>
+    <h3>Chapter 16: Independence</h3>
+    <p>A good architecture supports the use cases, and supports four kinds of independence:</p>
+    <ul>
+      <li><strong>Operation:</strong> components can be scaled or changed in how they run.</li>
+      <li><strong>Development:</strong> several teams can work without stepping on each other (Conway&rsquo;s law says the system will mirror the organisation anyway).</li>
+      <li><strong>Deployment:</strong> parts can be released without redeploying everything.</li>
+      <li><strong>Leaving options open:</strong> the most important of all.</li>
+    </ul>
+    <p>The chapter also separates <em>true</em> duplication from <em>accidental</em> duplication. Two pieces of code that look alike but change for different reasons are not duplicates; merging them couples things that should be independent. Decoupling can happen at different levels (source code, deployment units or services), and you choose the level by how much independence you need.</p>
+    <h3>Chapter 17: Boundaries, drawing lines</h3>
+    <p>A boundary is a line between things that matter and things that do not. The business rules matter; the database and the GUI are details. Draw the line so that the details depend on the business rules, never the other way. The author tells how the wiki application FitNesse was built without a database at first, using plain files behind an interface. The database decision was deferred and, in the end, never needed. The lesson is the &ldquo;plugin&rdquo; idea again: the GUI and the database are plug-ins to the business rules.</p>
+    <h3>Chapter 18: Boundary anatomy</h3>
+    <p>What does a boundary look like in practice? Most simply, a call across a boundary in the same program (a <em>monolith</em>) is a function call through an interface. A boundary can also be a deployment unit, a thread, a process, or a network service. The further out you go, the more expensive crossing becomes, but the principle is the same: the dependency across the line points toward the higher-level side. Most systems have a few boundaries of the cheaper kind and fewer of the costly kind.</p>
+    <h3>Chapter 19: Policy and level</h3>
+    <p>A <strong>policy</strong> is a rule about how the system behaves, and its <strong>level</strong> is its distance from the inputs and outputs. The further away, the higher the level. In the book&rsquo;s small encryption example, the translate step is a higher-level policy than the read and write steps. The rule: source dependencies should be decided by <em>level</em>, not by the direction of data flow. High-level policy should not depend on low-level details even if the data passes through them.</p>
+    <h3>Chapter 20: Business rules</h3>
+    <p><strong>Entities</strong> hold critical business rules and the data they work on, such as &ldquo;a loan accrues interest at this rate&rdquo;, which would exist even if there were no computer. <strong>Use cases</strong> describe application-specific rules: how a user, in one scenario, asks the entities to do their work. Use cases take simple request objects and return simple response objects, which are plain data and know nothing about the web or database.</p>
+<pre><code>class Loan(private val principal: Money, private val annualRate: Double) {   // Entity
+    fun interestFor(months: Int): Money = principal * (annualRate / 12 * months)
+}
+
+data class QuoteRequest(val principal: Money, val months: Int)                // plain data in
+data class QuoteResponse(val interest: Money)                                 // plain data out
+
+class QuoteLoan(private val annualRate: Double) {                             // Use case
+    fun execute(request: QuoteRequest) =
+        QuoteResponse(Loan(request.principal, annualRate).interestFor(request.months))
+}</code></pre>
+    <h3>Chapter 21: Screaming architecture</h3>
+    <p>If you look at the plans for a house, you should be able to tell if it is a house or a library. In the same way, the top-level structure of a code base should <em>shout its purpose</em>: &ldquo;this is a health-care system&rdquo;, not &ldquo;this is a Spring application&rdquo;. A framework is a tool, not a way of life. If the first thing you see in a project is the framework&rsquo;s folder layout, the architecture is shouting about the wrong thing. A good test: can you run the use cases without the web server and database?</p>
+<pre><code>// Screams "framework"            // Screams "library system"
+com.example/                      com.example.library/
+  controllers/                      borrowing/
+  services/                         catalogue/
+  repositories/                     membership/
+  models/                           fines/</code></pre>
+    <h3>Chapter 22: The Clean Architecture</h3>
+    <p>This chapter combines hexagonal, onion and similar architectures into one picture of concentric circles and a single rule. Because it is the best-known idea in the book, I give it its own section below, together with the original 2012 article.</p>
+    <h3>Chapter 23: Presenters and Humble Objects</h3>
+    <p>The <strong>Humble Object</strong> pattern splits a hard-to-test behaviour into two parts: a humble part that is so simple it barely needs testing, and a testable part with all the logic. The classic case is a GUI. The <em>presenter</em> takes the data from the use case and prepares everything the screen needs (strings, formatted dates, which buttons are enabled). The <em>view</em> is humble: it copies the prepared values onto the screen. The same idea applies to database gateways and mappers, and to service listeners.</p>
+<pre><code>data class OrderViewModel(val title: String, val total: String, val canCancel: Boolean)
+
+class OrderPresenter {                       // testable, no Android or web code
+    fun present(order: OrderResponse) = OrderViewModel(
+        title     = "Order #${order.id}",
+        total     = "%.2f USD".format(order.total),
+        canCancel = order.status == Status.PENDING,
+    )
+}
+// The view (Activity, Fragment, web page) just copies viewModel fields onto the screen.</code></pre>
+    <h3>Chapter 24: Partial boundaries</h3>
+    <p>Full boundaries are expensive: reciprocal interfaces, input and output data structures, and separate components. Sometimes you want to prepare for one without paying for it yet. The author gives three options: build everything but keep it in one component (<em>skip the last step</em>); use a <em>one-dimensional boundary</em>, an interface that only one side honours (a simple Strategy); or a <em>facade</em>, which is the cheapest and leaves the dependency pointing the wrong way. These are bets that you will not need the full thing, and they can decay.</p>
+    <h3>Chapter 25: Layers and boundaries</h3>
+    <p>Using a small text game (&ldquo;Hunt the Wumpus&rdquo;) as an example, the chapter shows that boundaries show up more often than you expect: between the user interface and the game rules, between the rules and the data storage, even between the rules and the choice of language (English versus another). The question is always whether to build a boundary now (cost) or to risk retrofitting later (also cost). The author&rsquo;s answer is to watch for the signs, and not to over-engineer or ignore the issue: you need to judge.</p>
+    <h3>Chapter 26: The Main component</h3>
+    <p><code>Main</code> is the <strong>dirtiest component</strong>, and that is by design. It is the entry point; it creates all the factories, strategies and global facilities, and wires them into the high-level policy. It is a plug-in to the application. You can have several (a development one, a test one, a production one), each with a different configuration.</p>
+<pre><code>fun main() {
+    val books     = InMemoryBooks()                     // concrete detail, chosen here only
+    val presenter = ConsolePresenter()
+    val useCase   = BorrowBook(books, presenter)
+    val controller = BorrowController(useCase)
+    controller.onBorrowClicked(bookId = "b1", memberId = "m7")
+}</code></pre>
+    <h3>Chapter 27: Services, great and small</h3>
+    <p>Service-oriented architecture and microservices are popular, but the chapter says a service is just a way of drawing a boundary, not an architecture in itself. It argues against two common beliefs. <strong>Decoupling fallacy:</strong> services that share data formats or meanings are still coupled; changing a shared field forces changes everywhere. <strong>Independent development and deployment fallacy:</strong> a feature that cuts across many services (the book&rsquo;s example adds &ldquo;delivery of kittens&rdquo; to a taxi app) needs all the services to change together. The answer is that services should be built with internal component-based architecture, and cross-cutting concerns should be handled through well-designed boundaries within and between services.</p>
+    <h3>Chapter 28: The test boundary</h3>
+    <p>Tests are part of the system architecture. They are the outermost circle, depend on everything, and nothing depends on them. The danger is the <strong>fragile test problem</strong>: if tests are tightly coupled to the structure of the system, a small change in production code breaks hundreds of tests, and developers start to avoid changing the code. The remedy is to design for testability and to give tests a <em>testing API</em>, a set of operations that bypass the security and expensive resources that tests do not need to repeat, and that is kept separate from the structure of the application.</p>
+    <h3>Chapter 29: Clean embedded architecture</h3>
+    <p>Embedded software has the same problems with a different flavour. The author quotes a rule often attributed to Kent Beck: <em>make it work, make it right, make it fast</em>, and says embedded developers tend to stop after step one. Software that is welded to hardware turns into <strong>firmware</strong>: code that cannot be tested off the device and that dies with the chip. The remedy is to separate layers. The hardware sits at the bottom, a hardware abstraction layer (HAL) hides it, and the application logic sits above and knows nothing about the device. Even the operating system should be hidden behind an interface. The test the book proposes: when the hardware changes, how much of the code has to change?</p>
+
+    <h2 id="article">7. The 2012 article: The Clean Architecture</h2>
+    <p>Long before the book, Robert Martin published a blog post on 13 August 2012, <a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank" rel="noopener">The Clean Architecture</a>. It is short, free, and worth reading in full. The chapter 22 of the book is built on it.</p>
+    <h3>The architectures it builds on</h3>
+    <p>The article starts by naming several earlier ideas that have the same aim: Hexagonal Architecture (ports and adapters, by Alistair Cockburn), Onion Architecture (by Jeffrey Palermo), Screaming Architecture (from the author&rsquo;s own earlier post), DCI (by James Coplien and Trygve Reenskaug) and BCE (by Ivar Jacobson). All of them separate software into layers, with at least one layer for business rules and another for interfaces. Systems built this way tend to be:</p>
+    <ul>
+      <li><strong>Independent of frameworks.</strong> You use the framework as a tool, not as a mould.</li>
+      <li><strong>Testable.</strong> Business rules can be tested without the UI, database or web server.</li>
+      <li><strong>Independent of the UI.</strong> The UI can change from web to console without changing the rules.</li>
+      <li><strong>Independent of the database.</strong> You can swap one database for another.</li>
+      <li><strong>Independent of any external agency.</strong> The business rules know nothing about the outside world.</li>
+    </ul>
+    <h3>The circles and the Dependency Rule</h3>
+    <figure class="fig">
+      <svg viewBox="0 0 640 330" role="img" aria-label="Four concentric circles: Entities in the centre, Use Cases around them, Interface Adapters, and Frameworks and Drivers outside. Arrows point inward.">
+        <circle cx="320" cy="165" r="158" class="boxo"/>
+        <circle cx="320" cy="165" r="118" class="boxg"/>
+        <circle cx="320" cy="165" r="78"  class="boxb"/>
+        <circle cx="320" cy="165" r="40"  class="boxp"/>
+        <text class="b c" x="320" y="170">Entities</text>
+        <text class="b c" x="320" y="112">Use Cases</text>
+        <text class="b c" x="320" y="72">Interface Adapters</text>
+        <text class="b c" x="320" y="32">Frameworks and Drivers</text>
+        <text class="sub" x="24" y="50">Outside: details</text><text class="sub" x="24" y="68">(web, database, UI)</text>
+        <text class="sub" x="470" y="50">Inside: policy</text><text class="sub" x="470" y="68">(business rules)</text>
+        <path class="arrow" d="M90,296 L262,205"/><path class="arrow" d="M550,296 L378,205"/>
+        <text class="sub c" x="320" y="322">Source code dependencies point inward only</text>
+      </svg>
+      <figcaption>The four circles of the article. The names and exact number of circles are schematic; the rule is what matters.</figcaption>
+    </figure>
+    <ol>
+      <li><strong>Entities</strong> (innermost): enterprise-wide business rules, as objects or as data plus functions. They are the least likely to change when something external changes.</li>
+      <li><strong>Use Cases:</strong> application-specific business rules. They orchestrate the flow of data to and from the entities and direct them to apply their rules. A change here should not touch the entities, and a change in the database or UI should not touch the use cases.</li>
+      <li><strong>Interface Adapters:</strong> converters between the format that suits the use cases and entities and the format that suits the outside agency. The whole MVC set (presenters, views and controllers) lives here, and so does all the SQL.</li>
+      <li><strong>Frameworks and Drivers</strong> (outermost): the database, the web framework and other tools. This is glue code, and it is where the details go.</li>
+    </ol>
+    <p><strong>The Dependency Rule:</strong> source code dependencies can only point <em>inwards</em>. Nothing in an inner circle can know anything about an outer one: not a function, class, variable or data format.</p>
+    <h3>Crossing a boundary</h3>
+    <p>There is an apparent conflict: when a user clicks a button, control goes from the controller to the use case and then to the presenter. But the use case must not depend on the presenter, since that would point outward. The answer is dependency inversion. The use case calls an interface (the <em>output port</em>) that is defined in the use case circle, and the presenter in the outer circle implements it. Source dependencies and the flow of control point in different directions at that point.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Control flows left to right from Controller to Use Case to Output Port to Presenter, but the Presenter's source dependency points back to the Output Port.">
+        <rect class="boxo" x="12"  y="60" width="120" height="46" rx="10"/><text class="b c" x="72"  y="88">Controller</text>
+        <rect class="boxg" x="176" y="60" width="120" height="46" rx="10"/><text class="b c" x="236" y="88">Use Case</text>
+        <rect class="boxp" x="340" y="60" width="130" height="46" rx="10"/><text class="b c" x="405" y="80">&laquo;Output Port&raquo;</text><text class="sub c" x="405" y="97">interface</text>
+        <rect class="boxo" x="514" y="60" width="114" height="46" rx="10"/><text class="b c" x="571" y="88">Presenter</text>
+        <path class="arrow" d="M134,83 L172,83"/><path class="arrow" d="M298,83 L336,83"/>
+        <path class="arrow" d="M512,83 L474,83" style="stroke-dasharray:5 4"/>
+        <text class="sub c" x="236" y="40">control flow &rarr;</text>
+        <text class="sub c" x="492" y="130">the presenter implements the port (dashed)</text>
+        <text class="sub c" x="320" y="156">The use case never mentions the presenter, so dependencies still point inward.</text>
+      </svg>
+      <figcaption>Dependency inversion at a boundary: control goes out, source code points in.</figcaption>
+    </figure>
+    <h3>Data across boundaries</h3>
+    <p>What passes across a boundary should be simple, isolated data: basic structures, data transfer objects or plain arguments. Do not pass entities or database rows outward or inward. Data should cross in the form that is most convenient for the <em>inner</em> circle. The article ends with the claim that following these rules is easy and gives a system that is testable by nature, where the database or web framework can be replaced with little work.</p>
+
+    <h2 id="part6">8. Part VI: Details</h2>
+    <p>This part makes one point five times: the things we treat as the centre of the system (database, web, frameworks) are details at the edge.</p>
+    <h3>Chapter 30: The database is a detail</h3>
+    <p>The <em>data model</em> is important; the <em>database</em> is a mechanism. A relational database is a good way to store and query data, but it is not the architecture. When disks were slow and spinning, database design mattered a lot, but with fast memory and flash the performance reasons for letting it shape your code have faded. Keep the business rules ignorant of the storage, and access data through an interface so you can change it later.</p>
+<pre><code>interface BookRepository {                    // owned by the business rules
+    fun find(id: String): Book?
+    fun save(book: Book)
+}
+// SQL, Room, files or memory are all just implementations of it.</code></pre>
+    <h3>Chapter 31: The web is a detail</h3>
+    <p>The author recalls how many times the industry swung between thin and fat clients, and concludes that the web is just another input and output device. Your system should not care whether it is reached through a browser, an app or a command line. The GUI is a detail, and the interface between it and the business rules should be a boundary.</p>
+    <h3>Chapter 32: Frameworks are details</h3>
+    <p>A framework author gives you the code and asks for your commitment in return, which the book calls an <em>asymmetric marriage</em>: you make a big commitment and they make none. So hold frameworks at arm&rsquo;s length. Do not let your business objects inherit from framework base classes, and do not scatter framework annotations through the core. Wrap and map them at the edge.</p>
+<pre><code>// Bad: the core is married to the persistence framework
+@Entity data class Book(@PrimaryKey val id: String, val title: String)
+
+// Clean: a plain core, with a mapping at the edge
+data class Book(val id: String, val title: String)
+
+@Entity data class BookRow(@PrimaryKey val id: String, val title: String)
+fun BookRow.toDomain() = Book(id, title)
+fun Book.toRow() = BookRow(id, title)</code></pre>
+    <h3>Chapter 33: Case study, video sales</h3>
+    <p>The author works through the architecture of a website that sells videos to individuals and to businesses. Start from the actors (viewer, purchaser, administrator, author) and their use cases, then draw the components: for each use case, a controller, an interactor, a presenter and a view, with entities and a gateway to the database in the middle. Then group them into components along the lines of the boundaries. The chapter's real point is the process: find actors, then use cases, then components, and arrange the arrows so that they all point toward the business rules.</p>
+    <h3>Chapter 34: The missing chapter</h3>
+    <p>Written by guest author Simon Brown, this chapter notes that good design can still be undone by how you implement it. It compares four ways to organise code:</p>
+    <table>
+      <tr><th>Way</th><th>Idea</th><th>Weakness</th></tr>
+      <tr><td>Package by layer</td><td>web, service, data folders</td><td>Does not show what the system does, and everything tends to become public.</td></tr>
+      <tr><td>Package by feature</td><td>one folder per feature</td><td>Better at showing purpose, but boundaries inside can blur.</td></tr>
+      <tr><td>Ports and adapters</td><td>domain inside, adapters outside</td><td>Needs discipline to keep the rule.</td></tr>
+      <tr><td>Package by component</td><td>a component bundles its logic and data access behind one entry point</td><td>Relies on the language to enforce access rules.</td></tr>
+    </table>
+    <p>The warning is about <strong>implementation details</strong>: if everything is <code>public</code>, then the compiler cannot enforce the architecture and a shortcut is one import away. In Kotlin, the <code>internal</code> modifier (visible only in the same module) and separate Gradle modules let the build do this enforcement for you.</p>
+
+    <h2 id="appendix">9. Appendix: Architecture archaeology</h2>
+    <p>The appendix is the author&rsquo;s personal history. He walks through projects from his own career, starting in the early 1970s with hardware that had tiny memories, and moving through the decades. The technologies change completely (from machine code and punched tape to databases and the web), but the architectural problems repeat: how to be independent of the device, how to keep policy apart from mechanism, how to test, and how to survive change. The lesson of the appendix is that these principles are old and have held up, which is a good argument for learning them rather than the framework of the month.</p>
+    <div class="note"><p>I am deliberately general here. The appendix is a story, and the best way to take it in is to read it in the author&rsquo;s own words.</p></div>
+
+    <h2 id="example">10. Putting it together: a small example in Kotlin</h2>
+    <p>Here is a complete, tiny system that follows the Dependency Rule: borrowing a library book. Read it from the inside out.</p>
+<pre><code>// ── 1. Entity (innermost): no imports from anywhere else ─────────────────
+class Book(val id: String, val title: String, var borrowedBy: String? = null) {
+    fun borrow(memberId: String) {
+        check(borrowedBy == null) { "Already borrowed" }
+        borrowedBy = memberId
+    }
+}
+
+// ── 2. Use case: owns the interfaces ("ports") it needs ──────────────────
+interface BookRepository { fun find(id: String): Book?; fun save(book: Book) }
+interface BorrowOutput   { fun borrowed(title: String); fun rejected(reason: String) }
+data class BorrowRequest(val bookId: String, val memberId: String)   // plain data
+
+class BorrowBook(
+    private val books: BookRepository,
+    private val output: BorrowOutput,
+) {
+    fun execute(request: BorrowRequest) {
+        val book = books.find(request.bookId) ?: return output.rejected("No such book")
+        try {
+            book.borrow(request.memberId)
+            books.save(book)
+            output.borrowed(book.title)
+        } catch (e: IllegalStateException) {
+            output.rejected(e.message ?: "Cannot borrow")
+        }
+    }
+}
+
+// ── 3. Interface adapters: implement the ports, convert formats ──────────
+class InMemoryBooks(vararg initial: Book) : BookRepository {
+    private val store = initial.associateBy { it.id }.toMutableMap()
+    override fun find(id: String) = store[id]
+    override fun save(book: Book) { store[book.id] = book }
+}
+
+class ConsolePresenter : BorrowOutput {                        // a humble view of the result
+    override fun borrowed(title: String) = println("You borrowed \"$title\"")
+    override fun rejected(reason: String) = println("Sorry: $reason")
+}
+
+class BorrowController(private val useCase: BorrowBook) {
+    fun onBorrowClicked(bookId: String, memberId: String) =
+        useCase.execute(BorrowRequest(bookId, memberId))
+}
+
+// ── 4. Main: the dirtiest part, wires everything ─────────────────────────
+fun main() {
+    val books      = InMemoryBooks(Book("b1", "Clean Architecture"))
+    val controller = BorrowController(BorrowBook(books, ConsolePresenter()))
+    controller.onBorrowClicked("b1", "m7")     // You borrowed "Clean Architecture"
+    controller.onBorrowClicked("b1", "m8")     // Sorry: Already borrowed
+}</code></pre>
+    <table>
+      <tr><th>Part</th><th>Circle</th><th>Knows about</th></tr>
+      <tr><td><code>Book</code></td><td>Entities</td><td>Nothing else.</td></tr>
+      <tr><td><code>BorrowBook</code>, ports, <code>BorrowRequest</code></td><td>Use cases</td><td>Entities only.</td></tr>
+      <tr><td><code>InMemoryBooks</code>, <code>ConsolePresenter</code>, <code>BorrowController</code></td><td>Interface adapters</td><td>Use cases and entities.</td></tr>
+      <tr><td><code>main</code></td><td>Frameworks and drivers</td><td>Everything, as the one place that is allowed to.</td></tr>
+    </table>
+    <p>Swap the console for an Android screen, or the in-memory map for a database, and nothing from the entity or the use case changes. To test <code>BorrowBook</code>, pass it a fake repository and a recording output; no screen and no database are needed.</p>
+
+    <h2 id="judgement">11. Where I use judgement</h2>
+    <ul>
+      <li><strong>Boundaries cost something.</strong> Interfaces, mappers and separate modules add code. For a small app or a prototype, a plain structure is the right call. The book itself says to watch for the need and not to build every boundary up front.</li>
+      <li><strong>It is a style, not the only one.</strong> The ideas overlap with hexagonal and onion architecture and with many team conventions. Use the Dependency Rule as the core idea and be flexible about the rest.</li>
+      <li><strong>Mapping fatigue.</strong> Converting between entity, row and view model for every feature can feel heavy. Keep separate models where the shapes really differ, and share them where they do not.</li>
+      <li><strong>Platform differences.</strong> Mobile apps, serverless functions and small services each have their own conventions. Kotlin helps with data classes, sealed types, <code>internal</code> and Gradle modules.</li>
+      <li><strong>Examples are dated.</strong> The book is from 2017 and uses Java and C++ examples. The ideas aged better than the code samples.</li>
+      <li><strong>Read the book for the stories.</strong> The anecdotes (FitNesse, the early years, the taxi-and-kittens example) carry much of the persuasion and do not fit in a summary.</li>
+    </ul>
+
+    <h2 id="takeaways">12. Takeaways, checklist and references</h2>
+    <p>Questions I ask when reviewing a design:</p>
+    <ul>
+      <li>If I delete the database or the framework, how much of the business logic has to change?</li>
+      <li>Do all source-code arrows point toward the business rules?</li>
+      <li>Can I run the use cases in a test with no UI and no real storage?</li>
+      <li>Does the top level of the project show <em>what</em> it does, not which framework it uses?</li>
+      <li>Is there a dependency cycle between modules?</li>
+      <li>Is the thing everyone depends on both stable and abstract?</li>
+      <li>Which decisions (database, web, framework) have I made earlier than I had to?</li>
+      <li>Is each boundary earning its cost?</li>
+    </ul>
+    <h3>References</h3>
+    <ul>
+      <li>Robert C. Martin, <em>Clean Architecture: A Craftsman&rsquo;s Guide to Software Structure and Design</em>, Prentice Hall, 2017. <a href="https://www.amazon.com/dp/0134494164" target="_blank" rel="noopener">Amazon</a> &middot; <a href="https://www.informit.com/store/clean-architecture-a-craftsmans-guide-to-software-structure-9780134494166" target="_blank" rel="noopener">InformIT</a></li>
+      <li>Robert C. Martin, <a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank" rel="noopener">The Clean Architecture</a>, 13 August 2012.</li>
+      <li>My other posts: <a href="clean-code-summary.html">Clean Code, Distilled</a>, <a href="solid-principles-explained.html">Designing for Change: The SOLID Principles</a> and <a href="design-docs-guide.html">Write It Before You Build It</a>.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Architecture</td><td>The shape of a system that makes it cheap to build, change and run.</td></tr>
+      <tr><td>Dependency Rule</td><td>Source code may only depend on things closer to the business rules.</td></tr>
+      <tr><td>Entity</td><td>An object holding core business rules that would exist without the application.</td></tr>
+      <tr><td>Use case</td><td>An application-specific rule describing one thing a user can do.</td></tr>
+      <tr><td>Boundary</td><td>A line between two parts, crossed through an interface.</td></tr>
+      <tr><td>Port / Adapter</td><td>An interface owned by the core, and the outer code that implements it.</td></tr>
+      <tr><td>Humble Object</td><td>A hard-to-test part made so simple that it barely needs tests.</td></tr>
+      <tr><td>Component</td><td>An independently deployable unit, such as a Gradle module or a jar.</td></tr>
+      <tr><td>Stability (I)</td><td>How hard a component is to change, measured by what depends on it.</td></tr>
+      <tr><td>Screaming architecture</td><td>A structure whose top level reveals what the system is for.</td></tr>
+      <tr><td>Main component</td><td>The entry point that creates and connects everything.</td></tr>
+      <tr><td>Firmware</td><td>Software so tied to hardware that it cannot outlive it.</td></tr>
+    </table>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

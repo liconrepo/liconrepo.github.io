@@ -78,6 +78,12 @@
     .toc ol { margin: 8px 0 0 20px; }
     .toc a { color: var(--sub); text-decoration: none; }
     .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 
     .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
     .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
@@ -197,8 +203,8 @@
       </ul>
     </div>
 
-    <div class="toc" role="navigation" aria-label="Contents">
-      <strong>Contents of Part 5</strong>
+    <details class="toc">
+      <summary><strong>Contents of Part 5</strong></summary>
       <ol>
         <li><a href="#loop">How Claude actually works: the loop</a></li>
         <li><a href="#phases">Explore, plan, implement, commit</a></li>
@@ -211,7 +217,7 @@
         <li><a href="#fix">When something goes wrong</a></li>
         <li><a href="#end5">Wrap-up and glossary</a></li>
       </ol>
-    </div>
+    </details>
 
     <h2 id="loop">1. How Claude actually works: the loop</h2>
     <p>The official docs describe three phases that blend together: <strong>gather context</strong>, <strong>take action</strong> and <strong>verify results</strong>. A question about your code might need only the first. A bug fix cycles through all three repeatedly. Claude decides what each step needs from what it learned in the previous one, and you can step in at any moment.</p>

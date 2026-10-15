@@ -78,6 +78,12 @@
     .toc ol { margin: 8px 0 0 20px; }
     .toc a { color: var(--sub); text-decoration: none; }
     .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 
     .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
     .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
@@ -222,8 +228,8 @@
       </ul>
     </div>
 
-    <div class="toc" role="navigation" aria-label="Contents">
-      <strong>Contents of Part 1</strong>
+    <details class="toc">
+      <summary><strong>Contents of Part 1</strong></summary>
       <ol>
         <li><a href="#what">What is Claude?</a></li>
         <li><a href="#interfaces">The official ways to use it</a></li>
@@ -235,7 +241,7 @@
         <li><a href="#settings">Settings files and where they live</a></li>
         <li><a href="#next">What comes next</a></li>
       </ol>
-    </div>
+    </details>
 
     <h2 id="what">1. What is Claude?</h2>
     <p><strong>Claude</strong> is a family of AI models made by Anthropic. You give it text (and, for some uses, images or files), and it writes text back: answers, explanations, summaries, and code. Under the hood it is a large language model, the same kind of &ldquo;very fancy autocomplete&rdquo; I described in my <a href="private-ai-chat-android.html">Android AI chat post</a>. It reads your input as tokens, and writes a reply one token at a time.</p>
@@ -473,6 +479,19 @@ $currentPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
 # or start there
 claude --permission-mode plan</code></pre>
     <p>To make plan mode the default for a project's terminal sessions, set <code>"defaultMode": "plan"</code> under <code>permissions</code> in <code>.claude/settings.json</code>.</p>
+    <div class="note">
+      <p><strong>Tips for plan mode</strong></p>
+      <ul>
+        <li><strong>Use plan mode to prepare for a complex request before making changes.</strong> A wrong assumption fixed in the plan costs a sentence, not twenty rewritten files.</li>
+        <li><strong>Start there in code you do not know.</strong> Ask Claude to explore and explain first, then ask for the change.</li>
+        <li><strong>Read the plan like a code review.</strong> Check which files it will touch and whether the steps are in a sensible order before you approve.</li>
+        <li><strong>Reply with changes, not just a yes.</strong> Choose &ldquo;No, keep planning&rdquo; and say what to adjust, for example &ldquo;do not touch the database layer&rdquo;.</li>
+        <li><strong>Edit the plan yourself.</strong> Press <code>Ctrl+G</code> to open it in your text editor.</li>
+        <li><strong>Ask for tests in the plan.</strong> A step like &ldquo;add tests for the three cases&rdquo; gives you a way to check the result afterwards.</li>
+        <li><strong>Save a plan you will need tomorrow.</strong> Ask Claude to write it to a file, because the plan disappears with the session.</li>
+        <li><strong>Skip it for tiny edits.</strong> A one-line fix or a rename does not need a plan.</li>
+      </ul>
+    </div>
     <div class="callout">
       <strong>Plan mode does not remember anything</strong>
       <p>Plan mode controls what Claude may <em>do</em>, not what it <em>remembers</em>. The plan lives in the conversation and is gone when you close the session or run <code>/clear</code>. If tomorrow continues the work, ask Claude to save the plan to a file such as <code>docs/features/my-feature.md</code> and link it from CLAUDE.md (Part 3).</p>

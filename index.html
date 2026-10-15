@@ -506,6 +506,11 @@
     .tag .si { width: 14px; height: 14px; flex-shrink: 0; opacity: .65; filter: invert(1); }
 
     /* ────────────────── BLOG ────────────────── */
+    .blog-cat { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .blog-cat.first { margin-top: 0; }
+    .blog-cat .bc-title { font-size: calc(15px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.2px; }
+    .blog-cat .bc-sub { font-size: calc(12px * var(--fs, 1)); color: var(--muted); }
+    .blog-cat + .archive-btn, .blog-cat + #archiveBtn { margin-top: 0; }
     .blog-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
     .blog-card {
       background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -848,7 +853,7 @@
       <div class="stat-label">Companies</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" data-count="38">0</div>
+      <div class="stat-num" data-count="42">0</div>
       <div class="stat-label">Technical Blogs</div>
     </div>
     <div class="stat-card">
@@ -1066,6 +1071,46 @@
   <div class="container">
     <p class="section-label">Technical Writing</p>
 
+    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">5 posts</span></p>
+    <div class="blog-grid new-grid">
+      <a href="blog/clean-architecture-summary.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Clean Architecture, Chapter by Chapter: A Kotlin Companion to Uncle Bob&rsquo;s Guide</div>
+        <div class="blog-summary">All chapters of <em>Clean Architecture</em> plus the 2012 article, with diagrams and Kotlin examples for the Dependency Rule, boundaries, components and details.</div>
+        <div class="blog-tags"><span class="blog-tag">Clean Architecture</span><span class="blog-tag">Book summary</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Software design</span></div>
+        <div class="blog-footer"><span class="views-badge">~45 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+      <a href="blog/clean-code-summary.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Clean Code, Distilled: What I Learned from Robert C. Martin&rsquo;s Classic</div>
+        <div class="blog-summary">My summary of all 17 chapters of <em>Clean Code</em>, from names and functions to error handling, classes, concurrency and smells, each with a bad and a clean Kotlin example, plus where to get the book.</div>
+        <div class="blog-tags"><span class="blog-tag">Clean Code</span><span class="blog-tag">Book summary</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Refactoring</span></div>
+        <div class="blog-footer"><span class="views-badge">~40 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+      <a href="blog/design-docs-guide.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Write It Before You Build It: A Practical Guide to Design Docs</div>
+        <div class="blog-summary">What a design doc is, what goes in it, a full worked example, a template you can copy, the benefits and costs, and when not to write one.</div>
+        <div class="blog-tags"><span class="blog-tag">Design docs</span><span class="blog-tag">Software design</span><span class="blog-tag">Teamwork</span><span class="blog-tag">Templates</span></div>
+        <div class="blog-footer"><span class="views-badge">~15 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+      <a href="blog/solid-principles-explained.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Designing for Change: The SOLID Principles, Explained and Practised</div>
+        <div class="blog-summary">The five SOLID design principles in plain words: one diagram and one small Kotlin example each, plus exercises with tests that you open in the Kotlin Playground and fix yourself.</div>
+        <div class="blog-tags"><span class="blog-tag">SOLID</span><span class="blog-tag">Design principles</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Clean code</span></div>
+        <div class="blog-footer"><span class="views-badge">~30 min with exercises</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+      <a href="blog/private-ai-chat-android.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article</div>
+        <div class="blog-title">Building a private AI chat app for Android: local models, online models, and shipping to Google Play</div>
+        <div class="blog-summary">How a chat app can run a language model on the phone, call an online model, fall back between them, and reach the Play Store: the theory, the architecture, a tiny model of your own, and the pitfalls.</div>
+        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">On-device AI</span><span class="blog-tag">llama.cpp</span><span class="blog-tag">Google Play</span></div>
+        <div class="blog-footer"><span class="views-badge">~25 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+    </div>
+
+    <p class="blog-cat"><span class="bc-title">Series</span><span class="bc-sub">2 series, 14 parts</span></p>
     <div class="blog-grid new-grid">
       <div class="series-card reveal">
         <div class="blog-idx">Series &middot; 6 parts<span class="blog-new">NEW</span></div>
@@ -1161,17 +1206,11 @@
         <div class="blog-tags"><span class="blog-tag">Claude Code</span><span class="blog-tag">CLAUDE.md</span><span class="blog-tag">Tokens</span><span class="blog-tag">MCP</span><span class="blog-tag">GitHub Actions</span><span class="blog-tag">Claude API</span></div>
         <div class="blog-footer"><span class="views-badge">~3 hours of reading</span><span class="blog-date">Oct 2026</span></div>
       </div>
-      <a href="blog/private-ai-chat-android.html" class="blog-card featured reveal">
-        <div class="blog-idx">Earlier</div>
-        <div class="blog-title">Building a private AI chat app for Android: local models, online models, and shipping to Google Play</div>
-        <div class="blog-summary">How a chat app can run a language model on the phone, call an online model, fall back between them, and reach the Play Store: the theory, the architecture, a tiny model of your own, and the pitfalls.</div>
-        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">On-device AI</span><span class="blog-tag">llama.cpp</span><span class="blog-tag">Google Play</span></div>
-        <div class="blog-footer"><span class="views-badge">~25 min read</span><span class="blog-date">Oct 2026</span></div>
-      </a>
     </div>
 
+    <p class="blog-cat"><span class="bc-title">Archive</span><span class="bc-sub">23 earlier posts on Viblo</span></p>
     <button type="button" class="archive-btn" id="archiveBtn" aria-expanded="false" aria-controls="archive">
-      <span>Archive &middot; 23 earlier posts from Viblo</span><span class="chev">&#9662;</span>
+      <span>Show the 23 archived posts</span><span class="chev">&#9662;</span>
     </button>
 
     <div id="archive" hidden>

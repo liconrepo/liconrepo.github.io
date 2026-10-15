@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Write It Before You Build It: A Practical Guide to Design Docs — Khairul Alam</title>
+  <meta name="description" content="What a design doc is, what goes in it, a full worked example, a copy-ready template, the benefits, the costs, and when not to write one." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+
+
+<main>
+  <article>
+    <p class="kicker">Software engineering &middot; For beginners</p>
+    <h1>Write It Before You Build It: A Practical Guide to Design Docs</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~15 min read</span></div>
+    <div class="tags"><span class="tag">Design docs</span><span class="tag">Software design</span><span class="tag">Teamwork</span><span class="tag">Templates</span></div>
+
+    <p class="lede">Most expensive mistakes in software are not typos. They are the wrong thing built well, or the right thing built in a way that nobody else agreed with. A design doc is a short document you write <em>before</em> you build, so those mistakes show up while they still cost a paragraph instead of a month. This post covers what goes in one, a complete example, a template you can copy, the benefits, the costs, and the cases where you should not write one.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>A design doc explains <em>what</em> you plan to build, <em>why</em>, and <em>how</em>, and what else you considered.</li>
+        <li>Its main job is to get feedback while change is still cheap.</li>
+        <li>Good ones are short, name their goals and non-goals, and compare real alternatives.</li>
+        <li>They cost time, and they go stale. Do not write one for small, easy-to-undo work.</li>
+        <li>Ask the other teams the change affects: security, operations, support, product and more. Each sees a risk you cannot.</li>
+        <li>A one-page template and a worked example are below.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#what">What a design doc is</a></li>
+        <li><a href="#lifecycle">How a design doc lives</a></li>
+        <li><a href="#anatomy">What goes inside</a></li>
+        <li><a href="#example">A worked example</a></li>
+        <li><a href="#reviews">Reviews from other teams</a></li>
+        <li><a href="#template">A template you can copy</a></li>
+        <li><a href="#good">What makes one good</a></li>
+        <li><a href="#pros">Benefits</a></li>
+        <li><a href="#cons">Costs and common failures</a></li>
+        <li><a href="#when-not">When not to write one</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="what">1. What a design doc is</h2>
+    <p>A design doc is a written plan for a change, shared with the people who will be affected by it before the work starts. It is not a specification that predicts every detail, and it is not documentation of finished code. It is a thinking tool: writing forces you to find the gaps, and sharing it lets other people find the ones you missed.</p>
+    <div class="analogy">
+      <p><strong>Analogy.</strong> An architect draws plans before the builders pour concrete. Moving a wall on paper takes an eraser. Moving it after the walls are up takes a demolition crew. A design doc is the paper stage.</p>
+    </div>
+    <p>It is usually a page or three, written in plain language. If you can explain the idea to a new teammate without opening the code, you are close to a good doc.</p>
+
+    <h2 id="lifecycle">2. How a design doc lives</h2>
+    <p>The document is not a one-off. It moves through a few simple stages, and the most valuable ones are the middle two: review and decision.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Five steps in a row: Idea, Draft, Review, Decide, Build, with an arrow looping from Build back to the doc labelled update when reality changes.">
+        <rect class="box"  x="14"  y="30" width="96" height="48" rx="12"/><text class="b c" x="62"  y="59">Idea</text>
+        <rect class="boxb" x="136" y="30" width="96" height="48" rx="12"/><text class="b c" x="184" y="59">Draft</text>
+        <rect class="boxo" x="258" y="30" width="96" height="48" rx="12"/><text class="b c" x="306" y="59">Review</text>
+        <rect class="boxp" x="380" y="30" width="96" height="48" rx="12"/><text class="b c" x="428" y="59">Decide</text>
+        <rect class="boxg" x="502" y="30" width="124" height="48" rx="12"/><text class="b c" x="564" y="59">Build</text>
+        <path class="arrow" d="M112,54 L132,54"/><path class="arrow" d="M234,54 L254,54"/><path class="arrow" d="M356,54 L376,54"/><path class="arrow" d="M478,54 L498,54"/>
+        <path class="rule" d="M564,80 L564,118 L184,118 L184,82" style="marker-end:url(#arr)"/>
+        <text class="sub c" x="374" y="138">Update the doc when reality changes the plan</text>
+      </svg>
+      <figcaption>Review is where the value is. The loop at the bottom keeps the doc from going stale.</figcaption>
+    </figure>
+
+    <h2 id="anatomy">3. What goes inside</h2>
+    <p>Different teams use different headings, but the useful ones are always the same. Each answers a question a reader will have.</p>
+    <table>
+      <tr><th>Section</th><th>Question it answers</th></tr>
+      <tr><td>Context</td><td>What is the situation, and why now?</td></tr>
+      <tr><td>Goals</td><td>What must be true when this is done?</td></tr>
+      <tr><td>Non-goals</td><td>What are we deliberately not doing?</td></tr>
+      <tr><td>Proposal</td><td>What exactly will we build, and how will the pieces fit?</td></tr>
+      <tr><td>Alternatives</td><td>What else did we consider, and why not those?</td></tr>
+      <tr><td>Risks</td><td>What could go wrong, and how will we notice?</td></tr>
+      <tr><td>Rollout</td><td>How do we ship it safely and undo it if needed?</td></tr>
+      <tr><td>Open questions</td><td>What do we still not know?</td></tr>
+      <tr><td>Reviews</td><td>Who looked at it, what did they say, and what changed because of it?</td></tr>
+    </table>
+    <div class="note"><p><strong>The two sections people skip:</strong> <em>Non-goals</em> prevent scope creep by writing down what you will not do. <em>Alternatives</em> prove you chose rather than defaulted. Reviewers read these two first.</p></div>
+
+    <h2 id="example">4. A worked example</h2>
+    <p>Here is a small but realistic design doc, shortened to fit. The scenario: an online shop sends the order receipt email during checkout. The numbers are made up for illustration.</p>
+
+    <h3>Design doc: send order receipts asynchronously</h3>
+    <p><strong>Author:</strong> Aiko &nbsp;&middot;&nbsp; <strong>Reviewers:</strong> Product, Security, Operations, Support, QA, Finance, Data &nbsp;&middot;&nbsp; <strong>Status:</strong> In review</p>
+
+    <h3>Context</h3>
+    <p>Checkout calls the email provider and waits for it before showing the &ldquo;order placed&rdquo; page. When the provider is slow, customers wait, and some press the button twice. Last month, 3% of checkouts took longer than 8 seconds, and every one of them was an email delay.</p>
+
+    <h3>Goals</h3>
+    <ul>
+      <li>Checkout never waits on email.</li>
+      <li>Every receipt is still sent at least once, even if the provider is down for an hour.</li>
+    </ul>
+
+    <h3>Non-goals</h3>
+    <ul>
+      <li>Changing the receipt design or wording.</li>
+      <li>Replacing the email provider.</li>
+      <li>Sending SMS or push receipts (a separate project).</li>
+    </ul>
+
+    <h3>Proposal</h3>
+    <p>When an order is saved, we also save a small &ldquo;send receipt&rdquo; job in the same database transaction. A background worker reads pending jobs, sends the email, and marks the job done. Failed jobs retry with growing delays, up to 24 hours, then raise an alert.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Checkout writes an order and a receipt job to the database. A worker reads pending jobs and calls the email provider.">
+        <rect class="boxb" x="14"  y="60" width="116" height="48" rx="12"/><text class="b c" x="72"  y="89">Checkout</text>
+        <rect class="boxg" x="196" y="60" width="140" height="48" rx="12"/><text class="b c" x="266" y="82">Database</text><text class="sub c" x="266" y="98">order + job</text>
+        <rect class="boxo" x="402" y="60" width="100" height="48" rx="12"/><text class="b c" x="452" y="89">Worker</text>
+        <rect class="box"  x="540" y="60" width="86" height="48" rx="12"/><text class="b c" x="583" y="82">Email</text><text class="sub c" x="583" y="98">provider</text>
+        <path class="arrow" d="M132,84 L192,84"/><path class="arrow" d="M402,84 L340,84" style="stroke-dasharray:5 4"/><path class="arrow" d="M504,84 L536,84"/>
+        <text class="sub c" x="162" y="52">1. save</text><text class="sub c" x="372" y="52">2. poll</text><text class="sub c" x="520" y="52">3. send</text>
+        <text class="sub c" x="320" y="146">Checkout returns after step 1. Email problems no longer reach the customer.</text>
+      </svg>
+      <figcaption>Saving the job together with the order means a job cannot be lost if the app crashes in between.</figcaption>
+    </figure>
+
+    <h3>Alternatives considered</h3>
+    <table>
+      <tr><th>Option</th><th>Why not</th></tr>
+      <tr><td>Keep it synchronous, add a shorter timeout</td><td>Fewer slow checkouts, but a timeout means a lost receipt with no retry.</td></tr>
+      <tr><td>Fire and forget in a new thread</td><td>Simple, but a crash or restart silently drops emails.</td></tr>
+      <tr><td>Managed message queue service</td><td>The most robust, but a new system to run for about 200 orders a day. Revisit if volume grows tenfold.</td></tr>
+    </table>
+
+    <h3>Risks</h3>
+    <ul>
+      <li><strong>Duplicate emails</strong> if a retry follows a send that actually worked. Mitigation: store the provider&rsquo;s message id and skip jobs that already have one.</li>
+      <li><strong>Worker stops silently.</strong> Mitigation: alert when the oldest pending job is more than 15 minutes old.</li>
+    </ul>
+
+    <h3>Rollout</h3>
+    <p>Ship behind a flag. Enable for 10% of orders for two days, compare receipt delivery rates, then 100%. To roll back, turn the flag off and checkout returns to the old path.</p>
+
+    <h3>Open questions</h3>
+    <ul>
+      <li>Is 24 hours the right retry limit for the support team?</li>
+      <li>Should the customer see &ldquo;receipt on its way&rdquo; on the confirmation page?</li>
+    </ul>
+
+    <p>Notice what the doc does <em>not</em> contain: no class names, no full code, no framework tutorial. It gives reviewers enough to disagree with the decision, and that is the point.</p>
+
+    <h2 id="reviews">5. Reviews from other teams</h2>
+    <p>Engineers reading an engineering doc will mostly find engineering problems. But the receipt change also touches customer data, on-call duty, the support desk, the budget and the team&rsquo;s schedule. Each of those groups sees a different risk, and only they can see it. Asking them early is much cheaper than hearing from them after launch.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 330" role="img" aria-label="A design doc in the centre with eight reviewer roles around it: product, architect, security, managers, operations, QA, support, finance and data, each with the question they usually ask.">
+        <rect class="boxb" x="240" y="136" width="160" height="58" rx="14"/><text class="b c" x="320" y="162">Design doc</text><text class="sub c" x="320" y="180">one shared page</text>
+        <rect class="boxo" x="8" y="10" width="148" height="58" rx="12"/><text class="b" x="20" y="34">Product</text><text class="sub" x="20" y="54">Right problem?</text>
+        <rect class="boxb" x="168" y="10" width="148" height="58" rx="12"/><text class="b" x="180" y="34">Architect</text><text class="sub" x="180" y="54">Fits the big picture?</text>
+        <rect class="boxr" x="328" y="10" width="148" height="58" rx="12"/><text class="b" x="340" y="34">Security</text><text class="sub" x="340" y="54">Who sees the data?</text>
+        <rect class="boxp" x="488" y="10" width="148" height="58" rx="12"/><text class="b" x="500" y="34">Managers</text><text class="sub" x="500" y="54">Time, people, risk?</text>
+        <rect class="boxg" x="8" y="262" width="148" height="58" rx="12"/><text class="b" x="20" y="286">Operations</text><text class="sub" x="20" y="306">What pages us?</text>
+        <rect class="box" x="168" y="262" width="148" height="58" rx="12"/><text class="b" x="180" y="286">QA and test</text><text class="sub" x="180" y="306">How do we test it?</text>
+        <rect class="boxp" x="328" y="262" width="148" height="58" rx="12"/><text class="b" x="340" y="286">Support</text><text class="sub" x="340" y="306">Can we explain it?</text>
+        <rect class="boxo" x="488" y="262" width="148" height="58" rx="12"/><text class="b" x="500" y="286">Finance, data</text><text class="sub" x="500" y="306">Cost? Measurable?</text>
+        <path class="rule" d="M82,70 L249,134"/>
+        <path class="rule" d="M82,260 L249,196"/>
+        <path class="rule" d="M242,70 L297,134"/>
+        <path class="rule" d="M242,260 L297,196"/>
+        <path class="rule" d="M402,70 L345,134"/>
+        <path class="rule" d="M402,260 L345,196"/>
+        <path class="rule" d="M562,70 L393,134"/>
+        <path class="rule" d="M562,260 L393,196"/>
+      </svg>
+      <figcaption>Eight common reviewers ask eight different questions.</figcaption>
+    </figure>
+
+    <h3>Who to ask, and what they look for</h3>
+    <table>
+      <tr><th>Stakeholder</th><th>Typically checks</th></tr>
+      <tr><td>Product or business owner</td><td>The problem is real, the goals match what customers need, the scope is worth the cost.</td></tr>
+      <tr><td>Architect or tech lead</td><td>The design fits the wider system, reuses existing building blocks, follows agreed standards, and does not make future changes harder.</td></tr>
+      <tr><td>Engineering peers</td><td>The design fits the codebase, is testable, and does not create hidden maintenance work.</td></tr>
+      <tr><td>Teams that use your API or data</td><td>Nothing they depend on changes without warning. This is the <em>compatibility</em> check.</td></tr>
+      <tr><td>Security and privacy</td><td>What personal data is stored, who can read it, how long it is kept, and what an attacker could do.</td></tr>
+      <tr><td>Operations or SRE</td><td>Monitoring, alerts, capacity, runbooks, and how the change fails.</td></tr>
+      <tr><td>QA and test</td><td>That the failure cases can be reproduced and checked before release.</td></tr>
+      <tr><td>Designers (UX)</td><td>Anything the customer sees is clear, consistent and accessible.</td></tr>
+      <tr><td>Customer support</td><td>That support can see what happened to a customer&rsquo;s request and explain it.</td></tr>
+      <tr><td>Data and analytics</td><td>That the success measures can be collected, and that existing reports do not silently break.</td></tr>
+      <tr><td>Finance</td><td>Running cost, vendor fees, and any change to billing.</td></tr>
+      <tr><td>Engineering or project managers</td><td>Effort, timing, staffing, dependencies on other teams, and whether the risk is acceptable for the schedule.</td></tr>
+      <tr><td>Legal or compliance</td><td>Regulations, contracts and data-retention rules, where they apply.</td></tr>
+    </table>
+    <div class="note"><p>You do not need all of them every time. Pick the groups whose work the change could affect. Asking someone who is not affected adds delay and no insight.</p></div>
+
+    <h3>What the reviews looked like for the receipts doc</h3>
+    <p>Here is a realistic set of comments on the example from section 4, and what the author did with each one. Notice that some comments changed the design, some were declined with a reason, and one fixed an open question.</p>
+    <table>
+      <tr><th>Reviewer</th><th>Comment</th><th>Outcome</th></tr>
+      <tr><td>Security</td><td>&ldquo;The job table stores customer email addresses. Who can read it, and how long do we keep it?&rdquo;</td><td><strong>Accepted.</strong> Only the worker can read it. Completed jobs are deleted after 30 days. Added to the Risks section.</td></tr>
+      <tr><td>Architect</td><td>&ldquo;The platform already has a standard retry helper. Can the worker use it instead of custom retry code?&rdquo;</td><td><strong>Accepted.</strong> The worker now uses the platform helper, so the retry delays come from shared code. Proposal section updated.</td></tr>
+      <tr><td>Operations</td><td>&ldquo;An alert is good. Who gets it, and what do they do when it fires?&rdquo;</td><td><strong>Accepted.</strong> Alert goes to the on-call rotation. Added a short runbook and a queue-age dashboard.</td></tr>
+      <tr><td>Support</td><td>&ldquo;Customers ask &lsquo;where is my receipt?&rsquo; Can we see whether it was sent?&rdquo;</td><td><strong>Accepted.</strong> Added a read-only job status view for the support tool. Also answered the open question: yes, show &ldquo;receipt on its way&rdquo; on the confirmation page.</td></tr>
+      <tr><td>Product</td><td>&ldquo;A receipt a day late is not useful for many orders. Is 24 hours right?&rdquo;</td><td><strong>Accepted.</strong> Retry limit reduced to 6 hours, then alert. Open question closed.</td></tr>
+      <tr><td>QA</td><td>&ldquo;How do we test when the provider is down?&rdquo;</td><td><strong>Accepted.</strong> Added a test plan using a fake provider that fails on demand.</td></tr>
+      <tr><td>Finance</td><td>&ldquo;Do retries increase what we pay the email provider?&rdquo;</td><td><strong>Answered, no change.</strong> The provider bills per accepted message, and the duplicate guard prevents double sends. Noted in the doc.</td></tr>
+      <tr><td>Data</td><td>&ldquo;Can we measure the time from order to receipt?&rdquo;</td><td><strong>Accepted.</strong> Added a delivery-delay metric to the success checks.</td></tr>
+      <tr><td>Engineering manager</td><td>&ldquo;This is about two weeks for one engineer, and on-call needs a short briefing. Can it land before the holiday sales freeze?&rdquo;</td><td><strong>Accepted.</strong> Added a timeline: build in two weeks, a 10% rollout in week three, and full rollout only after the freeze ends.</td></tr>
+      <tr><td>Mobile team (uses the order API)</td><td>&ldquo;Does the order response change?&rdquo;</td><td><strong>Answered.</strong> No. Added a Compatibility line to say so.</td></tr>
+      <tr><td>Engineering peer</td><td>&ldquo;Use a managed message queue instead of a database table.&rdquo;</td><td><strong>Declined, with reason.</strong> Already listed under Alternatives: too heavy for about 200 orders a day. Revisit if volume grows tenfold.</td></tr>
+    </table>
+
+    <h3>When reviewers disagree</h3>
+    <p>They will. Support may want receipts retried for as long as possible, while Product wants them dropped after a few hours. Do not average the opinions. Write both down, explain the trade-off, and let the person who owns the decision choose. Then record the outcome in the decision log so nobody reopens it by accident:</p>
+<pre><code>## Decision log
+- 2026-10-12: Retry receipts for 6 hours, then alert a person.
+  Support asked for 24 hours; Product argued a late receipt is not
+  useful. Decided by the Product owner. Revisit if support tickets
+  about missing receipts rise.</code></pre>
+
+    <h3>How to run a review well</h3>
+    <ul>
+      <li><strong>Ask specific people specific questions.</strong> &ldquo;Security, can you check the data retention section?&rdquo; gets better answers than a broadcast to everyone.</li>
+      <li><strong>Set a date.</strong> &ldquo;Comments by Friday&rdquo; stops the doc waiting forever. Silence after the deadline means no objection.</li>
+      <li><strong>Separate blockers from nits.</strong> Ask reviewers to mark which comments must be fixed before building, and which are suggestions.</li>
+      <li><strong>Answer every comment,</strong> even with &ldquo;declined, because&hellip;&rdquo;. People stop reviewing if they feel ignored.</li>
+      <li><strong>Do not get defensive.</strong> A comment about your design is not a comment about you.</li>
+      <li><strong>Track who has approved.</strong> A small sign-off table at the end of the doc shows at a glance who is still outstanding.</li>
+      <li><strong>Talk when text stalls.</strong> After two rounds of back-and-forth, a ten-minute call is faster. Then write the outcome back into the doc.</li>
+    </ul>
+
+    <h2 id="template">6. A template you can copy</h2>
+    <p>Paste this into your wiki, a markdown file in the repository, or a shared document. Delete sections that do not apply, but think twice before deleting <em>Non-goals</em> and <em>Alternatives</em>.</p>
+<pre><code># Design doc: &lt;short, specific title&gt;
+
+Author:     &lt;name&gt;
+Reviewers:  &lt;names&gt;
+Status:     Draft | In review | Approved | Superseded
+Last edit:  &lt;date&gt;
+
+## Summary
+Two or three sentences. What are we doing and why?
+
+## Context
+What is the situation today? What problem hurts, for whom, how much?
+Include numbers or examples if you have them.
+
+## Goals
+- What must be true when this is done? (testable if possible)
+
+## Non-goals
+- What this project deliberately will not do.
+
+## Proposal
+How it works, in plain words. Add one diagram.
+Cover data, interfaces, and how the main pieces talk to each other.
+
+## Alternatives considered
+| Option | Pros | Cons | Why not |
+|--------|------|------|---------|
+
+## Risks and mitigations
+- Risk: ...   Mitigation: ...
+
+## Security, privacy, and cost (if relevant)
+Who can access what? What personal data is involved? What does it cost to run?
+
+## Rollout and rollback
+How do we release it gradually? How do we undo it?
+
+## How we will know it worked
+Metrics, alerts, or checks, and the target for each.
+
+## Open questions
+- Things nobody knows yet, and who will find out.
+
+## Reviews and sign-off
+| Team | Reviewer | Status (pending / approved / concerns) | Notes |
+|------|----------|----------------------------------------|-------|
+
+## Decision log
+- &lt;date&gt;: &lt;what was decided and why&gt;
+</code></pre>
+    <div class="note"><p><strong>Scale the template to the work.</strong> A two-day change may need only Summary, Proposal and Risks, half a page in total. A change touching many teams may need every section.</p></div>
+
+    <h2 id="good">7. What makes one good</h2>
+    <ul>
+      <li><strong>Write for a smart stranger.</strong> Someone from another team, or you in six months, should follow it without a meeting.</li>
+      <li><strong>State the problem before the solution.</strong> If readers disagree about the problem, no solution will satisfy them.</li>
+      <li><strong>Be specific.</strong> &ldquo;Checkout is slow&rdquo; is vague. &ldquo;3% of checkouts take over 8 seconds&rdquo; can be checked.</li>
+      <li><strong>Compare real alternatives,</strong> including doing nothing. A list with one option is a decision announcement, not a design.</li>
+      <li><strong>Use one good diagram</strong> instead of three paragraphs of boxes and arrows in words.</li>
+      <li><strong>Mark what you are unsure about.</strong> Open questions invite help. Hidden doubts become production incidents.</li>
+      <li><strong>Keep it short.</strong> If it reaches ten pages, split it, or move detail into an appendix.</li>
+      <li><strong>Review it like you want yours reviewed:</strong> kindly, with reasons, and aimed at the design, not the author.</li>
+    </ul>
+
+    <h2 id="pros">8. Benefits</h2>
+    <table>
+      <tr><th>Benefit</th><th>What it looks like</th></tr>
+      <tr><td>Cheaper mistakes</td><td>A wrong assumption is fixed in a paragraph, not after a month of code.</td></tr>
+      <tr><td>Clearer thinking</td><td>Writing exposes vague parts. If you cannot explain a step, you do not understand it yet.</td></tr>
+      <tr><td>Shared understanding</td><td>Everyone starts from the same picture, so fewer surprises in code review.</td></tr>
+      <tr><td>Better decisions</td><td>More eyes catch security, cost, and operations concerns early.</td></tr>
+      <tr><td>A memory for the team</td><td>New joiners learn <em>why</em> things are built this way, which code alone cannot tell them.</td></tr>
+      <tr><td>Easier to say no (or yes)</td><td>Debates focus on a page, not on whoever argues the loudest.</td></tr>
+      <tr><td>Asynchronous work</td><td>People in other time zones can contribute without joining a call.</td></tr>
+    </table>
+
+    <h2 id="cons">9. Costs and common failures</h2>
+    <p>Design docs are not free, and bad ones are worse than none. Watch for these:</p>
+    <ul>
+      <li><strong>Time.</strong> A solid doc and its review can take days. If the change takes an hour, the doc costs more than the mistake would.</li>
+      <li><strong>Going stale.</strong> Code changes, the doc does not, and soon it misleads. Mark old docs <em>Superseded</em> or link to the newer one.</li>
+      <li><strong>Paper certainty.</strong> A confident doc can hide guesses. Some things only become clear by building; treat a prototype as a valid way to answer an open question.</li>
+      <li><strong>Doc theatre.</strong> Writing one to satisfy a process, with the decision already made, wastes everyone&rsquo;s time.</li>
+      <li><strong>Review as a bottleneck.</strong> Too many required reviewers, or no deadline for feedback, stalls the work. Name a few reviewers and set a date.</li>
+      <li><strong>Too much detail.</strong> Pseudo-code for every function turns a design doc into a bad program.</li>
+      <li><strong>Hard to find later.</strong> Keep docs in one known place and give them clear titles.</li>
+    </ul>
+
+    <h2 id="when-not">10. When not to write one</h2>
+    <p>Match the weight of the paper to the weight of the decision. Two questions help: <em>how hard is this to undo?</em> and <em>how many people does it affect?</em></p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="A ladder of four steps from a short message, to a short note, to a design doc, to a formal review with an RFC, rising with effort and risk.">
+        <rect class="boxg" x="14"  y="116" width="140" height="56" rx="10"/><text class="b c" x="84"  y="140">Just do it</text><text class="sub c" x="84"  y="158">small, reversible</text>
+        <rect class="boxb" x="170" y="86"  width="140" height="86" rx="10"/><text class="b c" x="240" y="118">Short note</text><text class="sub c" x="240" y="138">a message or</text><text class="sub c" x="240" y="154">a PR description</text>
+        <rect class="boxo" x="326" y="56"  width="140" height="116" rx="10"/><text class="b c" x="396" y="100">Design doc</text><text class="sub c" x="396" y="120">days of work,</text><text class="sub c" x="396" y="136">several people</text>
+        <rect class="boxp" x="482" y="26"  width="144" height="146" rx="10"/><text class="b c" x="554" y="76">Formal review</text><text class="sub c" x="554" y="98">many teams,</text><text class="sub c" x="554" y="114">hard to undo,</text><text class="sub c" x="554" y="130">security or data</text>
+        <text class="sub" x="14" y="20">More effort and risk &rarr;</text>
+      </svg>
+      <figcaption>Do not climb higher than the work needs.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Skip the doc when&hellip;</th><th>Do this instead</th></tr>
+      <tr><td>The change is small and easy to undo (a bug fix, a rename, a copy tweak)</td><td>Explain it in the PR description.</td></tr>
+      <tr><td>The problem is well known and the solution is obvious to everyone</td><td>Post a two-line message and move on.</td></tr>
+      <tr><td>You do not yet know what is possible</td><td>Build a quick throwaway prototype, then write up what you learned.</td></tr>
+      <tr><td>It is a personal project or a one-day experiment</td><td>Keep a few notes for yourself.</td></tr>
+      <tr><td>An emergency fix is needed now</td><td>Fix first, write the short post-incident note after.</td></tr>
+      <tr><td>The doc would only record a decision already final</td><td>Write a short decision record, not a design doc.</td></tr>
+    </table>
+    <div class="note"><p><strong>Rule of thumb:</strong> write one when the work will take more than a few days, touches other people&rsquo;s code or data, is hard to reverse, or you find yourself explaining it more than twice.</p></div>
+
+    <h2 id="takeaways">11. Takeaways and glossary</h2>
+    <ul>
+      <li>A design doc is a cheap way to find expensive mistakes early.</li>
+      <li>Put real effort into goals, non-goals and alternatives. They are what reviewers read first.</li>
+      <li>Keep it short, specific and honest about what is unknown.</li>
+      <li>Scale it to the work, and skip it when the change is small or easy to undo.</li>
+      <li>Treat it as a living document, and retire it when it is out of date.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Design doc</td><td>A written plan for a change, shared for feedback before building.</td></tr>
+      <tr><td>Goal / non-goal</td><td>What the project must achieve, and what it deliberately will not do.</td></tr>
+      <tr><td>Alternative</td><td>Another way to solve the same problem, with the reason it was not chosen.</td></tr>
+      <tr><td>RFC</td><td>&ldquo;Request for comments&rdquo;: a design doc shared widely, often across teams.</td></tr>
+      <tr><td>Decision record</td><td>A short note capturing one decision and why it was made.</td></tr>
+      <tr><td>Stakeholder</td><td>Anyone whose work or customers are affected by the change.</td></tr>
+      <tr><td>Sign-off</td><td>A reviewer&rsquo;s recorded approval that their concerns are addressed.</td></tr>
+      <tr><td>Blocking comment</td><td>A review comment that must be resolved before the work can start.</td></tr>
+      <tr><td>Rollout / rollback</td><td>Releasing a change gradually, and the plan for undoing it.</td></tr>
+      <tr><td>Feature flag</td><td>A switch that turns a new behaviour on or off without a new release.</td></tr>
+      <tr><td>Prototype</td><td>A quick, disposable build used to answer a question.</td></tr>
+    </table>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

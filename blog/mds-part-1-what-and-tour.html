@@ -78,6 +78,12 @@
     .toc ol { margin: 8px 0 0 20px; }
     .toc a { color: var(--sub); text-decoration: none; }
     .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 
     .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
     .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
@@ -192,7 +198,10 @@
 
 <div class="repo"><p><strong>Working code.</strong> Everything in this post exists and runs in the reference repository: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Clone it and follow along; the docs are also published at <a href="https://liconrepo.github.io/MobileDesignSystem/" target="_blank" rel="noopener">liconrepo.github.io/MobileDesignSystem</a>.</p><p>Files for this part:</p><ul><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/README.md" target="_blank" rel="noopener"><code>README.md</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/docs/layers.md" target="_blank" rel="noopener"><code>docs/layers.md</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/docs/principles.md" target="_blank" rel="noopener"><code>docs/principles.md</code></a></li></ul></div>
 
-<div class="toc"><strong>In this part</strong><ol><li><a href="#what">What a design system actually is</a></li><li><a href="#why">Why teams build one</a></li><li><a href="#ideas">Two ideas that organise the example</a></li><li><a href="#tour">A tour of the working repo</a></li><li><a href="#principles">The ground rules this series follows</a></li><li><a href="#next">What comes next</a></li></ol></div>
+<details class="toc">
+      <summary><strong>In this part</strong></summary>
+      <ol><li><a href="#what">What a design system actually is</a></li><li><a href="#why">Why teams build one</a></li><li><a href="#ideas">Two ideas that organise the example</a></li><li><a href="#tour">A tour of the working repo</a></li><li><a href="#principles">The ground rules this series follows</a></li><li><a href="#next">What comes next</a></li></ol>
+    </details>
 
 <div class="callout">
   <strong>Part 1 in 60 seconds</strong>

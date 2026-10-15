@@ -78,6 +78,12 @@
     .toc ol { margin: 8px 0 0 20px; }
     .toc a { color: var(--sub); text-decoration: none; }
     .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 
     .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
     .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
@@ -192,7 +198,10 @@
 
 <div class="repo"><p><strong>Working code.</strong> Everything in this post exists and runs in the reference repository: <a href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">github.com/liconrepo/MobileDesignSystem</a>. Clone it and follow along; the docs are also published at <a href="https://liconrepo.github.io/MobileDesignSystem/" target="_blank" rel="noopener">liconrepo.github.io/MobileDesignSystem</a>.</p><p>Files for this part:</p><ul><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_palette.xml" target="_blank" rel="noopener"><code>res/values/mds_palette.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_colors.xml" target="_blank" rel="noopener"><code>res/values/mds_colors.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values-night/mds_colors.xml" target="_blank" rel="noopener"><code>res/values-night/mds_colors.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/res/values/mds_themes.xml" target="_blank" rel="noopener"><code>res/values/mds_themes.xml</code></a></li><li><a href="https://github.com/liconrepo/MobileDesignSystem/blob/main/designsystem/src/main/java/io/github/liconrepo/mds/perceptual/Theming.kt" target="_blank" rel="noopener"><code>perceptual/Theming.kt</code></a></li></ul></div>
 
-<div class="toc"><strong>In this part</strong><ol><li><a href="#problem">The problem tokens solve</a></li><li><a href="#tier1">Tier 1: primitive tokens</a></li><li><a href="#tier2">Tier 2: semantic tokens</a></li><li><a href="#tier3">Tier 3: theme attributes</a></li><li><a href="#brands">A second brand in five lines</a></li><li><a href="#contrast">Checking contrast with arithmetic</a></li><li><a href="#pitfalls">Two traps worth knowing</a></li></ol></div>
+<details class="toc">
+      <summary><strong>In this part</strong></summary>
+      <ol><li><a href="#problem">The problem tokens solve</a></li><li><a href="#tier1">Tier 1: primitive tokens</a></li><li><a href="#tier2">Tier 2: semantic tokens</a></li><li><a href="#tier3">Tier 3: theme attributes</a></li><li><a href="#brands">A second brand in five lines</a></li><li><a href="#contrast">Checking contrast with arithmetic</a></li><li><a href="#pitfalls">Two traps worth knowing</a></li></ol>
+    </details>
 
 <div class="callout">
   <strong>Part 2 in 60 seconds</strong>

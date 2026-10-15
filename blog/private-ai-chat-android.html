@@ -76,6 +76,12 @@
     .toc ol { margin: 8px 0 0 20px; }
     .toc a { color: var(--sub); text-decoration: none; }
     .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 
     .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
     .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
@@ -154,8 +160,8 @@
       </ul>
     </div>
 
-    <div class="toc" role="navigation" aria-label="Contents">
-      <strong>Contents</strong>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
       <ol>
         <li><a href="#big-picture">The big picture</a></li>
         <li><a href="#how-it-works">How an AI chat actually works</a></li>
@@ -172,7 +178,7 @@
         <li><a href="#limits">Limitations</a></li>
         <li><a href="#takeaways">Takeaways and glossary</a></li>
       </ol>
-    </div>
+    </details>
 
     <!-- 1 -->
     <h2 id="big-picture">1. The big picture</h2>

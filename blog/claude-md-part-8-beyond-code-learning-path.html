@@ -78,6 +78,12 @@
     .toc ol { margin: 8px 0 0 20px; }
     .toc a { color: var(--sub); text-decoration: none; }
     .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 
     .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
     .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
@@ -196,8 +202,8 @@
       </ul>
     </div>
 
-    <div class="toc" role="navigation" aria-label="Contents">
-      <strong>Contents of Part 8</strong>
+    <details class="toc">
+      <summary><strong>Contents of Part 8</strong></summary>
       <ol>
         <li><a href="#apps">The Claude apps</a></li>
         <li><a href="#help">What the apps can do, and where it is explained</a></li>
@@ -210,7 +216,7 @@
         <li><a href="#cheat">One-page cheat sheet</a></li>
         <li><a href="#end8">Series wrap-up</a></li>
       </ol>
-    </div>
+    </details>
 
     <h2 id="apps">1. The Claude apps</h2>
     <p>Back in Part 1 I separated <strong>Claude</strong> (the models) from <strong>Claude Code</strong> (a coding assistant that works in your project). The consumer door to the same models is the <strong>Claude apps</strong>: claude.ai in a browser, the desktop app, and the mobile apps. You sign in with a Claude account and chat. Anthropic's Help Center has a short "Get started with Claude" collection that covers the basics, including <a href="https://support.claude.com/en/articles/8461763-where-can-i-access-claude" target="_blank" rel="noopener">where you can access Claude</a>, <a href="https://support.claude.com/en/articles/8114487-what-interfaces-can-i-use-to-access-claude" target="_blank" rel="noopener">what interfaces you can use</a>, and <a href="https://support.claude.com/en/articles/7996845-what-are-some-things-i-can-use-claude-for" target="_blank" rel="noopener">what you can use Claude for</a>.</p>

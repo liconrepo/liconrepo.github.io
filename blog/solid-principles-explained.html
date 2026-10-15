@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Designing for Change: The SOLID Principles, Explained and Practised — Khairul Alam</title>
+  <meta name="description" content="The five SOLID design principles in plain words: one picture and one small Kotlin example for each, showing the problem, the fix and when not to bother." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+
+<main>
+  <article>
+    <p class="kicker">Software design &middot; For beginners</p>
+    <h1>Designing for Change: The SOLID Principles, Explained and Practised</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~30 min with exercises</span></div>
+    <div class="tags"><span class="tag">SOLID</span><span class="tag">Design principles</span><span class="tag">Kotlin</span><span class="tag">Clean code</span></div>
+
+    <p class="lede">Every programmer has opened a file where changing one small thing breaks three others. SOLID is a set of five habits that make that happen less often. Each habit is simple on its own. This post gives you one picture and one small example for each, in Kotlin, though the ideas work in any language.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li><strong>S</strong>: A class should have one reason to change.</li>
+        <li><strong>O</strong>: Add new behaviour by adding code, not by editing old code.</li>
+        <li><strong>L</strong>: A child class must work anywhere its parent works.</li>
+        <li><strong>I</strong>: Do not force a class to depend on methods it does not use.</li>
+        <li><strong>D</strong>: Depend on a small contract, not on a concrete tool.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#why">Why design matters</a></li>
+        <li><a href="#s">S: Single Responsibility</a></li>
+        <li><a href="#o">O: Open/Closed</a></li>
+        <li><a href="#l">L: Liskov Substitution</a></li>
+        <li><a href="#i">I: Interface Segregation</a></li>
+        <li><a href="#d">D: Dependency Inversion</a></li>
+        <li><a href="#together">All five working together</a></li>
+        <li><a href="#overdo">When not to apply SOLID</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <div class="callout">
+      <strong>Practice is built in</strong>
+      <p>Every principle ends with a <em>Try it</em> box: a small Kotlin program with tests that print <code>PASS</code> or <code>FAIL</code>. Each has a button that opens it in the free Kotlin Playground in a new tab, where you can edit and run it. There is also a hint and a solution if you get stuck. Nothing is sent anywhere until you click the button.</p>
+    </div>
+
+    <h2 id="why">1. Why design matters</h2>
+    <p>Code is read and changed far more often than it is written. Bad structure makes every change risky, because you cannot tell what else will move. SOLID is not a law, it is a set of warning signs and cures. Think of a kitchen: a good one has separate stations, tools you can swap, and nothing that only works with one brand of oven.</p>
+    <div class="analogy">
+      <p><strong>Running example.</strong> We will use a tiny online shop. A customer places an order, we apply a discount, take a payment, save the order and send a receipt. Simple, and it goes wrong in all five ways.</p>
+    </div>
+
+    <h2 id="s">2. S: Single Responsibility Principle</h2>
+    <p><strong>A class should have only one reason to change.</strong> If the tax rules change <em>and</em> the email wording changes <em>and</em> the database changes, and all three force you to edit the same class, that class has too many jobs.</p>
+    <h3>The problem</h3>
+<pre><code>class OrderService {
+    fun placeOrder(order: Order) {
+        if (order.items.isEmpty()) error("Empty order")   // validation
+        val total = order.items.sumOf { it.price }        // pricing
+        database.save(order, total)                       // storage
+        mailer.send(order.email, "Thanks! You paid $total") // notification
+    }
+}</code></pre>
+    <p>This one function validates, prices, stores and emails. Four different people could ask you to change it for four different reasons.</p>
+    <h3>The fix: one job per class</h3>
+<pre><code>class OrderValidator { fun check(order: Order) { if (order.items.isEmpty()) error("Empty order") } }
+class PriceCalculator { fun total(order: Order) = order.items.sumOf { it.price } }
+class OrderRepository { fun save(order: Order, total: Double) { /* database */ } }
+class ReceiptSender { fun send(order: Order, total: Double) { /* email */ } }
+
+class OrderService(
+    private val validator: OrderValidator,
+    private val pricing: PriceCalculator,
+    private val repository: OrderRepository,
+    private val receipts: ReceiptSender,
+) {
+    fun placeOrder(order: Order) {
+        validator.check(order)
+        val total = pricing.total(order)
+        repository.save(order, total)
+        receipts.send(order, total)
+    }
+}</code></pre>
+    <p><code>OrderService</code> now only <em>coordinates</em>. A new email design touches <code>ReceiptSender</code> and nothing else.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Left: one big box doing four jobs. Right: a coordinator calling four small single-purpose boxes.">
+        <rect class="boxr" x="20" y="30" width="200" height="150" rx="14"/>
+        <text class="b c" x="120" y="58">OrderService</text>
+        <text class="sub c" x="120" y="88">validate</text><text class="sub c" x="120" y="110">price</text><text class="sub c" x="120" y="132">save</text><text class="sub c" x="120" y="154">email</text>
+        <text class="b c" x="120" y="208">Before: four reasons to change</text>
+        <rect class="boxb" x="300" y="80" width="110" height="52" rx="12"/><text class="b c" x="355" y="111">OrderService</text>
+        <rect class="boxg" x="500" y="12" width="124" height="38" rx="10"/><text class="c" x="562" y="36">Validator</text>
+        <rect class="boxg" x="500" y="62" width="124" height="38" rx="10"/><text class="c" x="562" y="86">PriceCalculator</text>
+        <rect class="boxg" x="500" y="112" width="124" height="38" rx="10"/><text class="c" x="562" y="136">Repository</text>
+        <rect class="boxg" x="500" y="162" width="124" height="38" rx="10"/><text class="c" x="562" y="186">ReceiptSender</text>
+        <path class="arrow" d="M412,100 L496,32"/><path class="arrow" d="M412,104 L496,82"/><path class="arrow" d="M412,110 L496,132"/><path class="arrow" d="M412,116 L496,182"/>
+        <text class="b c" x="460" y="224">After: one job each</text>
+      </svg>
+      <figcaption>Split by <em>reason to change</em>, not by size. Small classes are a result, not the goal.</figcaption>
+    </figure>
+    <div class="note"><p><strong>Quick test:</strong> describe the class in one sentence without using the word &ldquo;and&rdquo;. If you cannot, it probably does too much.</p></div>
+
+
+    <div class="try">
+      <h3>Try it: split the monolith</h3>
+      <p>The tests fail at first because the validator and calculator are empty. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class OrderValidator {
+    fun check(order: Order) { TODO("move the validation here") }
+}
+
+class PriceCalculator {
+    fun total(order: Order): Double { TODO("move the pricing here") }
+}
+
+class OrderService {
+    fun placeOrder(order: Order): Double {
+        if (order.items.isEmpty()) error("Empty order")   // validation
+        val total = order.items.sumOf { it.price }        // pricing
+        println("saved order, total = $total")            // storage
+        return total
+    }
+}</code></pre>
+      <a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-split-the-monolith">Open in Kotlin Playground &#8599;</a>
+      <script type="text/plain" id="pg-split-the-monolith">data class Item(val name: String, val price: Double)
+data class Order(val items: List<Item>)
+
+fun same(a: Double, b: Double) = Math.abs(a - b) < 1e-9
+
+fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+class OrderValidator {
+    fun check(order: Order) { TODO("move the validation here") }
+}
+
+class PriceCalculator {
+    fun total(order: Order): Double { TODO("move the pricing here") }
+}
+
+class OrderService {
+    fun placeOrder(order: Order): Double {
+        if (order.items.isEmpty()) error("Empty order")   // validation
+        val total = order.items.sumOf { it.price }        // pricing
+        println("saved order, total = $total")            // storage
+        return total
+    }
+}
+
+fun main() {
+    val order = Order(listOf(Item("pen", 10.0), Item("book", 20.0)))
+
+    test("validator rejects an empty order") {
+        val problem = runCatching { OrderValidator().check(Order(emptyList())) }.exceptionOrNull()
+        check(problem is IllegalStateException) { "expected an 'Empty order' error, got $problem" }
+    }
+    test("price calculator adds the items") {
+        check(same(PriceCalculator().total(order), 30.0)) { "wrong total" }
+    }
+    test("service still places the order") {
+        check(same(OrderService().placeOrder(order), 30.0)) { "wrong total" }
+    }
+}
+</script>
+      <details><summary>Hint</summary>
+        <p>Copy each commented line into the class named for it. Make <code>OrderService</code> call them. The tests only check behaviour, so the real goal is the structure.</p>
+      </details>
+      <details><summary>See the tests</summary>
+<pre><code>fun main() {
+    val order = Order(listOf(Item("pen", 10.0), Item("book", 20.0)))
+
+    test("validator rejects an empty order") {
+        val problem = runCatching { OrderValidator().check(Order(emptyList())) }.exceptionOrNull()
+        check(problem is IllegalStateException) { "expected an 'Empty order' error, got $problem" }
+    }
+    test("price calculator adds the items") {
+        check(same(PriceCalculator().total(order), 30.0)) { "wrong total" }
+    }
+    test("service still places the order") {
+        check(same(OrderService().placeOrder(order), 30.0)) { "wrong total" }
+    }
+}</code></pre>
+      </details>
+      <details><summary>Show a solution</summary>
+<pre><code>class OrderValidator {
+    fun check(order: Order) { if (order.items.isEmpty()) error("Empty order") }
+}
+
+class PriceCalculator {
+    fun total(order: Order): Double = order.items.sumOf { it.price }
+}
+
+class OrderService(
+    private val validator: OrderValidator = OrderValidator(),
+    private val pricing: PriceCalculator = PriceCalculator(),
+) {
+    fun placeOrder(order: Order): Double {
+        validator.check(order)
+        val total = pricing.total(order)
+        println("saved order, total = $total")
+        return total
+    }
+}</code></pre>
+      </details>
+    </div>
+
+    <h2 id="o">3. O: Open/Closed Principle</h2>
+    <p><strong>Code should be open for extension but closed for modification.</strong> When a new requirement arrives, you should add a new piece, not reopen working code and risk breaking it.</p>
+    <h3>The problem</h3>
+<pre><code>fun discount(customerType: String, total: Double): Double =
+    when (customerType) {
+        "regular" -> 0.0
+        "member"  -> total * 0.10
+        "student" -> total * 0.15
+        else      -> 0.0
+    }</code></pre>
+    <p>Marketing wants a &ldquo;black friday&rdquo; discount. You must edit this function, and every new type means another edit and another chance to break the old ones.</p>
+    <h3>The fix: one small class per rule</h3>
+<pre><code>interface Discount { fun apply(total: Double): Double }
+
+class NoDiscount      : Discount { override fun apply(total: Double) = 0.0 }
+class MemberDiscount  : Discount { override fun apply(total: Double) = total * 0.10 }
+class StudentDiscount : Discount { override fun apply(total: Double) = total * 0.15 }
+
+// New requirement: add a class. Nothing above changes.
+class BlackFridayDiscount : Discount { override fun apply(total: Double) = total * 0.30 }
+
+class PriceCalculator {
+    fun total(order: Order, discount: Discount): Double {
+        val gross = order.items.sumOf { it.price }
+        return gross - discount.apply(gross)
+    }
+}</code></pre>
+    <p><code>PriceCalculator</code> never learns about specific discounts. It is <em>closed</em> to change, yet <em>open</em> because you can plug in any new <code>Discount</code>.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="A calculator box connected to a Discount interface, with four discount classes below it, one of them dashed to show it is newly added.">
+        <rect class="boxb" x="240" y="14" width="160" height="42" rx="12"/><text class="b c" x="320" y="40">PriceCalculator</text>
+        <rect class="boxp" x="240" y="84" width="160" height="42" rx="12"/><text class="b c" x="320" y="110">&laquo;Discount&raquo;</text>
+        <path class="arrow" d="M320,58 L320,80"/>
+        <rect class="boxg" x="20" y="168" width="130" height="38" rx="10"/><text class="c" x="85" y="192">NoDiscount</text>
+        <rect class="boxg" x="170" y="168" width="140" height="38" rx="10"/><text class="c" x="240" y="192">MemberDiscount</text>
+        <rect class="boxg" x="330" y="168" width="140" height="38" rx="10"/><text class="c" x="400" y="192">StudentDiscount</text>
+        <rect class="ghost" x="490" y="168" width="136" height="38" rx="10"/><text class="c" x="558" y="192">BlackFriday</text>
+        <path class="rule" d="M85,166 L85,146 L558,146 L558,166"/><path class="rule" d="M240,166 L240,146"/><path class="rule" d="M400,166 L400,146"/><path class="rule" d="M320,146 L320,128"/>
+      </svg>
+      <figcaption>The dashed box is the new feature. It plugs in without touching the calculator.</figcaption>
+    </figure>
+
+
+    <div class="try">
+      <h3>Try it: add a rule without editing the calculator</h3>
+      <p>Fill in <code>BlackFridayDiscount</code>. Do not touch <code>PriceCalculator</code>. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>interface Discount { fun apply(total: Double): Double }
+
+class MemberDiscount : Discount {
+    override fun apply(total: Double) = total * 0.10
+}
+
+// Do NOT edit this class. New discounts must plug in from outside.
+class PriceCalculator {
+    fun total(gross: Double, discount: Discount) = gross - discount.apply(gross)
+}
+
+// Your job: Black Friday takes 30% off.
+class BlackFridayDiscount : Discount {
+    override fun apply(total: Double): Double = TODO("return 30% of total")
+}</code></pre>
+      <a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-add-a-rule-without-editing-the-calculator">Open in Kotlin Playground &#8599;</a>
+      <script type="text/plain" id="pg-add-a-rule-without-editing-the-calculator">data class Item(val name: String, val price: Double)
+data class Order(val items: List<Item>)
+
+fun same(a: Double, b: Double) = Math.abs(a - b) < 1e-9
+
+fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+interface Discount { fun apply(total: Double): Double }
+
+class MemberDiscount : Discount {
+    override fun apply(total: Double) = total * 0.10
+}
+
+// Do NOT edit this class. New discounts must plug in from outside.
+class PriceCalculator {
+    fun total(gross: Double, discount: Discount) = gross - discount.apply(gross)
+}
+
+// Your job: Black Friday takes 30% off.
+class BlackFridayDiscount : Discount {
+    override fun apply(total: Double): Double = TODO("return 30% of total")
+}
+
+fun main() {
+    val calc = PriceCalculator()
+
+    test("member discount takes 10% off") {
+        check(same(calc.total(100.0, MemberDiscount()), 90.0)) { "expected 90.0" }
+    }
+    test("Black Friday takes 30% off") {
+        check(same(calc.total(100.0, BlackFridayDiscount()), 70.0)) { "expected 70.0" }
+    }
+    test("a brand-new rule plugs in without touching the calculator") {
+        val fiveOff = object : Discount { override fun apply(total: Double) = 5.0 }
+        check(same(calc.total(100.0, fiveOff), 95.0)) { "expected 95.0" }
+    }
+}
+</script>
+      <details><summary>Hint</summary>
+        <p>Take the same shape as <code>MemberDiscount</code>, with a different number.</p>
+      </details>
+      <details><summary>See the tests</summary>
+<pre><code>fun main() {
+    val calc = PriceCalculator()
+
+    test("member discount takes 10% off") {
+        check(same(calc.total(100.0, MemberDiscount()), 90.0)) { "expected 90.0" }
+    }
+    test("Black Friday takes 30% off") {
+        check(same(calc.total(100.0, BlackFridayDiscount()), 70.0)) { "expected 70.0" }
+    }
+    test("a brand-new rule plugs in without touching the calculator") {
+        val fiveOff = object : Discount { override fun apply(total: Double) = 5.0 }
+        check(same(calc.total(100.0, fiveOff), 95.0)) { "expected 95.0" }
+    }
+}</code></pre>
+      </details>
+      <details><summary>Show a solution</summary>
+<pre><code>class BlackFridayDiscount : Discount {
+    override fun apply(total: Double) = total * 0.30
+}</code></pre>
+      </details>
+    </div>
+
+    <h2 id="l">4. L: Liskov Substitution Principle</h2>
+    <p><strong>If code works with a parent type, it must keep working when you hand it any child type.</strong> A child that quietly breaks the parent&rsquo;s promises is a trap for whoever uses it.</p>
+    <h3>The problem</h3>
+<pre><code>open class PaymentMethod {
+    open fun charge(amount: Double) { /* take money */ }
+    open fun refund(amount: Double) { /* give money back */ }
+}
+
+class GiftCard : PaymentMethod() {
+    override fun refund(amount: Double) {
+        throw UnsupportedOperationException("Gift cards cannot be refunded")
+    }
+}
+
+fun cancelOrder(method: PaymentMethod, amount: Double) {
+    method.refund(amount)   // crashes if it is a GiftCard
+}</code></pre>
+    <p><code>GiftCard</code> <em>is-a</em> <code>PaymentMethod</code> on paper, but it cannot be used everywhere one can. That surprise is the violation.</p>
+    <h3>The fix: model what is really true</h3>
+<pre><code>interface Payable    { fun charge(amount: Double) }
+interface Refundable : Payable { fun refund(amount: Double) }
+
+class CreditCard : Refundable { /* charge and refund */ }
+class GiftCard   : Payable    { /* charge only */ }
+
+fun cancelOrder(method: Refundable, amount: Double) = method.refund(amount)</code></pre>
+    <p>Now the compiler stops you from passing a gift card to <code>cancelOrder</code>. The bug becomes impossible instead of a runtime crash.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Left: GiftCard inherits refund but throws, shown in red. Right: Payable and Refundable split so GiftCard only promises charge.">
+        <rect class="boxo" x="30" y="14" width="170" height="42" rx="10"/><text class="b c" x="115" y="40">PaymentMethod</text>
+        <text class="sub c" x="115" y="76">charge, refund</text>
+        <rect class="boxr" x="30" y="100" width="170" height="42" rx="10"/><text class="b c" x="115" y="126">GiftCard</text>
+        <path class="arrow" d="M115,98 L115,60"/>
+        <text class="sub c" x="115" y="168">refund() throws!</text>
+        <text class="b c" x="115" y="192">Before: broken promise</text>
+
+        <rect class="boxp" x="330" y="14" width="150" height="42" rx="10"/><text class="b c" x="405" y="40">Payable</text>
+        <rect class="boxp" x="500" y="100" width="130" height="42" rx="10"/><text class="b c" x="565" y="126">Refundable</text>
+        <rect class="boxg" x="500" y="14" width="130" height="42" rx="10"/><text class="c" x="565" y="40">GiftCard</text>
+        <rect class="boxg" x="330" y="100" width="150" height="42" rx="10"/><text class="c" x="405" y="126">CreditCard</text>
+        <path class="arrow" d="M498,35 L484,35"/><path class="arrow" d="M405,98 L405,60"/><path class="arrow" d="M498,121 L484,121"/>
+        <text class="b c" x="480" y="192">After: only honest promises</text>
+      </svg>
+      <figcaption>Do not make a child pretend to do what it cannot. Split the contract instead.</figcaption>
+    </figure>
+    <div class="note"><p><strong>Warning signs:</strong> an override that throws &ldquo;not supported&rdquo;, does nothing silently, or needs an <code>if (x is Child)</code> check by the caller.</p></div>
+
+
+    <div class="try">
+      <h3>Try it: stop a child from breaking its promise</h3>
+      <p>The third test fails because <code>GiftCard</code> claims it can refund. Change the design so that promise is never made. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>interface Payable { fun charge(amount: Double): String }
+interface Refundable : Payable { fun refund(amount: Double): String }
+
+class CreditCard : Refundable {
+    override fun charge(amount: Double) = "charged $amount"
+    override fun refund(amount: Double) = "refunded $amount"
+}
+
+// A gift card promises refunds, then refuses to give them. Fix the promise.
+class GiftCard : Refundable {
+    override fun charge(amount: Double) = "gift card charged $amount"
+    override fun refund(amount: Double): String =
+        throw UnsupportedOperationException("Gift cards cannot be refunded")
+}
+
+fun cancelOrder(method: Refundable, amount: Double) = method.refund(amount)</code></pre>
+      <a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-stop-a-child-from-breaking-its-promise">Open in Kotlin Playground &#8599;</a>
+      <script type="text/plain" id="pg-stop-a-child-from-breaking-its-promise">data class Item(val name: String, val price: Double)
+data class Order(val items: List<Item>)
+
+fun same(a: Double, b: Double) = Math.abs(a - b) < 1e-9
+
+fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+interface Payable { fun charge(amount: Double): String }
+interface Refundable : Payable { fun refund(amount: Double): String }
+
+class CreditCard : Refundable {
+    override fun charge(amount: Double) = "charged $amount"
+    override fun refund(amount: Double) = "refunded $amount"
+}
+
+// A gift card promises refunds, then refuses to give them. Fix the promise.
+class GiftCard : Refundable {
+    override fun charge(amount: Double) = "gift card charged $amount"
+    override fun refund(amount: Double): String =
+        throw UnsupportedOperationException("Gift cards cannot be refunded")
+}
+
+fun cancelOrder(method: Refundable, amount: Double) = method.refund(amount)
+
+fun main() {
+    test("a credit card order can be cancelled") {
+        check(cancelOrder(CreditCard(), 5.0) == "refunded 5.0") { "refund failed" }
+    }
+    test("a gift card can still be charged") {
+        check(GiftCard().charge(5.0).startsWith("gift card")) { "charge failed" }
+    }
+    test("a gift card does not promise refunds") {
+        val card: Any = GiftCard()
+        check(card !is Refundable) { "GiftCard still claims to be Refundable" }
+    }
+}
+</script>
+      <details><summary>Hint</summary>
+        <p>A gift card is <code>Payable</code> but not <code>Refundable</code>. Remove the method that throws.</p>
+      </details>
+      <details><summary>See the tests</summary>
+<pre><code>fun main() {
+    test("a credit card order can be cancelled") {
+        check(cancelOrder(CreditCard(), 5.0) == "refunded 5.0") { "refund failed" }
+    }
+    test("a gift card can still be charged") {
+        check(GiftCard().charge(5.0).startsWith("gift card")) { "charge failed" }
+    }
+    test("a gift card does not promise refunds") {
+        val card: Any = GiftCard()
+        check(card !is Refundable) { "GiftCard still claims to be Refundable" }
+    }
+}</code></pre>
+      </details>
+      <details><summary>Show a solution</summary>
+<pre><code>class GiftCard : Payable {
+    override fun charge(amount: Double) = "gift card charged $amount"
+}</code></pre>
+      </details>
+    </div>
+
+    <h2 id="i">5. I: Interface Segregation Principle</h2>
+    <p><strong>No class should be forced to depend on methods it does not use.</strong> Many small, focused interfaces beat one giant one.</p>
+    <h3>The problem</h3>
+<pre><code>interface Notifier {
+    fun sendEmail(to: String, text: String)
+    fun sendSms(to: String, text: String)
+    fun sendPush(token: String, text: String)
+}
+
+class EmailOnlyNotifier : Notifier {
+    override fun sendEmail(to: String, text: String) { /* ok */ }
+    override fun sendSms(to: String, text: String) { /* not my job */ }
+    override fun sendPush(token: String, text: String) { /* not my job */ }
+}</code></pre>
+    <p>Two of the three methods are empty noise. If the SMS signature changes, <code>EmailOnlyNotifier</code> must be recompiled and reviewed for no reason.</p>
+    <h3>The fix: small interfaces</h3>
+<pre><code>interface EmailSender { fun sendEmail(to: String, text: String) }
+interface SmsSender   { fun sendSms(to: String, text: String) }
+interface PushSender  { fun sendPush(token: String, text: String) }
+
+class EmailNotifier : EmailSender { /* only what it needs */ }
+class MultiChannelNotifier : EmailSender, SmsSender, PushSender { /* all three */ }</code></pre>
+    <p>Each client picks exactly the abilities it needs. Think of a TV remote: a remote with 80 buttons you never press is harder to use than one with five.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="One fat interface with three methods on the left. On the right, three small interfaces, with EmailNotifier using only one.">
+        <rect class="boxr" x="30" y="20" width="170" height="104" rx="12"/><text class="b c" x="115" y="46">Notifier</text>
+        <text class="sub c" x="115" y="72">sendEmail</text><text class="sub c" x="115" y="92">sendSms</text><text class="sub c" x="115" y="112">sendPush</text>
+        <text class="b c" x="115" y="160">Before: one fat contract</text>
+        <rect class="boxp" x="330" y="14" width="140" height="38" rx="10"/><text class="c" x="400" y="38">EmailSender</text>
+        <rect class="boxp" x="330" y="66" width="140" height="38" rx="10"/><text class="c" x="400" y="90">SmsSender</text>
+        <rect class="boxp" x="330" y="118" width="140" height="38" rx="10"/><text class="c" x="400" y="142">PushSender</text>
+        <rect class="boxg" x="520" y="14" width="110" height="38" rx="10"/><text class="c" x="575" y="38">Email only</text>
+        <rect class="boxg" x="520" y="66" width="110" height="90" rx="10"/><text class="c" x="575" y="106">Multi-</text><text class="c" x="575" y="126">channel</text>
+        <path class="arrow" d="M518,33 L474,33"/><path class="arrow" d="M518,85 L474,85"/><path class="arrow" d="M518,137 L474,137"/>
+        <text class="b c" x="480" y="182">After: pick what you need</text>
+      </svg>
+      <figcaption>Split interfaces by who uses them, not by who implements them.</figcaption>
+    </figure>
+
+
+    <div class="try">
+      <h3>Try it: give each class only what it uses</h3>
+      <p>The last test fails because <code>EmailNotifier</code> carries SMS and push methods it does not use. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>interface EmailSender { fun sendEmail(to: String, text: String): String }
+interface SmsSender { fun sendSms(to: String, text: String): String }
+interface PushSender { fun sendPush(token: String, text: String): String }
+
+// The "fat" contract: everything in one.
+interface Notifier : EmailSender, SmsSender, PushSender
+
+// This class only sends email, but is forced to carry SMS and push too.
+class EmailNotifier : Notifier {
+    override fun sendEmail(to: String, text: String) = "email to $to: $text"
+    override fun sendSms(to: String, text: String): String =
+        throw UnsupportedOperationException("not my job")
+    override fun sendPush(token: String, text: String): String =
+        throw UnsupportedOperationException("not my job")
+}</code></pre>
+      <a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-give-each-class-only-what-it-uses">Open in Kotlin Playground &#8599;</a>
+      <script type="text/plain" id="pg-give-each-class-only-what-it-uses">data class Item(val name: String, val price: Double)
+data class Order(val items: List<Item>)
+
+fun same(a: Double, b: Double) = Math.abs(a - b) < 1e-9
+
+fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+interface EmailSender { fun sendEmail(to: String, text: String): String }
+interface SmsSender { fun sendSms(to: String, text: String): String }
+interface PushSender { fun sendPush(token: String, text: String): String }
+
+// The "fat" contract: everything in one.
+interface Notifier : EmailSender, SmsSender, PushSender
+
+// This class only sends email, but is forced to carry SMS and push too.
+class EmailNotifier : Notifier {
+    override fun sendEmail(to: String, text: String) = "email to $to: $text"
+    override fun sendSms(to: String, text: String): String =
+        throw UnsupportedOperationException("not my job")
+    override fun sendPush(token: String, text: String): String =
+        throw UnsupportedOperationException("not my job")
+}
+
+fun main() {
+    test("email still works") {
+        check(EmailNotifier().sendEmail("a@b.c", "hi") == "email to a@b.c: hi") { "wrong email text" }
+    }
+    test("EmailNotifier is an EmailSender") {
+        val n: Any = EmailNotifier()
+        check(n is EmailSender) { "it should send email" }
+    }
+    test("EmailNotifier is not forced to do SMS or push") {
+        val n: Any = EmailNotifier()
+        check(n !is SmsSender && n !is PushSender) { "it still carries methods it does not use" }
+    }
+}
+</script>
+      <details><summary>Hint</summary>
+        <p>Implement <code>EmailSender</code> instead of <code>Notifier</code>, then delete the two methods that throw.</p>
+      </details>
+      <details><summary>See the tests</summary>
+<pre><code>fun main() {
+    test("email still works") {
+        check(EmailNotifier().sendEmail("a@b.c", "hi") == "email to a@b.c: hi") { "wrong email text" }
+    }
+    test("EmailNotifier is an EmailSender") {
+        val n: Any = EmailNotifier()
+        check(n is EmailSender) { "it should send email" }
+    }
+    test("EmailNotifier is not forced to do SMS or push") {
+        val n: Any = EmailNotifier()
+        check(n !is SmsSender &amp;&amp; n !is PushSender) { "it still carries methods it does not use" }
+    }
+}</code></pre>
+      </details>
+      <details><summary>Show a solution</summary>
+<pre><code>class EmailNotifier : EmailSender {
+    override fun sendEmail(to: String, text: String) = "email to $to: $text"
+}</code></pre>
+      </details>
+    </div>
+
+    <h2 id="d">6. D: Dependency Inversion Principle</h2>
+    <p><strong>High-level code should not depend on low-level details. Both should depend on a small contract (an interface).</strong> Your business rules should not know whether data lives in MySQL, a file or memory.</p>
+    <h3>The problem</h3>
+<pre><code>class OrderService {
+    private val database = MySqlDatabase()   // hard-wired
+
+    fun placeOrder(order: Order) {
+        database.insert(order)
+    }
+}</code></pre>
+    <p>To test <code>placeOrder</code> you need a real MySQL server. To switch to another database you rewrite the service.</p>
+    <h3>The fix: depend on a contract and pass it in</h3>
+<pre><code>interface OrderStore { fun save(order: Order) }
+
+class MySqlOrderStore : OrderStore { override fun save(order: Order) { /* SQL */ } }
+class InMemoryOrderStore : OrderStore {
+    val saved = mutableListOf&lt;Order&gt;()
+    override fun save(order: Order) { saved += order }
+}
+
+class OrderService(private val store: OrderStore) {   // injected
+    fun placeOrder(order: Order) = store.save(order)
+}
+
+// In a test, no database needed:
+val store = InMemoryOrderStore()
+OrderService(store).placeOrder(order)
+check(store.saved.contains(order))</code></pre>
+    <p>The arrow of dependency flipped. Before, the service pointed at MySQL. Now both the service and MySQL point at <code>OrderStore</code>, which the business side owns. Passing the dependency in through the constructor is called <em>dependency injection</em>, and it is the everyday tool for this principle.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="Before: OrderService points directly at MySQL. After: OrderService points at the OrderStore interface, which MySQL and an in-memory store both implement.">
+        <rect class="boxb" x="20" y="30" width="130" height="42" rx="10"/><text class="b c" x="85" y="56">OrderService</text>
+        <rect class="boxr" x="20" y="120" width="130" height="42" rx="10"/><text class="c" x="85" y="146">MySQL</text>
+        <path class="arrow" d="M85,74 L85,116"/>
+        <text class="b c" x="85" y="196">Before: tied to one tool</text>
+        <rect class="boxb" x="270" y="30" width="130" height="42" rx="10"/><text class="b c" x="335" y="56">OrderService</text>
+        <rect class="boxp" x="270" y="98" width="130" height="42" rx="10"/><text class="b c" x="335" y="124">&laquo;OrderStore&raquo;</text>
+        <rect class="boxg" x="450" y="30" width="170" height="42" rx="10"/><text class="c" x="535" y="56">MySqlOrderStore</text>
+        <rect class="boxg" x="450" y="150" width="170" height="42" rx="10"/><text class="c" x="535" y="176">InMemoryOrderStore</text>
+        <path class="arrow" d="M335,74 L335,94"/>
+        <path class="arrow" d="M530,74 L530,100 L404,116"/><path class="arrow" d="M530,148 L530,130 L404,126"/>
+        <text class="b c" x="400" y="204">After: both depend on the contract</text>
+      </svg>
+      <figcaption>The business code names what it needs. Details plug in from outside.</figcaption>
+    </figure>
+
+
+    <div class="try">
+      <h3>Try it: inject the dependency</h3>
+      <p>This one fails to compile at first, which is the point: the service gives you no way to pass a store in. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>interface OrderStore { fun save(order: Order) }
+
+class MySqlOrderStore : OrderStore {
+    override fun save(order: Order) { error("There is no MySQL server in the browser") }
+}
+
+class InMemoryOrderStore : OrderStore {
+    val saved = mutableListOf&lt;Order&gt;()
+    override fun save(order: Order) { saved += order }
+}
+
+// OrderService creates its own database, so it cannot be tested here.
+// The test below calls OrderService(store). Make that compile and pass.
+class OrderService {
+    private val store: OrderStore = MySqlOrderStore()
+    fun placeOrder(order: Order) { store.save(order) }
+}</code></pre>
+      <a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-inject-the-dependency">Open in Kotlin Playground &#8599;</a>
+      <script type="text/plain" id="pg-inject-the-dependency">data class Item(val name: String, val price: Double)
+data class Order(val items: List<Item>)
+
+fun same(a: Double, b: Double) = Math.abs(a - b) < 1e-9
+
+fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+interface OrderStore { fun save(order: Order) }
+
+class MySqlOrderStore : OrderStore {
+    override fun save(order: Order) { error("There is no MySQL server in the browser") }
+}
+
+class InMemoryOrderStore : OrderStore {
+    val saved = mutableListOf<Order>()
+    override fun save(order: Order) { saved += order }
+}
+
+// OrderService creates its own database, so it cannot be tested here.
+// The test below calls OrderService(store). Make that compile and pass.
+class OrderService {
+    private val store: OrderStore = MySqlOrderStore()
+    fun placeOrder(order: Order) { store.save(order) }
+}
+
+fun main() {
+    val order = Order(listOf(Item("pen", 10.0)))
+    val store = InMemoryOrderStore()
+
+    test("the service saves through the store it is given") {
+        OrderService(store).placeOrder(order)
+        check(store.saved == listOf(order)) { "the order was not saved in the fake store" }
+    }
+}
+</script>
+      <details><summary>Hint</summary>
+        <p>Move the store into the constructor as a parameter. Delete the line that creates <code>MySqlOrderStore()</code>.</p>
+      </details>
+      <details><summary>See the tests</summary>
+<pre><code>fun main() {
+    val order = Order(listOf(Item("pen", 10.0)))
+    val store = InMemoryOrderStore()
+
+    test("the service saves through the store it is given") {
+        OrderService(store).placeOrder(order)
+        check(store.saved == listOf(order)) { "the order was not saved in the fake store" }
+    }
+}</code></pre>
+      </details>
+      <details><summary>Show a solution</summary>
+<pre><code>class OrderService(private val store: OrderStore) {
+    fun placeOrder(order: Order) { store.save(order) }
+}</code></pre>
+      </details>
+    </div>
+
+    <h2 id="together">7. All five working together</h2>
+    <p>Look at what our shop became without us trying to &ldquo;use SOLID&rdquo;:</p>
+    <table>
+      <tr><th>Principle</th><th>Where you can see it</th></tr>
+      <tr><td>S</td><td><code>Validator</code>, <code>PriceCalculator</code>, <code>OrderStore</code>, <code>ReceiptSender</code> each do one job.</td></tr>
+      <tr><td>O</td><td>New discounts are new classes; <code>PriceCalculator</code> never changes.</td></tr>
+      <tr><td>L</td><td>Only <code>Refundable</code> methods are accepted by <code>cancelOrder</code>.</td></tr>
+      <tr><td>I</td><td>Notifiers expose just the channels they support.</td></tr>
+      <tr><td>D</td><td><code>OrderService</code> receives an <code>OrderStore</code>; tests use an in-memory one.</td></tr>
+    </table>
+<pre><code>val service = OrderService(
+    validator = OrderValidator(),
+    pricing   = PriceCalculator(),
+    store     = MySqlOrderStore(),     // swap for InMemoryOrderStore() in tests
+    receipts  = ReceiptSender(EmailNotifier()),
+)</code></pre>
+    <p>The principles reinforce each other: small classes (S) hidden behind interfaces (D, I) are easy to extend (O) and replace safely (L).</p>
+
+    <h2 id="overdo">8. When not to apply SOLID</h2>
+    <p>SOLID is a cure for pain you actually feel. Applied everywhere in advance, it makes code harder to read.</p>
+    <ul>
+      <li><strong>Do not make an interface for everything.</strong> If a class has one implementation and no tests need a fake, a plain class is fine. Add the interface the day you need a second one.</li>
+      <li><strong>Do not split a 20-line class into five.</strong> Small scripts and prototypes are fine as they are.</li>
+      <li><strong>Wait for the second time.</strong> The first <code>when</code> over customer types is fine. When the third case arrives, that is the signal to apply Open/Closed.</li>
+      <li><strong>Judge by change.</strong> Ask &ldquo;what is likely to change here?&rdquo; and protect that spot only.</li>
+    </ul>
+
+    <h2 id="takeaways">9. Takeaways and glossary</h2>
+    <ul>
+      <li>SOLID is five small habits that keep change cheap and safe.</li>
+      <li>Use the pain as a trigger: a god class (S), a growing <code>when</code> (O), a throwing override (L), empty methods (I), or untestable code (D).</li>
+      <li>Prefer small interfaces and constructor injection; they solve most of the five at once.</li>
+      <li>Do not pre-build abstractions. Add them when the second need appears.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Responsibility</td><td>A reason a piece of code might need to change.</td></tr>
+      <tr><td>Interface</td><td>A contract listing what something can do, without saying how.</td></tr>
+      <tr><td>Abstraction</td><td>Hiding details behind a simple, stable contract.</td></tr>
+      <tr><td>Substitution</td><td>Using a child type wherever the parent is expected.</td></tr>
+      <tr><td>Dependency</td><td>Something your code needs in order to work.</td></tr>
+      <tr><td>Dependency injection</td><td>Handing a class what it needs, instead of letting it create it.</td></tr>
+      <tr><td>Coupling</td><td>How much one piece of code knows about, and relies on, another.</td></tr>
+    </table>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the starter programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>
