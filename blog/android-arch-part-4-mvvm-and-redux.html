@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MVVM and Redux (MVI): State Flows to the View — Khairul Alam</title>
+  <meta name="description" content="MVVM and Redux/MVI explained for Android beginners with Kotlin StateFlow, ViewModel, reducer and store examples, and how to choose between them." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .conv .fig { background: var(--bg); }
+    .conv h4 { margin: 14px 0 4px; font-size: calc(14px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android Architecture series &middot; Part 4 of 9</p>
+    <h1>MVVM and Redux (MVI): State Flows to the View</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~11 min read</span></div>
+    <div class="tags"><span class="tag">MVVM</span><span class="tag">Redux</span><span class="tag">MVI</span><span class="tag">StateFlow</span><span class="tag">Compose</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="android-arch-part-1-why-architecture.html"><small>Part 1</small>Why architecture</a><a href="android-arch-part-2-principles-and-patterns.html"><small>Part 2</small>Principles</a><a href="android-arch-part-3-mvc-and-mvp.html"><small>Part 3</small>MVC and MVP</a><a class="on" href="android-arch-part-4-mvvm-and-redux.html"><small>Part 4</small>MVVM and Redux</a><a href="android-arch-part-5-viper-and-modules.html"><small>Part 5</small>VIPER</a><a href="android-arch-part-6-di-async-errors.html"><small>Part 6</small>DI and async</a><a href="android-arch-part-7-data-and-config-changes.html"><small>Part 7</small>Data and config</a><a href="android-arch-part-8-testing-and-proof.html"><small>Part 8</small>Testing and proof</a><a href="android-arch-part-9-converting-architectures.html"><small>Part 9</small>Converting</a>
+    </div>
+
+    <p class="lede">The modern pair. Instead of telling the view what to do, the logic publishes state and the view draws it. MVVM is Google's mainstream choice; Redux/MVI is the same idea with stricter rules.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>MVVM:</strong> ViewModel exposes state, view observes, no view reference.</li><li><strong>Redux/MVI:</strong> one state, actions, a pure reducer, one-way data flow.</li><li><strong>Both:</strong> survive rotation and suit Jetpack Compose.</li><li><strong>Choose:</strong> MVVM by default, reducer style for complex screens.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#mvvm">MVVM: the view watches the state</a></li><li><a href="#redux">Redux / MVI: one state, one direction</a></li><li><a href="#compare">MVVM or MVI</a></li></ol>
+    </details>
+
+
+    <h2 id="mvvm">1. MVVM: the view watches the state</h2>
+    <p>In MVP the presenter <em>tells</em> the view what to do (&ldquo;showLoading!&rdquo;). In <strong>Model View ViewModel</strong> the ViewModel just <em>publishes state</em> and the view <em>observes</em> it. The ViewModel does not know the view exists, so there is no attach/detach dance and no leaked Activity.</p>
+<figure class="fig">
+<svg viewBox="0 0 640 180" role="img" aria-label="MVVM: the view sends events to the ViewModel; the ViewModel exposes state that the view observes.">
+<rect class="boxg" x="20" y="40" width="150" height="70" rx="12"/><text class="b c" x="95.0" y="72.0">View</text><text class="sub c" x="95.0" y="90.0">Activity / Compose</text><rect class="boxb" x="245" y="40" width="150" height="70" rx="12"/><text class="b c" x="320.0" y="72.0">ViewModel</text><text class="sub c" x="320.0" y="90.0">holds UI state</text><rect class="boxp" x="470" y="40" width="150" height="70" rx="12"/><text class="b c" x="545.0" y="72.0">Model</text><text class="sub c" x="545.0" y="90.0">repository, data</text><path class="arrow" d="M172,62 L243,62"/><path class="arrow" d="M243,90 L172,90"/><path class="arrow" d="M397,75 L468,75"/><text class="sub c" x="207" y="52">events</text><text class="sub c" x="207" y="108">state (observe)</text><text class="sub c" x="432" y="65">calls</text><text class="sub c" x="320" y="160">The arrow back to the view is observation, not a direct call.</text>
+</svg>
+<figcaption>The ViewModel never references the view. The view subscribes to a stream of state.</figcaption>
+</figure>
+
+    <h3>State as a single object</h3>
+<pre><code>sealed interface ProfileUiState {
+    data object Loading : ProfileUiState
+    data class Content(val profile: Profile) : ProfileUiState
+    data class Error(val message: String) : ProfileUiState
+}</code></pre>
+
+    <h3>The ViewModel</h3>
+<pre><code>@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val repo: ProfileRepository,
+    private val dispatchers: DispatcherProvider,
+) : ViewModel() {
+
+    private val _state = MutableStateFlow&lt;ProfileUiState&gt;(ProfileUiState.Loading)
+    val state: StateFlow&lt;ProfileUiState&gt; = _state.asStateFlow()
+
+    fun load(id: String) {
+        viewModelScope.launch {
+            _state.value = ProfileUiState.Loading
+            _state.value = try {
+                ProfileUiState.Content(withContext(dispatchers.io) { repo.getProfile(id) })
+            } catch (e: IOException) {
+                ProfileUiState.Error("No connection")
+            }
+        }
+    }
+}</code></pre>
+
+    <h3>The view</h3>
+    <p>The ViewProxy from Part 2 gets one extra method, <code>render(state)</code>, that maps a state to the right widgets. The Activity only connects the stream to it.</p>
+<pre><code>fun ProfileViewProxy.render(state: ProfileUiState) = when (state) {
+    ProfileUiState.Loading -&gt; showLoading()
+    is ProfileUiState.Content -&gt; showProfile(state.profile)
+    is ProfileUiState.Error -&gt; showError(state.message)
+}</code></pre>
+<pre><code>class ProfileActivity : AppCompatActivity() {
+    private val viewModel: ProfileViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val binding = ActivityProfileBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val proxy = ProfileViewProxy(binding)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {   // stops when screen is hidden
+                viewModel.state.collect { proxy.render(it) }
+            }
+        }
+        binding.load.setOnClickListener { viewModel.load("42") }
+    }
+}</code></pre>
+
+    <p>The ViewModel survives rotation, so the loaded profile stays on screen when the user turns the phone (more in Part 7). In Jetpack Compose the same idea is one line: <code>val state by viewModel.state.collectAsStateWithLifecycle()</code>.</p>
+    <table>
+      <thead><tr><th>Good</th><th>Watch out</th></tr></thead>
+      <tbody>
+        <tr><td>Official Jetpack support: <code>ViewModel</code>, <code>StateFlow</code>, <code>SavedStateHandle</code>.</td><td>If the state is many separate <code>LiveData</code> fields, they can disagree. Prefer one state object.</td></tr>
+        <tr><td>No view reference, so no leak and no detach.</td><td>One-time events (show a toast, navigate) do not fit state well. Model them explicitly (a channel or a consumed-flag in state).</td></tr>
+        <tr><td>Survives configuration changes.</td><td>Too much code in the ViewModel. Split into use cases.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="redux">2. Redux / MVI: one state, one direction</h2>
+    <p>Redux (from the web world) and <strong>MVI</strong> (Model View Intent) push the MVVM idea further. The rules:</p>
+    <ol>
+      <li>The whole screen is described by <strong>one immutable State</strong>.</li>
+      <li>The user (or the system) can only send <strong>Actions</strong> (also called Intents).</li>
+      <li>A <strong>Reducer</strong> is a pure function: <code>(oldState, action) -&gt; newState</code>.</li>
+      <li>A <strong>Store</strong> holds the current state and runs the reducer.</li>
+      <li>The View renders the state. Nothing else changes the state.</li>
+    </ol>
+<figure class="fig">
+<svg viewBox="0 0 640 200" role="img" aria-label="Redux loop: View sends Action to Store; Reducer computes new State; View renders the State.">
+<rect class="boxg" x="20" y="60" width="130" height="64" rx="12"/><text class="b c" x="85.0" y="89.0">View</text><text class="sub c" x="85.0" y="107.0">render(state)</text><rect class="boxo" x="205" y="60" width="130" height="64" rx="12"/><text class="b c" x="270.0" y="89.0">Action</text><text class="sub c" x="270.0" y="107.0">Load, Loaded, Failed</text><rect class="boxb" x="390" y="20" width="110" height="56" rx="12"/><text class="b c" x="445.0" y="45.0">Reducer</text><text class="sub c" x="445.0" y="63.0">pure function</text><rect class="boxp" x="505" y="100" width="120" height="64" rx="12"/><text class="b c" x="565.0" y="129.0">Store</text><text class="sub c" x="565.0" y="147.0">holds State</text><path class="arrow" d="M152,92 L203,92"/><path class="arrow" d="M337,80 L388,56"/><path class="arrow" d="M480,78 L540,98"/><path class="arrow" d="M505,150 L84,150 L84,126"/><text class="sub c" x="300" y="175">new State flows back to the View (one direction only)</text><text class="sub c" x="300" y="30">unidirectional data flow</text>
+</svg>
+<figcaption>Data goes around a loop in one direction. That makes every state change easy to trace and replay.</figcaption>
+</figure>
+<pre><code>data class ProfileState(
+    val loading: Boolean = false,
+    val profile: Profile? = null,
+    val error: String? = null,
+)
+
+sealed interface ProfileAction {
+    data class Load(val id: String) : ProfileAction
+    data class Loaded(val profile: Profile) : ProfileAction
+    data class Failed(val message: String) : ProfileAction
+}
+
+// Pure: same input, same output, no network, no Android.
+fun reduce(state: ProfileState, action: ProfileAction): ProfileState = when (action) {
+    is ProfileAction.Load   -&gt; state.copy(loading = true, error = null)
+    is ProfileAction.Loaded -&gt; state.copy(loading = false, profile = action.profile)
+    is ProfileAction.Failed -&gt; state.copy(loading = false, error = action.message)
+}
+
+class ProfileStore(
+    private val repo: ProfileRepository,
+    private val scope: CoroutineScope,
+) {
+    private val _state = MutableStateFlow(ProfileState())
+    val state: StateFlow&lt;ProfileState&gt; = _state
+
+    fun dispatch(action: ProfileAction) {
+        _state.update { reduce(it, action) }
+        if (action is ProfileAction.Load) {          // side effect lives outside the reducer
+            scope.launch {
+                runCatching { repo.getProfile(action.id) }
+                    .onSuccess { dispatch(ProfileAction.Loaded(it)) }
+                    .onFailure { dispatch(ProfileAction.Failed("No connection")) }
+            }
+        }
+    }
+}</code></pre>
+
+    <p>The reducer is the star: because it is a pure function, you can test every state change with a one-line assertion and log the list of actions to replay a bug exactly. The cost is more types (actions, state) and more ceremony for simple screens. Compose fits this style very well, since a composable is already <code>f(state) -&gt; UI</code>.</p>
+
+    <h2 id="compare">3. MVVM or MVI?</h2>
+    <p>They are close cousins. MVVM with a single <code>StateFlow&lt;UiState&gt;</code> and a <code>onEvent(event)</code> function <em>is</em> basically MVI. The difference is how strict you are:</p>
+    <table>
+      <thead><tr><th></th><th>MVVM</th><th>Redux / MVI</th></tr></thead>
+      <tbody>
+        <tr><td>State</td><td>One or several observable fields</td><td>Exactly one immutable object</td></tr>
+        <tr><td>Changing state</td><td>ViewModel methods set values</td><td>Only a reducer, driven by actions</td></tr>
+        <tr><td>Debugging</td><td>Read the methods</td><td>Replay the action log</td></tr>
+        <tr><td>Ceremony</td><td>Low</td><td>Higher</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>Beginner advice</strong><p>Start with MVVM and one state object. If the screen has many interacting states (a form, a player, a chat), move that screen to the stricter reducer style.</p></div>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul><li><a href="https://developer.android.com/topic/libraries/architecture/viewmodel" target="_blank" rel="noopener">ViewModel overview</a></li><li><a href="https://developer.android.com/topic/architecture/ui-layer" target="_blank" rel="noopener">UI layer and state holders</a></li><li><a href="https://redux.js.org/understanding/thinking-in-redux/three-principles" target="_blank" rel="noopener">Redux three principles</a></li><li><a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel" target="_blank" rel="noopener">Model-view-viewmodel (Wikipedia)</a></li></ul>
+    <div class="pager">
+      <a class="prev" href="android-arch-part-3-mvc-and-mvp.html"><small>&larr; Previous &middot; Part 3</small>MVC and MVP</a>
+      <a class="next" href="android-arch-part-5-viper-and-modules.html"><small>Next &middot; Part 5 &rarr;</small>VIPER and modules</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

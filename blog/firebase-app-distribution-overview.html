@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Firebase App Distribution: Get Test Builds to Testers Fast — Khairul Alam</title>
+  <meta name="description" content="An overview of Firebase App Distribution: testers and groups, release notes, Gradle and CLI upload, CI automation and the official setup links." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Firebase series &middot; Part 3 of 4</p>
+    <h1>Firebase App Distribution: Get Test Builds to Testers Fast</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~7 min read</span></div>
+    <div class="tags"><span class="tag">Firebase</span><span class="tag">App Distribution</span><span class="tag">Beta testing</span><span class="tag">CI</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="firebase-remote-config-overview.html"><small>Part 1</small>Remote Config</a>
+      <a href="firebase-analytics-overview.html"><small>Part 2</small>Analytics</a>
+      <a class="on" href="firebase-app-distribution-overview.html"><small>Part 3</small>App Distribution</a>
+      <a href="firebase-crashlytics-overview.html"><small>Part 4</small>Crashlytics</a>
+    </div>
+
+    <p class="lede">Before an app reaches the store, someone has to try it. App Distribution sends pre-release builds to your testers by email or link, so you can skip emailing APKs around. This is the overview; the official guide covers setup.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>What:</strong> deliver pre-release Android and iOS builds to testers.</li><li><strong>How:</strong> upload from the console, Gradle, the Firebase CLI or fastlane.</li><li><strong>Who:</strong> individual testers or named groups.</li><li><strong>Bonus:</strong> release notes, expiry, and tester feedback.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#what">What it is</a></li><li><a href="#flow">How a build reaches a tester</a></li><li><a href="#ways">Ways to upload</a></li><li><a href="#groups">Testers and groups</a></li><li><a href="#ci">Automating with CI</a></li><li><a href="#notes">Limits and good habits</a></li></ol>
+    </details>
+
+    <h2 id="what">1. What it is</h2>
+    <p>App Distribution is a pipeline for test builds. You upload an APK, AAB or IPA, choose who gets it, and testers receive an email with a link. It supports Android and iOS, with no store review in between.</p>
+        <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="Sketch of the Releases list showing builds and the groups they went to.">
+        <rect class="box" x="60" y="10" width="520" height="170" rx="10"/>
+        <path class="rule" d="M60,38 L580,38"/>
+        <circle cx="74" cy="24" r="4" fill="#ef4444"/><circle cx="88" cy="24" r="4" fill="#f59e0b"/><circle cx="102" cy="24" r="4" fill="#10b981"/>
+        <text class="sub" x="116" y="28">App Distribution &middot; Releases</text>
+        <text x="76" y="64">2.5.0 (build 412)</text>
+        <text class="sub" x="564" y="64" style="text-anchor:end">Group: QA</text>
+        <rect class="boxg" x="60" y="50" width="6" height="18" rx="3"/>
+        <text x="76" y="92">2.5.0 (build 409)</text>
+        <text class="sub" x="564" y="92" style="text-anchor:end">Group: QA</text>
+        <rect class="boxb" x="60" y="78" width="6" height="18" rx="3"/>
+        <text x="76" y="120">2.4.2 (build 398)</text>
+        <text class="sub" x="564" y="120" style="text-anchor:end">Group: Beta</text>
+        <rect class="boxo" x="60" y="106" width="6" height="18" rx="3"/>
+        <text x="76" y="148">2.4.1 (build 390)</text>
+        <text class="sub" x="564" y="148" style="text-anchor:end">Group: Beta</text>
+        <rect class="boxp" x="60" y="134" width="6" height="18" rx="3"/>
+
+      </svg>
+      <figcaption>A sketch of a releases list: each build, its version and the tester groups it was sent to. (Illustration, not a screenshot.)</figcaption>
+    </figure>
+
+    <h2 id="flow">2. How a build reaches a tester</h2>
+        <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Developer uploads a build to App Distribution, which invites testers by email, and testers install it on their device.">
+        <rect class="boxb" x="10" y="70" width="110" height="60" rx="12"/><text class="b c" x="65" y="97">Developer</text><text class="sub c" x="65" y="115">build APK/AAB</text>
+        <rect class="boxp" x="165" y="70" width="120" height="60" rx="12"/><text class="b c" x="225" y="97">App Distribution</text><text class="sub c" x="225" y="115">Gradle / CLI / CI</text>
+        <rect class="boxo" x="335" y="70" width="120" height="60" rx="12"/><text class="b c" x="395" y="97">Testers / groups</text><text class="sub c" x="395" y="115">invited by email</text>
+        <rect class="boxg" x="505" y="70" width="125" height="60" rx="12"/><text class="b c" x="567" y="97">Tester device</text><text class="sub c" x="567" y="115">App Tester / link</text>
+        <path class="arrow" d="M122,100 L161,100"/>
+        <path class="arrow" d="M287,100 L331,100"/>
+        <path class="arrow" d="M457,100 L501,100"/>
+        <text class="sub c" x="320" y="170">Feedback and crash reports flow back to you.</text>
+
+      </svg>
+      <figcaption>The path of a pre-release build, from your machine or CI to a tester&rsquo;s phone.</figcaption>
+    </figure>
+
+    <p>Testers install the <strong>App Tester</strong> app (Android) or a web clip (iOS) and see every build you have shared with them. Each build carries a version, build number and release notes. On iOS, devices must be registered in your provisioning profile.</p>
+    <h2 id="ways">3. Ways to upload</h2>
+    <table>
+      <tr><th>Method</th><th>Best for</th></tr>
+      <tr><td>Console drag and drop</td><td>One-off builds, quick checks.</td></tr>
+      <tr><td>Gradle plugin</td><td>Android developers; one command from the project.</td></tr>
+      <tr><td>Firebase CLI</td><td>Scripts and any CI.</td></tr>
+      <tr><td>fastlane</td><td>Teams already using fastlane for iOS and Android.</td></tr>
+    </table>
+    <h2 id="groups">4. Testers and groups</h2>
+    <p>Add testers by email and put them in <strong>groups</strong> such as <em>QA</em>, <em>Design</em> or <em>Beta</em>. Send a build to a group and everyone in it is notified. Writing short release notes helps testers know what to check.</p>
+    <h2 id="ci">5. Automating with CI</h2>
+    <p>The real payoff is automation. Let the pipeline upload every successful build and notify the group.</p>
+        <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="A CI pipeline: push, build, upload to App Distribution, QA installs.">
+        <rect class="boxg" x="20" y="70" width="130" height="60" rx="12"/><text class="b c" x="85" y="105">Git push</text>
+        <rect class="boxb" x="200" y="70" width="130" height="60" rx="12"/><text class="b c" x="265" y="97">CI build</text><text class="sub c" x="265" y="115">test + assemble</text>
+        <rect class="boxp" x="380" y="70" width="130" height="60" rx="12"/><text class="b c" x="445" y="97">Upload</text><text class="sub c" x="445" y="115">Gradle plugin</text>
+        <rect class="boxo" x="545" y="70" width="85" height="60" rx="12"/><text class="b c" x="587" y="105">QA</text>
+        <path class="arrow" d="M152,100 L196,100"/>
+        <path class="arrow" d="M332,100 L376,100"/>
+        <path class="arrow" d="M512,100 L541,100"/>
+
+      </svg>
+      <figcaption>A common automation: every merge to a branch produces a build and notifies your testers.</figcaption>
+    </figure>
+
+    <p>Authenticate CI with a service account or a token as Google documents, and keep it in your CI secret store.</p>
+    <h2 id="notes">6. Limits and good habits</h2>
+    <ul>
+      <li>It is for testing, not for public release. Use the store tracks for that.</li>
+      <li>Use separate Firebase apps or build variants (for example <code>.debug</code> or <code>.staging</code>) so test and production builds do not collide.</li>
+      <li>Always include release notes with the commit or ticket.</li>
+      <li>Remove testers who left the team.</li>
+    </ul>
+
+    <h2 id="links">Official links</h2>
+    <p>Setup steps change often, so follow Google&rsquo;s own guides rather than a copy here.</p>
+    <ul><li><a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">App Distribution documentation (overview)</a></li><li><a href="https://firebase.google.com/docs/app-distribution/android/distribute-console" target="_blank" rel="noopener">Distribute Android apps from the console</a></li><li><a href="https://firebase.google.com/docs/app-distribution/android/distribute-gradle" target="_blank" rel="noopener">Distribute Android apps with Gradle</a></li><li><a href="https://firebase.google.com/docs/app-distribution/ios/distribute-console" target="_blank" rel="noopener">Distribute iOS apps from the console</a></li><li><a href="https://firebase.google.com/docs/app-distribution/manage-testers" target="_blank" rel="noopener">Manage testers</a></li></ul>
+    <div class="pager">
+      <a class="prev" href="firebase-analytics-overview.html"><small>&larr; Previous &middot; Part 2</small>Analytics</a>
+      <a class="next" href="firebase-crashlytics-overview.html"><small>Next &middot; Part 4 &rarr;</small>Crashlytics</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

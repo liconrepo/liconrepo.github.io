@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Principles and Patterns: The Bricks Behind Every Architecture — Khairul Alam</title>
+  <meta name="description" content="SOLID, separation of concerns, KISS and DRY explained for Android beginners, plus the Proxy (ViewProxy, GlideProxy), Scheduler and Repository patterns with Kotlin code." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .conv .fig { background: var(--bg); }
+    .conv h4 { margin: 14px 0 4px; font-size: calc(14px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    .pop { display: inline-block; font-size: .72em; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: #92400e; background: color-mix(in srgb, #f59e0b 22%, var(--card)); border: 1px solid #f59e0b; border-radius: 6px; padding: 1px 7px; margin-left: 8px; vertical-align: middle; white-space: nowrap; }
+    [data-theme="dark"] .pop { color: #fcd34d; }
+    .cat-table td:nth-child(3), .cat-table td:nth-child(4) { white-space: nowrap; }
+    h3.pat { margin-top: 44px; padding-top: 22px; border-top: 1px dashed var(--border); font-size: calc(21px * var(--fs, 1)); }
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android Architecture series &middot; Part 2 of 9</p>
+    <h1>Principles and Patterns: The Bricks Behind Every Architecture</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~10 min read</span></div>
+    <div class="tags"><span class="tag">SOLID</span><span class="tag">KISS</span><span class="tag">DRY</span><span class="tag">Design patterns</span><span class="tag">Kotlin</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="android-arch-part-1-why-architecture.html"><small>Part 1</small>Why architecture</a><a class="on" href="android-arch-part-2-principles-and-patterns.html"><small>Part 2</small>Principles</a><a href="android-arch-part-3-mvc-and-mvp.html"><small>Part 3</small>MVC and MVP</a><a href="android-arch-part-4-mvvm-and-redux.html"><small>Part 4</small>MVVM and Redux</a><a href="android-arch-part-5-viper-and-modules.html"><small>Part 5</small>VIPER</a><a href="android-arch-part-6-di-async-errors.html"><small>Part 6</small>DI and async</a><a href="android-arch-part-7-data-and-config-changes.html"><small>Part 7</small>Data and config</a><a href="android-arch-part-8-testing-and-proof.html"><small>Part 8</small>Testing and proof</a><a href="android-arch-part-9-converting-architectures.html"><small>Part 9</small>Converting</a>
+    </div>
+
+    <p class="lede">Before comparing MVP and MVVM, learn the bricks they are all made from. This part covers the design principles and four patterns (ViewProxy, GlideProxy, Scheduler, Repository) that keep reappearing.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>Principles:</strong> SOLID, separation of concerns, KISS, DRY.</li><li><strong>Patterns:</strong> Proxy (ViewProxy, GlideProxy), Scheduler, Repository.</li><li><strong>Idea:</strong> depend on small interfaces so each box can be replaced.</li><li><strong>Warning:</strong> use a pattern only when it removes real pain.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#solid">SOLID in kitchen language</a></li><li><a href="#patterns">Design patterns in every variant</a></li><li><a href="#together">How they work together</a></li></ol>
+    </details>
+
+
+    <h2 id="solid">1. SOLID, in kitchen language</h2>
+    <p>SOLID is five habits that keep code easy to change. If you want the long version with more examples, read my <a href="solid-principles-explained.html">SOLID principles explained</a> article. Here is the short version, always with Android in mind. For the patterns themselves in Kotlin, with runnable exercises, see <a href="design-patterns-kotlin.html">Design Patterns in Kotlin</a>.</p>
+    <table>
+      <thead><tr><th>Letter</th><th>Principle</th><th>Android meaning</th></tr></thead>
+      <tbody>
+        <tr><td><strong>S</strong></td><td>Single Responsibility</td><td>A class has one reason to change. The <code>Activity</code> shows things; it does not parse JSON or run SQL.</td></tr>
+        <tr><td><strong>O</strong></td><td>Open / Closed</td><td>Add behavior by adding new code, not by editing working code. A new payment method is a new class, not another <code>if</code> in a 200-line function.</td></tr>
+        <tr><td><strong>L</strong></td><td>Liskov Substitution</td><td>A fake or alternative implementation must behave like the real one. A <code>FakeRepository</code> can replace <code>RealRepository</code> and the screen still works.</td></tr>
+        <tr><td><strong>I</strong></td><td>Interface Segregation</td><td>Small interfaces. A screen that only reads should not depend on an interface that also has <code>delete()</code> and <code>sync()</code>.</td></tr>
+        <tr><td><strong>D</strong></td><td>Dependency Inversion</td><td>High-level code depends on an interface, not on a concrete library. The presenter knows <code>ImageLoader</code>, not <code>Glide</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>Three more ideas travel with SOLID:</p>
+    <ul>
+      <li><strong>Separation of concerns:</strong> each part of the app deals with one concern (drawing, rules, storage). The three-box template from Part 1 is exactly this.</li>
+      <li><strong>KISS (Keep It Simple, Stupid):</strong> the simplest design that works is the best one. Do not add five layers to a screen that shows one label.</li>
+      <li><strong>DRY (Don&rsquo;t Repeat Yourself):</strong> one rule lives in one place. If the date format is copy-pasted in ten screens, a change means ten edits and one forgotten bug.</li>
+    </ul>
+    <div class="callout"><strong>KISS beats cleverness</strong><p>SOLID and design patterns are tools, not trophies. Use a pattern when it removes a real pain (hard to test, hard to change). Skip it when it only adds files.</p></div>
+
+    <h2 id="patterns">2. Design patterns you will meet in every variant</h2>
+    <p>A <a href="https://en.wikipedia.org/wiki/Software_design_pattern" target="_blank" rel="noopener">design pattern</a> is a named, reusable answer to a problem that keeps coming back. The nice thing about a name is that your team can say &ldquo;put it behind a proxy&rdquo; and everyone understands. The next four patterns appear in <em>every</em> architecture in this series.</p>
+
+    <h3 id="proxy">Proxy pattern: ViewProxy</h3>
+    <p>A <strong>proxy</strong> is a stand-in object with the same job description as the real thing, placed in front of it. A <strong>ViewProxy</strong> is a small class that wraps your real views (the <code>Activity</code>, XML views or Compose) and exposes simple commands like <code>showLoading()</code> or <code>showProfile(profile)</code>.</p>
+<figure class="fig">
+<svg viewBox="0 0 640 130" role="img" aria-label="Presenter talks to a ViewProxy interface; the proxy talks to the real Activity and views.">
+<rect class="boxb" x="10" y="30" width="150" height="60" rx="12"/><text class="b c" x="85.0" y="57.0">Logic</text><text class="sub c" x="85.0" y="75.0">Presenter / ViewModel</text><rect class="boxp" x="245" y="30" width="150" height="60" rx="12"/><text class="b c" x="320.0" y="57.0">ViewProxy</text><text class="sub c" x="320.0" y="75.0">showLoading(), render()</text><rect class="boxg" x="480" y="30" width="150" height="60" rx="12"/><text class="b c" x="555.0" y="57.0">Real views</text><text class="sub c" x="555.0" y="75.0">Activity, XML, Compose</text><path class="arrow" d="M162,60 L242,60"/><path class="arrow" d="M397,60 L477,60"/><text class="sub c" x="202" y="22">interface</text><text class="sub c" x="437" y="22">findViewById / binding</text>
+</svg>
+<figcaption>The logic never touches the framework. It only knows the proxy&rsquo;s small interface.</figcaption>
+</figure>
+<pre><code>interface ProfileView {
+    fun showLoading()
+    fun showProfile(profile: Profile)
+    fun showError(message: String)
+}
+
+// Lives next to the layout. The only class that knows about the ViewBinding.
+class ProfileViewProxy(private val binding: ActivityProfileBinding) : ProfileView {
+    override fun showLoading() { binding.progress.isVisible = true }
+    override fun showProfile(profile: Profile) {
+        binding.progress.isVisible = false
+        binding.name.text = profile.name
+    }
+    override fun showError(message: String) {
+        binding.progress.isVisible = false
+        binding.error.text = message
+    }
+}</code></pre>
+
+    <p>Why it helps: the logic can be tested on the plain JVM with a fake <code>ProfileView</code>, no emulator needed. And when the screen moves from XML to Jetpack Compose, only the proxy changes. <strong>ViewProxy works in every variant</strong>: in MVP the presenter calls it; in MVVM the view layer observes state and passes it to the proxy; in Redux it is the function <code>render(state)</code>. Part 8 proves it.</p>
+
+    <h3 id="glide">Proxy again: GlideProxy</h3>
+    <p>The same trick protects you from a library. Wrap Glide behind your own interface:</p>
+<pre><code>interface ImageLoader {
+    fun load(url: String, target: ImageView)
+}
+
+class GlideProxy : ImageLoader {
+    override fun load(url: String, target: ImageView) {
+        Glide.with(target).load(url).centerCrop().into(target)
+    }
+}
+// Later you can add CoilProxy : ImageLoader and change one line of wiring.</code></pre>
+
+    <p>Every screen uses <code>ImageLoader</code>. If Glide changes its API or you move to Coil, you edit one class. That is <strong>Dependency Inversion</strong> and the <strong>Open/Closed</strong> principle working together.</p>
+
+    <h3 id="scheduler">Scheduler pattern: AssessmentSchedulers</h3>
+    <p>Background work needs two answers: <em>which thread does the work</em> and <em>which thread shows the result</em>. If you hard-code <code>Dispatchers.IO</code> or <code>Schedulers.io()</code> everywhere, tests become slow and flaky. Hide that choice behind a small interface. In one project it was called <code>AssessmentSchedulers</code>; you can name it after your own feature.</p>
+<pre><code>// RxJava version
+interface AssessmentSchedulers {
+    fun io(): Scheduler
+    fun ui(): Scheduler
+}
+class AppSchedulers : AssessmentSchedulers {
+    override fun io() = Schedulers.io()
+    override fun ui() = AndroidSchedulers.mainThread()
+}
+class TestSchedulers : AssessmentSchedulers {   // used in unit tests
+    override fun io() = Schedulers.trampoline()
+    override fun ui() = Schedulers.trampoline()
+}
+
+// Coroutines version
+interface DispatcherProvider {
+    val io: CoroutineDispatcher
+    val main: CoroutineDispatcher
+}</code></pre>
+
+    <p>In production you inject the real threads. In tests you inject immediate ones (<code>trampoline()</code> for Rx, a test dispatcher for coroutines) and the async code runs in order, instantly.</p>
+
+    <h3 id="repo">Repository pattern: LocalRepository</h3>
+    <p>A <strong>repository</strong> is the single door to some data. The logic asks &ldquo;give me the profile&rdquo;; it does not care whether the answer came from memory, the database or the network.</p>
+<pre><code>interface ProfileRepository {
+    suspend fun getProfile(id: String): Profile
+}
+
+class LocalRepository(private val dao: ProfileDao) : ProfileRepository {
+    override suspend fun getProfile(id: String) = dao.find(id).toDomain()
+}
+
+class RemoteRepository(private val api: ProfileApi) : ProfileRepository {
+    override suspend fun getProfile(id: String) = api.profile(id).toDomain()
+}
+
+// The "real" repository the app injects. It chooses and combines sources.
+class DefaultProfileRepository(
+    private val local: LocalRepository,
+    private val remote: RemoteRepository,
+) : ProfileRepository {
+    override suspend fun getProfile(id: String): Profile =
+        runCatching { remote.getProfile(id).also { local.save(it) } }
+            .getOrElse { local.getProfile(id) }   // offline fallback
+}</code></pre>
+
+    <h3 id="more">A few more patterns worth a name</h3>
+    <table class="gloss">
+      <thead><tr><th>Pattern</th><th>Android example</th></tr></thead>
+      <tbody>
+        <tr><td>Observer</td><td><code>LiveData</code>, <code>StateFlow</code>, Rx streams: the view reacts when data changes.</td></tr>
+        <tr><td>Factory</td><td><code>ViewModelProvider.Factory</code>: builds objects that need constructor arguments.</td></tr>
+        <tr><td>Adapter</td><td><code>RecyclerView.Adapter</code>, and mapper functions that convert API models to domain models.</td></tr>
+        <tr><td>Strategy</td><td>Swap an algorithm: different sort orders, different payment providers.</td></tr>
+        <tr><td>Builder</td><td><code>AlertDialog.Builder</code>, <code>Retrofit.Builder</code>.</td></tr>
+        <tr><td>Singleton</td><td>One shared instance. Use through dependency injection, not as a global variable.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="together">3. How they work together</h2>
+    <ul>
+      <li><strong>Separation of concerns</strong> gives you the boxes (View, Logic, Data).</li>
+      <li><strong>Proxy</strong> keeps the View box replaceable. <strong>Repository</strong> keeps the Data box replaceable. <strong>Scheduler</strong> keeps threading replaceable.</li>
+      <li><strong>Dependency Inversion</strong> is what lets you replace them: depend on interfaces, get the real classes injected (Part 6).</li>
+      <li><strong>KISS and DRY</strong> stop you from overdoing any of it.</li>
+    </ul>
+    <p>Remember this list. In Part 8 the claim is that MVP, MVVM, VIPER and Redux are all built from these same bricks.</p>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul><li><a href="solid-principles-explained.html" target="_blank" rel="noopener">SOLID principles explained (my article)</a></li><li><a href="design-patterns-kotlin.html" target="_blank" rel="noopener">Design Patterns in Kotlin: 50+ patterns with Playground exercises (my article)</a></li><li><a href="https://en.wikipedia.org/wiki/Software_design_pattern" target="_blank" rel="noopener">Software design pattern (Wikipedia)</a></li><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a></li><li><a href="https://bumptech.github.io/glide/" target="_blank" rel="noopener">Glide image loading library</a></li></ul>
+    <div class="pager">
+      <a class="prev" href="android-arch-part-1-why-architecture.html"><small>&larr; Previous &middot; Part 1</small>Why architecture</a>
+      <a class="next" href="android-arch-part-3-mvc-and-mvp.html"><small>Next &middot; Part 3 &rarr;</small>MVC and MVP</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data, Network and Configuration Changes — Khairul Alam</title>
+  <meta name="description" content="Room, Retrofit, gRPC, microservices and how Android architectures keep state through rotation, language, font size and screen size changes." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .conv .fig { background: var(--bg); }
+    .conv h4 { margin: 14px 0 4px; font-size: calc(14px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android Architecture series &middot; Part 7 of 9</p>
+    <h1>Data, Network and Configuration Changes</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~13 min read</span></div>
+    <div class="tags"><span class="tag">Room</span><span class="tag">Retrofit</span><span class="tag">gRPC</span><span class="tag">Microservices</span><span class="tag">ViewModel</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="android-arch-part-1-why-architecture.html"><small>Part 1</small>Why architecture</a><a href="android-arch-part-2-principles-and-patterns.html"><small>Part 2</small>Principles</a><a href="android-arch-part-3-mvc-and-mvp.html"><small>Part 3</small>MVC and MVP</a><a href="android-arch-part-4-mvvm-and-redux.html"><small>Part 4</small>MVVM and Redux</a><a href="android-arch-part-5-viper-and-modules.html"><small>Part 5</small>VIPER</a><a href="android-arch-part-6-di-async-errors.html"><small>Part 6</small>DI and async</a><a class="on" href="android-arch-part-7-data-and-config-changes.html"><small>Part 7</small>Data and config</a><a href="android-arch-part-8-testing-and-proof.html"><small>Part 8</small>Testing and proof</a><a href="android-arch-part-9-converting-architectures.html"><small>Part 9</small>Converting</a>
+    </div>
+
+    <p class="lede">This part fills the Data box (Room, Retrofit, gRPC) and then shows what happens when rotation, language, font or window size changes, and why state must not live in the Activity.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>Local:</strong> Room for tables, DataStore for settings.</li><li><strong>Remote:</strong> Retrofit + OkHttp; gRPC for contract-first and streaming.</li><li><strong>Microservices:</strong> independent teams; use a gateway so the phone calls one API.</li><li><strong>Config changes:</strong> Activity is recreated; keep state in ViewModel, SavedStateHandle or storage.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#room">Local data with Room</a></li><li><a href="#retrofit">Remote data with Retrofit</a></li><li><a href="#grpc">What is gRPC</a></li><li><a href="#micro">How microservices help</a></li><li><a href="#config">Surviving configuration changes</a></li></ol>
+    </details>
+
+
+    <h2 id="room">1. Local data with Room</h2>
+    <p><strong>Room</strong> is Jetpack&rsquo;s layer over SQLite. You describe tables as classes and queries as functions; Room checks the SQL at compile time. It belongs to the Data box, behind your repository.</p>
+<pre><code>@Entity(tableName = "profile")
+data class ProfileEntity(@PrimaryKey val id: String, val name: String, val active: Boolean)
+
+@Dao
+interface ProfileDao {
+    @Query("SELECT * FROM profile WHERE id = :id")
+    suspend fun find(id: String): ProfileEntity?
+
+    @Query("SELECT * FROM profile WHERE id = :id")
+    fun observe(id: String): Flow&lt;ProfileEntity?&gt;         // emits again when data changes
+
+    @Upsert suspend fun save(entity: ProfileEntity)
+}
+
+@Database(entities = [ProfileEntity::class], version = 1)
+abstract class AppDatabase : RoomDatabase() { abstract fun profileDao(): ProfileDao }</code></pre>
+
+    <p>For small key-value settings (theme, language, onboarding done) use <strong>DataStore</strong> instead of <code>SharedPreferences</code>. Keep <code>ProfileEntity</code> (database shape) separate from <code>Profile</code> (what the app uses) and convert with a small mapper, so a database change does not ripple into the UI.</p>
+
+    <h2 id="retrofit">2. Remote data with Retrofit</h2>
+    <p><strong>Retrofit</strong> turns a REST API into a Kotlin interface, usually on top of <strong>OkHttp</strong> (the HTTP client) and a JSON converter such as kotlinx.serialization or Moshi.</p>
+<pre><code>interface ProfileApi {
+    @GET("profiles/{id}")
+    suspend fun profile(@Path("id") id: String): ProfileDto
+}
+
+val api = Retrofit.Builder()
+    .baseUrl("https://api.example.com/")
+    .client(OkHttpClient.Builder().build())
+    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+    .build()
+    .create(ProfileApi::class.java)</code></pre>
+
+    <p>Together with the repository from Part 2 you get the classic <strong>offline-first</strong> pattern: the database is the single source of truth. The repository refreshes from the network into the database, and the screen observes the database.</p>
+<figure class="fig">
+<svg viewBox="0 0 640 130" role="img" aria-label="Offline-first: the screen observes Room; the repository refreshes Room from the network.">
+<rect class="boxg" x="10" y="30" width="120" height="60" rx="12"/><text class="b c" x="70.0" y="57.0">Screen</text><text class="sub c" x="70.0" y="75.0">observes</text><rect class="boxo" x="175" y="30" width="130" height="60" rx="12"/><text class="b c" x="240.0" y="57.0">Room</text><text class="sub c" x="240.0" y="75.0">source of truth</text><rect class="boxp" x="350" y="30" width="120" height="60" rx="12"/><text class="b c" x="410.0" y="57.0">Repository</text><text class="sub c" x="410.0" y="75.0">refresh()</text><rect class="boxr" x="515" y="30" width="115" height="60" rx="12"/><text class="b c" x="572.5" y="57.0">Retrofit</text><text class="sub c" x="572.5" y="75.0">network</text><path class="arrow" d="M175,60 L132,60"/><path class="arrow" d="M350,60 L307,60"/><path class="arrow" d="M515,60 L472,60"/><text class="sub c" x="320" y="115">Arrows show who feeds whom: network fills the database, the database feeds the screen.</text>
+</svg>
+<figcaption>The user sees saved data instantly, and fresh data appears when the refresh finishes.</figcaption>
+</figure>
+
+    <h2 id="grpc">3. What is gRPC?</h2>
+    <p><strong>gRPC</strong> is a way for two programs to call each other&rsquo;s functions over the network. Instead of REST + JSON (&ldquo;send text to a URL&rdquo;), you write a contract in a <code>.proto</code> file, and tools generate the client and server code in your language.</p>
+<pre><code>// profile.proto
+syntax = "proto3";
+service ProfileService {
+  rpc GetProfile (ProfileRequest) returns (ProfileReply);
+  rpc WatchProfile (ProfileRequest) returns (stream ProfileReply);   // streaming
+}
+message ProfileRequest { string id = 1; }
+message ProfileReply   { string id = 1; string name = 2; bool active = 3; }</code></pre>
+
+    <table>
+      <thead><tr><th></th><th>REST + JSON</th><th>gRPC + protobuf</th></tr></thead>
+      <tbody>
+        <tr><td>Format</td><td>Text, human-readable</td><td>Binary, smaller and faster to parse</td></tr>
+        <tr><td>Contract</td><td>Often docs or OpenAPI</td><td>The <code>.proto</code> file is the contract; code is generated</td></tr>
+        <tr><td>Transport</td><td>HTTP/1.1 or 2</td><td>HTTP/2, supports streaming both ways</td></tr>
+        <tr><td>Browser/debug</td><td>Easy (curl, browser)</td><td>Needs tooling</td></tr>
+      </tbody>
+    </table>
+    <p>For Android: gRPC is a good fit when the backend already uses it or you need streaming. Architecturally nothing changes: the generated client sits behind a <code>RemoteRepository</code>, and the rest of the app never knows. The same protobuf messages can also be stored locally with Proto DataStore.</p>
+
+    <h2 id="micro">4. How microservices help</h2>
+    <p>A <strong>microservice</strong> backend is split into many small services (accounts, orders, payments), each with its own data and its own deploys, instead of one giant server. For a mobile team this matters in three ways:</p>
+    <ul>
+      <li><strong>Independent change:</strong> the payments team can ship without waiting for the profile team. This mirrors why you split the app into feature modules.</li>
+      <li><strong>Clear contracts:</strong> every service publishes a contract (OpenAPI or proto), which your repositories map to domain models.</li>
+      <li><strong>Resilience:</strong> if recommendations are down, the rest of the app can still work (handle the error per feature, Part 6).</li>
+    </ul>
+    <div class="note"><p><strong>Do not call ten services from the phone.</strong> Put an API gateway or a &ldquo;backend for frontend&rdquo; in front that combines them. Fewer round trips save battery and data, and the app talks to one tidy API.</p></div>
+
+    <h2 id="config">5. Surviving configuration changes</h2>
+    <p>By default, when the device configuration changes, Android <strong>destroys and recreates</strong> the Activity so it can load matching resources. These changes include:</p>
+    <ul>
+      <li><strong>Rotation</strong> (orientation)</li>
+      <li><strong>Language</strong> (locale)</li>
+      <li><strong>Font size</strong> (<code>fontScale</code>), plus dark mode</li>
+      <li><strong>Screen size:</strong> split-screen, multi-window, foldables, desktop windows</li>
+    </ul>
+    <p>The recreated Activity starts with empty fields. This is where architecture earns its keep: state must live <em>outside</em> the Activity.</p>
+    <table>
+      <thead><tr><th>Where state lives</th><th>Rotation / language / font / size change</th><th>Process death (system kills app in background)</th></tr></thead>
+      <tbody>
+        <tr><td>Activity / View fields</td><td>Lost</td><td>Lost</td></tr>
+        <tr><td><code>ViewModel</code> (MVVM) or retained presenter</td><td><strong>Survives</strong></td><td>Lost</td></tr>
+        <tr><td><code>SavedStateHandle</code> / <code>onSaveInstanceState</code></td><td><strong>Survives</strong></td><td><strong>Survives</strong> (small data only)</td></tr>
+        <tr><td>Room / DataStore / files</td><td><strong>Survives</strong></td><td><strong>Survives</strong></td></tr>
+      </tbody>
+    </table>
+<pre><code>class FormViewModel(private val saved: SavedStateHandle) : ViewModel() {
+    // typed text survives rotation AND process death
+    val draft: StateFlow&lt;String&gt; = saved.getStateFlow("draft", "")
+    fun onDraftChanged(text: String) { saved["draft"] = text }
+}</code></pre>
+
+    <h3>What each architecture does</h3>
+    <ul>
+      <li><strong>MVVM / MVI:</strong> the ViewModel survives the recreation, and the new Activity just collects the same state again. Easiest.</li>
+      <li><strong>MVP:</strong> the presenter dies with the Activity unless you retain it (for example inside a ViewModel). Many teams make the presenter state a plain object held by a ViewModel.</li>
+      <li><strong>VIPER:</strong> same as MVP for the presenter; interactors are stateless so nothing to save.</li>
+    </ul>
+    <h3>Language, font and size specifically</h3>
+    <ul>
+      <li><strong>Language:</strong> do not store translated strings in the ViewModel; store a resource id or a small <code>UiText</code> wrapper and resolve it in the view, so the new language appears after recreation. For an in-app language picker use <code>AppCompatDelegate.setApplicationLocales()</code> and persist the choice (DataStore).</li>
+      <li><strong>Font size:</strong> use <code>sp</code> for text, let containers grow or scroll, and test at the largest size. Do not hide controls with fixed heights.</li>
+      <li><strong>Screen size:</strong> design with window size classes (compact, medium, expanded) and layout resource qualifiers. The same ViewModel can serve a phone and a tablet layout.</li>
+      <li><strong>Avoid the shortcut:</strong> declaring <code>android:configChanges</code> to stop recreation hides bugs. Only use it for special cases such as video players, and handle the change yourself.</li>
+    </ul>
+    <div class="callout"><strong>Test it</strong><p>Turn on &ldquo;Don&rsquo;t keep activities&rdquo; in Developer options, rotate the phone, change the language and font size. If the screen keeps its state, your architecture works.</p></div>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul><li><a href="https://developer.android.com/training/data-storage/room" target="_blank" rel="noopener">Save data in a local database using Room</a></li><li><a href="https://square.github.io/retrofit/" target="_blank" rel="noopener">Retrofit</a></li><li><a href="https://grpc.io/docs/languages/kotlin/" target="_blank" rel="noopener">gRPC for Kotlin</a></li><li><a href="https://protobuf.dev/" target="_blank" rel="noopener">Protocol Buffers</a></li><li><a href="https://developer.android.com/guide/topics/resources/runtime-changes" target="_blank" rel="noopener">Handle configuration changes</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/saving-states" target="_blank" rel="noopener">Saving UI states</a></li><li><a href="https://martinfowler.com/articles/microservices.html" target="_blank" rel="noopener">Microservices (Martin Fowler)</a></li></ul>
+    <div class="pager">
+      <a class="prev" href="android-arch-part-6-di-async-errors.html"><small>&larr; Previous &middot; Part 6</small>DI, async and errors</a>
+      <a class="next" href="android-arch-part-8-testing-and-proof.html"><small>Next &middot; Part 8 &rarr;</small>Testing and the proof</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

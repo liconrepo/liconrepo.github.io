@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Firebase Remote Config: Change Your App Without a New Release — Khairul Alam</title>
+  <meta name="description" content="What Firebase Remote Config is, how parameters, conditions and fetch/activate work, common uses, and the official setup links." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Firebase series &middot; Part 1 of 4</p>
+    <h1>Firebase Remote Config: Change Your App Without a New Release</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~8 min read</span></div>
+    <div class="tags"><span class="tag">Firebase</span><span class="tag">Remote Config</span><span class="tag">Android</span><span class="tag">Feature flags</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a class="on" href="firebase-remote-config-overview.html"><small>Part 1</small>Remote Config</a>
+      <a href="firebase-analytics-overview.html"><small>Part 2</small>Analytics</a>
+      <a href="firebase-app-distribution-overview.html"><small>Part 3</small>App Distribution</a>
+      <a href="firebase-crashlytics-overview.html"><small>Part 4</small>Crashlytics</a>
+    </div>
+
+    <p class="lede">Remote Config lets you change how your app looks and behaves from a console, without publishing a new version. It is a key-value store in the cloud that your app downloads and reads. This post is the overview; Google&rsquo;s guide covers the exact setup.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>What:</strong> cloud key-value settings your app fetches.</li><li><strong>Use for:</strong> feature flags, kill switches, copy, limits, gradual rollouts.</li><li><strong>Key idea:</strong> ship defaults in the app, override them from the console.</li><li><strong>Watch out:</strong> values may arrive late. Fetch at launch and keep safe defaults.</li><li><strong>Not for:</strong> secrets or user data. Values are readable by the app user.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#what">What it is</a></li><li><a href="#flow">How it works</a></li><li><a href="#timing">Timing: values are not instant</a></li><li><a href="#cond">Conditions and rollouts</a></li><li><a href="#use">Common uses</a></li><li><a href="#code">A tiny example</a></li><li><a href="#limits">Limits and good habits</a></li></ol>
+    </details>
+
+    <h2 id="what">1. What it is</h2>
+    <p>Normally, changing a button colour or turning a feature off means a new build, a store review and users updating. With Remote Config the app reads its settings from Firebase instead. You edit a value in the console, publish, and the app picks it up on its next fetch.</p>
+    <div class="analogy"><p><strong>Analogy.</strong> A TV remote for your app: the TV (your code) is already built, and the remote (console) changes channels and volume from a distance.</p></div>
+        <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="Sketch of the Remote Config parameters list: keys with values.">
+        <rect class="box" x="60" y="10" width="520" height="170" rx="10"/>
+        <path class="rule" d="M60,38 L580,38"/>
+        <circle cx="74" cy="24" r="4" fill="#ef4444"/><circle cx="88" cy="24" r="4" fill="#f59e0b"/><circle cx="102" cy="24" r="4" fill="#10b981"/>
+        <text class="sub" x="116" y="28">Remote Config &middot; Parameters</text>
+        <text x="76" y="64">promo_banner_enabled</text>
+        <text class="sub" x="564" y="64" style="text-anchor:end">true</text>
+        <rect class="boxg" x="60" y="50" width="6" height="18" rx="3"/>
+        <text x="76" y="92">min_app_version</text>
+        <text class="sub" x="564" y="92" style="text-anchor:end">2.4.0</text>
+        <rect class="boxb" x="60" y="78" width="6" height="18" rx="3"/>
+        <text x="76" y="120">checkout_button_color</text>
+        <text class="sub" x="564" y="120" style="text-anchor:end">#10b981</text>
+        <rect class="boxo" x="60" y="106" width="6" height="18" rx="3"/>
+        <text x="76" y="148">welcome_message</text>
+        <text class="sub" x="564" y="148" style="text-anchor:end">Hello!</text>
+        <rect class="boxp" x="60" y="134" width="6" height="18" rx="3"/>
+
+      </svg>
+      <figcaption>A sketch of the console&rsquo;s Parameters tab: each row is a key with a default value, and can have conditions on top. (Illustration, not a screenshot.)</figcaption>
+    </figure>
+
+    <h2 id="flow">2. How it works</h2>
+    <p>Your app ships with <strong>in-app defaults</strong>. On start-up it <strong>fetches</strong> the latest values from the service, then <strong>activates</strong> them so the code reads the new ones. Fetches are throttled, so the new value may appear on the next launch rather than instantly.</p>
+        <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="Console publishes parameters to Remote Config in the cloud; the Android and iOS apps fetch and activate them.">
+        <rect class="boxb" x="20" y="80" width="120" height="60" rx="12"/><text class="b c" x="80" y="107">Firebase console</text><text class="sub c" x="80" y="125">your rules</text>
+        <rect class="boxp" x="220" y="80" width="120" height="60" rx="12"/><text class="b c" x="280" y="107">Remote Config</text><text class="sub c" x="280" y="125">cloud</text>
+        <rect class="boxg" x="440" y="20" width="180" height="56" rx="12"/><text class="b c" x="530" y="45">App v1 (Android)</text><text class="sub c" x="530" y="63">fetch + activate</text>
+        <rect class="boxg" x="440" y="144" width="180" height="56" rx="12"/><text class="b c" x="530" y="169">App v2 (iOS)</text><text class="sub c" x="530" y="187">fetch + activate</text>
+        <path class="arrow" d="M142,110 L216,110"/>
+        <path class="arrow" d="M342,100 L436,52"/>
+        <path class="arrow" d="M342,120 L436,172"/>
+        <text class="sub c" x="180" y="70">publish</text>
+        <text class="sub c" x="400" y="60">values</text>
+
+      </svg>
+      <figcaption>Change a value in the console, publish it, and apps pick it up on their next fetch. No store release.</figcaption>
+    </figure>
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Three layers: in-app defaults, fetched values, and active values the code reads.">
+        <rect class="boxo" x="20" y="60" width="130" height="60" rx="12"/><text class="b c" x="85" y="87">In-app defaults</text><text class="sub c" x="85" y="105">shipped in app</text>
+        <rect class="boxb" x="255" y="60" width="130" height="60" rx="12"/><text class="b c" x="320" y="87">Fetched values</text><text class="sub c" x="320" y="105">from server</text>
+        <rect class="boxg" x="490" y="60" width="130" height="60" rx="12"/><text class="b c" x="555" y="87">Active values</text><text class="sub c" x="555" y="105">what code reads</text>
+        <path class="arrow" d="M152,90 L251,90"/>
+        <path class="arrow" d="M387,90 L486,90"/>
+        <text class="sub c" x="202" y="78">fetch</text>
+        <text class="sub c" x="436" y="78">activate</text>
+        <text class="sub c" x="320" y="170">Code always reads the active value; if nothing was fetched, the default is used.</text>
+
+      </svg>
+      <figcaption>The lifecycle behind every call: defaults, fetched, active. Nothing changes in the UI until you activate.</figcaption>
+    </figure>
+
+    <h2 id="timing">3. Timing: values are not instant</h2>
+    <p>A fetch is a network call. On a slow connection, in airplane mode, or on the very first launch it may be late or fail, and the throttle can also hold back a refresh. If your code assumes the new value is already there, it can read the wrong one at the worst moment, such as a kill switch that has not arrived yet. This is the main runtime risk of Remote Config.</p>
+    <p>Two terms are used below, so here is what they mean in this post:</p>
+    <table>
+      <tr><th>Term</th><th>Meaning</th><th>Remote Config example</th></tr>
+      <tr><td>App launch</td><td>The short window from when the user opens the app until the first screen is ready: process start, <code>Application.onCreate</code>, splash screen.</td><td>Start the fetch here, so values can be ready before the user reaches a feature.</td></tr>
+      <tr><td>Runtime</td><td>Everything after launch, while the app is open and in use: screens, taps, background work.</td><td>Code reads a value with <code>getBoolean</code> or <code>getString</code>. A fetch started at runtime may finish at any moment, or not at all.</td></tr>
+    </table>
+    <p><strong>Launch-time fetch</strong> means asking for fresh values during app launch. <strong>Runtime risk</strong> means the app reads a value while the fetch is still running, or after it failed, and so gets the default or cached value instead of the new one.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="Timeline split into App launch and Runtime. At launch: set defaults, then start fetchAndActivate. At runtime: screens read values with a safe default; the fetch may finish at any time, and a late result applies on the next screen or launch.">
+        <rect class="boxb" x="10" y="14" width="250" height="236" rx="14" style="fill-opacity:.35"/>
+        <rect class="boxg" x="270" y="14" width="360" height="236" rx="14" style="fill-opacity:.35"/>
+        <text class="b" x="24" y="38">App launch</text><text class="sub" x="24" y="56">Application.onCreate / splash</text>
+        <text class="b" x="284" y="38">Runtime</text><text class="sub" x="284" y="56">app is open and in use</text>
+        <rect class="box" x="24" y="76" width="222" height="44" rx="10"/><text class="c" x="135" y="103">1. setDefaultsAsync</text>
+        <rect class="boxp" x="24" y="136" width="222" height="44" rx="10"/><text class="c b" x="135" y="163">2. fetchAndActivate()</text>
+        <path class="arrow" d="M135,121 L135,134"/>
+        <text class="sub c" x="135" y="206">starts a network call,</text><text class="sub c" x="135" y="224">does not wait for it</text>
+        <rect class="box" x="284" y="76" width="160" height="44" rx="10"/><text class="c" x="364" y="103">Screen A reads value</text>
+        <rect class="box" x="464" y="76" width="152" height="44" rx="10"/><text class="c" x="540" y="103">Screen B reads value</text>
+        <rect class="boxo" x="284" y="146" width="332" height="40" rx="10"/><text class="c" x="450" y="171">Fetch finishes: now, later, or never</text>
+        <path class="arrow" d="M246,158 L280,164"/>
+        <text class="sub c" x="450" y="212">Not finished yet: default or cached value</text>
+        <text class="sub c" x="450" y="232">Finished: new value from the next read</text>
+      </svg>
+      <figcaption>The fetch begins at launch but ends at runtime. Every read at runtime must be correct whichever value it gets.</figcaption>
+    </figure>
+<pre><code>// App launch: start the fetch early, and do not block on it
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        val rc = Firebase.remoteConfig
+        rc.setConfigSettingsAsync(remoteConfigSettings { minimumFetchIntervalInSeconds = 3600 })
+        rc.setDefaultsAsync(mapOf("new_checkout_enabled" to false))   // safe default: off
+        rc.fetchAndActivate()                                         // async, may finish later
+    }
+}
+
+// Runtime: read with the default as the fallback
+fun showCheckout() {
+    val useNew = Firebase.remoteConfig.getBoolean("new_checkout_enabled")
+    if (useNew) openNewCheckout() else openOldCheckout()   // both paths must work
+}</code></pre>
+    <p>Launching the fetch <strong>early, at app start</strong>, reduces that risk, because the values usually arrive before the user reaches the screen that needs them. Early fetch does not remove the risk, so combine it with these habits:</p>
+    <ul>
+      <li><strong>Fetch at launch.</strong> Call <code>fetchAndActivate()</code> in <code>Application.onCreate</code> or on the splash screen, not when the feature screen opens.</li>
+      <li><strong>Ship safe defaults.</strong> Choose each default so the app is fine if nothing ever arrives. A new feature should default to off.</li>
+      <li><strong>Prefer last-known values.</strong> Activated values are cached on the device, so a failed fetch still leaves the previous ones.</li>
+      <li><strong>Do not block the UI.</strong> Wait on the splash for a short timeout (about 2 seconds) at most, then continue with what you have.</li>
+      <li><strong>Apply at a safe moment.</strong> A value fetched now can take effect on the next launch or screen, so the UI does not change under the user. The real-time listener can push updates while the app is running.</li>
+      <li><strong>Keep important rules consistent.</strong> If a flag changes mid-session, read it once per screen, not on every call.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Timeline of app launch. Fetch starts at launch. Path A: values arrive in time and the screen uses them. Path B: values are late, so the screen uses the defaults or cached values and applies fresh ones next time.">
+        <rect class="boxb" x="20" y="90" width="110" height="50" rx="12"/><text class="b c" x="75" y="120">App launch</text>
+        <rect class="boxp" x="190" y="90" width="120" height="50" rx="12"/><text class="b c" x="250" y="112">Fetch starts</text><text class="sub c" x="250" y="130">async</text>
+        <path class="arrow" d="M132,115 L186,115"/>
+        <rect class="boxg" x="440" y="20" width="180" height="56" rx="12"/><text class="b c" x="530" y="44">Arrived in time</text><text class="sub c" x="530" y="62">screen uses new values</text>
+        <rect class="boxo" x="440" y="150" width="180" height="62" rx="12"/><text class="b c" x="530" y="174">Late or failed</text><text class="sub c" x="530" y="192">use cached or default values</text>
+        <path class="arrow" d="M312,105 L436,52"/><path class="arrow" d="M312,125 L436,178"/>
+        <text class="sub c" x="360" y="70">fast network</text><text class="sub c" x="360" y="172">slow / offline</text>
+      </svg>
+      <figcaption>Start the fetch early, and design the screen so it is correct on both paths.</figcaption>
+    </figure>
+    <h3>Runtime update: a value changes while the app is open</h3>
+    <p>The code above reads whatever is active. To hear about a change while the app is running, register a real-time listener. It tells you a new template was published; you then activate it and apply it at a safe moment, such as the next screen, not in the middle of a task.</p>
+<pre><code>Firebase.remoteConfig.addOnConfigUpdateListener(object : ConfigUpdateListener {
+    override fun onUpdate(update: ConfigUpdate) {
+        Firebase.remoteConfig.activate().addOnCompleteListener {
+            // Apply at a safe moment, e.g. on the next screen, not mid-task
+            checkoutFlag = Firebase.remoteConfig.getBoolean("new_checkout_enabled")
+        }
+    }
+    override fun onError(error: FirebaseRemoteConfigException) { /* keep current values */ }
+})</code></pre>
+    <p>See Google&rsquo;s real-time Remote Config guide for the exact setup and requirements.</p>
+    <h2 id="cond">4. Conditions and rollouts</h2>
+    <p>A parameter can have several values, each tied to a <strong>condition</strong>: app version, platform, country, language, a percentage of users, or a user property from Analytics. That gives you staged rollouts (5%, then 50%, then 100%) and per-market settings from one place.</p>
+    <p>Remote Config also powers <strong>A/B Testing</strong>: Firebase serves variants to different groups and measures which wins with Analytics.</p>
+    <h3>Rollout timing depends on your users</h3>
+    <p>Publishing in the console does not push a value to every phone at once. Each device gets it at its <strong>next successful fetch</strong>, and that depends on when the user opens the app and on the minimum fetch interval (12 hours by default). So the same rollout looks different for different apps:</p>
+    <ul>
+      <li><strong>Large user base:</strong> the change spreads over hours or days as people open the app. At any moment some users are on the old value and some on the new one, so your code and backend must tolerate both. A 10% rollout reaches about 10% of users, but only as they fetch.</li>
+      <li><strong>Small user base:</strong> percentages are only approximate, because users are placed in the percentage at random. With 50 users, a &ldquo;10%&rdquo; rollout might reach 3 or 8 people. Few users also means fewer fetches, so a value can take longer to show up for the quiet ones.</li>
+      <li><strong>Rarely opened apps:</strong> a user who opens the app once a week sees changes about a week late.</li>
+    </ul>
+    <p>Plan for this: raise the percentage in steps and watch Crashlytics and Analytics between steps. For time-critical changes such as a kill switch, shorten the fetch interval or use real-time Remote Config updates so running apps can pick the change up sooner. Do not rely on it as an instant switch.</p>
+    <h2 id="use">5. Common uses</h2>
+    <table>
+      <tr><th>Use</th><th>Example</th></tr>
+      <tr><td>Feature flag</td><td>Enable the new checkout for 10% of users.</td></tr>
+      <tr><td>Kill switch</td><td>Turn off a broken feature without a hotfix release.</td></tr>
+      <tr><td>Force update</td><td>Compare <code>min_app_version</code> with the installed version.</td></tr>
+      <tr><td>Content and copy</td><td>Seasonal banner text or promo colours.</td></tr>
+      <tr><td>Tuning</td><td>Timeouts, page sizes, retry counts.</td></tr>
+    </table>
+    <h2 id="code">6. A tiny example</h2>
+    <p>The shape of the Android code, after you have added the SDK as Google describes:</p>
+<pre><code>val rc = Firebase.remoteConfig
+rc.setDefaultsAsync(mapOf("promo_banner_enabled" to false))
+rc.fetchAndActivate().addOnCompleteListener {
+    val show = rc.getBoolean("promo_banner_enabled")
+    banner.isVisible = show
+}</code></pre>
+    <h2 id="limits">7. Limits and good habits</h2>
+    <ul>
+      <li>Never put secrets in it. Anyone can inspect the values.</li>
+      <li>Always set sensible defaults so the app works offline and on first launch.</li>
+      <li>Fetches are rate-limited; use a short interval only in debug builds.</li>
+      <li>Never assume the fetch has finished. Read values with a safe default and see section 3.</li>
+      <li>Name keys clearly and delete flags once a rollout is finished.</li>
+      <li>Make code safe if a value is missing or unexpected.</li>
+    </ul>
+
+    <h2 id="links">Official links</h2>
+    <p>Setup steps change often, so follow Google&rsquo;s own guides rather than a copy here.</p>
+    <ul><li><a href="https://firebase.google.com/docs/remote-config" target="_blank" rel="noopener">Remote Config documentation (overview)</a></li><li><a href="https://firebase.google.com/docs/remote-config/get-started?platform=android" target="_blank" rel="noopener">Get started on Android</a></li><li><a href="https://firebase.google.com/docs/remote-config/get-started?platform=ios" target="_blank" rel="noopener">Get started on iOS</a></li><li><a href="https://firebase.google.com/docs/remote-config/real-time" target="_blank" rel="noopener">Real-time Remote Config updates</a></li><li><a href="https://firebase.google.com/docs/remote-config/parameters" target="_blank" rel="noopener">Parameters and conditions</a></li><li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase console</a></li></ul>
+    <div class="pager">
+      <a class="next" href="firebase-analytics-overview.html"><small>Next &middot; Part 2 &rarr;</small>Analytics</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

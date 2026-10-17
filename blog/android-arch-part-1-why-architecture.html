@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Android Architecture for First-Timers: Why It Matters — Khairul Alam</title>
+  <meta name="description" content="Why Android apps need an architecture, the goals it serves, and a simple View, Logic, Data template that explains MVC, MVP, MVVM, VIPER and Redux." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .conv .fig { background: var(--bg); }
+    .conv h4 { margin: 14px 0 4px; font-size: calc(14px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android Architecture series &middot; Part 1 of 9</p>
+    <h1>Android Architecture for First-Timers: Why It Matters</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~8 min read</span></div>
+    <div class="tags"><span class="tag">Android</span><span class="tag">Architecture</span><span class="tag">MVC</span><span class="tag">MVP</span><span class="tag">MVVM</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a class="on" href="android-arch-part-1-why-architecture.html"><small>Part 1</small>Why architecture</a><a href="android-arch-part-2-principles-and-patterns.html"><small>Part 2</small>Principles</a><a href="android-arch-part-3-mvc-and-mvp.html"><small>Part 3</small>MVC and MVP</a><a href="android-arch-part-4-mvvm-and-redux.html"><small>Part 4</small>MVVM and Redux</a><a href="android-arch-part-5-viper-and-modules.html"><small>Part 5</small>VIPER</a><a href="android-arch-part-6-di-async-errors.html"><small>Part 6</small>DI and async</a><a href="android-arch-part-7-data-and-config-changes.html"><small>Part 7</small>Data and config</a><a href="android-arch-part-8-testing-and-proof.html"><small>Part 8</small>Testing and proof</a><a href="android-arch-part-9-converting-architectures.html"><small>Part 9</small>Converting</a>
+    </div>
+
+    <p class="lede">Architecture sounds scary, but the idea is small: decide where code lives so a team can keep shipping for years. This first part explains the goals and gives you one simple picture that the rest of the series reuses.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>Goal:</strong> one consistent architecture for faster delivery with quality.</li><li><strong>Also:</strong> easy change, low onboarding cost, scalable team and features.</li><li><strong>Template:</strong> View, Logic, Data. Every named architecture is a variation.</li><li><strong>Choice:</strong> there is no winner; adopt the benefits, not the label.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#why">Why do we need an architecture</a></li><li><a href="#template">The common template</a></li><li><a href="#menu">The menu of options</a></li><li><a href="#revamp">Cleaning up a big old codebase</a></li><li><a href="#map">What this series covers</a></li></ol>
+    </details>
+
+
+    <h2 id="why">1. Why do we need an architecture at all?</h2>
+    <p>Imagine your first Android app. One screen, one <code>Activity</code>. You put the button click, the network call, the JSON parsing and the list update all in the same file. It works, and it ships fast. Six months later there are 40 screens, 6 developers, and a 3,000-line <code>MainActivity</code> that nobody dares to touch.</p>
+    <div class="analogy"><p><strong>Think of a restaurant kitchen.</strong> In a tiny food stall, one person takes orders, cooks and washes dishes. In a restaurant that serves 500 people, you need stations: someone takes orders, someone cooks, someone stores ingredients. Each station has clear jobs and clear hand-offs. Software architecture is the same idea: <em>who does what, and who is allowed to talk to whom</em>.</p></div>
+    <p>An architecture is not a library you install. It is an agreement inside the team about where code lives. A good agreement gives you these benefits:</p>
+    <table>
+      <thead><tr><th>Goal</th><th>What it means in plain words</th></tr></thead>
+      <tbody>
+        <tr><td><strong>One consistent architecture</strong></td><td>Every screen is built the same way, so the team delivers <strong>faster with quality</strong>. Nobody reinvents the structure for each feature.</td></tr>
+        <tr><td><strong>Evolutionary change</strong></td><td>The design supports change in the future. You can swap a database, a network library or a UI toolkit without rewriting the app.</td></tr>
+        <tr><td><strong>Less onboarding cost</strong></td><td>A new teammate learns the pattern once and can then read any screen.</td></tr>
+        <tr><td><strong>Easy to change and maintain</strong></td><td>A bug or a new rule touches one small place, not twenty files.</td></tr>
+        <tr><td><strong>Scalable team size</strong></td><td>Five people can work in parallel without constant merge conflicts, because they own different pieces.</td></tr>
+        <tr><td><strong>Scalable feature size</strong></td><td>Feature number 100 costs about the same to add as feature number 10.</td></tr>
+        <tr><td><strong>Modularity, cohesion, readability, testability</strong></td><td>Small pieces (modular), each doing one related job (cohesive), easy to read, and easy to check with automated tests (testable).</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>The honest summary</strong><p>Architecture is a tool to <em>deliver faster with good quality for a long time</em>. If a rule does not help one of the goals above, question it.</p></div>
+
+    <h2 id="template">2. The common template: View, Logic, Data</h2>
+    <p>Here is the secret that makes this whole series simple: <strong>almost every Android architecture is the same three boxes with different names.</strong> Google&rsquo;s own <a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a> describes the same idea as a UI layer, an optional domain layer and a data layer.</p>
+<figure class="fig">
+<svg viewBox="0 0 640 296" role="img" aria-label="Three layers: View on top, Logic in the middle, Data at the bottom. Data splits into local and remote.">
+<rect class="boxg" x="170" y="8" width="300" height="54" rx="12"/><text class="b c" x="320.0" y="32.0">View (UI layer)</text><text class="sub c" x="320.0" y="50.0">Activity, Fragment, Compose, XML, ViewProxy</text><rect class="boxb" x="170" y="84" width="300" height="54" rx="12"/><text class="b c" x="320.0" y="108.0">Logic</text><text class="sub c" x="320.0" y="126.0">Presenter, ViewModel, Interactor, Reducer</text><rect class="boxp" x="170" y="160" width="300" height="50" rx="12"/><text class="b c" x="320.0" y="182.0">Repository</text><text class="sub c" x="320.0" y="200.0">one door to all data</text><rect class="boxo" x="60" y="242" width="220" height="44" rx="12"/><text class="b c" x="170.0" y="269.0">Local: Room, DataStore, cache</text><rect class="boxr" x="360" y="242" width="220" height="44" rx="12"/><text class="b c" x="470.0" y="269.0">Remote: Retrofit, gRPC</text><path class="arrow" d="M320,64 L320,82"/><path class="arrow" d="M320,140 L320,158"/><path class="arrow" d="M280,212 L190,240"/><path class="arrow" d="M360,212 L450,240"/><text class="sub c" x="560" y="40">draws pixels</text><text class="sub c" x="560" y="116">rules and decisions</text><text class="sub c" x="560" y="190">local or remote?</text><text class="sub c" x="80" y="40">user taps</text>
+</svg>
+<figcaption>The universal template. Dependencies point downward: View knows Logic, Logic knows Data, and never the reverse.</figcaption>
+</figure>
+
+    <p>When people say <strong>M, V and P</strong> (or M, V and VM), they usually mean:</p>
+    <ul>
+      <li><strong>M = Model = the data layer.</strong> Data classes, protobuf messages, repositories, the database, remote API calls and caches.</li>
+      <li><strong>V = View = the UI layer.</strong> <code>Activity</code>, <code>Fragment</code>, adapters, dialogs, XML layouts, Compose functions, and a <em>ViewProxy</em> (a small wrapper around a view; you will meet it in Part 2).</li>
+      <li><strong>P (or VM, or Interactor) = the logic layer.</strong> The code that decides <em>what should happen</em>: validate the input, ask the data layer, turn the result into something the view can show.</li>
+    </ul>
+    <div class="note"><p><strong>Rule of the three boxes:</strong> the View never talks to the database or the network. The Data layer never knows that a screen exists. All decisions live in the middle box.</p></div>
+
+    <h2 id="menu">3. The menu of options</h2>
+    <p>There is no single winner. The popular choices over the years:</p>
+    <table class="gloss">
+      <thead><tr><th>Name</th><th>Stands for</th><th>One-line idea</th></tr></thead>
+      <tbody>
+        <tr><td>MVC</td><td>Model View Controller</td><td>The original. A controller connects the view and the model. On Android the <code>Activity</code> often becomes both view and controller. (In older notes this is sometimes written &ldquo;MCP (old)&rdquo;; the classic old one is MVC.)</td></tr>
+        <tr><td>MVP</td><td>Model View Presenter</td><td>A presenter holds the logic and tells the view what to show through an interface.</td></tr>
+        <tr><td>MVVM</td><td>Model View ViewModel</td><td>A ViewModel exposes state; the view observes it. Google&rsquo;s recommended direction.</td></tr>
+        <tr><td>VIPER</td><td>View Interactor Presenter Entity Router</td><td>Five small roles, each with one job, including a Router for navigation.</td></tr>
+        <tr><td>Redux / MVI</td><td>View Action Store State Reducer</td><td>One state object, changed only by actions through a reducer. Data flows in one direction.</td></tr>
+      </tbody>
+    </table>
+    <p>The list keeps changing over time, because every option has pros and cons and the platform itself moves (Jetpack, Kotlin, Compose). So do not hunt for the &ldquo;perfect&rdquo; name. <strong>Focus on adopting the maximum benefits</strong>: the goals in section 1.</p>
+
+    <h2 id="revamp">4. Using it to clean up a big old codebase</h2>
+    <p>These architectures are also a plan for <em>revamping</em> a large codebase. You do not rewrite everything. You move one screen at a time:</p>
+    <ol>
+      <li>Pick one screen. Extract its data access into a <strong>repository</strong> (section 3 box).</li>
+      <li>Move its decisions out of the <code>Activity</code> into a <strong>presenter or ViewModel</strong>.</li>
+      <li>Leave the <code>Activity</code> as a thin <strong>view</strong>.</li>
+      <li>Repeat for the next screen. Old and new screens live together until the old ones are gone.</li>
+    </ol>
+    <p>Along the way you apply SOLID, the Repository pattern, dependency injection and other design patterns that Part 2 and Part 6 explain. Clean code is the by-product, not a separate project.</p>
+
+    <h2 id="map">5. What this series covers</h2>
+    <ol>
+      <li><strong>Why architecture</strong> (this part).</li>
+      <li><strong>Principles and patterns:</strong> SOLID, KISS, DRY, Proxy, Scheduler, Repository.</li>
+      <li><strong>MVC and MVP</strong>, with ViewProxy.</li>
+      <li><strong>MVVM and Redux (MVI).</strong></li>
+      <li><strong>VIPER</strong> and splitting into modules.</li>
+      <li><strong>Plumbing:</strong> dependency injection, coroutines and Rx, lifecycle, errors.</li>
+      <li><strong>Data and config changes:</strong> Room, Retrofit, gRPC, microservices, rotation, language, font and screen size.</li>
+      <li><strong>Testing (TDD) and the proof</strong> that all of these are secretly the same thing.</li>
+      <li><strong>Converting between architectures:</strong> step-by-step recipes, code and diagrams for moving from any one to any other.</li>
+    </ol>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture (Android Developers)</a></li><li><a href="https://en.wikipedia.org/wiki/Software_design_pattern" target="_blank" rel="noopener">Software design pattern (Wikipedia)</a></li></ul>
+    <div class="pager">
+            <a class="next" href="android-arch-part-2-principles-and-patterns.html"><small>Next &middot; Part 2 &rarr;</small>Principles and patterns</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

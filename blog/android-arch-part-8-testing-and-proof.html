@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Testing, TDD and the Proof: All Architectures Are Alike — Khairul Alam</title>
+  <meta name="description" content="TDD for Android architectures and a code-based proof that MVC, MVP, MVVM, VIPER and Redux share the same View, Logic, Data structure, with a final ten-point checklist." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .conv .fig { background: var(--bg); }
+    .conv h4 { margin: 14px 0 4px; font-size: calc(14px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android Architecture series &middot; Part 8 of 9</p>
+    <h1>Testing, TDD and the Proof: All Architectures Are Alike</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~12 min read</span></div>
+    <div class="tags"><span class="tag">TDD</span><span class="tag">Testing</span><span class="tag">MVP</span><span class="tag">MVVM</span><span class="tag">Redux</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="android-arch-part-1-why-architecture.html"><small>Part 1</small>Why architecture</a><a href="android-arch-part-2-principles-and-patterns.html"><small>Part 2</small>Principles</a><a href="android-arch-part-3-mvc-and-mvp.html"><small>Part 3</small>MVC and MVP</a><a href="android-arch-part-4-mvvm-and-redux.html"><small>Part 4</small>MVVM and Redux</a><a href="android-arch-part-5-viper-and-modules.html"><small>Part 5</small>VIPER</a><a href="android-arch-part-6-di-async-errors.html"><small>Part 6</small>DI and async</a><a href="android-arch-part-7-data-and-config-changes.html"><small>Part 7</small>Data and config</a><a class="on" href="android-arch-part-8-testing-and-proof.html"><small>Part 8</small>Testing and proof</a><a href="android-arch-part-9-converting-architectures.html"><small>Part 9</small>Converting</a>
+    </div>
+
+    <p class="lede">The finale. First, how testing (and TDD) rewards a clean architecture. Then the proof: one feature written four ways, with the same core and only one step that differs.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>TDD:</strong> red, green, refactor; hard-to-test code is a design smell.</li><li><strong>Proof:</strong> MVP, MVVM, VIPER and Redux share one core and differ only in how results reach the view.</li><li><strong>Unchanged:</strong> dependency direction, logic without Android, passive view.</li><li><strong>Checklist:</strong> ten habits to take to your own codebase.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#tdd">TDD: let tests shape the design</a></li><li><a href="#proof">The proof: they are all the same</a></li><li><a href="#ten">Your ten-point checklist</a></li></ol>
+    </details>
+
+
+    <h2 id="tdd">1. TDD: let tests shape the design</h2>
+    <p><strong>Test-driven development</strong> is a loop of three small steps:</p>
+<figure class="fig">
+<svg viewBox="0 0 640 110" role="img" aria-label="Red green refactor">
+<rect class="boxr" x="20.0" y="20" width="177.3" height="70" rx="12"/><text class="b c" x="108.65" y="52.0">Red</text><text class="sub c" x="108.65" y="70.0">write a failing test</text><path class="arrow" d="M200.3,55 L227.3,55"/><rect class="boxg" x="231.3" y="20" width="177.3" height="70" rx="12"/><text class="b c" x="319.95000000000005" y="52.0">Green</text><text class="sub c" x="319.95000000000005" y="70.0">make it pass, simply</text><path class="arrow" d="M411.7,55 L438.7,55"/><rect class="boxb" x="442.7" y="20" width="177.3" height="70" rx="12"/><text class="b c" x="531.35" y="52.0">Refactor</text><text class="sub c" x="531.35" y="70.0">clean up, tests stay green</text>
+</svg>
+<figcaption>The TDD loop: red, green, refactor, then repeat.</figcaption>
+</figure>
+
+    <p>TDD pushes you toward good architecture without effort. If a test is hard to write, the code has too many hidden dependencies, which is a design smell. Everything in this series (interfaces, repositories, schedulers, ViewProxy, DI) exists partly to make this easy: the logic box has no Android code, so a test is a few lines on the plain JVM.</p>
+<pre><code>class FakeProfileRepository(var result: Result&lt;Profile&gt;) : ProfileRepository {
+    override suspend fun getProfile(id: String) = result.getOrThrow()
+}
+
+class ProfileViewModelTest {
+    private val dispatchers = TestDispatcherProvider(UnconfinedTestDispatcher())
+
+    @Test fun `shows content when load succeeds`() = runTest {
+        val repo = FakeProfileRepository(Result.success(Profile("1", "Ana", true)))
+        val vm = ProfileViewModel(repo, dispatchers)
+
+        vm.load("1")
+
+        assertEquals(ProfileUiState.Content(Profile("1", "Ana", true)), vm.state.value)
+    }
+
+    @Test fun `shows error when network fails`() = runTest {
+        val repo = FakeProfileRepository(Result.failure(IOException()))
+        val vm = ProfileViewModel(repo, dispatchers)
+
+        vm.load("1")
+
+        assertEquals(ProfileUiState.Error("No connection"), vm.state.value)
+    }
+}</code></pre>
+
+    <h3>The test pyramid</h3>
+    <ul>
+      <li><strong>Many unit tests</strong> (JVM, milliseconds): presenters, ViewModels, interactors, reducers, mappers.</li>
+      <li><strong>Some integration tests:</strong> repository with an in-memory Room database or a mock web server.</li>
+      <li><strong>Few UI tests</strong> (Espresso or Compose tests): the main user journeys only.</li>
+    </ul>
+    <p>Because the view is passive (a ViewProxy or a <code>render(state)</code> function), you hardly need UI tests to check logic.</p>
+
+    <h2 id="proof">2. The proof: they are all the same thing</h2>
+    <p>Here is the claim from Part 1: MVC, MVP, MVVM, VIPER and Redux are the same three boxes with different names. Let us prove it with code. Take one feature, &ldquo;load a profile&rdquo;, and keep the part that never changes:</p>
+<pre><code>// The core. Identical in every architecture below.
+class LoadProfile(private val repo: ProfileRepository) {
+    suspend operator fun invoke(id: String): Result&lt;Profile&gt; = runCatching { repo.getProfile(id) }
+}</code></pre>
+
+    <p>Now the four &ldquo;different&rdquo; architectures, each reduced to its logic role:</p>
+<pre><code>// MVP: logic CALLS the view through an interface
+class ProfilePresenter(private val view: ProfileView, private val loadProfile: LoadProfile, private val scope: CoroutineScope) {
+    fun onLoad(id: String) = scope.launch {
+        view.showLoading()
+        loadProfile(id).onSuccess(view::showProfile).onFailure { view.showError("No connection") }
+    }
+}
+
+// MVVM: logic PUBLISHES state, the view observes
+class ProfileViewModel(private val loadProfile: LoadProfile) : ViewModel() {
+    val state = MutableStateFlow&lt;ProfileUiState&gt;(ProfileUiState.Loading)
+    fun onLoad(id: String) = viewModelScope.launch {
+        state.value = ProfileUiState.Loading
+        state.value = loadProfile(id).fold({ ProfileUiState.Content(it) }, { ProfileUiState.Error("No connection") })
+    }
+}
+
+// VIPER: same as MVP; the Interactor IS LoadProfile, the Router handles navigation
+class ViperPresenter(private val view: ProfileView, private val interactor: LoadProfile, private val router: ProfileRouter, private val scope: CoroutineScope) {
+    fun onLoad(id: String) = scope.launch { /* identical to the MVP body */ }
+}
+
+// Redux: logic is the reducer + one effect, state goes through a store
+fun reduce(s: ProfileState, a: ProfileAction): ProfileState = when (a) { /* Load, Loaded, Failed */ }
+suspend fun effect(a: ProfileAction.Load, loadProfile: LoadProfile) =
+    loadProfile(a.id).fold({ ProfileAction.Loaded(it) }, { ProfileAction.Failed("No connection") })</code></pre>
+
+    <p>Read the four snippets again. In every one of them:</p>
+    <ol>
+      <li>An <strong>event</strong> arrives from the view (<code>onLoad(id)</code>).</li>
+      <li>The same <strong>core</strong> (<code>LoadProfile</code> &rarr; repository) asks the data layer.</li>
+      <li>The result is turned into <strong>something the view can show</strong>.</li>
+      <li>That result reaches the view. This is the <em>only</em> step that differs.</li>
+    </ol>
+
+    <table>
+      <thead><tr><th>Architecture</th><th>Logic box is called</th><th>Data box is called</th><th>How the logic reaches the view</th></tr></thead>
+      <tbody>
+        <tr><td>MVC</td><td>Controller</td><td>Model</td><td>Controller updates the view directly</td></tr>
+        <tr><td>MVP</td><td>Presenter</td><td>Model / repository</td><td>Calls a view interface (ViewProxy)</td></tr>
+        <tr><td>MVVM</td><td>ViewModel</td><td>Model / repository</td><td>Exposes observable state</td></tr>
+        <tr><td>VIPER</td><td>Interactor + Presenter (+ Router)</td><td>Entity / repository</td><td>Presenter calls a view interface</td></tr>
+        <tr><td>Redux / MVI</td><td>Reducer + Store (+ effects)</td><td>Repository</td><td>Store emits a new state</td></tr>
+      </tbody>
+    </table>
+<figure class="fig">
+<svg viewBox="0 0 640 190" role="img" aria-label="One shared core in the middle; the four architectures only differ in how events enter and how results leave.">
+<rect class="boxg" x="10" y="60" width="120" height="70" rx="12"/><text class="b c" x="70.0" y="92.0">View</text><text class="sub c" x="70.0" y="110.0">ViewProxy / render</text><rect class="boxo" x="175" y="12" width="130" height="36" rx="12"/><text class="b c" x="240.0" y="35.0">MVP: Presenter</text><rect class="boxo" x="175" y="58" width="130" height="36" rx="12"/><text class="b c" x="240.0" y="81.0">MVVM: ViewModel</text><rect class="boxo" x="175" y="104" width="130" height="36" rx="12"/><text class="b c" x="240.0" y="127.0">VIPER: Presenter</text><rect class="boxo" x="175" y="150" width="130" height="36" rx="12"/><text class="b c" x="240.0" y="173.0">Redux: Reducer</text><rect class="boxb" x="350" y="60" width="130" height="70" rx="12"/><text class="b c" x="415.0" y="92.0">Core</text><text class="sub c" x="415.0" y="110.0">LoadProfile</text><rect class="boxp" x="520" y="60" width="110" height="70" rx="12"/><text class="b c" x="575.0" y="92.0">Data</text><text class="sub c" x="575.0" y="110.0">Repository</text><path class="arrow" d="M132,95 L173,30"/><path class="arrow" d="M132,95 L173,76"/><path class="arrow" d="M132,95 L173,122"/><path class="arrow" d="M132,95 L173,168"/><path class="arrow" d="M307,30 L348,85"/><path class="arrow" d="M307,76 L348,92"/><path class="arrow" d="M307,122 L348,100"/><path class="arrow" d="M307,168 L348,108"/><path class="arrow" d="M482,95 L518,95"/>
+</svg>
+<figcaption>Swap the orange box and nothing else moves. That is why migrating between these architectures is mostly mechanical.</figcaption>
+</figure>
+
+    <h3>Three things that never change</h3>
+    <ul>
+      <li><strong>Direction of dependency:</strong> View &rarr; Logic &rarr; Data, never backwards.</li>
+      <li><strong>The logic has no Android framework code</strong>, so it is testable on the JVM. The same fake repository and the same <code>LoadProfile</code> test serve all four.</li>
+      <li><strong>The view is passive</strong> and replaceable (ViewProxy, <code>render(state)</code>, a Composable).</li>
+    </ul>
+    <h3>The small differences, honestly</h3>
+    <table>
+      <thead><tr><th>Choice</th><th>MVP / VIPER</th><th>MVVM / Redux</th></tr></thead>
+      <tbody>
+        <tr><td>Logic &rarr; view</td><td>Push: call a method</td><td>Pull: observe state</td></tr>
+        <tr><td>Lifecycle</td><td>You attach and detach</td><td>The framework helps (ViewModel, lifecycle-aware collection)</td></tr>
+        <tr><td>Rotation</td><td>You retain the presenter</td><td>ViewModel survives</td></tr>
+        <tr><td>Boilerplate</td><td>Contract interfaces</td><td>State and action types</td></tr>
+      </tbody>
+    </table>
+    <p>Those differences are real, and they are why the industry moved from MVP to MVVM. But they are differences of <em>delivery</em>, not of <em>structure</em>. Learn one well and you can read all of them.</p>
+
+    <h2 id="ten">3. Your ten-point checklist</h2>
+    <ol>
+      <li>Pick <strong>one</strong> architecture per codebase and write a one-page template for it.</li>
+      <li>Three boxes: View, Logic, Data. Dependencies point one way.</li>
+      <li>The view is passive. Use a ViewProxy or <code>render(state)</code>.</li>
+      <li>Logic has no <code>Context</code>, no <code>View</code>, no framework.</li>
+      <li>One repository per data source of truth; map DTO and entity to domain models.</li>
+      <li>Depend on interfaces and inject them (Hilt or Koin).</li>
+      <li>Hide threads behind a scheduler/dispatcher provider.</li>
+      <li>Keep state out of the Activity; test rotation, language, font size and window size.</li>
+      <li>Map errors once, show friendly messages everywhere.</li>
+      <li>Write the test first when you can. Revamp old code one screen at a time. Keep it simple.</li>
+    </ol>
+    <div class="callout"><strong>The takeaway</strong><p>A consistent architecture means faster delivery with quality, easy change, low onboarding cost, and room for the team and the app to grow. The label (MVP, MVVM, VIPER, Redux) matters far less than being consistent and keeping the three boxes clean. Adopt the benefits, not the buzzwords.</p></div>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul><li><a href="https://developer.android.com/training/testing/fundamentals" target="_blank" rel="noopener">Android testing fundamentals</a></li><li><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/" target="_blank" rel="noopener">kotlinx-coroutines-test</a></li><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a></li></ul>
+    <div class="pager">
+      <a class="prev" href="android-arch-part-7-data-and-config-changes.html"><small>&larr; Previous &middot; Part 7</small>Data, network and config changes</a>
+      <a class="next" href="android-arch-part-9-converting-architectures.html"><small>Next &middot; Part 9 &rarr;</small>Converting between architectures</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

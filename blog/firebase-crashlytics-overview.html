@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Firebase Crashlytics: Find and Fix Crashes Faster — Khairul Alam</title>
+  <meta name="description" content="An overview of Firebase Crashlytics: how crashes are captured and grouped, custom keys and logs, non-fatal errors, alerts and the official setup links." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Firebase series &middot; Part 4 of 4</p>
+    <h1>Firebase Crashlytics: Find and Fix Crashes Faster</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~8 min read</span></div>
+    <div class="tags"><span class="tag">Firebase</span><span class="tag">Crashlytics</span><span class="tag">Stability</span><span class="tag">Android</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="firebase-remote-config-overview.html"><small>Part 1</small>Remote Config</a>
+      <a href="firebase-analytics-overview.html"><small>Part 2</small>Analytics</a>
+      <a href="firebase-app-distribution-overview.html"><small>Part 3</small>App Distribution</a>
+      <a class="on" href="firebase-crashlytics-overview.html"><small>Part 4</small>Crashlytics</a>
+    </div>
+
+    <p class="lede">A crash you cannot see is a crash you cannot fix. Crashlytics collects crashes from real devices, groups them by cause and tells you which ones hurt the most users. This is the overview; Google&rsquo;s guide has the setup.</p>
+    <div class="callout">
+      <strong>In 60 seconds</strong>
+      <ul><li><strong>What:</strong> real-time crash and error reporting.</li><li><strong>Groups</strong> thousands of crashes into a few issues, ranked by impact.</li><li><strong>Context:</strong> stack trace, device, OS, custom keys, logs, user id.</li><li><strong>Alerts:</strong> new issue, regression, velocity spike.</li></ul>
+    </div>
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#what">What it is</a></li><li><a href="#flow">How a crash gets to you</a></li><li><a href="#issue">Reading an issue</a></li><li><a href="#ctx">Adding context</a></li><li><a href="#nonfatal">Non-fatal errors</a></li><li><a href="#alerts">Alerts and workflow</a></li><li><a href="#habits">Limits and good habits</a></li></ol>
+    </details>
+
+    <h2 id="what">1. What it is</h2>
+    <p>Crashlytics is a lightweight crash reporter. When your app crashes, the SDK saves the report and sends it at the next launch. The console then shows what broke, how often and for whom. It also records ANRs on Android, and crashes in Flutter, Unity and NDK code.</p>
+        <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="Sketch of the Crashlytics issues list ordered by number of events.">
+        <rect class="box" x="60" y="10" width="520" height="170" rx="10"/>
+        <path class="rule" d="M60,38 L580,38"/>
+        <circle cx="74" cy="24" r="4" fill="#ef4444"/><circle cx="88" cy="24" r="4" fill="#f59e0b"/><circle cx="102" cy="24" r="4" fill="#10b981"/>
+        <text class="sub" x="116" y="28">Crashlytics &middot; Issues</text>
+        <text x="76" y="64">NullPointerException CartAdapter</text>
+        <text class="sub" x="564" y="64" style="text-anchor:end">4.8K</text>
+        <rect class="boxr" x="60" y="50" width="6" height="18" rx="3"/>
+        <text x="76" y="92">IllegalStateException Checkout</text>
+        <text class="sub" x="564" y="92" style="text-anchor:end">930</text>
+        <rect class="boxo" x="60" y="78" width="6" height="18" rx="3"/>
+        <text x="76" y="120">OutOfMemoryError ImageLoader</text>
+        <text class="sub" x="564" y="120" style="text-anchor:end">211</text>
+        <rect class="boxp" x="60" y="106" width="6" height="18" rx="3"/>
+        <text x="76" y="148">ANR MainActivity.onResume</text>
+        <text class="sub" x="564" y="148" style="text-anchor:end">98</text>
+        <rect class="boxb" x="60" y="134" width="6" height="18" rx="3"/>
+
+      </svg>
+      <figcaption>A sketch of the issues list, sorted by impact. The names and numbers are made up. (Illustration, not a screenshot.)</figcaption>
+    </figure>
+
+    <h2 id="flow">2. How a crash gets to you</h2>
+        <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="A crash on a device is captured by the SDK, sent to Crashlytics, grouped into an issue, and shown as an alert and an issue page.">
+        <rect class="boxr" x="20" y="70" width="120" height="64" rx="12"/><text class="b c" x="80" y="99">App crashes</text><text class="sub c" x="80" y="117">fatal / non-fatal</text>
+        <rect class="boxb" x="200" y="70" width="120" height="64" rx="12"/><text class="b c" x="260" y="99">SDK on device</text><text class="sub c" x="260" y="117">stack trace + keys</text>
+        <rect class="boxp" x="380" y="70" width="110" height="64" rx="12"/><text class="b c" x="435" y="99">Crashlytics</text><text class="sub c" x="435" y="117">group by cause</text>
+        <rect class="boxg" x="535" y="20" width="95" height="56" rx="12"/><text class="b c" x="582" y="53">Alert</text>
+        <rect class="boxo" x="535" y="130" width="95" height="56" rx="12"/><text class="b c" x="582" y="163">Issue page</text>
+        <path class="arrow" d="M142,102 L196,102"/>
+        <path class="arrow" d="M322,102 L376,102"/>
+        <path class="arrow" d="M492,90 L531,60"/>
+        <path class="arrow" d="M492,114 L531,150"/>
+
+      </svg>
+      <figcaption>From a crash on a user&rsquo;s phone to an alert and an issue you can act on.</figcaption>
+    </figure>
+
+    <h2 id="issue">3. Reading an issue</h2>
+    <p>Similar crashes are grouped into one <strong>issue</strong>. Check the event and user counts first, then the version where it started, then the stack trace. Fix what affects the most users before you chase rare ones.</p>
+        <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="An issue summary with counts, a stack trace, custom keys and breadcrumb logs.">
+        <rect class="boxr" x="20" y="10" width="600" height="46" rx="12"/><text class="b c" x="320" y="38">Issue: NullPointerException in CartAdapter.bind</text>
+        <text class="sub c" x="120" y="86">4,812 events</text>
+        <text class="sub c" x="320" y="86">1,903 users</text>
+        <text class="sub c" x="520" y="86">first seen in 2.5.0</text>
+        <rect class="boxo" x="20" y="106" width="600" height="40" rx="12"/><text class="b c" x="320" y="131">Stack trace: CartAdapter.kt:84 &larr; RecyclerView.onBind</text>
+        <rect class="boxb" x="20" y="160" width="290" height="40" rx="12"/><text class="b c" x="165" y="185">Keys: screen = Cart</text>
+        <rect class="boxg" x="330" y="160" width="290" height="40" rx="12"/><text class="b c" x="475" y="185">Logs: tapped "Apply coupon"</text>
+
+      </svg>
+      <figcaption>What one issue contains: counts, the trace, and the context you attach with keys and logs.</figcaption>
+    </figure>
+
+    <p>Release builds are obfuscated, so upload the mapping file (the Gradle plugin does it for you) to see readable names instead of <code>a.b.c</code>.</p>
+    <h2 id="ctx">4. Adding context</h2>
+<pre><code>val c = Firebase.crashlytics
+c.setUserId("u_123")           // use an id, not an email
+c.setCustomKey("screen", "Cart")
+c.log("tapped Apply coupon")   // breadcrumb</code></pre>
+    <h2 id="nonfatal">5. Non-fatal errors</h2>
+    <p>Caught exceptions you still care about, like a failed parse or a bad server response, can be reported with <code>recordException</code>. They appear as non-fatal issues without crashing the app.</p>
+    <h2 id="alerts">6. Alerts and workflow</h2>
+    <ul>
+      <li><strong>New issue</strong> and <strong>regression</strong> alerts by email, Slack or Jira.</li>
+      <li><strong>Velocity alerts</strong> when one issue climbs quickly.</li>
+      <li>Close an issue when fixed; it reopens as a regression if it returns.</li>
+      <li>Link to BigQuery export for deeper analysis.</li>
+    </ul>
+    <h2 id="habits">7. Limits and good habits</h2>
+    <ul>
+      <li>Force a test crash once to confirm your setup, then remove it.</li>
+      <li>Never log personal data in keys, logs or user ids.</li>
+      <li>Let users opt out where the law or your policy requires it.</li>
+      <li>Review the top issues in every release before you roll out to 100%.</li>
+    </ul>
+
+    <h2 id="links">Official links</h2>
+    <p>Setup steps change often, so follow Google&rsquo;s own guides rather than a copy here.</p>
+    <ul><li><a href="https://firebase.google.com/docs/crashlytics" target="_blank" rel="noopener">Crashlytics documentation (overview)</a></li><li><a href="https://firebase.google.com/docs/crashlytics/get-started?platform=android" target="_blank" rel="noopener">Get started on Android</a></li><li><a href="https://firebase.google.com/docs/crashlytics/get-started?platform=ios" target="_blank" rel="noopener">Get started on iOS</a></li><li><a href="https://firebase.google.com/docs/crashlytics/customize-crash-reports?platform=android" target="_blank" rel="noopener">Customize crash reports</a></li><li><a href="https://firebase.google.com/docs/crashlytics/force-a-crash" target="_blank" rel="noopener">Test your implementation</a></li></ul>
+    <div class="pager">
+      <a class="prev" href="firebase-app-distribution-overview.html"><small>&larr; Previous &middot; Part 3</small>App Distribution</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>
