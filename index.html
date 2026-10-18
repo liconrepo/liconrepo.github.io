@@ -102,54 +102,8 @@
     }
     .nav-links a:hover { color: var(--text); }
     .nav-links a:hover::after { transform: scaleX(1); }
-    .hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--muted); font-size: calc(20px * var(--fs, 1)); }
 
 
-    /* ────────────────── SEARCH ────────────────── */
-    .nav-right { display: flex; align-items: center; gap: 8px; }
-    .search-btn {
-      display: flex; align-items: center; gap: 8px; cursor: pointer;
-      background: var(--card); border: 1px solid var(--border); border-radius: 9px;
-      color: var(--muted); font: inherit; font-size: calc(13px * var(--fs, 1)); padding: 6px 10px;
-      transition: border-color .18s, color .18s;
-    }
-    .search-btn:hover { border-color: var(--border-h); color: var(--text); }
-    .search-btn kbd {
-      font: inherit; font-size: calc(11px * var(--fs, 1)); padding: 1px 6px; border-radius: 5px;
-      border: 1px solid var(--border-h); color: var(--muted);
-    }
-    .search-overlay {
-      display: none; position: fixed; inset: 0; z-index: 300;
-      background: rgba(0,0,0,0.35); backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      align-items: flex-start; justify-content: center; padding: 12vh 16px 0;
-    }
-    .search-overlay.open { display: flex; }
-    .search-box {
-      width: 100%; max-width: 600px; background: var(--card);
-      border: 1px solid var(--border-h); border-radius: 16px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.25); overflow: hidden;
-    }
-    .search-box input {
-      width: 100%; border: 0; outline: 0; background: transparent;
-      font: inherit; font-size: calc(16px * var(--fs, 1)); color: var(--text); padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .search-results { max-height: 52vh; overflow-y: auto; padding: 8px; }
-    .search-item {
-      display: block; width: 100%; text-align: left; cursor: pointer;
-      background: none; border: 0; font: inherit; color: inherit;
-      padding: 10px 12px; border-radius: 10px;
-    }
-    .search-item.active { background: var(--card-h); outline: 1px solid var(--border-h); }
-    .search-item .si-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-    .search-item .si-title { font-size: calc(14px * var(--fs, 1)); font-weight: 600; color: var(--text); }
-    .search-item .si-sec { font-size: calc(11px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .6px; white-space: nowrap; }
-    .search-item .si-snip { font-size: calc(12px * var(--fs, 1)); color: var(--sub); margin-top: 2px; line-height: 1.5; }
-    .search-item mark { background: rgba(250,204,21,0.45); color: inherit; border-radius: 3px; }
-    .search-empty { padding: 24px; text-align: center; color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
-    .search-hint { padding: 8px 16px; border-top: 1px solid var(--border); font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
-    .search-hit { outline: 2px solid rgba(250,204,21,0.8); outline-offset: 4px; border-radius: 10px; transition: outline-color .6s; }
 
 
     /* ────────────────── CONTACT ────────────────── */
@@ -247,11 +201,6 @@
     @media(max-width:720px){ .tablet { padding: 10px; border-radius: 24px; } .tablet::before { display: none; } .tablet-body { padding: 8px 14px 14px; height: 520px; } .tablet-nav { gap: 36px; } .tablet-status .tv-title { display: none; } }
 
 
-    .sp-top { display: flex; gap: 8px; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); }
-    .sp-input { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; color: var(--muted);
-      background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; }
-    .sp-input:focus-within { border-color: var(--border-h); }
-    .sp-input input { border: 0; padding: 11px 0; border-bottom: 0; font-size: calc(14px * var(--fs, 1)); }
     .sp-btn, .sp-icon { display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none;
       background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text);
       font: inherit; font-size: calc(13px * var(--fs, 1)); font-weight: 500; padding: 0 14px; transition: border-color .18s; }
@@ -269,24 +218,8 @@
     .sp-chip.current { background: rgba(225,29,72,0.08); border-color: rgba(225,29,72,0.35); color: #be123c; }
     .sp-chip.current svg { color: #be123c; }
     .sp-ext { color: var(--muted); font-size: calc(12px * var(--fs, 1)); font-weight: 400; }
-    .search-box > .search-hint { display: none; }
     @media(max-width:480px){ .sp-grid { grid-template-columns: 1fr; } }
 
-    /* Mobile: keep the panel inside the visible viewport (dvh follows the on-screen keyboard) */
-    @media(max-width:720px){
-      .search-overlay { padding: max(env(safe-area-inset-top), 12px) 10px 0; }
-      .search-box { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; border-radius: 14px; }
-      .sp-top { flex: 0 0 auto; padding: 10px; }
-      /* 16px minimum stops iOS Safari zooming the page when the field is focused */
-      .sp-input input { font-size: max(16px, calc(14px * var(--fs, 1))); }
-      .search-box .sp-body, .search-box .search-results { flex: 1 1 auto; min-height: 0; max-height: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-      .search-box .sp-body { padding: 0 10px calc(14px + env(safe-area-inset-bottom)); }
-      .search-box .search-results { padding: 6px 6px calc(10px + env(safe-area-inset-bottom)); }
-      .sp-chip { min-height: 44px; }
-      .search-item { padding: 12px; }
-      .search-item .si-top { flex-wrap: wrap; gap: 2px 12px; }
-      .search-item .si-title { overflow-wrap: anywhere; }
-    }
 
     .settings-btn { padding: 6px 8px; }
     .settings-box { max-width: 420px; }
@@ -315,8 +248,6 @@
         radial-gradient(ellipse 900px 600px at 15% 10%, rgba(160,160,200,0.06) 0%, transparent 65%),
         radial-gradient(ellipse 600px 500px at 85% 90%, rgba(160,160,200,0.04) 0%, transparent 65%);
     }
-    [data-theme="dark"] .search-overlay { background: rgba(0,0,0,0.6); }
-    [data-theme="dark"] .search-box { box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
     [data-theme="dark"] .sp-chip.current,
     [data-theme="dark"] .sp-chip.current svg { color: #fb7185; }
     [data-theme="dark"] .avatar { box-shadow: 0 32px 80px rgba(0,0,0,0.7); }
@@ -780,8 +711,6 @@
     @media(max-width:720px){
       nav { padding: 0 20px; }
       .nav-links { display: none; }
-      .hamburger { display: block; }
-      .search-btn:not(.settings-btn) { display: none; }
       .hero-wrap { flex-direction: column; align-items: center; text-align: center; padding: 64px 20px 52px; gap: 36px; }
       .hero-text h1 { font-size: calc(38px * var(--fs, 1)); letter-spacing: -1.4px; }
       .hero-text .tagline { max-width: 100%; }
@@ -804,6 +733,7 @@
     .d3 { transition-delay: .24s; }
     .d4 { transition-delay: .32s; }
   </style>
+  <link rel="stylesheet" href="data/search/search.css">
 </head>
 <body id="top">
 
@@ -828,18 +758,6 @@
     <button class="hamburger" onclick="openSearch()" aria-label="Menu">&#9776;</button>
   </div>
 </nav>
-
-<!-- SEARCH -->
-<div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Search">
-  <div class="search-box">
-    <div class="sp-top">
-      <label class="sp-input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="searchInput" type="search" placeholder="Jump to a section or search…" autocomplete="off" spellcheck="false"></label>
-    </div>
-    <div id="searchHome" hidden></div>
-    <div class="search-results" id="searchResults" hidden></div>
-    <div class="search-hint">↑ ↓ to navigate · Enter to open · ⌘Enter to locate on page · searches every article · Esc to close</div>
-  </div>
-</div>
 
 <!-- SETTINGS -->
 <div class="search-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-label="Settings">
@@ -1447,7 +1365,7 @@
     <p class="blog-cat"><span class="bc-title">Livefeeds</span><span class="bc-sub">1 post</span></p>
     <div class="blog-grid new-grid">
       <a href="blog/llm-models-directory.html" class="blog-card featured reveal">
-        <div class="blog-idx">Live list<span class="blog-new">NEW</span></div>
+        <div class="blog-idx">Live feed<span class="blog-new">NEW</span></div>
         <div class="blog-title">LLM Models: a daily-updated list of language models</div>
         <div class="blog-summary">Language models from companies around the world, on an interactive world map and in a searchable list: filter by free, paid or open weights, and compare prices, context size and release dates. Refreshed every day.</div>
         <div class="blog-tags"><span class="blog-tag">LLM</span><span class="blog-tag">AI models</span><span class="blog-tag">Pricing</span><span class="blog-tag">Open weights</span></div>
@@ -1756,122 +1674,16 @@
     setSeries(box, box.hidden);
   }));
 
-  /* Site search — indexes the page content itself */
-  const SEARCH_SOURCES = [
-    { sel: '.hero-text',          section: 'About',      title: () => 'About Khairul Alam' },
-    { sel: '.stat-card',          section: 'Highlights', title: el => el.textContent.replace(/\s+/g, ' ').trim() },
-    { sel: '.exp-card',           section: 'Experience', title: el => el.querySelector('.exp-title').textContent },
-    { sel: '.st-group',           section: 'Skills',     title: el => el.querySelector('.st-name').textContent },
-    { sel: '.st-leaves .tag',     section: 'Skills',     title: el => el.textContent },
-    { sel: '.oss-card',           section: 'Open Source', title: el => el.querySelector('.oss-name').textContent },
-    { sel: '.series-card',        section: 'Writing',   title: el => el.querySelector('.series-title').textContent },
-    { sel: '.series-part',        section: 'Writing',    title: el => 'Claude Code series, Part ' + el.querySelector('.sp-num').textContent + ': ' + el.querySelector('.sp-title').textContent, link: true },
-    { sel: '.blog-card',          section: 'Writing',    title: el => el.querySelector('.blog-title').textContent, link: true },
-    { sel: '.lead-item',          section: 'Leadership', title: el => el.querySelector('p').textContent },
-    { sel: '.edu-card',           section: 'Education',  title: el => el.querySelector('.edu-degree').textContent },
-    { sel: '.interest-chip',      section: 'Interests',  title: el => el.querySelector('.interest-label').textContent },
-    { sel: '.view-all-link',      section: 'Writing',    title: el => el.textContent, link: true },
-  ];
-  const searchIndex = [];
-  SEARCH_SOURCES.forEach(src => document.querySelectorAll(src.sel).forEach(el => {
-    const text = el.textContent.replace(/\s+/g, ' ').trim();
-    const title = src.title(el).replace(/\s+/g, ' ').trim();
-    const extra = src.extra ? src.extra(el) : '';
-    searchIndex.push({ el, title, section: src.section, link: src.link ? el : null, text, hay: (title + ' ' + text + ' ' + extra + ' ' + src.section).toLowerCase() });
-  }));
+  /* Search lives in data/search/search.js (shared with the blog pages). This is the only part that knows how this page hides things. */
+  window.siteSearchReveal = function (el) {
+    if (!el.offsetParent && el.closest('#stree')) el = document.getElementById('radialMenu');   // the skills tree is replaced by the radial menu on wide screens
+    if (el.closest('#archive')) setArchive(true);
+    const seriesBox = el.closest('.series-parts');
+    if (seriesBox) setSeries(seriesBox, true);
+    return el;
+  };
 
-  /* Full text of every article (search-index.json, built by tools/build_search_index.py), loaded the first time search opens */
-  let articles = null, articlesLoading = null;
-  function loadArticles() {
-    if (articles || articlesLoading) return;
-    articlesLoading = fetch('search-index.json')
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .catch(() => new Promise(res => {                    // opened from disk (file://), where fetch is blocked: use the script copy
-        const sc = document.createElement('script');
-        sc.src = 'data/search/search-data.js';
-        sc.onload = () => res((window.SITE_SEARCH || {}).articles || []);
-        sc.onerror = () => res([]);
-        document.head.appendChild(sc);
-      }))
-      .then(list => {
-        articles = list.map(a => {
-          const series = /series/i.test(a.k || '') ? 'Series \u00b7 ' + a.k.split('\u00b7').pop().trim() : 'Article';
-          return { u: a.u, t: a.t, label: series, s: a.s, tl: a.t.toLowerCase(), hay: (a.t + ' ' + a.k + ' ' + a.s.map(g => g.h + ' ' + g.x).join(' ')).toLowerCase() };
-        });
-        if (sOverlay.classList.contains('open') && sInput.value.trim()) runSearch(sInput.value);
-      });
-  }
-  const count = (hay, t) => hay.split(t).length - 1;
-  function articleHits(terms) {
-    if (!articles) return [];
-    return articles.filter(a => terms.every(t => a.hay.includes(t))).map(a => {
-      let best = null, bs = -1;
-      a.s.forEach(g => {                                   // the section that matches the most words
-        const h = g.h.toLowerCase(), x = (g.h + ' ' + g.x).toLowerCase();
-        const sc = terms.filter(t => x.includes(t)).length * 3 + terms.filter(t => h.includes(t)).length * 2;
-        if (sc > bs) { bs = sc; best = g; }
-      });
-      const rank = terms.filter(t => a.tl.includes(t)).length * 100 + bs * 10 + Math.min(count(a.hay, terms[0]), 30);
-      return { article: true, title: a.t, section: a.label, href: a.u + (best && best.id ? '#' + best.id : ''), u: a.u, heading: best ? best.h : '', text: best ? best.x : '', rank };
-    }).sort((x, y) => y.rank - x.rank);
-  }
-
-  const sOverlay = document.getElementById('searchOverlay');
-  const sInput   = document.getElementById('searchInput');
-  const sResults = document.getElementById('searchResults');
-  const sHome    = document.getElementById('searchHome');
-  let sHits = [], sActive = 0;
-
-  const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  function mark(text, terms) {
-    let out = esc(text);
-    terms.forEach(t => { out = out.replace(new RegExp('(' + esc(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>'); });
-    return out;
-  }
-  function snippet(text, terms) {
-    const low = text.toLowerCase(), found = terms.map(t => low.indexOf(t)).filter(i => i >= 0);
-    const i = found.length ? Math.min(...found) : 0;
-    const start = Math.max(0, i - 40);
-    return (start ? '…' : '') + text.slice(start, start + 120) + (text.length > start + 120 ? '…' : '');
-  }
-  function runSearch(q) {
-    const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
-    const art = terms.length ? articleHits(terms) : [];
-    const artUrls = new Set(art.map(x => x.u));
-    const page = !terms.length ? [] : searchIndex
-      .filter(it => terms.every(t => it.hay.includes(t)))
-      .filter(it => !(it.link && artUrls.has(it.link.getAttribute('href'))))      // the article result below already covers this card
-      .map(it => ({ it, score: (it.title.toLowerCase().includes(terms[0]) ? 0 : 1) + (it.el.matches('.tag') ? 0 : 0.5) }))
-      .sort((a, b) => a.score - b.score).slice(0, 12).map(x => x.it);
-    sHits = page.concat(art.slice(0, 30 - page.length));
-    sActive = 0;
-    sHome.hidden = true;
-    sResults.hidden = !terms.length;
-    if (!terms.length) return;
-    const waiting = !articles && articlesLoading ? '<div class="search-empty">Searching articles\u2026</div>' : '';
-    if (!sHits.length) { sResults.innerHTML = waiting || '<div class="search-empty">No results for \u201c' + esc(q) + '\u201d.</div>'; return; }
-    sResults.innerHTML = sHits.map((it, i) =>
-      '<button class="search-item' + (i ? '' : ' active') + '" data-i="' + i + '">' +
-      '<div class="si-top"><span class="si-title">' + mark(it.title.slice(0, 90), terms) + '</span><span class="si-sec">' + it.section + '</span></div>' +
-      (it.article
-        ? '<div class="si-snip">' + (it.heading ? '<strong>' + esc(it.heading.slice(0, 60)) + '</strong> \u00b7 ' : '') + mark(snippet(it.text, terms), terms) + '</div>'
-        : (it.text !== it.title ? '<div class="si-snip">' + mark(snippet(it.text, terms), terms) + '</div>' : '')) +
-      '</button>').join('') + waiting;
-  }
-  function setActive(n) {
-    const items = sResults.querySelectorAll('.search-item');
-    if (!items.length) return;
-    sActive = (n + items.length) % items.length;
-    items.forEach((e, i) => e.classList.toggle('active', i === sActive));
-    items[sActive].scrollIntoView({ block: 'nearest' });
-  }
-  function openSearch() {
-    loadArticles();
-    sOverlay.classList.add('open');
-    sInput.value = ''; runSearch('');
-    sInput.focus();
-  }
-  sOverlay.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSearch(); });
+  /* Settings */
   const sgOverlay = document.getElementById('settingsOverlay');
   const themeSeg = document.getElementById('themeSeg');
   const darkMQ = matchMedia('(prefers-color-scheme: dark)');
@@ -1906,47 +1718,7 @@
   function openSettings()  { closeSearch(); sgOverlay.classList.add('open'); }
   function closeSettings() { sgOverlay.classList.remove('open'); }
   sgOverlay.addEventListener('click', e => { if (e.target === sgOverlay) closeSettings(); });
-  function closeSearch() { sOverlay.classList.remove('open'); }
-  function openItem(it) {
-    closeSearch();
-    if (it.link.protocol === 'mailto:' || it.link.target !== '_blank') location.href = it.link.href;
-    else window.open(it.link.href, '_blank', 'noopener');
-  }
-  function goTo(it) {
-    closeSearch();
-    if (!it.el.offsetParent && it.el.closest('#stree')) it = { ...it, el: document.getElementById('radialMenu') };
-    if (it.el.closest('#archive')) setArchive(true);
-    const seriesBox = it.el.closest('.series-parts');
-    if (seriesBox) setSeries(seriesBox, true);
-    it.el.classList.add('visible');
-    it.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    it.el.classList.add('search-hit');
-    setTimeout(() => it.el.classList.remove('search-hit'), 2000);
-  }
-  sInput.addEventListener('input', () => runSearch(sInput.value));
-  sResults.addEventListener('click', e => {
-    const b = e.target.closest('.search-item');
-    if (!b) return;
-    const it = sHits[+b.dataset.i];
-    if (it.article) { location.href = it.href; return; }
-    if (it.link && !(e.metaKey || e.ctrlKey)) openItem(it); else goTo(it);
-  });
-  sOverlay.addEventListener('click', e => { if (e.target === sOverlay) closeSearch(); });
-  document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); return; }
-    if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); openSearch(); return; }
-    if (e.key === 'Escape') closeSettings();
-    if (!sOverlay.classList.contains('open')) return;
-    if (e.key === 'Escape') closeSearch();
-    else if (e.key === 'ArrowDown') { e.preventDefault(); setActive(sActive + 1); }
-    else if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(sActive - 1); }
-    else if (e.key === 'Enter' && sHits[sActive]) {
-      e.preventDefault();
-      const it = sHits[sActive];
-      if (it.article) { location.href = it.href; return; }
-      if (it.link && !(e.metaKey || e.ctrlKey)) openItem(it); else goTo(it);
-    }
-  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSettings(); });
 
   /* Skills tree — one group open at a time */
   (function () {
@@ -2259,5 +2031,6 @@
     add(label('Technical Writing'), articles + parts + archived, 'post');
   })();
 </script>
+<script src="data/search/search.js" data-home defer></script>
 </body>
 </html>

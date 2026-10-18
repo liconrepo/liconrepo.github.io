@@ -1,0 +1,80 @@
+/* Search: the look of the search button and the search window, shared by the home page and every blog page.
+   Linked from <head> on every page (the home page's Settings window reuses .search-overlay and .search-box too).
+   The behaviour lives in search.js. */
+
+/* ────────────────── SEARCH ────────────────── */
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.search-btn {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  background: var(--card); border: 1px solid var(--border); border-radius: 9px;
+  color: var(--muted); font: inherit; font-size: calc(13px * var(--fs, 1)); padding: 6px 10px;
+  transition: border-color .18s, color .18s;
+}
+.search-btn:hover { border-color: var(--border-h); color: var(--text); }
+.search-btn kbd {
+  font: inherit; font-size: calc(11px * var(--fs, 1)); padding: 1px 6px; border-radius: 5px;
+  border: 1px solid var(--border-h); color: var(--muted);
+}
+.search-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.35); backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: flex-start; justify-content: center; padding: 12vh 16px 0;
+}
+.search-overlay.open { display: flex; }
+.search-box {
+  width: 100%; max-width: 600px; background: var(--card);
+  border: 1px solid var(--border-h); border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25); overflow: hidden;
+}
+.search-box input {
+  width: 100%; border: 0; outline: 0; background: transparent;
+  font: inherit; font-size: calc(16px * var(--fs, 1)); color: var(--text); padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.search-results { max-height: 52vh; overflow-y: auto; padding: 8px; }
+.search-item {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  background: none; border: 0; font: inherit; color: inherit;
+  padding: 10px 12px; border-radius: 10px;
+}
+.search-item.active { background: var(--card-h); outline: 1px solid var(--border-h); }
+.search-item .si-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.search-item .si-title { font-size: calc(14px * var(--fs, 1)); font-weight: 600; color: var(--text); }
+.search-item .si-sec { font-size: calc(11px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .6px; white-space: nowrap; }
+.search-item .si-snip { font-size: calc(12px * var(--fs, 1)); color: var(--sub); margin-top: 2px; line-height: 1.5; }
+.search-item mark { background: rgba(250,204,21,0.45); color: inherit; border-radius: 3px; }
+.search-empty { padding: 24px; text-align: center; color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
+.search-hint { padding: 8px 16px; border-top: 1px solid var(--border); font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+.search-btn:focus-visible, .search-item:focus-visible, .hamburger:focus-visible { outline: 2px solid var(--accent, #3b82f6); outline-offset: 2px; }
+.search-hit { outline: 2px solid rgba(250,204,21,0.8); outline-offset: 4px; border-radius: 10px; transition: outline-color .6s; }
+.hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--muted); font-size: calc(20px * var(--fs, 1)); }
+
+.sp-top { display: flex; gap: 8px; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); }
+.sp-input { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; color: var(--muted);
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; }
+.sp-input:focus-within { border-color: var(--border-h); }
+.sp-input input { border: 0; padding: 11px 0; border-bottom: 0; font-size: calc(14px * var(--fs, 1)); }
+.search-box > .search-hint { display: none; }
+
+/* Mobile: keep the panel inside the visible viewport (dvh follows the on-screen keyboard) */
+@media(max-width:720px){
+  .search-overlay { padding: max(env(safe-area-inset-top), 12px) 10px 0; }
+  .search-box { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; border-radius: 14px; }
+  .sp-top { flex: 0 0 auto; padding: 10px; }
+  /* 16px minimum stops iOS Safari zooming the page when the field is focused */
+  .sp-input input { font-size: max(16px, calc(14px * var(--fs, 1))); }
+  .search-box .search-results { flex: 1 1 auto; min-height: 0; max-height: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .search-box .search-results { padding: 6px 6px calc(10px + env(safe-area-inset-bottom)); }
+  .search-item { padding: 12px; }
+  .search-item .si-top { flex-wrap: wrap; gap: 2px 12px; }
+  .search-item .si-title { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 720px) {
+  .hamburger { display: block; }
+  .search-btn:not(.settings-btn) { display: none; }
+}
+
+[data-theme="dark"] .search-overlay { background: rgba(0,0,0,0.6); }
+[data-theme="dark"] .search-box { box-shadow: 0 24px 80px rgba(0,0,0,0.6); }

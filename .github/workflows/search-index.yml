@@ -1,6 +1,6 @@
 name: Rebuild search index and sitemap
 
-# Keeps search-index.json, data/search/search-data.js and sitemap.xml in step with the articles in blog/.
+# Keeps data/search/search-data.js and sitemap.xml in step with the articles in blog/.
 # It runs on every push to main, rebuilds both files, and commits them back
 # only if the result is different (so most pushes end with "already up to date").
 on:
@@ -28,13 +28,13 @@ jobs:
 
       - name: Commit the index if it changed
         run: |
-          if [ -z "$(git status --porcelain search-index.json data/search/search-data.js sitemap.xml)" ]; then
+          if [ -z "$(git status --porcelain data/search/search-data.js sitemap.xml)" ]; then
             echo "Generated files are already up to date"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add search-index.json data/search/search-data.js sitemap.xml
+          git add data/search/search-data.js sitemap.xml
           git commit -m "Rebuild search index and sitemap [skip ci]"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

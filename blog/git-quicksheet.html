@@ -138,6 +138,7 @@
     })();
   </script>
 
+  <link rel="stylesheet" href="../data/search/search.css">
 </head>
 <body>
 
@@ -173,28 +174,28 @@
       <figcaption>Where each command moves your work.</figcaption>
     </figure>
 
-    <h2>Setup</h2>
+    <h2 id="setup">Setup</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git config --global user.name "Name"</code></td><td>Set the name on your commits</td></tr><tr><td><code>git config --global user.email "me@x.com"</code></td><td>Set the email on your commits</td></tr><tr><td><code>git config --global init.defaultBranch main</code></td><td>Name new repositories' first branch <code>main</code></td></tr><tr><td><code>git config --global pull.rebase true</code></td><td>Make <code>git pull</code> rebase instead of merge</td></tr><tr><td><code>git config --list --show-origin</code></td><td>Show every setting and where it comes from</td></tr></table>
-    <h2>Start a repository</h2>
+    <h2 id="start-a-repository">Start a repository</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git init</code></td><td>Turn the current folder into a repository</td></tr><tr><td><code>git clone &lt;url&gt;</code></td><td>Copy a remote repository with all its history</td></tr><tr><td><code>git clone --depth 1 &lt;url&gt;</code></td><td>Shallow clone: latest snapshot only, much faster</td></tr><tr><td><code>git remote -v</code></td><td>List the remotes</td></tr></table>
-    <h2>Save work</h2>
+    <h2 id="save-work">Save work</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git status -sb</code></td><td>Short status with branch info</td></tr><tr><td><code>git add &lt;file&gt;</code></td><td>Stage a file</td></tr><tr><td><code>git add -p</code></td><td>Stage piece by piece (hunks)</td></tr><tr><td><code>git commit -m "msg"</code></td><td>Commit what is staged</td></tr><tr><td><code>git commit -am "msg"</code></td><td>Stage tracked files and commit (not new files)</td></tr><tr><td><code>git commit --amend</code></td><td>Change the last commit (before pushing only)</td></tr><tr><td><code>git rm &lt;file&gt; / git mv &lt;a&gt; &lt;b&gt;</code></td><td>Delete or rename a file and stage it</td></tr></table>
-    <h2>Branches</h2>
+    <h2 id="branches">Branches</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git branch -vv</code></td><td>List local branches with their upstream</td></tr><tr><td><code>git switch -c &lt;name&gt;</code></td><td>Create a branch and move to it</td></tr><tr><td><code>git switch &lt;name&gt;</code></td><td>Move to an existing branch</td></tr><tr><td><code>git switch -</code></td><td>Go back to the previous branch</td></tr><tr><td><code>git branch -d &lt;name&gt;</code></td><td>Delete a merged branch (<code>-D</code> to force)</td></tr><tr><td><code>git branch -m &lt;new&gt;</code></td><td>Rename the current branch</td></tr><tr><td><code>git push origin --delete &lt;name&gt;</code></td><td>Delete a remote branch</td></tr></table>
-    <h2>Merge and rebase</h2>
+    <h2 id="merge-and-rebase">Merge and rebase</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git merge &lt;branch&gt;</code></td><td>Merge a branch into the current one</td></tr><tr><td><code>git merge --no-ff &lt;branch&gt;</code></td><td>Always create a merge commit</td></tr><tr><td><code>git merge --squash &lt;branch&gt;</code></td><td>Combine the branch into one staged change</td></tr><tr><td><code>git merge --abort</code></td><td>Cancel a merge that has conflicts</td></tr><tr><td><code>git rebase main</code></td><td>Replay your commits on top of main</td></tr><tr><td><code>git rebase -i HEAD~3</code></td><td>Reorder, squash or reword the last 3 commits</td></tr><tr><td><code>git rebase --continue / --abort</code></td><td>Carry on or cancel after a conflict</td></tr><tr><td><code>git cherry-pick &lt;commit&gt;</code></td><td>Copy one commit onto the current branch</td></tr></table>
-    <h2>Remotes</h2>
+    <h2 id="remotes">Remotes</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git fetch --prune</code></td><td>Download updates and drop deleted remote branches</td></tr><tr><td><code>git pull</code></td><td>Fetch and integrate (merge or rebase)</td></tr><tr><td><code>git push -u origin &lt;branch&gt;</code></td><td>Publish a branch and set its upstream</td></tr><tr><td><code>git push</code></td><td>Push the current branch</td></tr><tr><td><code>git push --force-with-lease</code></td><td>Safer force push for your own branch only</td></tr><tr><td><code>git remote add upstream &lt;url&gt;</code></td><td>Add the original repo when working from a fork</td></tr></table>
-    <h2>Look around</h2>
+    <h2 id="look-around">Look around</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git log --oneline --graph --all</code></td><td>Compact history graph of all branches</td></tr><tr><td><code>git log -p &lt;file&gt;</code></td><td>History of a file with the changes</td></tr><tr><td><code>git log -S"text"</code></td><td>Commits that added or removed this text</td></tr><tr><td><code>git diff / git diff --staged</code></td><td>Unstaged / staged changes</td></tr><tr><td><code>git diff main...feature</code></td><td>What the feature branch adds since it split</td></tr><tr><td><code>git show &lt;commit&gt;</code></td><td>One commit in full</td></tr><tr><td><code>git blame &lt;file&gt;</code></td><td>Who last changed each line</td></tr><tr><td><code>git shortlog -sn</code></td><td>Commit count per author</td></tr></table>
-    <h2>Undo and recover</h2>
+    <h2 id="undo-and-recover">Undo and recover</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git restore &lt;file&gt;</code></td><td>Discard edits in a file (gone for good)</td></tr><tr><td><code>git restore --staged &lt;file&gt;</code></td><td>Unstage but keep the edits</td></tr><tr><td><code>git revert &lt;commit&gt;</code></td><td>New commit that undoes an old one. Safe when shared</td></tr><tr><td><code>git reset --soft HEAD~1</code></td><td>Undo last commit, keep changes staged</td></tr><tr><td><code>git reset --mixed HEAD~1</code></td><td>Undo last commit, keep changes unstaged</td></tr><tr><td><code>git reset --hard &lt;commit&gt;</code></td><td>Move the branch and throw away changes. Danger</td></tr><tr><td><code>git clean -fd</code></td><td>Delete untracked files and folders. Use <code>-n</code> first</td></tr><tr><td><code>git reflog</code></td><td>List where HEAD has been, to find lost commits</td></tr><tr><td><code>git switch -c rescue &lt;id&gt;</code></td><td>Bring a lost commit back on a new branch</td></tr></table>
-    <h2>Stash, tags and worktrees</h2>
+    <h2 id="stash-tags-and-worktrees">Stash, tags and worktrees</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git stash push -u -m "wip"</code></td><td>Shelve changes, including untracked files</td></tr><tr><td><code>git stash list / pop / apply</code></td><td>See, restore and drop / restore and keep</td></tr><tr><td><code>git tag -a v1.2.0 -m "msg"</code></td><td>Create an annotated release tag</td></tr><tr><td><code>git push origin --tags</code></td><td>Publish tags</td></tr><tr><td><code>git worktree add ../fix hotfix/x</code></td><td>Check out another branch in a second folder</td></tr></table>
-    <h2>Debugging</h2>
+    <h2 id="debugging">Debugging</h2>
     <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git bisect start / bad / good</code></td><td>Binary-search for the commit that broke something</td></tr><tr><td><code>git bisect run &lt;test&gt;</code></td><td>Let a script do the bisecting</td></tr><tr><td><code>git bisect reset</code></td><td>Finish and return to your branch</td></tr><tr><td><code>git grep "text"</code></td><td>Search tracked files quickly</td></tr></table>
 
-    <h2>.gitignore patterns</h2>
+    <h2 id="gitignore-patterns">.gitignore patterns</h2>
     <table class="cs"><tr><th>Pattern</th><th>Meaning</th></tr>
       <tr><td><code>*.log</code></td><td>Ignore all files ending in .log</td></tr>
       <tr><td><code>build/</code></td><td>Ignore a folder named build anywhere</td></tr>
@@ -204,7 +205,7 @@
     </table>
     <div class="note"><p>Never commit secrets (<code>.env</code>, keys, tokens). If one slips in, treat it as leaked and rotate it.</p></div>
 
-    <h2>Which branching strategy?</h2>
+    <h2 id="which-branching-strategy">Which branching strategy?</h2>
     <table class="cs"><tr><th>Situation</th><th>Use</th></tr>
       <tr><td>Web app or API, deploy often</td><td>GitHub Flow, or trunk-based with feature flags</td></tr>
       <tr><td>Numbered versions, old versions supported</td><td>Git Flow, or <code>release/x.y</code> branches</td></tr>
@@ -213,7 +214,7 @@
       <tr><td>Production fire</td><td><code>hotfix/*</code> from the production tag, then merge back to main</td></tr>
     </table>
 
-    <h2>Rules of thumb</h2>
+    <h2 id="rules-of-thumb">Rules of thumb</h2>
     <ul>
       <li>Short branches, small pull requests, CI on every PR, protected <code>main</code>.</li>
       <li>Never rebase, reset or force-push commits that others have pulled. Use <code>revert</code> instead.</li>
@@ -226,6 +227,6 @@
 </main>
 
 <footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
-<script src="../data/search/blog-search.js" defer></script>
+<script src="../data/search/search.js" defer></script>
 </body>
 </html>

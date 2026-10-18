@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Build the generated site files:
 
-  search-index.json  the full text of every article in blog/, split at headings
-                     (the home page loads it the first time search is opened)
   data/search/search-data.js
-                     the same articles plus the home page's own content (experience, skills, open
-                     source, education...) as a script, so the search on every blog page also works
-                     when a page is opened straight from disk (file://), where fetch() is blocked
+                     everything the site search looks through, as one script: the full text of every
+                     article in blog/ (split at headings) plus the home page's own content (experience,
+                     skills, open source, education...). It is a script rather than JSON so search also
+                     works when a page is opened straight from disk (file://), where fetch() is blocked.
+                     Loaded by data/search/search.js on the home page and on every blog page.
   sitemap.xml        every page of the site, for Google and other search engines
 
 Run from the repository root after adding or editing a post:
@@ -113,9 +113,6 @@ def build():
         words = sum(len(s["x"].split()) for s in segs)
         out.append({"u": "blog/" + path.name, "t": title, "k": p.kicker, "s": segs})
         print(f"{path.name:58s} {words:6d} words, {len(segs):3d} sections")
-    (ROOT / "search-index.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    size = (ROOT / "search-index.json").stat().st_size
-    print(f"\nWrote search-index.json: {len(out)} articles, {size/1024:.0f} KB")
     build_data_js(out)
 
 
@@ -182,26 +179,12 @@ class Tree(HTMLParser):
 
 
 def page_items():
-    """Mirrors SEARCH_SOURCES in index.html (what the home page search indexes)."""
+    """What the search finds on the home page. Each item remembers the CSS selector `sel` and its position `n`
+    among the matches, so the browser can find the element again (document.querySelectorAll(sel)[n])."""
     tree = Tree()
     tree.feed((ROOT / "index.html").read_text(encoding="utf-8"))
     squash = lambda t: re.sub(r"\s+", " ", t).strip()
     sub = lambda n, c: n.first(c)
-    sources = [
-        (lambda n: n.has("hero-text"), "About", lambda n: "About Khairul Alam", False),
-        (lambda n: n.has("stat-card"), "Highlights", lambda n: n.text(), False),
-        (lambda n: n.has("exp-card"), "Experience", lambda n: sub(n, "exp-title").text(), False),
-        (lambda n: n.has("st-group"), "Skills", lambda n: sub(n, "st-name").text(), False),
-        (lambda n: n.has("tag") and any(a.has("st-leaves") for a in anc(n)), "Skills", lambda n: n.text(), False),
-        (lambda n: n.has("oss-card"), "Open Source", lambda n: sub(n, "oss-name").text(), False),
-        (lambda n: n.has("series-card"), "Writing", lambda n: sub(n, "series-title").text(), False),
-        (lambda n: n.has("series-part"), "Writing", lambda n: "Claude Code series, Part " + sub(n, "sp-num").text() + ": " + sub(n, "sp-title").text(), True),
-        (lambda n: n.has("blog-card"), "Writing", lambda n: sub(n, "blog-title").text(), True),
-        (lambda n: n.has("lead-item"), "Leadership", lambda n: n.first(tag="p").text(), False),
-        (lambda n: n.has("edu-card"), "Education", lambda n: sub(n, "edu-degree").text(), False),
-        (lambda n: n.has("interest-chip"), "Interests", lambda n: sub(n, "interest-label").text(), False),
-        (lambda n: n.has("view-all-link"), "Writing", lambda n: n.text(), True),
-    ]
 
     def anc(n):
         n = n.parent
@@ -209,18 +192,38 @@ def page_items():
             yield n
             n = n.parent
 
+    # (selector, matcher, section, title, is a link)
+    sources = [
+        (".hero-text", lambda n: n.has("hero-text"), "About", lambda n: "About Khairul Alam", False),
+        (".stat-card", lambda n: n.has("stat-card"), "Highlights", lambda n: n.text(), False),
+        (".exp-card", lambda n: n.has("exp-card"), "Experience", lambda n: sub(n, "exp-title").text(), False),
+        (".st-group", lambda n: n.has("st-group"), "Skills", lambda n: sub(n, "st-name").text(), False),
+        (".st-leaves .tag", lambda n: n.has("tag") and any(a.has("st-leaves") for a in anc(n)), "Skills", lambda n: n.text(), False),
+        (".oss-card", lambda n: n.has("oss-card"), "Open Source", lambda n: sub(n, "oss-name").text(), False),
+        (".series-card", lambda n: n.has("series-card"), "Writing", lambda n: sub(n, "series-title").text(), False),
+        (".series-part", lambda n: n.has("series-part"), "Writing", lambda n: "Claude Code series, Part " + sub(n, "sp-num").text() + ": " + sub(n, "sp-title").text(), True),
+        (".blog-card", lambda n: n.has("blog-card"), "Writing", lambda n: sub(n, "blog-title").text(), True),
+        (".lead-item", lambda n: n.has("lead-item"), "Leadership", lambda n: n.first(tag="p").text(), False),
+        (".edu-card", lambda n: n.has("edu-card"), "Education", lambda n: sub(n, "edu-degree").text(), False),
+        (".interest-chip", lambda n: n.has("interest-chip"), "Interests", lambda n: sub(n, "interest-label").text(), False),
+        (".view-all-link", lambda n: n.has("view-all-link"), "Writing", lambda n: n.text(), True),
+    ]
+
     out = []
-    for match, section, title_fn, link in sources:
+    for sel, match, section, title_fn, link in sources:
+        pos = -1
         for n in tree.root.walk():
             if not match(n):
                 continue
+            pos += 1                                   # position among everything the selector matches
             try:
                 title = squash(title_fn(n))
             except AttributeError:
                 continue
             if not title:
                 continue
-            item = {"title": title, "text": squash(n.text()), "section": section, "link": link, "tag": n.has("tag")}
+            item = {"id": len(out), "title": title, "text": squash(n.text()), "section": section, "link": link,
+                    "tag": n.has("tag"), "sel": sel, "n": pos}
             if link:
                 href = n.attrs.get("href")
                 if not href:
