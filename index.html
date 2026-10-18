@@ -84,6 +84,7 @@
       font-size: calc(16px * var(--fs, 1)); font-weight: 600; color: var(--text);
       letter-spacing: -.4px;
     }
+    .nav-logo { text-decoration: none; cursor: pointer; }
     .nav-logo em { color: var(--muted); font-style: normal; font-weight: 400; }
     .nav-links { display: flex; gap: 2px; }
     .nav-links a {
@@ -370,6 +371,7 @@
       position: relative; overflow: hidden;
       box-shadow: 0 32px 80px rgba(0,0,0,0.25);
     }
+    .avatar picture { display: block; width: 100%; height: 100%; }
     .avatar img {
       width: 100%; height: 100%; object-fit: cover; display: block;
       filter: grayscale(15%);
@@ -807,7 +809,7 @@
 
 <!-- NAV -->
 <nav>
-  <span class="nav-logo">Khairul <em>Alam</em></span>
+  <a class="nav-logo" href="#top" aria-label="Khairul Alam, back to top">Khairul <em>Alam</em></a>
   <div class="nav-links">
     <a href="#experience">Experience</a>
     <a href="#skills">Skills</a>
@@ -867,7 +869,7 @@
 <div class="hero-wrap">
   <div class="avatar-wrap">
     <div class="avatar">
-      <img src="data/avatar/191caf3a-de6b-4b67-855a-3ad37058fd87.png" alt="Khairul Alam">
+      <picture><source srcset="data/avatar/191caf3a-de6b-4b67-855a-3ad37058fd87.webp" type="image/webp"><img src="data/avatar/191caf3a-de6b-4b67-855a-3ad37058fd87.png" alt="Khairul Alam" width="400" height="393" fetchpriority="high"></picture>
       <div class="avatar-ring"></div>
     </div>
   </div>
@@ -899,25 +901,25 @@
       <div class="exp-card reveal" style="--c:#d4244f">
         <div class="exp-date">Feb 2020 &ndash; Present</div>
         <div class="exp-dur" data-since="2020-02"></div>
-        <div class="exp-co"><span class="exp-logo"><img src="logos/e39f4ccf-92dd-498b-8d27-cb496224af0b.svg" alt="" width="22" height="22" loading="lazy"></span><div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo"><img src="data/logos/e39f4ccf-92dd-498b-8d27-cb496224af0b.svg" alt="" width="22" height="22" loading="lazy"></span><div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Tokyo, Japan</div>
       </div>
       <div class="exp-card reveal d1" style="--c:#d4244f">
         <div class="exp-date">Feb 2018 &ndash; Jan 2020</div>
         <div class="exp-dur">2 yrs</div>
-        <div class="exp-co"><span class="exp-logo tight"><img src="logos/9c65415d-b428-43bd-975c-1a9f1c47488d.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="data/logos/9c65415d-b428-43bd-975c-1a9f1c47488d.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Tokyo, Japan</div>
       </div>
       <div class="exp-card reveal d2" style="--c:#f2542d">
         <div class="exp-date">Aug 2015 &ndash; Jan 2018</div>
         <div class="exp-dur">2 yrs 6 mos</div>
-        <div class="exp-co"><span class="exp-logo tight"><img src="logos/f286ae30-30f5-4340-a59e-1eea0d0e45d0.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="data/logos/f286ae30-30f5-4340-a59e-1eea0d0e45d0.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Hanoi, Vietnam</div>
       </div>
       <div class="exp-card reveal d3" style="--c:#00a878">
         <div class="exp-date">Nov 2014 &ndash; Jul 2015</div>
         <div class="exp-dur">9 mos</div>
-        <div class="exp-co"><span class="exp-logo tight"><img src="logos/f8c9752f-7ee6-4f13-a97c-938a00e1e6f9.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="data/logos/f8c9752f-7ee6-4f13-a97c-938a00e1e6f9.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Dhaka, Bangladesh</div>
       </div>
     </div>
@@ -1236,9 +1238,9 @@
             <span class="sp-body"><span class="sp-title">Programming patterns for solving problems</span><span class="sp-desc">Two pointers, sliding window, prefix sums, monotonic stack and more.</span></span>
             <span class="sp-meta">~50 min</span>
           </a>
-          <a class="series-part" href="blog/dsa-part-9-study-path-cheat-sheet.html">
+          <a class="series-part" href="blog/dsa-part-9-study-path-quicksheet.html">
             <span class="sp-num">9</span>
-            <span class="sp-body"><span class="sp-title">Study path and cheat sheet</span><span class="sp-desc">Big-O, Theta and Omega explained, full time and space cheat sheets, a study routine and mini-projects.</span></span>
+            <span class="sp-body"><span class="sp-title">Study path and quicksheet</span><span class="sp-desc">Big-O, Theta and Omega explained, full time and space quicksheets, a study routine and mini-projects.</span></span>
             <span class="sp-meta">~40 min</span>
           </a>
         </div>
@@ -1332,7 +1334,7 @@
           </a>
           <a class="series-part" href="blog/claude-md-part-8-beyond-code-learning-path.html">
             <span class="sp-num">8</span>
-            <span class="sp-body"><span class="sp-title">Beyond code and your learning path</span><span class="sp-desc">The Claude apps, Claude Code for non-developers, a first-week plan, exercises, courses and a cheat sheet.</span></span>
+            <span class="sp-body"><span class="sp-title">Beyond code and your learning path</span><span class="sp-desc">The Claude apps, Claude Code for non-developers, a first-week plan, exercises, courses and a quicksheet.</span></span>
             <span class="sp-meta">~15 min</span>
           </a>
         </div>
@@ -1384,7 +1386,7 @@
           </a>
           <a class="series-part" href="blog/codex-part-8-beyond-code-learning-path.html">
             <span class="sp-num">8</span>
-            <span class="sp-body"><span class="sp-title">Beyond code and your learning path</span><span class="sp-desc">What Codex and ChatGPT can do beyond code, a first-week plan, exercises, official resources and a cheat sheet.</span></span>
+            <span class="sp-body"><span class="sp-title">Beyond code and your learning path</span><span class="sp-desc">What Codex and ChatGPT can do beyond code, a first-week plan, exercises, official resources and a quicksheet.</span></span>
             <span class="sp-meta">~23 min</span>
           </a>
         </div>
@@ -1424,20 +1426,20 @@
       </div>
     </div>
 
-    <p class="blog-cat"><span class="bc-title">Cheatsheets</span><span class="bc-sub">2 posts</span></p>
+    <p class="blog-cat"><span class="bc-title">Quicksheets</span><span class="bc-sub">2 posts</span></p>
     <div class="blog-grid new-grid">
-      <a href="blog/git-cheat-sheet.html" class="blog-card featured reveal">
-        <div class="blog-idx">Cheat sheet<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Git Cheat Sheet: Commands, Undo Recipes and Branching on One Page</div>
+      <a href="blog/git-quicksheet.html" class="blog-card featured reveal">
+        <div class="blog-idx">Quicksheet<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Git Quicksheet: Commands, Undo Recipes and Branching on One Page</div>
         <div class="blog-summary">The Git commands you use most, grouped by task: setup, branches, merge and rebase, remotes, undo and recovery, stash, tags and debugging, plus a quick branching strategy guide.</div>
-        <div class="blog-tags"><span class="blog-tag">Cheat sheet</span><span class="blog-tag">Git</span><span class="blog-tag">Branching</span></div>
+        <div class="blog-tags"><span class="blog-tag">Quicksheet</span><span class="blog-tag">Git</span><span class="blog-tag">Branching</span></div>
         <div class="blog-footer"><span class="views-badge">~8 min skim</span><span class="blog-date">Oct 2026</span></div>
       </a>
-      <a href="blog/patterns-cheat-sheet.html" class="blog-card featured reveal">
-        <div class="blog-idx">Cheat sheet<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Patterns Cheat Sheet: Architecture, Design Patterns and DSA on One Page</div>
+      <a href="blog/patterns-quicksheet.html" class="blog-card featured reveal">
+        <div class="blog-idx">Quicksheet<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Patterns Quicksheet: Architecture, Design Patterns and DSA on One Page</div>
         <div class="blog-summary">127 patterns in one searchable list: Android architecture, design principles, 53 software design patterns and 49 DSA patterns, each with a short description, a popular mark and a link to learn more.</div>
-        <div class="blog-tags"><span class="blog-tag">Cheat sheet</span><span class="blog-tag">Architecture</span><span class="blog-tag">Design patterns</span><span class="blog-tag">DSA</span></div>
+        <div class="blog-tags"><span class="blog-tag">Quicksheet</span><span class="blog-tag">Architecture</span><span class="blog-tag">Design patterns</span><span class="blog-tag">DSA</span></div>
         <div class="blog-footer"><span class="views-badge">~10 min skim</span><span class="blog-date">Oct 2026</span></div>
       </a>
     </div>
@@ -1559,7 +1561,7 @@
     <p class="section-label">Education</p>
     <div class="edu-card reveal">
       <div class="edu-badge">
-        <img src="logos/310e1d46-9e86-4477-895f-403f9d5a40c9.svg" alt="University of Rajshahi logo" width="56" height="56" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:14px;font-weight:700;color:#1a2540\'>RU</span>')">
+        <img src="data/logos/310e1d46-9e86-4477-895f-403f9d5a40c9.svg" alt="University of Rajshahi logo" width="56" height="56" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:14px;font-weight:700;color:#1a2540\'>RU</span>')">
       </div>
       <div class="edu-text">
         <div class="edu-degree">Bachelor of Science &mdash; Computer Science &amp; Engineering</div>
@@ -1783,8 +1785,14 @@
   function loadArticles() {
     if (articles || articlesLoading) return;
     articlesLoading = fetch('search-index.json')
-      .then(r => r.ok ? r.json() : [])
-      .catch(() => [])
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .catch(() => new Promise(res => {                    // opened from disk (file://), where fetch is blocked: use the script copy
+        const sc = document.createElement('script');
+        sc.src = 'data/search/search-data.js';
+        sc.onload = () => res((window.SITE_SEARCH || {}).articles || []);
+        sc.onerror = () => res([]);
+        document.head.appendChild(sc);
+      }))
       .then(list => {
         articles = list.map(a => {
           const series = /series/i.test(a.k || '') ? 'Series \u00b7 ' + a.k.split('\u00b7').pop().trim() : 'Article';

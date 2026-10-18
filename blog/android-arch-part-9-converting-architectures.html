@@ -178,14 +178,14 @@
       <a href="android-arch-part-1-why-architecture.html"><small>Part 1</small>Why architecture</a><a href="android-arch-part-2-principles-and-patterns.html"><small>Part 2</small>Principles</a><a href="android-arch-part-3-mvc-and-mvp.html"><small>Part 3</small>MVC and MVP</a><a href="android-arch-part-4-mvvm-and-redux.html"><small>Part 4</small>MVVM and Redux</a><a href="android-arch-part-5-viper-and-modules.html"><small>Part 5</small>VIPER</a><a href="android-arch-part-6-di-async-errors.html"><small>Part 6</small>DI and async</a><a href="android-arch-part-7-data-and-config-changes.html"><small>Part 7</small>Data and config</a><a href="android-arch-part-8-testing-and-proof.html"><small>Part 8</small>Testing and proof</a><a class="on" href="android-arch-part-9-converting-architectures.html"><small>Part 9</small>Converting</a><a href="clean-architecture-summary.html"><small>Part 10</small>Clean Architecture</a>
     </div>
 
-    <p class="lede">Since every architecture is the same three boxes, moving between them is mostly mechanical. This part gives you before/after code, mapping diagrams and a cheat sheet for each direction.</p>
+    <p class="lede">Since every architecture is the same three boxes, moving between them is mostly mechanical. This part gives you before/after code, mapping diagrams and a quicksheet for each direction.</p>
     <div class="callout">
       <strong>In 60 seconds</strong>
       <ul><li><strong>Rule:</strong> one screen at a time, one box at a time, tests first.</li><li><strong>MVP &rarr; MVVM:</strong> <code>view.showX()</code> becomes <code>state = X</code>; use a bridge ViewModel to go gradually.</li><li><strong>MVVM &rarr; Redux:</strong> methods become actions, assignments move to a reducer.</li><li><strong>To VIPER:</strong> extract an interactor and a router.</li></ul>
     </div>
     <details class="toc">
       <summary><strong>Contents</strong></summary>
-      <ol><li><a href="#why">Why conversion is mostly mechanical</a></li><li><a href="#mvc-mvp">MVC to MVP</a></li><li><a href="#mvp-mvvm">MVP to MVVM</a></li><li><a href="#mvvm-redux">MVVM to Redux / MVI</a></li><li><a href="#to-redux">MVP to Redux / MVI</a></li><li><a href="#viper">To and from VIPER</a></li><li><a href="#matrix">Conversion cheat sheet</a></li><li><a href="#plan">A migration plan for a big codebase</a></li></ol>
+      <ol><li><a href="#why">Why conversion is mostly mechanical</a></li><li><a href="#mvc-mvp">MVC to MVP</a></li><li><a href="#mvp-mvvm">MVP to MVVM</a></li><li><a href="#mvvm-redux">MVVM to Redux / MVI</a></li><li><a href="#to-redux">MVP to Redux / MVI</a></li><li><a href="#viper">To and from VIPER</a></li><li><a href="#matrix">Conversion quicksheet</a></li><li><a href="#plan">A migration plan for a big codebase</a></li></ol>
     </details>
 
 
@@ -350,7 +350,7 @@ class ProfilePresenter(view: ProfileView, interactor: LoadProfileInteractor, rou
 
     <p><strong>Back from VIPER</strong> to MVVM: inject the interactor into the ViewModel (it becomes a domain use case), turn the presenter's formatting into the state mapping, and turn router calls into one-time navigation events that the view observes. Many modern apps end up exactly here: an MVVM screen with use cases, which is VIPER's I and E without the heavy P and R.</p>
 
-    <h2 id="matrix">7. Conversion cheat sheet</h2>
+    <h2 id="matrix">7. Conversion quicksheet</h2>
     <table>
       <thead><tr><th>From &rarr; To</th><th>What moves</th><th>What stays</th><th>Effort</th></tr></thead>
       <tbody>
@@ -512,5 +512,6 @@ interactor(id).onSuccess(view::showProfile)</code></pre>
 </main>
 
 <footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/blog-search.js" defer></script>
 </body>
 </html>

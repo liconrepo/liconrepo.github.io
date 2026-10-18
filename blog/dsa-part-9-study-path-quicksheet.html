@@ -12,8 +12,8 @@
   </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Data Structures and Algorithms, Part 9: Study Path and Cheat Sheet — Khairul Alam</title>
-  <meta name="description" content="The wrap-up of the data structures and algorithms series in Kotlin: a Big-O, Theta and Omega primer, complete time and space cheat sheets, a which-structure-to-use table, a study routine, debugging and randomized testing habits, real-world examples, capstone projects and further reading." />
+  <title>Data Structures and Algorithms, Part 9: Study Path and Quicksheet — Khairul Alam</title>
+  <meta name="description" content="The wrap-up of the data structures and algorithms series in Kotlin: a Big-O, Theta and Omega primer, complete time and space quicksheets, a which-structure-to-use table, a study routine, debugging and randomized testing habits, real-world examples, capstone projects and further reading." />
   <meta name="theme-color" content="#e4e4e7" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -164,28 +164,28 @@
 <main>
   <article>
     <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 9 of 9</p>
-    <h1>Data Structures and Algorithms, Part 9: Study Path and Cheat Sheet</h1>
+    <h1>Data Structures and Algorithms, Part 9: Study Path and Quicksheet</h1>
     <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~40 min with exercises</span></div>
-    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Cheat sheet</span><span class="tag">Study plan</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Quicksheet</span><span class="tag">Study plan</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
     <div class="series" role="navigation" aria-label="Series">
-      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a class="on" href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a class="on" href="dsa-part-9-study-path-quicksheet.html"><small>Part 9</small>Study path</a>
     </div>
 
-    <p class="lede">You now know the main data structures and the main ways to solve problems with them. This last part is the one to bookmark: a recap, a Big-O cheat sheet, a table for choosing a structure, a practice routine, testing habits, real systems that use these ideas, and projects to build next.</p>
+    <p class="lede">You now know the main data structures and the main ways to solve problems with them. This last part is the one to bookmark: a recap, a Big-O quicksheet, a table for choosing a structure, a practice routine, testing habits, real systems that use these ideas, and projects to build next.</p>
 
     <div class="callout">
       <strong>This part in 60 seconds</strong>
-      <ul><li><code>O</code> is an upper bound, <code>&Omega;</code> a lower bound and <code>&Theta;</code> a tight bound; best, average and worst case are a separate idea.</li><li>The cheat sheets list the best, average and worst cost and the space of every structure and algorithm in the series.</li><li>Choose a structure by the operation you need most: lookup, order, smallest-first, LIFO or FIFO, prefix, connectivity, shortest path.</li><li>Study by predicting, running, breaking and rewriting from memory, with spaced repetition and a mistakes log.</li><li>Test fast code against a brute-force version on many seeded random inputs.</li><li>Build one of the capstone projects to make the ideas yours.</li></ul>
+      <ul><li><code>O</code> is an upper bound, <code>&Omega;</code> a lower bound and <code>&Theta;</code> a tight bound; best, average and worst case are a separate idea.</li><li>The quicksheets list the best, average and worst cost and the space of every structure and algorithm in the series.</li><li>Choose a structure by the operation you need most: lookup, order, smallest-first, LIFO or FIFO, prefix, connectivity, shortest path.</li><li>Study by predicting, running, breaking and rewriting from memory, with spaced repetition and a mistakes log.</li><li>Test fast code against a brute-force version on many seeded random inputs.</li><li>Build one of the capstone projects to make the ideas yours.</li></ul>
     </div>
 
     <details class="toc">
       <summary><strong>Contents</strong></summary>
-      <ol><li><a href="#recap">The series on one page</a></li><li><a href="#notation">Big-O, Theta and Omega</a></li><li><a href="#fullsheet">Complete cheat sheet: best, average and worst</a></li><li><a href="#bigo">Big-O cheat sheet</a></li><li><a href="#choose">Which structure should I use?</a></li><li><a href="#study">How to study this material</a></li><li><a href="#debug">Debugging and testing algorithms</a></li><li><a href="#real">Where this shows up in real systems</a></li><li><a href="#capstone">Capstone mini-projects</a></li><li><a href="#reading">Further reading</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+      <ol><li><a href="#recap">The series on one page</a></li><li><a href="#notation">Big-O, Theta and Omega</a></li><li><a href="#fullsheet">Complete quicksheet: best, average and worst</a></li><li><a href="#bigo">Big-O quicksheet</a></li><li><a href="#choose">Which structure should I use?</a></li><li><a href="#study">How to study this material</a></li><li><a href="#debug">Debugging and testing algorithms</a></li><li><a href="#real">Where this shows up in real systems</a></li><li><a href="#capstone">Capstone mini-projects</a></li><li><a href="#reading">Further reading</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
     </details>
 
 <h2 id="recap">1. The series on one page</h2>
 
-<p>You have come a long way. This part is a map you can come back to: what each part gave you, a cheat sheet of costs, and a plan for what to do next. Keep it open in a tab while you practise.</p>
+<p>You have come a long way. This part is a map you can come back to: what each part gave you, a quicksheet of costs, and a plan for what to do next. Keep it open in a tab while you practise.</p>
 <figure class="fig">
 <svg viewBox="0 0 640 572" role="img" aria-label="The nine parts of the series, each building on the one before">
 <rect class="boxo" x="20" y="2" width="600" height="52" rx="12"/><text class="b" x="40" y="34">Part 1</text><text class="b" x="110" y="25">Cost</text><text class="sub" x="110" y="43">Big-O, time vs space, six-step method</text>
@@ -204,7 +204,7 @@
 <path class="arrow" d="M320,439 L320,449"/>
 <rect class="boxb" x="20" y="450" width="600" height="52" rx="12"/><text class="b" x="40" y="482">Part 8</text><text class="b" x="110" y="482">Patterns: two pointers, window, prefix sums, ...</text>
 <path class="arrow" d="M320,503 L320,513"/>
-<rect class="boxg" x="20" y="514" width="600" height="52" rx="12"/><text class="b" x="40" y="546">Part 9</text><text class="b" x="110" y="537">Study path and cheat sheet</text><text class="sub" x="110" y="555">you are here</text>
+<rect class="boxg" x="20" y="514" width="600" height="52" rx="12"/><text class="b" x="40" y="546">Part 9</text><text class="b" x="110" y="537">Study path and quicksheet</text><text class="sub" x="110" y="555">you are here</text>
 </svg>
 <figcaption>Each part builds on the one before it.</figcaption></figure>
 <table><tr><th>Part</th><th>The one idea to remember</th></tr><tr><td><a href="dsa-part-1-start-here.html">1. Start here</a></td><td>Count steps as the input grows. Write the slow, correct version first.</td></tr><tr><td><a href="dsa-part-2-arrays-strings-hashing.html">2. Arrays and hashing</a></td><td>A hash map turns "search the whole list" into "look it up".</td></tr><tr><td><a href="dsa-part-3-stacks-queues-linked-lists.html">3. Stacks and queues</a></td><td>Last in, first out (stack) and first in, first out (queue) solve many ordering problems.</td></tr><tr><td><a href="dsa-part-4-trees-heaps-tries.html">4. Trees and heaps</a></td><td>Shape matters: a balanced tree gives <code>O(log n)</code>; a heap gives the smallest item fast.</td></tr><tr><td><a href="dsa-part-5-graphs.html">5. Graphs</a></td><td>Many problems are really "things and connections". BFS finds fewest steps; DFS explores deep.</td></tr><tr><td><a href="dsa-part-6-sorting-and-searching.html">6. Sorting and searching</a></td><td>Sorted data lets you throw away half the search space each step.</td></tr><tr><td><a href="dsa-part-7-recursion-backtracking-dp.html">7. Recursion and DP</a></td><td>Solve small versions first; remember answers you have already computed.</td></tr><tr><td><a href="dsa-part-8-problem-solving-patterns.html">8. Patterns</a></td><td>Familiar shapes (window, two pointers, prefix sums) turn <code>O(n&sup2;)</code> into <code>O(n)</code>.</td></tr></table>
@@ -261,7 +261,7 @@ fun main() {
 
 <h3>Best case and worst case are not the same thing as O and &Omega;</h3>
 <p>This trips up almost everyone. <strong>Best, average and worst</strong> describe <em>which input</em> you feed the code. <strong>O, &Omega; and &Theta;</strong> describe <em>how you bound a growth rate</em>. You can use any symbol on any case: &ldquo;the worst case is <code>&Theta;(n)</code>&rdquo; and &ldquo;the best case is <code>O(1)</code>&rdquo; are both fine sentences.</p>
-<p>Cheat sheets squeeze this into one convention, and so do we below: <strong>&Omega; = best case, &Theta; = average (typical) case, O = worst case</strong>. It is a handy shortcut, not a law. Where an algorithm costs the same for every input, one &Theta; covers all three.</p>
+<p>Quicksheets squeeze this into one convention, and so do we below: <strong>&Omega; = best case, &Theta; = average (typical) case, O = worst case</strong>. It is a handy shortcut, not a law. Where an algorithm costs the same for every input, one &Theta; covers all three.</p>
 <div class="try demo"><h3>Run it: one algorithm, three costs</h3>
 <p>The best case stays at 1 step for any <code>n</code>, the typical case is about half the list, and the worst case is the whole list.</p>
 <pre><code>// Linear search: how many items do we look at?
@@ -376,7 +376,7 @@ fun main() {
     return comparisons
 }</code></pre>
 </details></div>
-<h2 id="fullsheet">3. Complete cheat sheet: best, average and worst</h2>
+<h2 id="fullsheet">3. Complete quicksheet: best, average and worst</h2>
 
 <p>Columns follow the convention above: <strong>&Omega;</strong> best, <strong>&Theta;</strong> average or typical, <strong>O</strong> worst. When one value is shown, all three agree. Variables: <code>n</code> items, <code>V</code> vertices, <code>E</code> edges, <code>k</code> key or word length, <code>m</code> a value range.</p>
 <h3>Data structures: average and worst case</h3>
@@ -405,7 +405,7 @@ fun main() {
 <li>Recursion depth counts as space: a recursion <code>n</code> calls deep uses <code>O(n)</code> stack, even if it allocates nothing else.</li>
 </ul>
 <div class="note"><p><strong>Quick reading tips.</strong> If you see a sort anywhere, add <code>n log n</code>. If you see a hash map, assume <code>O(1)</code> per operation. If you see nested loops, multiply. If you see recursion that branches twice with only one fewer item, think <code>2&#8319;</code>.</p></div>
-<h2 id="bigo">4. Big-O cheat sheet</h2>
+<h2 id="bigo">4. Big-O quicksheet</h2>
 
 <p>Costs below are for the usual implementation and for the worst case unless the note says otherwise. <code>n</code> is the number of items, <code>V</code> and <code>E</code> are vertices and edges of a graph, and <code>k</code> is the length of a word or key.</p>
 <h3>Data structures</h3>
@@ -898,7 +898,7 @@ fun main() {
 <li><strong>The Kotlin documentation</strong> at kotlinlang.org. Look at the pages on collections, especially the lists, sets, maps and sequences, so you know what the standard library already gives you.</li>
 <li><strong>The source of your language's standard collections.</strong> Reading how <code>ArrayList</code>, <code>HashMap</code> and <code>PriorityQueue</code> are written is a great second pass once you know the basics.</li>
 </ul>
-<div class="callout"><strong>What to do next</strong><p>Pick one capstone project, put the cheat sheet beside you, and start with the smallest working version. When it works, write the tests, then make it faster. That loop of build, test, improve is the whole craft.</p></div>
+<div class="callout"><strong>What to do next</strong><p>Pick one capstone project, put the quicksheet beside you, and start with the smallest working version. When it works, write the tests, then make it faster. That loop of build, test, improve is the whole craft.</p></div>
 
     <h2 id="takeaways">11. Takeaways</h2>
     <ul><li>Pick the structure from the operation, then check the cost in the table.</li><li>Brute force is the answer key for your fast solution.</li><li>Seeded random tests find bugs your hand-written tests miss, and can be repeated.</li><li>Practise a little, often, and rewrite code from memory.</li><li>Real systems use the same structures you have just built: trees, heaps, tries, graphs and hash maps.</li><li>Keep building. A small project teaches more than another chapter.</li></ul>
@@ -921,5 +921,6 @@ fun main() {
     a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
   });
 </script>
+<script src="../data/search/blog-search.js" defer></script>
 </body>
 </html>

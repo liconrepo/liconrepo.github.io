@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://liconrepo.github.io/</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://liconrepo.github.io/</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-1-why-architecture.html</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-2-principles-and-patterns.html</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-3-mvc-and-mvp.html</loc><lastmod>2026-10-18</lastmod></url>
@@ -39,15 +39,15 @@
   <url><loc>https://liconrepo.github.io/blog/dsa-part-6-sorting-and-searching.html</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/dsa-part-7-recursion-backtracking-dp.html</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/dsa-part-8-problem-solving-patterns.html</loc><lastmod>2026-10-18</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/dsa-part-9-study-path-cheat-sheet.html</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/dsa-part-9-study-path-quicksheet.html</loc></url>
   <url><loc>https://liconrepo.github.io/blog/firebase-analytics-overview.html</loc><lastmod>2026-10-17</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/firebase-app-distribution-overview.html</loc><lastmod>2026-10-17</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/firebase-crashlytics-overview.html</loc><lastmod>2026-10-17</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/firebase-remote-config-overview.html</loc><lastmod>2026-10-17</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/git-cheat-sheet.html</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/git-quicksheet.html</loc></url>
   <url><loc>https://liconrepo.github.io/blog/git-vcs-branching-guide.html</loc><lastmod>2026-10-18</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/java-desktop-app-guide.html</loc><lastmod>2026-10-18</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/llm-models-directory.html</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/llm-models-directory.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-1-what-and-tour.html</loc><lastmod>2026-10-15</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-2-design-tokens.html</loc><lastmod>2026-10-15</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-3-building-a-component.html</loc><lastmod>2026-10-15</lastmod></url>
@@ -55,7 +55,7 @@
   <url><loc>https://liconrepo.github.io/blog/mds-part-5-layers-and-templates.html</loc><lastmod>2026-10-15</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-6-shipping-and-lessons.html</loc><lastmod>2026-10-15</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mobile-system-design.html</loc><lastmod>2026-10-18</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/patterns-cheat-sheet.html</loc><lastmod>2026-10-18</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/patterns-quicksheet.html</loc></url>
   <url><loc>https://liconrepo.github.io/blog/private-ai-chat-android.html</loc><lastmod>2026-10-15</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/solid-principles-explained.html</loc><lastmod>2026-10-18</lastmod></url>
 </urlset>

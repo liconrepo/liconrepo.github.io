@@ -168,7 +168,7 @@
     <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~25 min with exercises</span></div>
     <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Big-O</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
     <div class="series" role="navigation" aria-label="Series">
-      <a class="on" href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+      <a class="on" href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-quicksheet.html"><small>Part 9</small>Study path</a>
     </div>
 
     <p class="lede">Before any list, tree or graph, you need two skills: knowing roughly how expensive a piece of code is, and having a repeatable way to attack a problem. This first part gives you both, with small programs you can run and change.</p>
@@ -190,7 +190,7 @@
 <div class="analogy"><p><strong>Think of a kitchen.</strong> A data structure is how you store things: a spice rack, a fridge, a pile of plates. An algorithm is the recipe. A messy kitchen still lets you cook, but it takes much longer, and it gets much worse when you cook for a hundred people instead of two.</p></div>
 
 <p>Here is the map of the nine parts. Each one stands on its own, but they are written to be read in order.</p>
-<table><tr><th>Part</th><th>What you learn</th></tr><tr><td>1. Start here</td><td>How to measure the cost of code (Big-O) and a method for solving problems.</td></tr><tr><td>2. Arrays and hashing</td><td>Arrays, strings, hash maps and sets, the workhorses of everyday code.</td></tr><tr><td>3. Stacks and queues</td><td>Stacks, queues, deques and linked lists.</td></tr><tr><td>4. Trees and heaps</td><td>Binary trees, search trees, heaps and tries.</td></tr><tr><td>5. Graphs</td><td>Modelling networks, breadth-first and depth-first search, shortest paths, union-find.</td></tr><tr><td>6. Sorting and searching</td><td>Classic sorts, binary search and when to use which.</td></tr><tr><td>7. Recursion and DP</td><td>Recursion, backtracking, greedy choices and dynamic programming.</td></tr><tr><td>8. Patterns</td><td>Two pointers, sliding window, prefix sums, monotonic stack and more.</td></tr><tr><td>9. Study path</td><td>A cheat sheet, a practice routine and where to go next.</td></tr></table>
+<table><tr><th>Part</th><th>What you learn</th></tr><tr><td>1. Start here</td><td>How to measure the cost of code (Big-O) and a method for solving problems.</td></tr><tr><td>2. Arrays and hashing</td><td>Arrays, strings, hash maps and sets, the workhorses of everyday code.</td></tr><tr><td>3. Stacks and queues</td><td>Stacks, queues, deques and linked lists.</td></tr><tr><td>4. Trees and heaps</td><td>Binary trees, search trees, heaps and tries.</td></tr><tr><td>5. Graphs</td><td>Modelling networks, breadth-first and depth-first search, shortest paths, union-find.</td></tr><tr><td>6. Sorting and searching</td><td>Classic sorts, binary search and when to use which.</td></tr><tr><td>7. Recursion and DP</td><td>Recursion, backtracking, greedy choices and dynamic programming.</td></tr><tr><td>8. Patterns</td><td>Two pointers, sliding window, prefix sums, monotonic stack and more.</td></tr><tr><td>9. Study path</td><td>A quicksheet, a practice routine and where to go next.</td></tr></table>
 
 <h3>How to use the code</h3>
 <p>Every program in the series is complete: copy it or press the green or blue <em>Open in Kotlin Playground</em> button, press <strong>Run</strong>, and change things to see what happens. The <em>Try it</em> boxes contain tests that print <code>PASS</code> or <code>FAIL</code>; they fail at first on purpose. Nothing is sent anywhere until you click a button.</p>
@@ -292,7 +292,7 @@ fun main() {
 </script></div>
 
 <p>Look at the last row. At <code>n = 10,000</code> the linear code takes ten thousand steps and the quadratic code takes a hundred million. That gap is why we care.</p>
-<div class="note"><p><strong>Best, average, worst.</strong> Big-O usually describes the <em>worst case</em>: the most steps the input could force. Searching a list for a value might find it on the first try (best case) or the last (worst case, <code>O(n)</code>). We plan for the worst. Part 9 adds the other two symbols, <code>&Omega;</code> and <code>&Theta;</code>, and a full cheat sheet.</p></div>
+<div class="note"><p><strong>Best, average, worst.</strong> Big-O usually describes the <em>worst case</em>: the most steps the input could force. Searching a list for a value might find it on the first try (best case) or the last (worst case, <code>O(n)</code>). We plan for the worst. Part 9 adds the other two symbols, <code>&Omega;</code> and <code>&Theta;</code>, and a full quicksheet.</p></div>
 <h2 id="space">3. Time and space</h2>
 
 <p>Code costs two things: <strong>time</strong> (steps) and <strong>space</strong> (extra memory). Big-O describes both. A loop that only keeps a counter uses <code>O(1)</code> extra space. A program that builds a copy of its input uses <code>O(n)</code>.</p>
@@ -580,5 +580,6 @@ fun main() {
     a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
   });
 </script>
+<script src="../data/search/blog-search.js" defer></script>
 </body>
 </html>

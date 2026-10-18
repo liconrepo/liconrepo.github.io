@@ -3,6 +3,10 @@
 
   search-index.json  the full text of every article in blog/, split at headings
                      (the home page loads it the first time search is opened)
+  data/search/search-data.js
+                     the same articles plus the home page's own content (experience, skills, open
+                     source, education...) as a script, so the search on every blog page also works
+                     when a page is opened straight from disk (file://), where fetch() is blocked
   sitemap.xml        every page of the site, for Google and other search engines
 
 Run from the repository root after adding or editing a post:
@@ -112,6 +116,132 @@ def build():
     (ROOT / "search-index.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     size = (ROOT / "search-index.json").stat().st_size
     print(f"\nWrote search-index.json: {len(out)} articles, {size/1024:.0f} KB")
+    build_data_js(out)
+
+
+# ---- the home page's own content, for the search on blog pages ----
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr", "path", "circle", "rect", "line"}
+
+
+class Node:
+    def __init__(self, tag, attrs, parent):
+        self.tag, self.attrs, self.parent, self.kids = tag, dict(attrs), parent, []
+
+    def classes(self):
+        return (self.attrs.get("class") or "").split()
+
+    def text(self):
+        return "".join(k if isinstance(k, str) else k.text() for k in self.kids)
+
+    def walk(self):
+        for k in self.kids:
+            if isinstance(k, Node):
+                yield k
+                yield from k.walk()
+
+    def has(self, cls):
+        return cls in self.classes()
+
+    def first(self, cls=None, tag=None):
+        for n in self.walk():
+            if (cls is None or n.has(cls)) and (tag is None or n.tag == tag):
+                return n
+        return None
+
+
+class Tree(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.root = Node("root", [], None)
+        self.cur = self.root
+        self.skip = 0
+
+    def handle_starttag(self, tag, attrs):
+        n = Node(tag, attrs, self.cur)
+        self.cur.kids.append(n)
+        if tag in ("script", "style"):
+            self.skip += 1
+        if tag not in VOID:
+            self.cur = n
+
+    def handle_startendtag(self, tag, attrs):
+        self.cur.kids.append(Node(tag, attrs, self.cur))
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style"):
+            self.skip = max(0, self.skip - 1)
+        n = self.cur
+        while n is not None and n.tag != tag:
+            n = n.parent
+        if n is not None and n.parent is not None:
+            self.cur = n.parent
+
+    def handle_data(self, data):
+        if not self.skip:
+            self.cur.kids.append(data)
+
+
+def page_items():
+    """Mirrors SEARCH_SOURCES in index.html (what the home page search indexes)."""
+    tree = Tree()
+    tree.feed((ROOT / "index.html").read_text(encoding="utf-8"))
+    squash = lambda t: re.sub(r"\s+", " ", t).strip()
+    sub = lambda n, c: n.first(c)
+    sources = [
+        (lambda n: n.has("hero-text"), "About", lambda n: "About Khairul Alam", False),
+        (lambda n: n.has("stat-card"), "Highlights", lambda n: n.text(), False),
+        (lambda n: n.has("exp-card"), "Experience", lambda n: sub(n, "exp-title").text(), False),
+        (lambda n: n.has("st-group"), "Skills", lambda n: sub(n, "st-name").text(), False),
+        (lambda n: n.has("tag") and any(a.has("st-leaves") for a in anc(n)), "Skills", lambda n: n.text(), False),
+        (lambda n: n.has("oss-card"), "Open Source", lambda n: sub(n, "oss-name").text(), False),
+        (lambda n: n.has("series-card"), "Writing", lambda n: sub(n, "series-title").text(), False),
+        (lambda n: n.has("series-part"), "Writing", lambda n: "Claude Code series, Part " + sub(n, "sp-num").text() + ": " + sub(n, "sp-title").text(), True),
+        (lambda n: n.has("blog-card"), "Writing", lambda n: sub(n, "blog-title").text(), True),
+        (lambda n: n.has("lead-item"), "Leadership", lambda n: n.first(tag="p").text(), False),
+        (lambda n: n.has("edu-card"), "Education", lambda n: sub(n, "edu-degree").text(), False),
+        (lambda n: n.has("interest-chip"), "Interests", lambda n: sub(n, "interest-label").text(), False),
+        (lambda n: n.has("view-all-link"), "Writing", lambda n: n.text(), True),
+    ]
+
+    def anc(n):
+        n = n.parent
+        while n is not None:
+            yield n
+            n = n.parent
+
+    out = []
+    for match, section, title_fn, link in sources:
+        for n in tree.root.walk():
+            if not match(n):
+                continue
+            try:
+                title = squash(title_fn(n))
+            except AttributeError:
+                continue
+            if not title:
+                continue
+            item = {"title": title, "text": squash(n.text()), "section": section, "link": link, "tag": n.has("tag")}
+            if link:
+                href = n.attrs.get("href")
+                if not href:
+                    continue
+                item["href"] = href
+                item["ext"] = n.attrs.get("target") == "_blank"
+            else:
+                sec = next((a for a in anc(n) if a.tag == "section" and a.attrs.get("id")), None)
+                item["href"] = "index.html" + ("#" + sec.attrs["id"] if sec else "")
+                item["ext"] = False
+            out.append(item)
+    return out
+
+
+def build_data_js(articles):
+    d = ROOT / "data" / "search"
+    d.mkdir(parents=True, exist_ok=True)
+    page = page_items()
+    payload = json.dumps({"articles": articles, "page": page}, ensure_ascii=False, separators=(",", ":"))
+    (d / "search-data.js").write_text("window.SITE_SEARCH=" + payload + ";\n", encoding="utf-8")
+    print(f"Wrote data/search/search-data.js: {len(articles)} articles, {len(page)} home page items")
 
 
 def last_modified(path):
