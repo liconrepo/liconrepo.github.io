@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Build search-index.json: the full text of every article in blog/, split at headings.
+"""Build the generated site files:
+
+  search-index.json  the full text of every article in blog/, split at headings
+                     (the home page loads it the first time search is opened)
+  sitemap.xml        every page of the site, for Google and other search engines
 
 Run from the repository root after adding or editing a post:
 
     python3 tools/build_search_index.py
 
-The home page loads search-index.json the first time the search box is opened,
-so searching finds words anywhere inside the articles, not just in their titles.
+The GitHub Action in .github/workflows/search-index.yml does this automatically.
 """
-import json, re, sys
+import json, re, subprocess, sys
 from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+SITE = "https://liconrepo.github.io/"
 BLOCK = {"p", "div", "li", "ul", "ol", "tr", "td", "th", "table", "pre", "br", "section", "article",
          "figure", "figcaption", "details", "summary", "blockquote", "h1", "h2", "h3", "h4", "main", "text"}
 SKIP = {"script", "style", "nav", "footer", "head", "noscript"}
@@ -110,5 +114,27 @@ def build():
     print(f"\nWrote search-index.json: {len(out)} articles, {size/1024:.0f} KB")
 
 
+def last_modified(path):
+    """Date of the last commit that touched a file (YYYY-MM-DD), or None when git history is not available."""
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", str(path.relative_to(ROOT))],
+                             cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+        return out or None
+    except Exception:
+        return None
+
+
+def build_sitemap():
+    pages = [(ROOT / "index.html", SITE)] + [(p, SITE + "blog/" + p.name) for p in sorted((ROOT / "blog").glob("*.html"))]
+    rows = []
+    for path, url in pages:
+        mod = last_modified(path)
+        rows.append("  <url><loc>%s</loc>%s</url>" % (url, "<lastmod>%s</lastmod>" % mod if mod else ""))
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(rows) + "\n</urlset>\n"
+    (ROOT / "sitemap.xml").write_text(xml, encoding="utf-8")
+    print(f"Wrote sitemap.xml: {len(pages)} pages")
+
+
 if __name__ == "__main__":
     build()
+    build_sitemap()
