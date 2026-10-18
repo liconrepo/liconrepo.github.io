@@ -168,6 +168,82 @@
     .contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .contact-form button { justify-self: start; cursor: pointer; font: inherit; }
     @media(max-width:720px){ .contact-row { grid-template-columns: 1fr; } }
+    /* ────────────────── ANDROID TABLET (Get In Touch) ────────────────── */
+    .tablet {
+      position: relative; width: 100%; padding: 18px; border-radius: 34px; background: linear-gradient(145deg, #2a2a30, #0f0f13);
+      box-shadow: 0 0 0 1px #3a3a42, 0 30px 70px rgba(0,0,0,0.35), inset 0 0 0 2px #0a0a0d;
+    }
+    .tablet::before { content: ''; position: absolute; top: 50%; left: 7px; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: #1d2a3a; box-shadow: inset 0 0 2px #4a6a90; }
+    .tablet-screen { background: var(--bg); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
+    .tablet-status { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 8px 22px 12px; font-size: calc(12px * var(--fs, 1)); font-weight: 600; color: var(--sub); }
+    .tablet-status .tv-title { font-weight: 500; color: var(--muted); }
+    .tablet-status .ts-r { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+    .ts-wifi { width: 14px; height: 10px; background: currentColor; clip-path: polygon(50% 100%, 0 20%, 20% 0, 50% 25%, 80% 0, 100% 20%); opacity: .8; }
+    .ts-batt { display: inline-flex; align-items: center; gap: 4px; }
+    .ts-bat { width: 9px; height: 15px; border: 1.5px solid currentColor; border-radius: 3px; position: relative; opacity: .85; }
+    .ts-bat::before { content: ''; position: absolute; left: 50%; top: -4px; width: 4px; height: 2px; margin-left: -2px; background: currentColor; border-radius: 1px 1px 0 0; }
+    .ts-bat::after { content: ''; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 72%; background: currentColor; border-radius: 1px; }
+    /* Notification tray: pull the status bar down (or press Enter on it) */
+    .tablet-screen { position: relative; }
+    .tablet-status { position: relative; cursor: grab; touch-action: none; user-select: none; outline: none; }
+    .tablet-status::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 38px; height: 3px; margin-left: -19px; border-radius: 2px; background: var(--muted); opacity: .45; }
+    .tablet-status:hover::after { opacity: .8; }
+    .tablet-status:focus-visible { box-shadow: inset 0 0 0 2px var(--text); border-radius: 6px; }
+    .ts-l { display: inline-flex; align-items: center; gap: 7px; }
+    .ts-dot { --c: #22c55e; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: expNow 1.8s ease-in-out infinite; }
+    .ts-dot.seen { display: none; }
+    .tray { position: absolute; z-index: 5; left: 0; right: 0; top: 0; bottom: 56px; display: flex; flex-direction: column; padding: 14px 18px 8px;
+      background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-radius: 0 0 22px 22px; box-shadow: 0 18px 40px rgba(0,0,0,0.3);
+      transform: translateY(calc((var(--p, 0) - 1) * 100%)); visibility: hidden; }
+    .tray.anim { transition: transform .32s cubic-bezier(.16,1,.3,1); }
+    .tray.show { visibility: visible; }
+    .tray-head { display: flex; align-items: flex-end; justify-content: space-between; padding: 4px 4px 12px; }
+    .tray-time { font-size: calc(22px * var(--fs, 1)); font-weight: 600; letter-spacing: -.5px; color: var(--text); line-height: 1; }
+    .tray-clear { border: 1px solid var(--border); border-radius: 999px; background: var(--card); color: var(--sub); font: inherit; font-size: calc(12px * var(--fs, 1)); padding: 6px 14px; cursor: pointer; }
+    .tray-clear:hover { border-color: var(--border-h); color: var(--text); }
+    .tray-list { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+    .notif { position: relative; display: block; padding: 11px 38px 11px 13px; border-radius: 16px; background: var(--card); border: 1px solid var(--border); text-decoration: none; color: inherit; transition: transform .25s, opacity .25s, border-color .2s; }
+    .notif:hover { border-color: var(--border-h); }
+    .notif.gone { transform: translateX(40px); opacity: 0; }
+    .notif-app { display: flex; align-items: center; gap: 7px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .notif-ic { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 5px; background: #e11d48; color: #fff; font-size: 9px; font-weight: 700; }
+    .notif-title { margin-top: 5px; font-size: calc(14px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.1px; line-height: 1.35; }
+    .notif-text { margin-top: 3px; font-size: calc(12px * var(--fs, 1)); color: var(--sub); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .notif-x { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer; }
+    .notif-x:hover { background: var(--card-h); color: var(--text); }
+    .tray-empty { margin: auto; color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
+    .tray-grip { display: flex; justify-content: center; padding: 10px 0 4px; cursor: grab; touch-action: none; }
+    .tray-grip i { width: 38px; height: 4px; border-radius: 2px; background: var(--muted); opacity: .55; }
+    @media(prefers-reduced-motion: reduce) { .tray.anim { transition: none; } }
+    .tablet-body { padding: 10px 26px 18px; min-height: 520px; }
+    .tv:not([hidden]) { animation: tvIn .28s ease both; }
+    @keyframes tvIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .tablet .contact-form { max-width: none; }
+    .tablet .contact-intro { margin-bottom: 14px; max-width: none; }
+    .tablet-nav { display: flex; align-items: center; justify-content: center; gap: 56px; padding: 4px 0 8px; color: var(--muted); }
+    .tn-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 36px; border: 0; border-radius: 18px; background: transparent; color: inherit; cursor: pointer; transition: background .18s, color .18s, opacity .18s; }
+    .tn-btn:hover { background: var(--card-h); color: var(--text); }
+    .tn-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+    .tn-btn.on { color: var(--text); }
+    .tn-btn i { display: block; opacity: .85; }
+    .tn-back { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-right: 12px solid currentColor; }
+    .tn-home { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; }
+    .tn-recent { width: 12px; height: 12px; border-radius: 2px; border: 2px solid currentColor; }
+    .tv-apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 22px 12px; padding: 24px 6px; max-width: 640px; margin: 0 auto; }
+    .app { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px; border: 0; border-radius: 14px; background: transparent; color: var(--text); font: inherit; font-size: calc(12px * var(--fs, 1)); font-weight: 500; text-decoration: none; cursor: pointer; transition: transform .2s, background .2s; }
+    .app:hover { transform: translateY(-3px); background: var(--card); }
+    .app-ic { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 16px; color: #fff; font-size: 22px; font-weight: 700; box-shadow: 0 8px 18px rgba(0,0,0,0.2); }
+    .tv-recents { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; padding: 30px 0 20px; min-height: 300px; align-items: center; }
+    .rc-card { width: 210px; padding: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--card); color: var(--text); font: inherit; cursor: pointer; text-align: left; overflow: hidden; transition: transform .2s, border-color .2s; }
+    .rc-card:hover { transform: translateY(-4px); border-color: var(--border-h); }
+    .rc-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: calc(13px * var(--fs, 1)); font-weight: 600; }
+    .rc-head .app-ic { width: 26px; height: 26px; border-radius: 8px; font-size: 13px; box-shadow: none; }
+    .rc-body { padding: 14px 12px 18px; font-size: calc(12px * var(--fs, 1)); color: var(--muted); line-height: 1.5; }
+    .tv-clear { display: block; margin: 0 auto; padding: 8px 18px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); color: var(--sub); font: inherit; font-size: calc(12px * var(--fs, 1)); cursor: pointer; }
+    .tv-clear:hover { border-color: var(--border-h); color: var(--text); }
+    .rc-empty { color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
+    @media(max-width:720px){ .tablet { padding: 10px; border-radius: 24px; } .tablet::before { display: none; } .tablet-body { padding: 8px 14px 14px; min-height: 0; } .tablet-nav { gap: 36px; } .tablet-status .tv-title { display: none; } }
 
 
     .sp-top { display: flex; gap: 8px; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); }
@@ -442,9 +518,12 @@
     .exp-card + .exp-card { border-top: 1px solid var(--border); }
     .exp-card:hover { background: var(--card-h); }
     .exp-date { font-size: calc(12px * var(--fs, 1)); font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--sub); }
-    .exp-date .now { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--c); animation: expNow 1.6s ease-in-out infinite; }
     @keyframes expNow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 50%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
     .exp-dur { font-size: calc(13px * var(--fs, 1)); color: var(--sub); }
+    .exp-co { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .exp-logo { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 11px; background: #fff; border: 1px solid var(--border-h); overflow: hidden; padding: 6px; }
+    .exp-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .exp-logo.tight { padding: 2px; }
     .exp-company { font-size: calc(15px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.2px; }
     .exp-title   { font-size: calc(12px * var(--fs, 1)); color: var(--muted); margin-top: 2px; }
     .exp-meta    { font-size: calc(13px * var(--fs, 1)); color: var(--sub); }
@@ -577,71 +656,54 @@
     .oss-links a:hover { color: var(--text); border-color: var(--border-h); }
 
     /* ────────────────── LEADERSHIP ────────────────── */
-    .lead-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .lead-grid { counter-reset: lead; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 32px; }
     .lead-item {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 22px; transition: all .2s;
+      counter-increment: lead; display: grid; grid-template-columns: 34px 32px minmax(0, 1fr); align-items: start; column-gap: 10px;
+      padding: 14px 4px; border-top: 1px solid var(--border); transition: background .2s, padding .25s;
     }
-    .lead-item:hover { background: var(--card-h); border-color: var(--border-h); }
-    .lead-icon { font-size: calc(20px * var(--fs, 1)); margin-bottom: 12px; display: block; }
-    .lead-item p { color: var(--sub); font-size: calc(13px * var(--fs, 1)); line-height: 1.7; }
+    .lead-item::before {
+      content: counter(lead, decimal-leading-zero); font-size: calc(18px * var(--fs, 1)); font-weight: 700; line-height: 32px;
+      letter-spacing: -.5px; color: var(--muted); transition: color .25s;
+    }
+    .lead-item:hover { background: var(--card); padding-left: 10px; }
+    .lead-item:hover::before { color: #e11d48; }
+    .lead-icon { font-size: calc(17px * var(--fs, 1)); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9px; background: var(--card); border: 1px solid var(--border); }
+    .lead-item p { color: var(--sub); font-size: calc(12.5px * var(--fs, 1)); line-height: 1.6; padding-top: 1px; }
 
     /* ────────────────── EDUCATION ────────────────── */
     .edu-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 28px; display: flex; gap: 22px; align-items: center;
-      transition: all .2s;
+      display: flex; align-items: center; gap: 16px; padding: 18px 4px;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: background .2s, padding .25s;
     }
-    .edu-card:hover { background: var(--card-h); border-color: var(--border-h); }
-    .edu-badge {
-      width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
-      background: #fff;
-      border: 1px solid var(--border-h);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; padding: 4px;
-    }
+    .edu-card:hover { background: var(--card); padding-left: 12px; padding-right: 12px; }
+    .edu-badge { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 3px; background: #fff; border: 1px solid var(--border-h); flex-shrink: 0; }
     .edu-badge img { width: 100%; height: 100%; object-fit: contain; }
-    .edu-degree { font-size: calc(15px * var(--fs, 1)); font-weight: 600; letter-spacing: -.25px; }
-    .edu-uni    { font-size: calc(13px * var(--fs, 1)); color: var(--sub); margin-top: 4px; }
-    .edu-years  { font-size: calc(12px * var(--fs, 1)); color: var(--muted); margin-top: 4px; }
+    .edu-text { flex: 1; min-width: 0; }
+    .edu-degree { font-size: calc(15px * var(--fs, 1)); font-weight: 600; letter-spacing: -.2px; color: var(--text); }
+    .edu-uni    { margin-top: 3px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); }
+    .edu-country { margin-top: 1px; font-size: calc(12px * var(--fs, 1)); color: var(--muted); }
+    .edu-years  { flex-shrink: 0; font-size: calc(12px * var(--fs, 1)); font-weight: 600; letter-spacing: 1.5px; color: var(--muted); }
+    .edu-years::before, .edu-years::after { content: ''; width: 40px; height: 1px; background: var(--border-h); }
 
     /* ────────────────── INTERESTS ────────────────── */
     .interests-row { display: flex; flex-wrap: nowrap; gap: 14px; }
-    .interest-chip { flex: 1; justify-content: center; }
-    .interest-chip {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--card);
-      border-radius: 16px; padding: 16px 24px;
-      position: relative; overflow: hidden;
-      transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
-      cursor: default;
+    .interest-chip { flex: 1; perspective: 900px; height: 124px; cursor: pointer; outline: none; }
+    .flip-in { position: relative; width: 100%; height: 100%; transition: transform .6s cubic-bezier(.16,1,.3,1); transform-style: preserve-3d; }
+    .interest-chip:hover .flip-in, .interest-chip:focus-visible .flip-in, .interest-chip.flipped .flip-in { transform: rotateY(180deg); }
+    .interest-chip:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 16px; }
+    .flip-face {
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px; text-align: center; border-radius: 16px; border: 1px solid var(--border);
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
     }
-    .interest-chip::before {
-      content: '';
-      position: absolute; inset: 0; border-radius: 16px;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.08) 100%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude;
-      pointer-events: none;
-    }
-    .interest-chip::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.5) 0%, transparent 70%);
-      opacity: 0; transition: opacity .3s;
-      pointer-events: none;
-    }
-    .interest-chip:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.15); }
-    .interest-chip:hover::after { opacity: 1; }
+    .flip-front { background: var(--card); }
+    .flip-back { background: linear-gradient(145deg, #e11d48, #9f1239); border-color: transparent; color: #fff; transform: rotateY(180deg); font-size: calc(13px * var(--fs, 1)); line-height: 1.45; font-weight: 500; box-shadow: 0 14px 34px rgba(225,29,72,0.28); }
     .interest-icon {
-      font-size: calc(24px * var(--fs, 1)); line-height: 1; flex-shrink: 0;
+      font-size: calc(30px * var(--fs, 1)); line-height: 1; flex-shrink: 0;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     }
-    .interest-label {
-      font-size: calc(13px * var(--fs, 1)); font-weight: 500; color: var(--sub);
-      letter-spacing: -.1px;
-    }
+    .interest-label { font-size: calc(13px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.1px; }
+    @media(prefers-reduced-motion: reduce) { .flip-in { transition: none; } }
 
     /* ────────────────── FOOTER ────────────────── */
     footer { border-top: 1px solid var(--border); padding: 48px 28px 40px; text-align: center; }
@@ -722,7 +784,8 @@
       .blog-grid { grid-template-columns: 1fr; }
       .series-parts { grid-template-columns: 1fr; }
       .lead-grid { grid-template-columns: 1fr; }
-      .edu-card { flex-direction: column; text-align: center; }
+      .edu-card { flex-wrap: wrap; }
+      .edu-years { width: 100%; padding-left: 72px; }
       .container { padding: 0 20px; }
       .interests-row { flex-wrap: wrap; }
       .interest-chip { flex: calc(50% - 7px); }
@@ -747,8 +810,8 @@
     <a href="#skills">Skills</a>
     <a href="#opensource">Open Source</a>
     <a href="#blogs">Writing</a>
-    <a href="#leadership">Leadership</a>
     <a href="#education">Education</a>
+    <a href="#leadership">Leadership</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
@@ -816,9 +879,9 @@
       </div>
     </div>
     <div class="hero-links">
-      <a href="mailto:licon.cseru10@gmail.com" class="btn btn-primary">Email</a>
-      <a href="https://www.linkedin.com/in/khairul-alam-licon/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn</a>
-      <a href="https://github.com/liconrepo" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+      <a href="mailto:licon.cseru10@gmail.com" class="btn btn-primary"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>Email</a>
+      <a href="https://www.linkedin.com/in/khairul-alam-licon/" target="_blank" rel="noopener" class="btn btn-ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+      <a href="https://github.com/liconrepo" target="_blank" rel="noopener" class="btn btn-ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>GitHub</a>
     </div>
   </div>
 </div>
@@ -831,27 +894,27 @@
     <div class="exp-list">
       <div class="exp-head"><span>Period</span><span>Duration</span><span>Company</span><span>Location</span></div>
       <div class="exp-card reveal" style="--c:#d4244f">
-        <div class="exp-date"><span class="now"></span>Feb 2020 &ndash; Present</div>
+        <div class="exp-date">Feb 2020 &ndash; Present</div>
         <div class="exp-dur" data-since="2020-02"></div>
-        <div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div>
+        <div class="exp-co"><span class="exp-logo"><img src="logos/rakuten.svg" alt="" width="22" height="22" loading="lazy"></span><div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Tokyo, Japan</div>
       </div>
       <div class="exp-card reveal d1" style="--c:#d4244f">
         <div class="exp-date">Feb 2018 &ndash; Jan 2020</div>
         <div class="exp-dur">2 yrs</div>
-        <div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="logos/mercari.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Tokyo, Japan</div>
       </div>
       <div class="exp-card reveal d2" style="--c:#f2542d">
         <div class="exp-date">Aug 2015 &ndash; Jan 2018</div>
         <div class="exp-dur">2 yrs 6 mos</div>
-        <div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="logos/sun-asterisk.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Hanoi, Vietnam</div>
       </div>
       <div class="exp-card reveal d3" style="--c:#00a878">
         <div class="exp-date">Nov 2014 &ndash; Jul 2015</div>
         <div class="exp-dur">9 mos</div>
-        <div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="logos/lantas.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Dhaka, Bangladesh</div>
       </div>
     </div>
@@ -1392,6 +1455,24 @@
   </div>
 </section>
 
+<!-- EDUCATION -->
+<section id="education">
+  <div class="container">
+    <p class="section-label">Education</p>
+    <div class="edu-card reveal">
+      <div class="edu-badge">
+        <img src="ru-logo.svg" alt="University of Rajshahi logo" width="56" height="56" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:14px;font-weight:700;color:#1a2540\'>RU</span>')">
+      </div>
+      <div class="edu-text">
+        <div class="edu-degree">Bachelor of Science &mdash; Computer Science &amp; Engineering</div>
+        <div class="edu-uni">University of Rajshahi</div>
+        <div class="edu-country">Bangladesh</div>
+      </div>
+      <div class="edu-years">2010 &ndash; 2014</div>
+    </div>
+  </div>
+</section>
+
 <!-- LEADERSHIP -->
 <section id="leadership">
   <div class="container">
@@ -1417,47 +1498,40 @@
   </div>
 </section>
 
-<!-- EDUCATION -->
-<section id="education">
-  <div class="container">
-    <p class="section-label">Education</p>
-    <div class="edu-card reveal">
-      <div class="edu-badge" style="background:#1a2540;border-color:rgba(255,255,255,0.1);padding:6px">
-        <img src="https://upload.wikimedia.org/wikipedia/en/e/e2/University_of_Rajshahi_logo.svg" alt="RU" style="width:100%;height:100%;object-fit:contain" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:13px;font-weight:700;color:#a0b4d0;letter-spacing:-.5px\'>RU</span>')">
-      </div>
-      <div>
-        <div class="edu-degree">Bachelor of Science &mdash; Computer Science &amp; Engineering</div>
-        <div class="edu-uni">University of Rajshahi, Bangladesh</div>
-        <div class="edu-years">2010 &ndash; 2014</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- INTERESTS -->
 <section id="interests">
   <div class="container">
     <p class="section-label">Loves To</p>
     <div class="interests-row reveal">
-      <div class="interest-chip">
-        <span class="interest-icon">✍️</span>
-        <span class="interest-label">Writing / Coding</span>
+      <div class="interest-chip" tabindex="0" role="button" aria-label="Writing / Coding">
+        <div class="flip-in">
+          <div class="flip-face flip-front"><span class="interest-icon">✍️</span><span class="interest-label">Writing / Coding</span></div>
+          <div class="flip-face flip-back">Turning ideas into articles and code.</div>
+        </div>
       </div>
-      <div class="interest-chip">
-        <span class="interest-icon">🥾</span>
-        <span class="interest-label">Hiking</span>
+      <div class="interest-chip" tabindex="0" role="button" aria-label="Hiking">
+        <div class="flip-in">
+          <div class="flip-face flip-front"><span class="interest-icon">🥾</span><span class="interest-label">Hiking</span></div>
+          <div class="flip-face flip-back">Fresh air and long trails.</div>
+        </div>
       </div>
-      <div class="interest-chip">
-        <span class="interest-icon">🎱</span>
-        <span class="interest-label">Billiards</span>
+      <div class="interest-chip" tabindex="0" role="button" aria-label="Billiards">
+        <div class="flip-in">
+          <div class="flip-face flip-front"><span class="interest-icon">🎱</span><span class="interest-label">Billiards</span></div>
+          <div class="flip-face flip-back">Angles, patience and a steady hand.</div>
+        </div>
       </div>
-      <div class="interest-chip">
-        <span class="interest-icon">🏏</span>
-        <span class="interest-label">Cricket</span>
+      <div class="interest-chip" tabindex="0" role="button" aria-label="Cricket">
+        <div class="flip-in">
+          <div class="flip-face flip-front"><span class="interest-icon">🏏</span><span class="interest-label">Cricket</span></div>
+          <div class="flip-face flip-back">Teamwork out on the pitch.</div>
+        </div>
       </div>
-      <div class="interest-chip">
-        <span class="interest-icon">💻</span>
-        <span class="interest-label">Hackathons</span>
+      <div class="interest-chip" tabindex="0" role="button" aria-label="Hackathons">
+        <div class="flip-in">
+          <div class="flip-face flip-front"><span class="interest-icon">💻</span><span class="interest-label">Hackathons</span></div>
+          <div class="flip-face flip-back">Building fast with great people.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1467,8 +1541,14 @@
 <section id="contact">
   <div class="container">
     <p class="section-label">Get In Touch</p>
-    <p class="contact-intro reveal">Have a project, question, or just want to say hello? Send me a message and it will open in your email app, addressed to <a href="mailto:licon.cseru10@gmail.com" style="color:var(--text)">licon.cseru10@gmail.com</a>.</p>
-    <form class="contact-form reveal" id="contactForm">
+    <div class="tablet reveal" id="tablet">
+     <div class="tablet-screen" id="tabletScreen">
+      <div class="tablet-status" id="tabletStatus" role="button" tabindex="0" aria-expanded="false" aria-controls="tray" aria-label="Notifications: pull down or press Enter to open" title="Pull down for notifications"><span class="ts-l"><span id="tabletTime">9:41</span><i class="ts-dot" id="tsDot"></i></span><span class="tv-title" id="tvTitle">Mail</span><span class="ts-r"><i class="ts-wifi"></i><span class="ts-batt"><i class="ts-bat"></i>85%</span></span></div>
+      <div class="tablet-body">
+
+        <div class="tv" data-view="mail">
+    <p class="contact-intro">Have a project, question, or just want to say hello? Send me a message and it will open in your email app, addressed to <a href="mailto:licon.cseru10@gmail.com" style="color:var(--text)">licon.cseru10@gmail.com</a>.</p>
+    <form class="contact-form" id="contactForm">
       <div class="contact-row">
         <label>Name<input name="name" required autocomplete="name"></label>
         <label>Your email<input name="email" type="email" required autocomplete="email"></label>
@@ -1477,6 +1557,37 @@
       <label>Message<textarea name="message" required></textarea></label>
       <button type="submit" class="btn btn-primary">Send Email</button>
     </form>
+        </div>
+
+        <div class="tv" data-view="home" hidden>
+          <div class="tv-apps">
+            <button type="button" class="app" data-open="mail"><span class="app-ic" style="background:#ea4335"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3 7 9 6.5L21 7"/></svg></span>Mail</button>
+            <a class="app" href="https://www.linkedin.com/in/khairul-alam-licon/" target="_blank" rel="noopener"><span class="app-ic" style="background:#0a66c2"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span>LinkedIn</a>
+            <a class="app" href="https://github.com/liconrepo" target="_blank" rel="noopener"><span class="app-ic" style="background:#24292f"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></span>GitHub</a>
+            <a class="app" href="#blogs"><span class="app-ic" style="background:#e11d48">&#9998;</span>Writing</a>
+            <a class="app" href="#experience"><span class="app-ic" style="background:#d97706">&#9636;</span>Experience</a>
+            <a class="app" href="#skills"><span class="app-ic" style="background:#059669">&#10022;</span>Skills</a>
+          </div>
+        </div>
+
+        <div class="tv" data-view="recents" hidden>
+          <div class="tv-recents" id="tvRecents"></div>
+          <button type="button" class="tv-clear" id="tvClear">Clear all</button>
+        </div>
+
+      </div>
+      <div class="tray" id="tray" inert aria-label="Notifications">
+        <div class="tray-head"><div class="tray-time">Notifications</div><button type="button" class="tray-clear" id="trayClear">Clear all</button></div>
+        <div class="tray-list" id="trayList"></div>
+        <div class="tray-grip" id="trayGrip" title="Pull up to close"><i></i></div>
+      </div>
+      <div class="tablet-nav">
+        <button type="button" class="tn-btn" id="tnBack" aria-label="Back"><i class="tn-back"></i></button>
+        <button type="button" class="tn-btn" id="tnHome" aria-label="Home"><i class="tn-home"></i></button>
+        <button type="button" class="tn-btn" id="tnRecent" aria-label="Recent screens"><i class="tn-recent"></i></button>
+      </div>
+     </div>
+    </div>
   </div>
 </section>
 
@@ -1558,7 +1669,7 @@
     { sel: '.blog-card',          section: 'Writing',    title: el => el.querySelector('.blog-title').textContent, link: true },
     { sel: '.lead-item',          section: 'Leadership', title: el => el.querySelector('p').textContent },
     { sel: '.edu-card',           section: 'Education',  title: el => el.querySelector('.edu-degree').textContent },
-    { sel: '.interest-chip',      section: 'Interests',  title: el => el.textContent },
+    { sel: '.interest-chip',      section: 'Interests',  title: el => el.querySelector('.interest-label').textContent },
     { sel: '.view-all-link',      section: 'Writing',    title: el => el.textContent, link: true },
   ];
   const searchIndex = [];
@@ -1871,6 +1982,123 @@
     const t = (n.getFullYear() - y) * 12 + (n.getMonth() + 1 - m) + 1, yr = Math.floor(t / 12), mo = t % 12;
     el.textContent = [yr ? yr + (yr > 1 ? ' yrs' : ' yr') : '', mo ? mo + (mo > 1 ? ' mos' : ' mo') : ''].filter(Boolean).join(' ');
   });
+
+  /* Loves To: tap/click flips a card on touch devices (hover/focus handle desktop) */
+  document.querySelectorAll('.interest-chip').forEach(c => c.addEventListener('click', () => c.classList.toggle('flipped')));
+
+  /* Android tablet (Get In Touch): working Back / Home / Recents between Mail and the home screen */
+  (function () {
+    const tab = document.getElementById('tablet'); if (!tab) return;
+    const views = {}; tab.querySelectorAll('.tv').forEach(v => views[v.dataset.view] = v);
+    const META = { mail: { name: 'Mail', ic: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3 7 9 6.5L21 7"/></svg>', bg: '#ea4335', note: 'Get in touch: send me a message.' }, home: { name: 'Home', ic: '&#9711;', bg: '#52525b', note: 'App launcher: Mail, LinkedIn, GitHub and more.' } };
+    const back = document.getElementById('tnBack'), home = document.getElementById('tnHome'), rec = document.getElementById('tnRecent');
+    const title = document.getElementById('tvTitle'), recWrap = document.getElementById('tvRecents');
+    let stack = ['mail'], seen = ['mail'];                      // stack = navigation history; seen = recent apps (newest first)
+    const cur = () => stack[stack.length - 1];
+    function render() {
+      const c = cur();
+      Object.keys(views).forEach(k => views[k].hidden = k !== c);
+      title.textContent = c === 'recents' ? 'Recent' : META[c].name;
+      home.classList.toggle('on', c === 'home'); rec.classList.toggle('on', c === 'recents');
+      if (c === 'recents') {
+        recWrap.textContent = '';
+        if (!seen.length) { const e = document.createElement('p'); e.className = 'rc-empty'; e.textContent = 'No recent screens'; recWrap.appendChild(e); }
+        seen.forEach(k => {
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'rc-card';
+          b.innerHTML = '<div class="rc-head"><span class="app-ic" style="background:' + META[k].bg + '">' + META[k].ic + '</span>' + META[k].name + '</div><div class="rc-body">' + META[k].note + '</div>';
+          b.onclick = () => go(k); recWrap.appendChild(b);
+        });
+      }
+    }
+    function go(v) {
+      if (v === cur()) return;
+      stack.push(v);
+      if (v !== 'recents') { seen = [v].concat(seen.filter(x => x !== v)); }
+      render();
+    }
+    back.onclick = () => {                                      // always enabled: steps back through history, and from the first screen returns to Mail
+      if (stack.length > 1) stack.pop(); else stack = ['mail'];
+      const c = cur(); if (c !== 'recents') seen = [c].concat(seen.filter(x => x !== c));
+      render();
+    };
+    home.onclick = () => go('home');
+    rec.onclick = () => go('recents');
+    document.getElementById('tvClear').onclick = () => { seen = []; stack = ['home']; seen = ['home']; render(); };
+    tab.querySelectorAll('[data-open]').forEach(b => b.onclick = () => go(b.dataset.open));
+    const clocks = document.querySelectorAll('#tabletTime');
+    const tick = () => { const d = new Date(), t = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); clocks.forEach(c => c.textContent = t); };
+    tick(); setInterval(tick, 30000);
+    render();
+  })();
+
+  /* Android tablet notification tray: pull the status bar down for random articles to read */
+  (function () {
+    const screen = document.getElementById('tabletScreen'), bar = document.getElementById('tabletStatus'), tray = document.getElementById('tray');
+    if (!screen || !bar || !tray) return;
+    const list = document.getElementById('trayList'), grip = document.getElementById('trayGrip'), dot = document.getElementById('tsDot');
+    const clean = t => (t || '').replace(/\s+/g, ' ').trim();
+    const take = (arr, n) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); };
+    function pool() {
+      const featured = [], parts = [], other = [];
+      document.querySelectorAll('a.blog-card').forEach(a => {
+        const it = { href: a.getAttribute('href'), ext: a.target === '_blank', title: clean(a.querySelector('.blog-title')?.textContent), text: clean(a.querySelector('.blog-summary')?.textContent), app: 'Writing · Article' };
+        if (it.title) (a.classList.contains('featured') ? featured : other).push(it);
+      });
+      document.querySelectorAll('a.series-part').forEach(a => {
+        const series = clean(a.closest('.series-card')?.querySelector('.series-title')?.textContent);
+        parts.push({ href: a.getAttribute('href'), ext: a.target === '_blank', title: clean(a.querySelector('.sp-title')?.textContent), text: clean(a.querySelector('.sp-desc')?.textContent), app: 'Writing · ' + (series.length > 38 ? series.slice(0, 36) + '…' : series) });
+      });
+      return { featured, parts, other };
+    }
+    function fill() {                                    // one featured guide, one series part, one more article, in random order
+      const p = pool(), picks = take([].concat(take(p.featured, 1), take(p.parts, 1), take(p.other.length ? p.other : p.featured, 1)), 3);
+      const seen = new Set(), uniq = picks.filter(x => !seen.has(x.href) && seen.add(x.href));
+      list.textContent = '';
+      uniq.forEach(x => {
+        const a = document.createElement('a'); a.className = 'notif'; a.href = x.href; if (x.ext) { a.target = '_blank'; a.rel = 'noopener'; }
+        a.innerHTML = '<div class="notif-app"><span class="notif-ic">W</span><span class="na"></span></div><div class="notif-title"></div><div class="notif-text"></div><button type="button" class="notif-x" aria-label="Dismiss">&times;</button>';
+        a.querySelector('.na').textContent = x.app; a.querySelector('.notif-title').textContent = x.title; a.querySelector('.notif-text').textContent = x.text;
+        a.querySelector('.notif-x').addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); a.classList.add('gone'); setTimeout(() => { a.remove(); empty(); }, 240); });
+        list.appendChild(a);
+      });
+      empty();
+    }
+    function empty() { if (!list.children.length) { const e = document.createElement('p'); e.className = 'tray-empty'; e.textContent = 'No blog suggestion. Pull up to close.'; list.appendChild(e); } else { const e = list.querySelector('.tray-empty'); if (e) e.remove(); } }
+    document.getElementById('trayClear').onclick = () => { list.textContent = ''; empty(); };
+
+    let p = 0, open = false, drag = null, filled = false;
+    const H = () => tray.offsetHeight || 1;
+    function setP(v) { p = Math.max(0, Math.min(1, v)); tray.style.setProperty('--p', p); }
+    function prepare() {                                 // pick new random articles each time the tray is pulled
+      if (filled) return; filled = true; fill();
+    }
+    function settle(o) {
+      open = o; tray.classList.add('anim', 'show'); setP(o ? 1 : 0);
+      bar.setAttribute('aria-expanded', String(o)); tray.inert = !o;
+      if (o) { prepare(); dot.classList.add('seen'); } else { filled = false; setTimeout(() => { if (!open) tray.classList.remove('show'); }, 340); }
+    }
+    function start(e, el) { drag = { y: e.clientY, moved: 0, base: p, was: open }; el.setPointerCapture(e.pointerId); tray.classList.remove('anim'); tray.classList.add('show'); prepare(); }
+    function move(e) { if (!drag) return; const dy = e.clientY - drag.y; drag.moved = Math.max(drag.moved, Math.abs(dy)); setP(drag.base + dy / H()); }
+    function end(isBar) {
+      if (!drag) return;
+      const d = drag; drag = null;
+      if (d.moved < 5) { settle(isBar ? !d.was : false); return; }       // a plain click toggles from the status bar, closes from the grip
+      settle(p > (d.was ? 0.7 : 0.25));
+    }
+    const cancel = () => { drag = null; settle(open); };
+    bar.addEventListener('pointerdown', e => start(e, bar));
+    bar.addEventListener('pointermove', move);
+    bar.addEventListener('pointerup', () => end(true));
+    bar.addEventListener('pointercancel', cancel);
+    grip.addEventListener('pointerdown', e => start(e, grip));
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', () => end(false));
+    grip.addEventListener('pointercancel', cancel);
+    bar.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); settle(!open); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && open) { settle(false); bar.focus(); } });
+    document.addEventListener('pointerdown', e => { if (open && !drag && !tray.contains(e.target) && !bar.contains(e.target)) settle(false); });
+    setP(0);
+  })();
 </script>
 </body>
 </html>
