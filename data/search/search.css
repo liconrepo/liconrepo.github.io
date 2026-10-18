@@ -32,18 +32,36 @@
   font: inherit; font-size: calc(16px * var(--fs, 1)); color: var(--text); padding: 18px 20px;
   border-bottom: 1px solid var(--border);
 }
-.search-results { max-height: 52vh; overflow-y: auto; padding: 8px; }
+.search-results { max-height: 52vh; overflow-y: auto; padding: 8px; overscroll-behavior: contain; counter-reset: sr; perspective: 900px; }
+
+/* Result rows: numbered, separated by a thin line, and lifted in 3D under the pointer to say "click me" */
 .search-item {
-  display: block; width: 100%; text-align: left; cursor: pointer;
-  background: none; border: 0; font: inherit; color: inherit;
-  padding: 10px 12px; border-radius: 10px;
+  display: block; width: 100%; text-align: left; cursor: pointer; position: relative;
+  background: none; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; font: inherit; color: inherit;
+  padding: 11px 12px 11px 50px; counter-increment: sr;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-radius .16s;
 }
-.search-item.active { background: var(--card-h); outline: 1px solid var(--border-h); }
+.search-item:last-of-type { border-bottom-color: transparent; }
+.search-item::before {
+  content: counter(sr); position: absolute; left: 11px; top: 11px; width: 26px; height: 26px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--border-h); color: var(--muted);
+  font-size: calc(11px * var(--fs, 1)); font-weight: 600; font-variant-numeric: tabular-nums; transition: background .16s, color .16s, border-color .16s;
+}
+.search-item:hover, .search-item.active {
+  background: var(--card-h); border-radius: 12px; border-bottom-color: transparent; z-index: 1;
+  transform: translateZ(18px) translateY(-2px) rotateX(1.6deg);
+  box-shadow: 0 14px 28px -8px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.55);
+}
+.search-item:hover::before, .search-item.active::before { background: var(--accent, #3b82f6); border-color: var(--accent, #3b82f6); color: #fff; }
+[data-theme="dark"] .search-item:hover, [data-theme="dark"] .search-item.active { box-shadow: 0 14px 28px -8px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08); }
+@media (prefers-reduced-motion: reduce) { .search-item { transition: none; } .search-item:hover, .search-item.active { transform: none; } }
 .search-item .si-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
 .search-item .si-title { font-size: calc(14px * var(--fs, 1)); font-weight: 600; color: var(--text); }
 .search-item .si-sec { font-size: calc(11px * var(--fs, 1)); color: var(--muted); text-transform: uppercase; letter-spacing: .6px; white-space: nowrap; }
 .search-item .si-snip { font-size: calc(12px * var(--fs, 1)); color: var(--sub); margin-top: 2px; line-height: 1.5; }
 .search-item mark { background: rgba(250,204,21,0.45); color: inherit; border-radius: 3px; }
+.search-count { position: sticky; top: -8px; z-index: 1; margin: -8px -8px 4px; padding: 8px 20px 6px; background: var(--card); border-bottom: 1px solid var(--border); font-size: calc(11px * var(--fs, 1)); font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
 .search-empty { padding: 24px; text-align: center; color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
 .search-hint { padding: 8px 16px; border-top: 1px solid var(--border); font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
 .search-btn:focus-visible, .search-item:focus-visible { outline: 2px solid var(--accent, #3b82f6); outline-offset: 2px; }
@@ -65,7 +83,7 @@
   .sp-input input { font-size: max(16px, calc(14px * var(--fs, 1))); }
   .search-box .search-results { flex: 1 1 auto; min-height: 0; max-height: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
   .search-box .search-results { padding: 6px 6px calc(10px + env(safe-area-inset-bottom)); }
-  .search-item { padding: 12px; }
+  .search-item { padding: 12px 12px 12px 50px; }
   .search-item .si-top { flex-wrap: wrap; gap: 2px 12px; }
   .search-item .si-title { overflow-wrap: anywhere; }
 }
@@ -78,3 +96,7 @@
 
 [data-theme="dark"] .search-overlay { background: rgba(0,0,0,0.6); }
 [data-theme="dark"] .search-box { box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+
+/* While the search window is open the page behind it does not scroll (the scrollbar width is kept so nothing shifts) */
+html.search-lock { overflow: hidden; padding-right: var(--sbw, 0); }
+.search-overlay { overscroll-behavior: contain; }

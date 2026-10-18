@@ -99,26 +99,29 @@
     var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
     var art = terms.length ? articleHits(terms) : [], urls = {};
     art.forEach(function (a) { urls[a.u] = 1; });
-    var pg = !terms.length || !pageItems ? [] : pageItems
+    var pgAll = !terms.length || !pageItems ? [] : pageItems
       .filter(function (it) { return terms.every(function (t) { return it.hay.indexOf(t) >= 0; }); })
       .filter(function (it) { return !(it.link && urls[it.href]); })                      // the article result already covers this card
       .map(function (it) { return { it: it, score: (it.tl.indexOf(terms[0]) >= 0 ? 0 : 1) + (it.tag ? 0 : 0.5) }; })
-      .sort(function (a, b) { return a.score - b.score; }).slice(0, 12).map(function (x) { return x.it; });
+      .sort(function (a, b) { return a.score - b.score; });
+    var pg = pgAll.map(function (x) { return x.it; });
     hits = pg.map(function (it) { return { kind: it.link ? 'link' : 'item', item: it, title: it.title, section: it.section, text: it.text !== it.title ? it.text : '' }; })
-      .concat(art.slice(0, 30 - pg.length));
-    active = 0;
+      .concat(art);
+    var total = hits.length;
+    active = -1;                                                   // nothing is highlighted until you point at a row or press the arrow keys
     res.hidden = !terms.length;
     if (!terms.length) return;
     var waiting = (!articles || !pageItems) ? '<div class="search-empty">Searching…</div>' : '';
     if (!hits.length) { res.innerHTML = waiting || '<div class="search-empty">No results for “' + esc(q) + '”.</div>'; return; }
-    res.innerHTML = hits.map(function (it, i) {
-      return '<button type="button" class="search-item' + (i ? '' : ' active') + '" data-i="' + i + '"><div class="si-top"><span class="si-title">' + mark(it.title.slice(0, 90), terms) + '</span><span class="si-sec">' + esc(it.section) + '</span></div>' +
+    var countLine = '<div class="search-count" aria-live="polite">' + total + (total === 1 ? ' result' : ' results') + (total > 6 ? ' \u00b7 scroll for more' : '') + '</div>';
+    res.innerHTML = countLine + hits.map(function (it, i) {
+      return '<button type="button" class="search-item" data-i="' + i + '"><div class="si-top"><span class="si-title">' + mark(it.title.slice(0, 90), terms) + '</span><span class="si-sec">' + esc(it.section) + '</span></div>' +
         (it.text ? '<div class="si-snip">' + (it.heading ? '<strong>' + esc(it.heading.slice(0, 60)) + '</strong> · ' : '') + mark(snippet(it.text, terms), terms) + '</div>' : '') + '</button>';
     }).join('') + waiting;
   }
   function setActive(n) {
     var items = res.querySelectorAll('.search-item'); if (!items.length) return;
-    active = (n + items.length) % items.length;
+    active = n < 0 ? items.length - 1 : n % items.length;
     items.forEach(function (e, i) { e.classList.toggle('active', i === active); });
     items[active].scrollIntoView({ block: 'nearest' });
   }
@@ -158,14 +161,23 @@
   function openSearch() {
     load();
     lastFocus = document.activeElement;
+    var root = document.documentElement;
+    root.style.setProperty('--sbw', Math.max(0, innerWidth - root.clientWidth) + 'px');       // keep the page from shifting when the scrollbar goes
+    root.classList.add('search-lock');
     ov.classList.add('open');
     input.value = ''; run('');
     input.focus();
   }
-  function closeSearch() { ov.classList.remove('open'); }
+  function closeSearch() { ov.classList.remove('open'); document.documentElement.classList.remove('search-lock'); }
   window.openSearch = openSearch; window.closeSearch = closeSearch;
 
   input.addEventListener('input', function () { run(input.value); });
+  res.addEventListener('mouseover', function (e) {                   // the row under the pointer replaces any keyboard highlight
+    var b = e.target.closest('.search-item'); if (!b || +b.dataset.i === active) return;
+    active = +b.dataset.i;
+    res.querySelectorAll('.search-item.active').forEach(function (x) { x.classList.remove('active'); });
+    b.classList.add('active');
+  });
   res.addEventListener('click', function (e) { var b = e.target.closest('.search-item'); if (b) go(hits[+b.dataset.i], e.metaKey || e.ctrlKey); });
   ov.addEventListener('click', function (e) { if (e.target === ov) closeSearch(); });
   document.addEventListener('keydown', function (e) {
@@ -175,8 +187,8 @@
     if (!ov.classList.contains('open')) return;
     if (e.key === 'Escape') closeSearch();
     else if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
-    else if (e.key === 'Enter' && hits[active]) { e.preventDefault(); go(hits[active], e.metaKey || e.ctrlKey); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active < 0 ? -1 : active - 1); }
+    else if (e.key === 'Enter' && hits.length) { e.preventDefault(); go(hits[active < 0 ? 0 : active], e.metaKey || e.ctrlKey); }   // nothing highlighted: open the first result
   });
   addEventListener('hashchange', fromHash);
   fromHash();
