@@ -186,23 +186,27 @@
 <h2 id="recap">1. The series on one page</h2>
 
 <p>You have come a long way. This part is a map you can come back to: what each part gave you, a cheat sheet of costs, and a plan for what to do next. Keep it open in a tab while you practise.</p>
-<figure class="fig"><div class="diagram"><pre> Part 1  Cost        Big-O, time vs space, six-step method
-    |
- Part 2  Arrays / strings / hash maps / sets   (the workhorses)
-    |
- Part 3  Stacks / queues / deques / linked lists  (order rules)
-    |
- Part 4  Trees / BST / heaps / tries           (hierarchy, "smallest first")
-    |
- Part 5  Graphs: BFS, DFS, shortest path, union-find   (connections)
-    |
- Part 6  Sorting and binary search             (put things in order, find fast)
-    |
- Part 7  Recursion, backtracking, greedy, DP   (break problems down)
-    |
- Part 8  Patterns: two pointers, window, prefix sums, ...
-    |
- Part 9  Study path and cheat sheet            (you are here)</pre></div><figcaption>Each part builds on the one before it.</figcaption></figure>
+<figure class="fig">
+<svg viewBox="0 0 640 572" role="img" aria-label="The nine parts of the series, each building on the one before">
+<rect class="boxo" x="20" y="2" width="600" height="52" rx="12"/><text class="b" x="40" y="34">Part 1</text><text class="b" x="110" y="25">Cost</text><text class="sub" x="110" y="43">Big-O, time vs space, six-step method</text>
+<path class="arrow" d="M320,55 L320,65"/>
+<rect class="boxb" x="20" y="66" width="600" height="52" rx="12"/><text class="b" x="40" y="98">Part 2</text><text class="b" x="110" y="89">Arrays / strings / hash maps / sets</text><text class="sub" x="110" y="107">the workhorses</text>
+<path class="arrow" d="M320,119 L320,129"/>
+<rect class="boxb" x="20" y="130" width="600" height="52" rx="12"/><text class="b" x="40" y="162">Part 3</text><text class="b" x="110" y="153">Stacks / queues / deques / linked lists</text><text class="sub" x="110" y="171">order rules</text>
+<path class="arrow" d="M320,183 L320,193"/>
+<rect class="boxp" x="20" y="194" width="600" height="52" rx="12"/><text class="b" x="40" y="226">Part 4</text><text class="b" x="110" y="217">Trees / BST / heaps / tries</text><text class="sub" x="110" y="235">hierarchy, "smallest first"</text>
+<path class="arrow" d="M320,247 L320,257"/>
+<rect class="boxp" x="20" y="258" width="600" height="52" rx="12"/><text class="b" x="40" y="290">Part 5</text><text class="b" x="110" y="281">Graphs: BFS, DFS, shortest path, union-find</text><text class="sub" x="110" y="299">connections</text>
+<path class="arrow" d="M320,311 L320,321"/>
+<rect class="boxb" x="20" y="322" width="600" height="52" rx="12"/><text class="b" x="40" y="354">Part 6</text><text class="b" x="110" y="345">Sorting and binary search</text><text class="sub" x="110" y="363">put things in order, find fast</text>
+<path class="arrow" d="M320,375 L320,385"/>
+<rect class="boxp" x="20" y="386" width="600" height="52" rx="12"/><text class="b" x="40" y="418">Part 7</text><text class="b" x="110" y="409">Recursion, backtracking, greedy, DP</text><text class="sub" x="110" y="427">break problems down</text>
+<path class="arrow" d="M320,439 L320,449"/>
+<rect class="boxb" x="20" y="450" width="600" height="52" rx="12"/><text class="b" x="40" y="482">Part 8</text><text class="b" x="110" y="482">Patterns: two pointers, window, prefix sums, ...</text>
+<path class="arrow" d="M320,503 L320,513"/>
+<rect class="boxg" x="20" y="514" width="600" height="52" rx="12"/><text class="b" x="40" y="546">Part 9</text><text class="b" x="110" y="537">Study path and cheat sheet</text><text class="sub" x="110" y="555">you are here</text>
+</svg>
+<figcaption>Each part builds on the one before it.</figcaption></figure>
 <table><tr><th>Part</th><th>The one idea to remember</th></tr><tr><td><a href="dsa-part-1-start-here.html">1. Start here</a></td><td>Count steps as the input grows. Write the slow, correct version first.</td></tr><tr><td><a href="dsa-part-2-arrays-strings-hashing.html">2. Arrays and hashing</a></td><td>A hash map turns "search the whole list" into "look it up".</td></tr><tr><td><a href="dsa-part-3-stacks-queues-linked-lists.html">3. Stacks and queues</a></td><td>Last in, first out (stack) and first in, first out (queue) solve many ordering problems.</td></tr><tr><td><a href="dsa-part-4-trees-heaps-tries.html">4. Trees and heaps</a></td><td>Shape matters: a balanced tree gives <code>O(log n)</code>; a heap gives the smallest item fast.</td></tr><tr><td><a href="dsa-part-5-graphs.html">5. Graphs</a></td><td>Many problems are really "things and connections". BFS finds fewest steps; DFS explores deep.</td></tr><tr><td><a href="dsa-part-6-sorting-and-searching.html">6. Sorting and searching</a></td><td>Sorted data lets you throw away half the search space each step.</td></tr><tr><td><a href="dsa-part-7-recursion-backtracking-dp.html">7. Recursion and DP</a></td><td>Solve small versions first; remember answers you have already computed.</td></tr><tr><td><a href="dsa-part-8-problem-solving-patterns.html">8. Patterns</a></td><td>Familiar shapes (window, two pointers, prefix sums) turn <code>O(n&sup2;)</code> into <code>O(n)</code>.</td></tr></table>
 <h2 id="notation">2. Big-O, Theta and Omega</h2>
 
@@ -212,17 +216,22 @@
 
 <h3>The definition, in words</h3>
 <p>Say <code>f(n)</code> is the number of steps. We write <code>f(n) = O(g(n))</code> when, for large enough <code>n</code>, <code>f(n)</code> is never more than some constant times <code>g(n)</code>. We write <code>f(n) = &Omega;(g(n))</code> when it is never less than some (smaller) constant times <code>g(n)</code>. We write <code>f(n) = &Theta;(g(n))</code> when both are true.</p>
-<figure class="fig"><div class="diagram"><pre> steps
-   ^                      c2 * g(n)   &lt;- upper bound: f is under this   (O)
-   |                    /
-   |                  /  .  f(n)
-   |                /  .
-   |              /  .       Theta = f(n) squeezed between
-   |            /.            c1 * g(n) and c2 * g(n)
-   |          /         c1 * g(n)   &lt;- lower bound: f is over this     (Omega)
-   |        /
-   +--------+---------------------------&gt; n
-            n0  (the bounds only need to hold from here on)</pre></div><figcaption>Theta means f is sandwiched between two scaled copies of g once n is big enough.</figcaption></figure>
+<figure class="fig">
+<svg viewBox="0 0 760 350" role="img" aria-label="Theta: f(n) sandwiched between c1*g(n) and c2*g(n) from n0 onward">
+<polygon points="200,247 520,60 520,180 200,263" fill="#10b981" fill-opacity="0.16"/>
+<path class="arrow" d="M60,300 L60,16"/><path class="arrow" d="M60,300 L650,300"/>
+<text class="sub" x="70" y="24">steps</text><text class="b" x="656" y="305">n</text>
+<path d="M200,300 L200,40" class="rule" stroke-dasharray="4 4"/>
+<path d="M60,300 L520,60" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M60,300 L520,180" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M60,300 C150,255 230,250 300,215 S430,160 520,118" fill="none" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+<text class="b" x="530" y="64" style="fill:#3b82f6">c2 * g(n)</text><text class="sub" x="530" y="82">upper bound: f is under this (O)</text>
+<text class="b" x="530" y="122" style="fill:#f59e0b">f(n)</text>
+<text class="b" x="530" y="184" style="fill:#a855f7">c1 * g(n)</text><text class="sub" x="530" y="202">lower bound: f is over this (Omega)</text>
+<text class="b" x="84" y="50">Theta = f(n) squeezed between</text><text class="b" x="84" y="70">c1 * g(n) and c2 * g(n)</text>
+<text class="b c" x="200" y="322">n0</text><text class="sub" x="200" y="342" style="text-anchor:middle">(the bounds only need to hold from here on)</text>
+</svg>
+<figcaption>Theta means f is sandwiched between two scaled copies of g once n is big enough.</figcaption></figure>
 
 <p>Example: <code>f(n) = 3n + 10</code>. It is <code>O(n)</code> because <code>3n + 10 &le; 4n</code> once <code>n &ge; 10</code>. It is <code>&Omega;(n)</code> because <code>3n + 10 &ge; 3n</code>. So it is <code>&Theta;(n)</code>. It is also true, but loose, that it is <code>O(n&sup2;)</code>. Always give the tightest bound you can.</p>
 <div class="try demo"><h3>Run it: watch the bounds hold</h3>
@@ -431,13 +440,16 @@ fun main() {
 <li><strong>Trace by hand with a table.</strong> Take a tiny input and write one row per loop step with the variables as columns. The next demo does this in code.</li>
 <li><strong>Change one thing at a time.</strong> When you modify code, run it after each small change.</li>
 </ul>
-<figure class="fig"><div class="diagram"><pre> Trace of binary search for 7 in [1, 3, 5, 7, 9, 11]
-
- step | lo | hi | mid | a[mid] | decision
- -----+----+----+-----+--------+--------------------
-   1  | 0  | 5  |  2  |   5    | 5 &lt; 7, go right: lo = 3
-   2  | 3  | 5  |  4  |   9    | 9 &gt; 7, go left:  hi = 3
-   3  | 3  | 3  |  3  |   7    | found at index 3</pre></div><figcaption>A hand trace is just a table. Draw it on paper before you trust the code.</figcaption></figure>
+<figure class="fig">
+<svg viewBox="0 0 720 220" role="img" aria-label="Trace table of binary search for 7 in [1, 3, 5, 7, 9, 11] in three steps">
+<text class="b" x="20" y="24">Trace of binary search for 7 in [1, 3, 5, 7, 9, 11]</text>
+<rect class="boxb" x="20" y="40" width="680" height="34" rx="8"/>
+<text class="b c" x="55.0" y="62">step</text><text class="b c" x="120.0" y="62">lo</text><text class="b c" x="180.0" y="62">hi</text><text class="b c" x="245.0" y="62">mid</text><text class="b c" x="320.0" y="62">a[mid]</text><text class="b " x="374" y="62">decision</text>
+<rect class="box" x="20" y="82" width="680" height="38" rx="8"/><text class="c" x="55.0" y="107">1</text><text class="c" x="120.0" y="107">0</text><text class="c" x="180.0" y="107">5</text><rect class="boxo" x="220" y="88" width="50" height="26" rx="6"/><text class="b c" x="245.0" y="106">2</text><text class="c" x="320.0" y="107">5</text><text x="374" y="107">5 &lt; 7, go right: lo = 3</text>
+<rect class="box" x="20" y="126" width="680" height="38" rx="8"/><text class="c" x="55.0" y="151">2</text><text class="c" x="120.0" y="151">3</text><text class="c" x="180.0" y="151">5</text><rect class="boxo" x="220" y="132" width="50" height="26" rx="6"/><text class="b c" x="245.0" y="150">4</text><text class="c" x="320.0" y="151">9</text><text x="374" y="151">9 &gt; 7, go left: hi = 3</text>
+<rect class="boxg" x="20" y="170" width="680" height="38" rx="8"/><text class="c" x="55.0" y="195">3</text><text class="c" x="120.0" y="195">3</text><text class="c" x="180.0" y="195">3</text><rect class="boxo" x="220" y="176" width="50" height="26" rx="6"/><text class="b c" x="245.0" y="194">3</text><text class="c" x="320.0" y="195">7</text><text x="374" y="195">found at index 3</text>
+</svg>
+<figcaption>A hand trace is just a table. Draw it on paper before you trust the code.</figcaption></figure>
 
 <h3>An 8-week example schedule</h3>
 <p>About 4 to 6 hours a week works well. Adjust to your timetable; finishing slowly is better than rushing.</p>

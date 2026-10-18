@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mobile System Design: A Practical Guide for Android Engineers — Khairul Alam</title>
+  <meta name="description" content="A practical framework for mobile system design: requirements, API, data model, client architecture, caching, offline-first sync, performance, security and release, with worked designs for a feed, a chat app and live tracking." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+    /* ── Pattern catalogue (expandable families, popular badge) ── */
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .pop { display: inline-block; font-size: .72em; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: #92400e; background: color-mix(in srgb, #f59e0b 22%, var(--card)); border: 1px solid #f59e0b; border-radius: 6px; padding: 1px 7px; margin-left: 8px; vertical-align: middle; white-space: nowrap; }
+    [data-theme="dark"] .pop { color: #fcd34d; }
+    .cat-table td:nth-child(3), .cat-table td:nth-child(4), .cat-table td:nth-child(5) { white-space: nowrap; }
+    .cat-table td:nth-child(4) { color: #f59e0b; text-align: center; }
+    .srcs { color: var(--muted); font-size: .8em; }
+    .cov-s { color: var(--muted); font-style: italic; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Article &middot; System design</p>
+    <h1>Mobile System Design: A Practical Guide for Android Engineers</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~30 min read</span></div>
+    <div class="tags"><span class="tag">System design</span><span class="tag">Android</span><span class="tag">Offline-first</span><span class="tag">Architecture</span></div>
+
+<p class="lede">A mobile system design question is not a backend question with a phone drawn on the left. The phone is a small, unreliable computer that is often offline, runs on a battery, can be killed at any moment and is shipped as a binary you cannot patch tomorrow. This article gives you a repeatable way to design for those facts, with a step-by-step framework, the building blocks, and three worked designs.</p>
+
+<div class="callout">
+  <strong>This article in 60 seconds</strong>
+  <ul>
+    <li>Design the <strong>client</strong> first: what the user sees, what must work offline, what must be fast.</li>
+    <li>Follow six steps: requirements, API, data model, architecture, deep dives, trade-offs.</li>
+    <li>The network is a <em>slow, flaky, metered</em> resource. Cache, paginate, batch, retry with backoff and make writes idempotent.</li>
+    <li>Use the local database as the <strong>single source of truth</strong>; the UI only observes it.</li>
+    <li>Budget for battery, memory, startup time and app size, and plan for rollout, feature flags and a kill switch.</li>
+  </ul>
+</div>
+
+<details class="toc">
+  <summary><strong>Contents</strong></summary>
+  <ol>
+    <li><a href="#different">What makes mobile system design different</a></li>
+    <li><a href="#framework">A six-step framework</a></li>
+    <li><a href="#requirements">Step 1: Requirements and constraints</a></li>
+    <li><a href="#api">Step 2: The API between app and server</a></li>
+    <li><a href="#data">Step 3: Data model and local storage</a></li>
+    <li><a href="#architecture">Step 4: Client architecture</a></li>
+    <li><a href="#network">Networking building blocks</a></li>
+    <li><a href="#offline">Offline-first and sync</a></li>
+    <li><a href="#perf">Performance, battery and memory</a></li>
+    <li><a href="#security">Security and privacy</a></li>
+    <li><a href="#release">Release, flags and observability</a></li>
+    <li><a href="#examples">Three worked designs</a></li>
+    <li><a href="#classic">Classic system design lessons, seen from the phone</a></li>
+    <li><a href="#mistakes">Common mistakes and a checklist</a></li>
+    <li><a href="#takeaways">Takeaways</a></li>
+  </ol>
+</details>
+
+<h2 id="different">1. What makes mobile system design different</h2>
+
+<p>Backend design asks: how do we serve a million requests per second? Mobile design asks a different question: <strong>how does one phone give one person a fast, correct, battery-friendly experience on a bad network?</strong> The server still matters, but the client is where most of the interesting trade-offs live.</p>
+
+<table>
+  <tr><th>Constraint</th><th>What it means for the design</th></tr>
+  <tr><td>Unreliable network</td><td>Requests fail, time out, or succeed after the user left the screen. Assume offline is normal.</td></tr>
+  <tr><td>Metered, slow data</td><td>Send less: pagination, compression, small images, delta updates.</td></tr>
+  <tr><td>Battery</td><td>Radios and wake-ups cost power. Batch work, avoid polling, respect Doze and background limits.</td></tr>
+  <tr><td>Limited memory</td><td>The OS kills background apps and large bitmaps cause crashes. Cache with limits.</td></tr>
+  <tr><td>Process death and lifecycle</td><td>State must survive rotation and being killed. Never keep the only copy of data in memory.</td></tr>
+  <tr><td>Fragmented devices</td><td>Many OS versions, screen sizes and performance tiers. Test low-end devices.</td></tr>
+  <tr><td>Slow release cycle</td><td>Users run old versions for months. APIs must be backward compatible; you need remote control (flags).</td></tr>
+  <tr><td>Untrusted device</td><td>The app can be inspected, rooted or modified. Never trust the client for authorization.</td></tr>
+</table>
+
+<div class="analogy"><p><strong>Think of a courier on a mountain road.</strong> The courier (the phone) sometimes has no signal, carries a small bag (memory), and has a limited fuel tank (battery). A good plan packs what is needed ahead of time, delivers in batches, writes everything down so a lost trip can be resumed, and never depends on a call going through at the exact right moment.</p></div>
+
+<figure class="fig">
+<svg viewBox="0 0 720 554" role="img" aria-label="Whole system architecture: phone, CDN, load balancer, API servers, cache, database, queue, blob store, workers and push"><text class="b" x="10" y="20">The whole system, from thumb to disk and back</text><g transform="translate(0,34)"><rect class="boxb" x="20" y="40" width="130" height="60" rx="10"/><text class="b c" x="85.0" y="75.0">Phone app</text><rect class="boxg" x="230" y="40" width="180" height="60" rx="10"/><text class="b c" x="320.0" y="66.0">CDN edge</text><text class="sub c" x="320.0" y="84.0">images, static</text><rect class="boxo" x="500" y="40" width="190" height="60" rx="10"/><text class="b c" x="595.0" y="75.0">Push (FCM / APNs)</text><rect class="boxg" x="230" y="190" width="180" height="60" rx="10"/><text class="b c" x="320.0" y="216.0">Load balancer</text><text class="sub c" x="320.0" y="234.0">+ rate limiter</text><rect class="boxg" x="500" y="190" width="190" height="60" rx="10"/><text class="b c" x="595.0" y="216.0">API servers</text><text class="sub c" x="595.0" y="234.0">(stateless)</text><path class="arrow" d="M150,70 L228,70"/><text class="sub c" x="189" y="62">DNS, HTTPS</text><path class="arrow" d="M320,100 L320,188"/><text class="sub" x="330" y="149">miss</text><path class="arrow" d="M85,100 L85,220 L228,220"/><text class="sub" x="95" y="165">API calls</text><path class="arrow" d="M410,220 L498,220"/><path class="arrow" d="M595,190 L595,102"/><text class="sub" x="605" y="150">push</text><path class="rule" d="M595,250 L595,285"/><path class="rule" d="M85,285 L635,285"/><path class="arrow" d="M85,285 L85,328"/><path class="arrow" d="M265,285 L265,328"/><path class="arrow" d="M455,285 L455,328"/><path class="arrow" d="M635,285 L635,328"/><rect class="boxo" x="20" y="330" width="130" height="64" rx="10"/><text class="b c" x="85.0" y="358.0">Cache</text><text class="sub c" x="85.0" y="376.0">(Redis)</text><rect class="boxp" x="190" y="330" width="150" height="64" rx="10"/><text class="b c" x="265.0" y="358.0">DB</text><text class="sub c" x="265.0" y="376.0">(sharded, replicas)</text><rect class="boxo" x="380" y="330" width="150" height="64" rx="10"/><text class="b c" x="455.0" y="367.0">Queue / pub-sub</text><rect class="boxp" x="570" y="330" width="130" height="64" rx="10"/><text class="b c" x="635.0" y="367.0">Blob store</text><path class="arrow" d="M455,394 L455,436"/><rect class="boxg" x="290" y="438" width="330" height="64" rx="10"/><text class="b c" x="455.0" y="466.0">Workers</text><text class="sub c" x="455.0" y="484.0">fan-out, push, thumbnails, search index</text></g></svg>
+<figcaption>The classic back-end boxes from a system design course. In a mobile design you also draw the phone, its local database, and the push path back to it.</figcaption></figure>
+
+<h2 id="framework">2. A six-step framework</h2>
+
+
+<p>Use the same order every time. It keeps you from jumping to a favourite library before you know the problem.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 380" role="img" aria-label="Six steps of a mobile system design, from requirements to trade-offs"><rect class="boxb" x="20" y="10" width="190" height="44" rx="10"/><text class="b c" x="115.0" y="37.0">1  Requirements</text><text x="230" y="37">what must the app do? what must it never do?</text><path class="arrow" d="M115,54 L115,70"/><rect class="boxb" x="20" y="72" width="190" height="44" rx="10"/><text class="b c" x="115.0" y="99.0">2  API</text><text x="230" y="99">what does the app ask the server, and how often?</text><path class="arrow" d="M115,116 L115,132"/><rect class="boxb" x="20" y="134" width="190" height="44" rx="10"/><text class="b c" x="115.0" y="161.0">3  Data model</text><text x="230" y="161">what is stored on the phone, and who owns it?</text><path class="arrow" d="M115,178 L115,194"/><rect class="boxb" x="20" y="196" width="190" height="44" rx="10"/><text class="b c" x="115.0" y="223.0">4  Architecture</text><text x="230" y="223">layers, state, navigation, modules</text><path class="arrow" d="M115,240 L115,256"/><rect class="boxg" x="20" y="258" width="190" height="44" rx="10"/><text class="b c" x="115.0" y="285.0">5  Deep dives</text><text x="230" y="285">caching, sync, images, push, performance, security</text><path class="arrow" d="M115,302 L115,318"/><rect class="boxo" x="20" y="320" width="190" height="44" rx="10"/><text class="b c" x="115.0" y="347.0">6  Trade-offs</text><text x="230" y="347">what did we give up, how do we ship and measure it?</text></svg>
+<figcaption>Spend about one fifth of your time on each of the first four steps and the rest on deep dives and trade-offs.</figcaption></figure>
+
+<h2 id="requirements">3. Step 1: Requirements and constraints</h2>
+
+<h3>Functional requirements</h3>
+<p>List what the user can do, in a few short sentences. For a feed app: &ldquo;see a feed, scroll forever, like a post, create a post with a photo, get notified of replies.&rdquo; Mark which of these must work <strong>offline</strong>.</p>
+
+<h3>Non-functional requirements</h3>
+<p>These decide the design. Ask about each one, and write a number when you can.</p>
+<table>
+  <tr><th>Area</th><th>Questions to ask</th></tr>
+  <tr><td>Latency</td><td>How fast must the first screen appear? Cold start under 2 seconds? Scroll at 60 frames per second?</td></tr>
+  <tr><td>Offline</td><td>Read-only offline, or can the user also write and sync later?</td></tr>
+  <tr><td>Consistency</td><td>Is a stale feed fine? Is a stale bank balance fine? Who wins when two devices edit the same thing?</td></tr>
+  <tr><td>Scale</td><td>How many users, how many requests per user per day, how big is the data?</td></tr>
+  <tr><td>Battery and data</td><td>Is it used for hours (navigation) or seconds (a widget)? Must it work on 2G?</td></tr>
+  <tr><td>Security</td><td>Personal or payment data? Do we need encryption at rest, certificate pinning, biometric unlock?</td></tr>
+  <tr><td>Platforms</td><td>Android only? Tablets, wearables, foldables? Minimum OS version?</td></tr>
+  <tr><td>Release</td><td>How often do we ship? Can we roll back? Do we need A/B tests?</td></tr>
+</table>
+
+<h2 id="api">4. Step 2: The API between app and server</h2>
+
+<p>The app and server meet at the API. A mobile-friendly API is shaped by the screens, not only by the database.</p>
+
+<table>
+  <tr><th>Style</th><th>Good for</th><th>Watch out for</th></tr>
+  <tr><td>REST over HTTPS and JSON</td><td>Most apps. Simple, cacheable, easy to debug.</td><td>Over-fetching and many round trips per screen.</td></tr>
+  <tr><td>GraphQL</td><td>Screens that need different slices of data; fewer round trips.</td><td>Caching is harder; query cost must be limited on the server.</td></tr>
+  <tr><td>gRPC and Protocol Buffers</td><td>Compact binary messages, streaming, strong contracts.</td><td>Tooling and debugging are heavier; proxies may need support.</td></tr>
+  <tr><td>WebSocket / SSE</td><td>Live updates: chat, scores, presence.</td><td>Keeping a connection open costs battery; reconnection logic is required.</td></tr>
+  <tr><td>Push (FCM)</td><td>Waking the app when it is closed.</td><td>Delivery is best effort; never rely on it as the only path.</td></tr>
+</table>
+
+<h3>Design rules for a mobile API</h3>
+<ul>
+  <li><strong>Pagination, not &ldquo;get all&rdquo;.</strong> Prefer cursors (&ldquo;give me 20 items after this token&rdquo;) over page numbers, because items are inserted while the user scrolls.</li>
+  <li><strong>Idempotency keys for writes.</strong> The app may retry a request after a timeout. A unique key per action lets the server ignore the duplicate.</li>
+  <li><strong>Versioning and compatibility.</strong> Old app versions live for months. Add fields; do not remove or rename them. Return a minimum-supported-version signal so you can force an upgrade as a last resort.</li>
+  <li><strong>Small payloads.</strong> Compress (gzip or brotli), return only the fields the screen needs, send image URLs with size hints rather than full images.</li>
+  <li><strong>Conditional requests.</strong> Use <code>ETag</code> or <code>If-Modified-Since</code> so unchanged data costs a tiny 304 response.</li>
+  <li><strong>Clear errors.</strong> Return a machine-readable code, so the app can tell &ldquo;retry later&rdquo; from &ldquo;you must log in&rdquo; from &ldquo;this will never work&rdquo;.</li>
+</ul>
+
+<pre><code>GET  /v1/feed?limit=20&amp;cursor=eyJ0IjoxNzI5...      -&gt; { "items": [...], "nextCursor": "eyJ0Ijox..." }
+POST /v1/posts          Idempotency-Key: 7f3c-...    -&gt; 201 { "id": "p_91" }
+POST /v1/posts/p_91/like   Idempotency-Key: a12b-... -&gt; 200 (second call returns the same result)</code></pre>
+
+<h2 id="data">5. Step 3: Data model and local storage</h2>
+
+<p>Decide what lives on the phone, in what shape, and who is the owner of each piece of data.</p>
+
+<table>
+  <tr><th>What</th><th>Where to keep it</th><th>Notes</th></tr>
+  <tr><td>Structured, queryable data (posts, messages, orders)</td><td>SQLite through Room</td><td>The main store. Index the columns you filter and sort on.</td></tr>
+  <tr><td>Small settings and flags</td><td>DataStore (or SharedPreferences)</td><td>Not for large or relational data.</td></tr>
+  <tr><td>Secrets and tokens</td><td>Android Keystore with encrypted storage</td><td>Never in plain preferences or in source.</td></tr>
+  <tr><td>Images and files</td><td>Disk cache with a size limit</td><td>Evict least recently used items; the OS may clear the cache.</td></tr>
+  <tr><td>Screen state</td><td>ViewModel plus saved state</td><td>Cheap and temporary; rebuild from the database when needed.</td></tr>
+</table>
+
+<h3>Separate the models</h3>
+<p>Keep three shapes of the same thing and convert between them at the edges. It lets the server, the database and the UI change independently.</p>
+<pre><code>// What the server sends (network model)
+@Serializable data class PostDto(val id: String, val text: String, val authorId: String, val createdAt: Long)
+
+// What the database stores (entity)
+@Entity data class PostEntity(@PrimaryKey val id: String, val text: String, val authorId: String,
+                              val createdAt: Long, val syncState: Int /* 0 synced, 1 pending, 2 failed */)
+
+// What the screen needs (UI model)
+data class PostUi(val id: String, val text: String, val timeAgo: String, val isPending: Boolean)</code></pre>
+
+<div class="note"><p><strong>Why a <code>syncState</code> column?</strong> It lets the UI show a clock icon for a post that is saved locally but not yet uploaded, and it lets a background worker find everything that still needs to be sent.</p></div>
+
+<h2 id="architecture">6. Step 4: Client architecture</h2>
+
+<p>Keep three layers: a UI that shows state, a domain layer with the rules, and a data layer that hides where data comes from. This is the View, Logic, Data idea from my <a href="android-arch-part-1-why-architecture.html">architecture series</a>, and the repository is the glue.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 390" role="img" aria-label="Layered architecture: UI, ViewModel, domain use cases, repository, local database and remote API"><rect class="boxb" x="20" y="10" width="250" height="48" rx="10"/><text class="b c" x="145.0" y="39.0">UI (Compose / Views)</text><text class="sub" x="290" y="39">shows state, sends events</text><rect class="boxb" x="20" y="82" width="250" height="48" rx="10"/><text class="b c" x="145.0" y="111.0">ViewModel</text><text class="sub" x="290" y="111">holds screen state, calls use cases</text><rect class="boxg" x="20" y="154" width="250" height="48" rx="10"/><text class="b c" x="145.0" y="183.0">Domain: use cases</text><text class="sub" x="290" y="183">business rules, no Android classes</text><rect class="boxo" x="20" y="226" width="250" height="48" rx="10"/><text class="b c" x="145.0" y="255.0">Repository</text><text class="sub" x="290" y="255">single entry point for data</text><path class="arrow" d="M70,58 L70,80"/><text class="sub" x="60" y="74" text-anchor="end">events</text><path class="arrow" d="M220,80 L220,60"/><text class="sub" x="232" y="74">StateFlow of UI state</text><path class="arrow" d="M145,130 L145,152"/><path class="arrow" d="M145,202 L145,224"/><path class="arrow" d="M95,274 L95,310"/><path class="arrow" d="M265,274 L265,310"/><rect class="boxp" x="20" y="312" width="150" height="60" rx="10"/><text class="b c" x="95.0" y="338.0">Local DB</text><text class="sub c" x="95.0" y="356.0">(Room)</text><rect class="boxp" x="190" y="312" width="150" height="60" rx="10"/><text class="b c" x="265.0" y="338.0">Remote API</text><text class="sub c" x="265.0" y="356.0">(Retrofit)</text><text class="sub" x="360" y="338">DB is the source of truth</text><text class="sub" x="360" y="358">network refreshes the DB</text></svg>
+<figcaption>The UI observes the database through the repository. The network only updates the database.</figcaption></figure>
+
+<h3>Choices to state out loud</h3>
+<ul>
+  <li><strong>Presentation pattern:</strong> MVVM with a single state object, or MVI when you want strictly one-way flow. See <a href="android-arch-part-4-mvvm-and-redux.html">MVVM and Redux</a>.</li>
+  <li><strong>Dependency injection:</strong> Hilt or Koin so layers can be replaced in tests. See <a href="android-arch-part-6-di-async-errors.html">DI, async and errors</a>.</li>
+  <li><strong>Concurrency:</strong> coroutines and Flow, with the main thread kept free for drawing.</li>
+  <li><strong>Modularization:</strong> split into feature and core modules once the team or build time grows. See <a href="android-arch-part-5-viper-and-modules.html">VIPER and modules</a>.</li>
+  <li><strong>Navigation and deep links:</strong> one place that maps a URL or notification to a screen.</li>
+</ul>
+
+<pre><code>class FeedRepository(private val dao: PostDao, private val api: FeedApi) {
+
+    // The UI observes this. It never reads the network directly.
+    fun feed(): Flow&lt;List&lt;Post&gt;&gt; = dao.observeAll().map { rows -&gt; rows.map { it.toDomain() } }
+
+    // Called on open, pull to refresh, or by a background worker.
+    suspend fun refresh(): Result&lt;Unit&gt; = runCatching {
+        val page = api.feed(limit = 20)
+        dao.upsertAll(page.items.map { it.toEntity() })
+    }
+}</code></pre>
+
+<h2 id="network">7. Networking building blocks</h2>
+
+<h3>Caching: layers, from fastest to slowest</h3>
+<table>
+  <tr><th>Layer</th><th>Speed</th><th>Use for</th></tr>
+  <tr><td>In-memory (LRU map)</td><td>Instant</td><td>The last few screens, decoded images.</td></tr>
+  <tr><td>Local database</td><td>Milliseconds</td><td>The data the app shows. Survives restarts.</td></tr>
+  <tr><td>HTTP cache</td><td>Milliseconds</td><td>Responses with <code>Cache-Control</code> or <code>ETag</code>.</td></tr>
+  <tr><td>CDN edge</td><td>Tens of milliseconds</td><td>Images, video, static config.</td></tr>
+  <tr><td>Origin server</td><td>Hundreds of milliseconds</td><td>The truth.</td></tr>
+</table>
+<p>Common cache policies: <strong>cache-then-network</strong> (show stored data now, refresh in the background), <strong>stale-while-revalidate</strong> (use stale data and update it silently), and <strong>network-first with fallback</strong> (for data that must be fresh, such as a balance).</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 444" role="img" aria-label="Cache-then-network read: show stored items at once, then handle 304, 200 or error from the network"><text class="b" x="10" y="20">Cache-then-network read (what the screen sees)</text><g transform="translate(0,34)"><rect class="boxb" x="20" y="10" width="150" height="40" rx="10"/><text class="b c" x="95.0" y="35.0">open screen</text><path class="arrow" d="M95,50 L95,78"/><rect class="boxp" x="20" y="80" width="150" height="40" rx="10"/><text class="b c" x="95.0" y="105.0">read Room</text><path class="arrow" d="M170,100 L238,100"/><rect class="boxg" x="240" y="80" width="300" height="40" rx="10"/><text class="b c" x="390.0" y="105.0">show stored items at once</text><text class="sub" x="556" y="105">t = 20 ms</text><path class="arrow" d="M95,120 L95,148"/><rect class="boxb" x="20" y="150" width="230" height="56" rx="10"/><text class="b c" x="135.0" y="174.0">GET /feed</text><text class="sub c" x="135.0" y="192.0">If-None-Match: "v42"</text><path class="rule" d="M95,206 L95,371"/><path class="arrow" d="M95,251 L318,251"/><text class="sub" x="108" y="243">304 Not Modified</text><path class="arrow" d="M95,311 L318,311"/><text class="sub" x="108" y="303">200 + new items</text><path class="arrow" d="M95,371 L318,371"/><text class="sub" x="108" y="363">error / offline</text><rect class="boxg" x="320" y="231" width="200" height="40" rx="10"/><text class="b c" x="420.0" y="256.0">keep what is shown</text><rect class="boxp" x="320" y="291" width="120" height="40" rx="10"/><text class="b c" x="380.0" y="316.0">write to Room</text><path class="arrow" d="M440,311 L462,311"/><rect class="boxp" x="464" y="291" width="96" height="40" rx="10"/><text class="b c" x="512.0" y="316.0">Flow emits</text><path class="arrow" d="M560,311 L582,311"/><rect class="boxg" x="584" y="291" width="110" height="40" rx="10"/><text class="b c" x="639.0" y="316.0">list updates</text><rect class="boxr" x="320" y="351" width="380" height="40" rx="10"/><text class="c" x="510.0" y="376.0">keep stored items, show small "offline" banner</text></g></svg>
+<figcaption>The user sees something immediately. The network only improves it.</figcaption></figure>
+<h3>Retries: exponential backoff with jitter</h3>
+<p>If a request fails because of a timeout or a 5xx error, wait and try again, with the wait doubling each time and a little randomness so a million phones do not retry at the same instant. Do <em>not</em> retry client errors such as 400 or 403; they will never succeed. Only retry writes that are idempotent.</p>
+<pre><code>suspend fun &lt;T&gt; retryWithBackoff(times: Int = 4, base: Long = 500, block: suspend () -&gt; T): T {
+    var delayMs = base
+    repeat(times - 1) {
+        try { return block() } catch (e: IOException) { /* transient: fall through and wait */ }
+        delay(delayMs + Random.nextLong(0, delayMs / 2))      // jitter
+        delayMs *= 2
+    }
+    return block()                                            // last attempt: let the error out
+}</code></pre>
+
+<figure class="fig">
+<svg viewBox="0 0 720 534" role="img" aria-label="Sequence diagram: app retries a POST with the same idempotency key K1 over a lossy network, the server creates one post"><text class="b" x="10" y="20">Request lifecycle on a bad network (write with an idempotency key)</text><g transform="translate(0,34)"><path class="ghost" d="M110,34 L110,500"/><path class="ghost" d="M360,34 L360,500"/><path class="ghost" d="M610,34 L610,500"/><rect class="boxb" x="50.0" y="0" width="120" height="34" rx="10"/><text class="b c" x="110.0" y="22.0">App</text><rect class="box" x="300.0" y="0" width="120" height="34" rx="10"/><text class="b c" x="360.0" y="22.0">Network</text><rect class="boxg" x="550.0" y="0" width="120" height="34" rx="10"/><text class="b c" x="610.0" y="22.0">Server</text><path class="arrow" d="M112,90 L358,90"/><path d="M362,90 L500,90" fill="none" stroke="#ef4444" stroke-width="1.7" stroke-dasharray="5 4"/><path d="M502,84 L514,96 M514,84 L502,96" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" fill="none"/><text class="sub c" x="235" y="82">1 POST /posts  key=K1</text><text class="sub c" x="430" y="82">lost</text><rect class="boxr" x="125" y="108" width="170" height="28" rx="10"/><text class="c" x="210.0" y="127.0">timeout after 10 s</text><rect class="boxo" x="125" y="146" width="170" height="28" rx="10"/><text class="c" x="210.0" y="165.0">wait 0.5 s + jitter</text><path class="arrow" d="M112,210 L358,210"/><path class="arrow" d="M362,210 L608,210"/><text class="sub c" x="235" y="202">2 POST /posts  key=K1 (retry)</text><rect class="boxg" x="385" y="220" width="215" height="28" rx="10"/><text class="c" x="492.5" y="239.0">create post, remember K1</text><path d="M608,285 L420,285" fill="none" stroke="#ef4444" stroke-width="1.7" stroke-dasharray="5 4"/><path d="M404,279 L416,291 M416,279 L404,291" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" fill="none"/><text class="sub c" x="540" y="277">201 (response lost)</text><rect class="boxo" x="125" y="300" width="170" height="28" rx="10"/><text class="c" x="210.0" y="319.0">wait 1 s + jitter</text><path class="arrow" d="M112,375 L358,375"/><path class="arrow" d="M362,375 L608,375"/><text class="sub c" x="235" y="367">3 POST /posts  key=K1 (retry)</text><rect class="boxg" x="385" y="385" width="215" height="28" rx="10"/><text class="c" x="492.5" y="404.0">K1 seen: return same 201</text><path class="arrow" d="M608,440 L362,440"/><path class="arrow" d="M358,440 L112,440"/><text class="sub c" x="235" y="432">4 201 (same result)</text><rect class="boxg" x="125" y="455" width="130" height="30" rx="10"/><text class="c" x="190.0" y="475.0">mark SYNCED</text><rect class="boxo" x="390" y="455" width="210" height="30" rx="10"/><text class="b c" x="495.0" y="475.0">one post, not three</text></g></svg>
+<figcaption>Retries are safe only because the server recognises the key. Without it, the second request would create a duplicate post.</figcaption></figure>
+<h3>Pagination</h3>
+<p>Load the first page fast, load the next when the user is near the end, and keep the pages in the database so scrolling back is instant. On Android, Paging 3 with a <code>RemoteMediator</code> does exactly this. A cursor beats an offset, because an offset shifts when new items appear at the top.</p>
+
+<h3>Images</h3>
+<ul>
+  <li>Use a proven loader (Coil, Glide) rather than writing your own. It gives you memory and disk caching, request cancellation when a row scrolls away, and downsampling.</li>
+  <li>Ask the server or CDN for the size you need (thumbnail versus full), and a modern format such as WebP or AVIF.</li>
+  <li>Show a small placeholder (a blurred preview or a colour) so layout does not jump.</li>
+</ul>
+
+<h3>Real-time and push</h3>
+<table>
+  <tr><th>Need</th><th>Approach</th></tr>
+  <tr><td>Updates while the screen is open</td><td>WebSocket or SSE; fall back to polling on a long interval.</td></tr>
+  <tr><td>Updates while the app is closed</td><td>FCM push with a small payload (&ldquo;something changed&rdquo;), then fetch the details.</td></tr>
+  <tr><td>Never miss a message</td><td>Give every message a sequence number or timestamp, and on reconnect ask &ldquo;what happened since X?&rdquo;.</td></tr>
+</table>
+
+<h3>Background work</h3>
+<p>Use <strong>WorkManager</strong> for deferrable, guaranteed work (upload a photo, sync when the network returns), with constraints such as &ldquo;connected&rdquo; and &ldquo;not low battery&rdquo;. Use a foreground service only for work the user is actively aware of (navigation, a call, a download).</p>
+
+<h2 id="offline">8. Offline-first and sync</h2>
+
+<p>Offline-first means the app works from its local data and treats the network as a background sync. Reads come from the database; writes go to the database first, then to the server.</p>
+
+<figure class="fig">
+<svg viewBox="0 0 720 362" role="img" aria-label="Outbox flow: write locally as pending, enqueue a job, POST with an idempotency key, retry on failure, mark synced"><rect class="boxb" x="20" y="10" width="200" height="40" rx="10"/><text class="b c" x="120.0" y="35.0">user taps "send"</text><path class="arrow" d="M120,50 L120,76"/><rect class="boxp" x="20" y="78" width="330" height="44" rx="10"/><text class="b c" x="185.0" y="105.0">1. write to local DB</text><text class="sub" x="365" y="96">syncState = PENDING</text><text class="sub" x="365" y="114">(UI updates at once)</text><path class="arrow" d="M185,122 L185,148"/><rect class="boxo" x="20" y="150" width="330" height="44" rx="10"/><text class="b c" x="185.0" y="177.0">2. enqueue WorkManager job</text><text class="sub" x="365" y="176">(needs network)</text><path class="arrow" d="M185,194 L185,220"/><rect class="boxb" x="20" y="222" width="330" height="44" rx="10"/><text class="b c" x="185.0" y="249.0">3. POST to server with Idempotency-Key</text><path class="arrow" d="M350,244 L478,244"/><text class="sub c" x="414" y="236">fail (transient)</text><rect class="boxr" x="480" y="222" width="190" height="44" rx="10"/><text class="b c" x="575.0" y="249.0">retry with backoff</text><path class="arrow" d="M575,222 L575,206 L300,206 L300,220"/><path class="arrow" d="M185,266 L185,306"/><text class="sub" x="197" y="292">ok</text><rect class="boxg" x="20" y="308" width="400" height="44" rx="10"/><text class="b c" x="220.0" y="335.0">4. mark SYNCED, store server id and timestamp</text></svg>
+<figcaption>The user never waits for the network. The outbox is a table of pending writes.</figcaption></figure>
+
+<h3>The outbox pattern</h3>
+<p>Store every outgoing change in a table (or the pending rows themselves). A background worker drains it in order. Because each item has a stable id, a crash or a retry cannot send it twice with a different effect.</p>
+
+<h3>Conflicts: what if two devices edit the same thing?</h3>
+<table>
+  <tr><th>Strategy</th><th>How it works</th><th>Use when</th></tr>
+  <tr><td>Last write wins</td><td>The newest timestamp (or server order) wins.</td><td>Simple settings, low stakes. Beware clock differences; prefer server time.</td></tr>
+  <tr><td>Versioning (optimistic lock)</td><td>The write includes the version it was based on; the server rejects a stale one and the app re-reads and re-applies.</td><td>Documents and records edited by few people.</td></tr>
+  <tr><td>Field-level merge</td><td>Merge non-overlapping field changes.</td><td>Profiles and forms.</td></tr>
+  <tr><td>CRDTs or operational transform</td><td>Data structures that merge automatically.</td><td>Collaborative text; high complexity, use only when needed.</td></tr>
+  <tr><td>Ask the user</td><td>Show both versions.</td><td>Rare, high-value conflicts.</td></tr>
+</table>
+
+<div class="callout"><strong>Pull sync, in short</strong>
+<p>Keep a <code>lastSyncToken</code> per resource. Ask the server for changes since the token, apply them in one database transaction, then save the new token. If the process dies half-way, the transaction rolls back and the next run starts from the old token.</p></div>
+
+<h2 id="perf">9. Performance, battery and memory</h2>
+
+<h3>Set budgets, then measure</h3>
+<table>
+  <tr><th>Metric</th><th>Typical target</th><th>Common fixes</th></tr>
+  <tr><td>Cold start</td><td>Under about 2 seconds to first useful screen</td><td>Defer heavy initialisation, lazy-load libraries, use Baseline Profiles and the splash screen API.</td></tr>
+  <tr><td>Frame time</td><td>Under 16 ms per frame (60 fps), 8 ms at 120 Hz</td><td>No work on the main thread, stable keys in lists, avoid unneeded recomposition.</td></tr>
+  <tr><td>Memory</td><td>No leaks; no out-of-memory on low-end devices</td><td>Downsample bitmaps, bounded caches, avoid holding Activity references.</td></tr>
+  <tr><td>Battery</td><td>Few wake-ups, few radio sessions</td><td>Batch requests, push instead of poll, WorkManager constraints.</td></tr>
+  <tr><td>App size</td><td>As small as practical</td><td>App bundles, R8 shrinking, on-demand feature modules, compressed assets.</td></tr>
+  <tr><td>Network use</td><td>Few bytes per session</td><td>Compression, delta sync, image sizing, avoid chatty APIs.</td></tr>
+</table>
+
+<h3>Radio and battery</h3>
+<p>The mobile radio stays in a high-power state for a while after each request. Ten small requests spread over ten minutes cost much more battery than one request carrying the same data. Group non-urgent work and let the system choose the moment.</p>
+
+<h3>Lists</h3>
+<p>Long lists are the most common performance problem. Use lazy lists (<code>LazyColumn</code> or <code>RecyclerView</code>), give items stable keys, keep item layouts shallow, load images asynchronously and avoid doing heavy work in the binding code.</p>
+
+<h2 id="security">10. Security and privacy</h2>
+<ul>
+  <li><strong>The client is not trusted.</strong> Authorization, price calculation and validation are decided on the server. Client checks are only for user experience.</li>
+  <li><strong>Transport:</strong> HTTPS only; consider certificate pinning for high-risk apps, with a plan for rotating certificates.</li>
+  <li><strong>Authentication:</strong> short-lived access tokens plus a refresh token held in the Keystore. Refresh once and queue other requests while it happens. On refresh failure, send the user to sign in.</li>
+  <li><strong>Data at rest:</strong> keep as little as possible; encrypt sensitive data; clear it on sign-out.</li>
+  <li><strong>Secrets:</strong> never ship API secrets in the app. Anything in the binary can be extracted.</li>
+  <li><strong>Privacy:</strong> ask for permissions at the moment they are needed, explain why, honour consent and deletion requests, and avoid logging personal data.</li>
+  <li><strong>Hardening:</strong> R8 obfuscation slows reverse engineering; Play Integrity checks help with abuse, but neither replaces server-side checks.</li>
+</ul>
+
+<figure class="fig">
+<svg viewBox="0 0 640 354" role="img" aria-label="Token refresh without a stampede: three 401 responses share one refresh, then replay or sign in"><text class="b" x="10" y="20">Token refresh without a stampede</text><g transform="translate(0,34)"><g transform="translate(40,0)"><rect class="boxr" x="20" y="10" width="160" height="38" rx="10"/><text class="c" x="100.0" y="34.0">Req A: 401 expired</text><path class="rule" d="M100,48 L100,72"/><rect class="boxr" x="200" y="10" width="160" height="38" rx="10"/><text class="c" x="280.0" y="34.0">Req B: 401 expired</text><path class="rule" d="M280,48 L280,72"/><rect class="boxr" x="380" y="10" width="160" height="38" rx="10"/><text class="c" x="460.0" y="34.0">Req C: 401 expired</text><path class="rule" d="M460,48 L460,72"/><path class="rule" d="M100,72 L460,72"/><path class="arrow" d="M280,72 L280,100"/><rect class="boxo" x="170" y="102" width="220" height="50" rx="10"/><text class="b c" x="280.0" y="132.0">one shared refresh (mutex)</text><path class="rule" d="M280,152 L280,176"/><path class="rule" d="M150,176 L430,176"/><path class="arrow" d="M150,176 L150,200"/><path class="arrow" d="M430,176 L430,200"/><text class="sub" x="140" y="194" text-anchor="end">ok</text><text class="sub" x="440" y="194">fail</text><rect class="boxg" x="55" y="202" width="190" height="40" rx="10"/><text class="b c" x="150.0" y="227.0">save new tokens</text><path class="arrow" d="M150,242 L150,268"/><rect class="boxg" x="55" y="270" width="190" height="40" rx="10"/><text class="b c" x="150.0" y="295.0">replay A, B, C</text><rect class="boxr" x="335" y="202" width="190" height="40" rx="10"/><text class="b c" x="430.0" y="227.0">clear tokens</text><path class="arrow" d="M430,242 L430,268"/><rect class="boxr" x="335" y="270" width="190" height="40" rx="10"/><text class="b c" x="430.0" y="295.0">go to sign-in</text></g></g></svg>
+<figcaption>Only the first 401 triggers a refresh. The others wait for the result and then retry once.</figcaption></figure>
+<h2 id="release">11. Release, flags and observability</h2>
+
+<p>Because you cannot instantly fix a shipped app, the system around the code matters as much as the code.</p>
+<table>
+  <tr><th>Tool</th><th>Purpose</th></tr>
+  <tr><td>Staged rollout</td><td>Release to 1%, 5%, 20%, 100% and watch crashes and metrics between steps. Halt if they worsen.</td></tr>
+  <tr><td>Feature flags and remote config</td><td>Turn features on or off without a release; run A/B experiments; provide a <strong>kill switch</strong> for risky code.</td></tr>
+  <tr><td>Crash reporting</td><td>Collect stack traces and the app version; track crash-free users.</td></tr>
+  <tr><td>Analytics</td><td>Track funnels and key events with a stable schema; respect consent.</td></tr>
+  <tr><td>Performance monitoring</td><td>Cold start, screen load and request latency in the field, by device class and country.</td></tr>
+  <tr><td>Forced and soft upgrade</td><td>A server field says &ldquo;this version is too old&rdquo; (force) or &ldquo;an update is available&rdquo; (nudge).</td></tr>
+  <tr><td>Backward-compatible migrations</td><td>Database migrations must work from any previous version; test them.</td></tr>
+</table>
+
+<div class="note"><p><strong>Testing strategy.</strong> Many fast unit tests for use cases and view models, repository tests with a fake API and an in-memory database, a few UI tests for the key flows, and screenshot tests for visual regressions. See <a href="android-arch-part-8-testing-and-proof.html">testing and TDD</a>.</p></div>
+
+<h2 id="examples">12. Three worked designs</h2>
+
+<h3>A. A social feed (Instagram or X style)</h3>
+<p><strong>Requirements:</strong> infinite scroll, like, post with photo, notifications. Stale data for a few minutes is fine. Posting should work offline.</p>
+<ul>
+  <li><strong>API:</strong> cursor-paginated <code>GET /feed</code>; idempotent <code>POST /posts</code> and <code>POST /likes</code>; images served from a CDN with several sizes.</li>
+  <li><strong>Data:</strong> Room tables for posts, users and a remote-keys table for paging. Paging 3 with a <code>RemoteMediator</code> loads from the network into the database; the UI reads from the database.</li>
+  <li><strong>Likes:</strong> optimistic update. Flip the heart at once, queue the request, and revert with a short message if it finally fails. Keep a counter that the server owns, so retries do not double-count.</li>
+  <li><strong>Posting a photo:</strong> save to the database with <code>syncState = PENDING</code>, compress the photo on a background thread, upload in chunks with WorkManager (resumable), then attach the media id to the post request.</li>
+  <li><strong>Images:</strong> Coil with disk and memory caches, thumbnails in the list and the full size in the detail screen, blurred placeholder.</li>
+  <li><strong>Freshness:</strong> pull to refresh, refresh on open if the last sync is older than a few minutes, and a push notification only for important events.</li>
+  <li><strong>Trade-off:</strong> showing cached content fast means a small risk of stale items; mark them softly (a &ldquo;new posts&rdquo; pill) rather than reordering under the user&rsquo;s thumb.</li>
+</ul>
+
+<figure class="fig">
+<svg viewBox="0 0 720 384" role="img" aria-label="Feed paging with a RemoteMediator: list reads from Room, mediator fills Room from the API; like tap goes through Room and WorkManager"><text class="b" x="10" y="20">Feed paging with a RemoteMediator</text><g transform="translate(0,34)"><rect class="boxb" x="20" y="40" width="130" height="50" rx="10"/><text class="b c" x="85.0" y="70.0">LazyColumn</text><rect class="boxg" x="200" y="40" width="150" height="50" rx="10"/><text class="b c" x="275.0" y="70.0">Pager (Paging 3)</text><rect class="boxp" x="420" y="40" width="260" height="50" rx="10"/><text class="b c" x="550.0" y="70.0">Room: posts + remote_keys</text><path class="arrow" d="M198,65 L152,65"/><path class="arrow" d="M418,65 L352,65"/><path class="arrow" d="M85,90 L85,198 L198,198"/><text class="sub" x="95" y="150">user nears the end</text><rect class="boxo" x="200" y="170" width="150" height="56" rx="10"/><text class="b c" x="275.0" y="194.0">RemoteMediator</text><text class="sub c" x="275.0" y="212.0">(load next page)</text><path class="arrow" d="M350,198 L393,198"/><rect class="boxb" x="395" y="170" width="180" height="56" rx="10"/><text class="c" x="485.0" y="203.0">GET /feed?cursor=...</text><path class="arrow" d="M575,198 L603,198"/><rect class="boxg" x="605" y="170" width="95" height="56" rx="10"/><text class="b c" x="652.5" y="203.0">API</text><path class="arrow" d="M540,170 L540,92"/><text class="sub" x="530" y="135" text-anchor="end">write page + next cursor</text><text class="b" x="20" y="282">Like tap:</text><rect class="boxb" x="20" y="294" width="130" height="42" rx="10"/><text class="c" x="85.0" y="320.0">UI flips heart</text><path class="arrow" d="M150,315 L171,315"/><rect class="boxp" x="173" y="294" width="130" height="42" rx="10"/><text class="c" x="238.0" y="320.0">Room (pending)</text><path class="arrow" d="M303,315 L324,315"/><rect class="boxo" x="326" y="294" width="125" height="42" rx="10"/><text class="c" x="388.5" y="320.0">WorkManager</text><path class="arrow" d="M451,315 L472,315"/><rect class="boxg" x="474" y="294" width="160" height="42" rx="10"/><text class="c" x="554.0" y="320.0">POST /like (key)</text></g></svg>
+<figcaption>The list reads only from Room. The mediator fills Room from the network, one cursor page at a time.</figcaption></figure>
+
+<h3>B. A chat app (WhatsApp style)</h3>
+<p><strong>Requirements:</strong> one-to-one and group chat, delivery and read status, works offline, history is stored on the phone, messages must never be lost or duplicated.</p>
+<ul>
+  <li><strong>Transport:</strong> a persistent WebSocket while the app is in the foreground; FCM high-priority push when it is not. The push only says &ldquo;you have a new message&rdquo;, and the app then syncs.</li>
+  <li><strong>Message identity:</strong> the client generates a unique id (a UUID) for each message. The server stores it, so a retry cannot create a duplicate. The server adds an increasing sequence number per conversation for ordering.</li>
+  <li><strong>Local database:</strong> conversations, messages (with state: sending, sent, delivered, read, failed), participants. The chat screen observes a query for one conversation, ordered by sequence number and then by local time.</li>
+  <li><strong>Send flow:</strong> write the message as <em>sending</em> to the database, show it immediately, hand it to the socket (or the outbox worker when offline), and update to <em>sent</em> when the server acknowledges.</li>
+  <li><strong>Reconnect:</strong> the app tells the server the last sequence number per conversation it has and receives anything newer.</li>
+  <li><strong>Receipts and typing:</strong> small events over the socket; typing indicators are not stored. Batch read receipts so opening a long chat sends one message, not hundreds.</li>
+  <li><strong>Media:</strong> upload separately and send only a reference; encrypt end to end if required, with keys in the Keystore.</li>
+  <li><strong>Trade-off:</strong> a permanent connection gives instant messages but costs battery, so close it when the app goes to the background and rely on push.</li>
+</ul>
+
+<figure class="fig">
+<svg viewBox="0 0 740 614" role="img" aria-label="Sequence diagram of sending one chat message from Alice through the server to Bob, with delivery and read receipts"><text class="b" x="10" y="20">Sending one chat message</text><g transform="translate(0,34)"><path class="ghost" d="M100,34 L100,470"/><path class="ghost" d="M365,34 L365,470"/><path class="ghost" d="M630,34 L630,470"/><rect class="boxb" x="35.0" y="0" width="130" height="34" rx="10"/><text class="b c" x="100.0" y="22.0">Alice app</text><rect class="boxg" x="300.0" y="0" width="130" height="34" rx="10"/><text class="b c" x="365.0" y="22.0">Server</text><rect class="boxb" x="565.0" y="0" width="130" height="34" rx="10"/><text class="b c" x="630.0" y="22.0">Bob app</text><rect class="boxb" x="115" y="50" width="215" height="28" rx="10"/><text class="c" x="222.5" y="69.0">1 save local (id=M1, sending)</text><path class="arrow" d="M102,118 L363,118"/><text class="sub c" x="232.5" y="111">2 send M1</text><rect class="boxg" x="380" y="126" width="140" height="28" rx="10"/><text class="c" x="450.0" y="145.0">3 store, seq=57</text><path class="arrow" d="M363,188 L102,188"/><text class="sub c" x="232.5" y="181">4 ack seq=57</text><rect class="boxb" x="115" y="206" width="100" height="28" rx="10"/><text class="c" x="165.0" y="225.0">5 mark sent</text><path class="arrow" d="M367,220 L628,220"/><text class="sub c" x="497.5" y="213">6 push / socket</text><rect class="boxb" x="510" y="240" width="110" height="28" rx="10"/><text class="c" x="565.0" y="259.0">7 save, show</text><path class="arrow" d="M628,304 L367,304"/><text class="sub c" x="497.5" y="297">8 delivered M1</text><path class="arrow" d="M363,344 L102,344"/><text class="sub c" x="232.5" y="337">9 delivered</text><path class="arrow" d="M628,394 L367,394"/><text class="sub c" x="497.5" y="387">10 read up to 57</text><text class="sub c" x="497.5" y="410">(one batched receipt)</text><path class="arrow" d="M363,448 L102,448"/><text class="sub c" x="232.5" y="441">11 read</text><rect class="boxo" x="20" y="490" width="700" height="34" rx="10"/><text class="c" x="370.0" y="512.0">Offline for Alice: steps 2 to 5 wait in the outbox; M1 is sent when the network returns.</text><rect class="boxp" x="20" y="534" width="700" height="34" rx="10"/><text class="c" x="370.0" y="556.0">Bob reconnects: "give me conversation C after seq 52"  then the server replays 53 to 57.</text></g></svg>
+<figcaption>The client-made id removes duplicates; the server sequence number gives the order.</figcaption></figure>
+<h3>C. A ride or delivery tracking screen</h3>
+<p><strong>Requirements:</strong> show the driver&rsquo;s position moving on a map in near real time, with a changing ETA, on mobile networks that drop out.</p>
+<ul>
+  <li><strong>Updates:</strong> subscribe to a stream (WebSocket or gRPC streaming) while the screen is visible; unsubscribe when it is not. Send small position messages (id, latitude, longitude, heading, timestamp).</li>
+  <li><strong>Smoothness:</strong> positions arrive every few seconds, so the app animates between them (interpolation) and snaps to the road. Ignore out-of-order messages by timestamp.</li>
+  <li><strong>Resilience:</strong> on reconnect, fetch the latest state first and then resume the stream. Show &ldquo;last updated 20 s ago&rdquo; when the stream is silent.</li>
+  <li><strong>The rider&rsquo;s own location:</strong> use the fused location provider with a balanced accuracy, a foreground service while a trip is active, and lower frequency when the phone is still, to save battery.</li>
+  <li><strong>Maps:</strong> load only the visible area, cluster markers, and cap the number drawn.</li>
+  <li><strong>Trade-off:</strong> higher update frequency looks smoother but costs data and battery; pick the lowest rate that still feels live.</li>
+</ul>
+
+<figure class="fig">
+<svg viewBox="0 0 720 374" role="img" aria-label="Live tracking: driver GPS goes through a location service to a pub-sub topic, then a stream to the rider app"><text class="b" x="10" y="20">Live tracking</text><g transform="translate(0,34)"><rect class="boxb" x="20" y="10" width="110" height="48" rx="10"/><text class="b c" x="75.0" y="39.0">Driver app</text><path class="arrow" d="M130,34 L258,34"/><text class="sub c" x="194" y="26">GPS every 3-5 s</text><rect class="boxg" x="260" y="10" width="150" height="48" rx="10"/><text class="b c" x="335.0" y="39.0">Location service</text><path class="arrow" d="M410,34 L448,34"/><rect class="boxp" x="450" y="10" width="230" height="48" rx="10"/><text class="c" x="565.0" y="39.0">pub-sub topic "trip:T9"</text><path class="arrow" d="M565,58 L565,134 L132,134"/><text class="sub c" x="350" y="126">WebSocket / gRPC stream (while visible)</text><rect class="boxb" x="20" y="110" width="110" height="48" rx="10"/><text class="b c" x="75.0" y="139.0">Rider app</text><path class="rule" d="M75,158 L75,222 L75,288"/><path class="arrow" d="M75,200 L98,200"/><path class="arrow" d="M75,288 L98,288"/><rect class="boxg" x="100" y="178" width="500" height="44" rx="10"/><text class="c" x="350.0" y="205.0">interpolate between points, snap to road, drop old timestamps</text><rect class="boxo" x="100" y="250" width="580" height="76" rx="10"/><text class="b c" x="390.0" y="284.0">stream silent for 15 s?</text><text class="sub c" x="390.0" y="302.0">show "last updated 15 s ago", fetch latest state, resubscribe</text></g></svg>
+<figcaption>Pub-sub fans one driver update out to everyone watching that trip. The rider app subscribes only while the screen is open.</figcaption></figure>
+<h2 id="classic">13. Classic system design lessons, seen from the phone</h2>
+
+<p>Well-known system design courses (the Grokking series, for example) teach the back end: estimation, building blocks and case studies. I have not copied any course; the tables below are my own summary of the usual topics, and a full course is the place to go deep on the server side. Every one of these ideas still shapes a mobile design, because the app is the first component in that picture.</p>
+
+<h3>The RESHADED approach, mapped to this article</h3>
+<p>The course ends with a named approach for tackling a design problem. As I understand it, the letters stand for Requirements, Estimation, Storage schema, High-level design, API design, Detailed design, Evaluation and Distinctive component or feature. It lines up with the six steps in section 2:</p>
+<table>
+  <tr><th>RESHADED</th><th>This article</th><th>Mobile twist</th></tr>
+  <tr><td>Requirements</td><td>Step 1</td><td>Add offline, battery, data cost and OS support.</td></tr>
+  <tr><td>Estimation</td><td>Below</td><td>Estimate per-device bytes and wake-ups as well as server load.</td></tr>
+  <tr><td>Storage schema</td><td>Step 3</td><td>Server tables and the on-device Room schema.</td></tr>
+  <tr><td>High-level design</td><td>Overview diagram, Step 4</td><td>Draw the phone, its local database and the push path.</td></tr>
+  <tr><td>API design</td><td>Step 2</td><td>Cursors, idempotency keys, compatibility with old app versions.</td></tr>
+  <tr><td>Detailed design</td><td>Sections 7 to 10</td><td>Sync, retries, images, security.</td></tr>
+  <tr><td>Evaluation</td><td>Section 11</td><td>Flags, rollout, field metrics, stated trade-offs.</td></tr>
+  <tr><td>Distinctive component</td><td>Worked designs</td><td>Outbox for chat, RemoteMediator for feeds, streaming for tracking.</td></tr>
+</table>
+
+<h3>Back-of-the-envelope estimates</h3>
+<p>Estimate first; it tells you whether you need a cache, a CDN or sharding. Use round numbers and show the arithmetic.</p>
+<pre><code>Feed app, 10 million daily users, 20 feed requests per user per day
+  requests per day     = 10M x 20            = 200M
+  average per second   = 200M / 86,400       = about 2,300 requests/s
+  peak (3x average)                          = about 7,000 requests/s
+
+  one feed page        = 20 items x 1 KB     = 20 KB (JSON, before compression)
+  traffic per second   = 2,300 x 20 KB       = about 46 MB/s   -&gt; use a CDN and compression
+
+On the phone: 100 posts cached x 1 KB = 100 KB of rows (tiny);
+              100 thumbnails x 30 KB   = 3 MB on disk        (set a disk-cache limit)</code></pre>
+
+<h3>Non-functional characteristics</h3>
+<table>
+  <tr><th>Back-end term</th><th>What it means on a phone</th></tr>
+  <tr><td>Availability</td><td>The app still opens and shows data when the server is down. Offline-first gives you this for free on reads.</td></tr>
+  <tr><td>Reliability</td><td>A message or payment is never lost or doubled: outbox, idempotency keys, durable local writes.</td></tr>
+  <tr><td>Scalability</td><td>Your retries, polling and reconnects are part of the server&rsquo;s load. Backoff and jitter protect it.</td></tr>
+  <tr><td>Fault tolerance</td><td>Handle partial failure: one endpoint down should not blank the whole screen.</td></tr>
+  <tr><td>Consistency (CAP trade-off)</td><td>Offline writes mean you choose availability and accept eventual consistency, so you need a conflict strategy.</td></tr>
+</table>
+
+<h3>Building blocks and where the app touches them</h3>
+<table>
+  <tr><th>Building block</th><th>Server idea</th><th>What the mobile engineer decides</th></tr>
+  <tr><td>DNS</td><td>Name to IP address</td><td>Which host names to use; cost of extra hosts (each needs a lookup and a TLS handshake).</td></tr>
+  <tr><td>Load balancer</td><td>Spread requests over servers; health checks</td><td>Retry safely, because a retry may land on another server; keep requests stateless.</td></tr>
+  <tr><td>CDN</td><td>Cache static content near the user</td><td>Image sizes and formats, cache headers, signed URLs.</td></tr>
+  <tr><td>Distributed cache</td><td>Fast reads (for example Redis)</td><td>Use ETags so a cached response costs a 304; know that data may be slightly stale.</td></tr>
+  <tr><td>Database, replication, sharding</td><td>Scale storage and reads</td><td>Replicas can lag, so show your own write immediately (read-your-writes) from local data.</td></tr>
+  <tr><td>Key-value store</td><td>Simple, fast, partitioned data</td><td>Session, settings and token lookups need nothing more.</td></tr>
+  <tr><td>Sequencer (unique IDs)</td><td>Ordered, unique ids across servers</td><td>Generate client ids (UUID) for offline creates; let the server add the order.</td></tr>
+  <tr><td>Message queue</td><td>Absorb bursts, decouple work</td><td>Your upload is accepted fast and processed later, so design a &ldquo;processing&rdquo; state in the UI.</td></tr>
+  <tr><td>Pub-sub</td><td>Fan an event out to many subscribers</td><td>Chat rooms, live scores, tracking: subscribe on screen show, unsubscribe on hide.</td></tr>
+  <tr><td>Rate limiter</td><td>Protect the server per user or key</td><td>Honour <code>429</code> and <code>Retry-After</code>; do not hammer.</td></tr>
+  <tr><td>Blob store</td><td>Large files such as photos and video</td><td>Direct, resumable, chunked uploads with pre-signed URLs.</td></tr>
+  <tr><td>Search and typeahead</td><td>Indexing and prefix matching</td><td>Debounce typing (about 200 ms), cancel stale requests, cache recent queries.</td></tr>
+  <tr><td>Distributed task scheduler</td><td>Run jobs later or repeatedly</td><td>WorkManager is the on-device equivalent.</td></tr>
+  <tr><td>Monitoring and logging</td><td>Server errors and latency</td><td>Client-side crash and latency reporting with app version and device class.</td></tr>
+  <tr><td>Sharded counters</td><td>Count likes and views at scale</td><td>Show an approximate count and update it optimistically; do not block on the exact number.</td></tr>
+</table>
+
+<h3>Classic case studies and the mobile angle</h3>
+<table>
+  <tr><th>Case study</th><th>Server focus</th><th>Mobile focus</th></tr>
+  <tr><td>URL shortener (TinyURL)</td><td>Id generation, read-heavy cache</td><td>App Links and deep links, handling redirects, offline link list.</td></tr>
+  <tr><td>Twitter and newsfeed, Instagram</td><td>Fan-out on write versus read, ranking</td><td>Cursor paging, optimistic likes, image loading, stale-feed UX.</td></tr>
+  <tr><td>WhatsApp and Messenger</td><td>Connection servers, message routing, receipts</td><td>Outbox, client message ids, reconnect with sequence numbers, push wake-up.</td></tr>
+  <tr><td>YouTube</td><td>Transcoding, CDN, adaptive bitrate</td><td>Adaptive streaming (ExoPlayer/Media3), prefetching, download for offline, data-saver mode.</td></tr>
+  <tr><td>Uber, proximity service (Yelp), Google Maps</td><td>Geospatial indexing, matching, routing</td><td>Fused location, battery-aware updates, map tiles caching, marker clustering.</td></tr>
+  <tr><td>Google Docs</td><td>Concurrent edits (operational transform or CRDT)</td><td>Offline edits, merge on reconnect, cursor presence.</td></tr>
+  <tr><td>Typeahead</td><td>Trie or index, ranking</td><td>Debounce, cancel, local history, tiny payloads.</td></tr>
+  <tr><td>Payment system</td><td>Exactly-once effect, ledger</td><td>Idempotency keys, never double-charge on retry, clear pending state.</td></tr>
+  <tr><td>Deployment system</td><td>Staged release, rollback</td><td>Play staged rollout, feature flags, forced upgrade.</td></tr>
+  <tr><td>Web crawler, rate limiter</td><td>Politeness, throttling</td><td>Respect server limits in your own sync code.</td></tr>
+</table>
+
+<h2 id="mistakes">14. Common mistakes and a checklist</h2>
+
+<h3>Mistakes to avoid</h3>
+<ul>
+  <li>Reading the network directly from the UI, so the screen is blank offline.</li>
+  <li>Keeping the only copy of data in memory or in a ViewModel.</li>
+  <li>Retrying everything, including non-idempotent writes and permanent errors.</li>
+  <li>Polling every few seconds instead of using push or a long interval.</li>
+  <li>Loading full-size images into small views.</li>
+  <li>Breaking old app versions by changing or removing API fields.</li>
+  <li>Shipping a risky feature with no flag and no staged rollout.</li>
+  <li>Trusting the client for permission checks.</li>
+  <li>Designing only the happy path: no loading, empty, error, offline or partial states.</li>
+</ul>
+
+<h3>Design-review checklist</h3>
+<table>
+  <tr><th>Ask yourself</th><th>Answer in your design</th></tr>
+  <tr><td>What works offline, and where does the data live?</td><td>Local database as the source of truth.</td></tr>
+  <tr><td>How do pages, refreshes and updates arrive?</td><td>Cursor pagination, refresh policy, push or socket.</td></tr>
+  <tr><td>What happens when a request fails or repeats?</td><td>Backoff, idempotency keys, outbox.</td></tr>
+  <tr><td>What happens when two devices edit?</td><td>A named conflict strategy.</td></tr>
+  <tr><td>What are the performance and battery budgets?</td><td>Numbers for start time, frame time, memory, data.</td></tr>
+  <tr><td>How is it secured?</td><td>Token storage, transport, server-side authorization.</td></tr>
+  <tr><td>How is it released and watched?</td><td>Staged rollout, flags, crash and latency metrics.</td></tr>
+  <tr><td>What did we trade away?</td><td>State it: freshness vs speed, battery vs liveness, simplicity vs flexibility.</td></tr>
+</table>
+
+<h2 id="takeaways">15. Takeaways</h2>
+<ul>
+  <li>Start from the user&rsquo;s experience and the phone&rsquo;s limits, then design the API, data and architecture to fit.</li>
+  <li>Make the local database the source of truth; the network is a background sync.</li>
+  <li>Be defensive about the network: paginate, cache, batch, back off with jitter, use idempotency keys.</li>
+  <li>Set budgets for start time, frame time, memory, battery and data, and measure them in the field.</li>
+  <li>Plan for what you cannot undo: backward-compatible APIs, feature flags, kill switches and staged rollouts.</li>
+  <li>Always say the trade-off out loud. A design without a stated cost is not finished.</li>
+</ul>
+
+<table class="gloss">
+  <tr><th>Term</th><th>In plain words</th></tr>
+  <tr><td>Offline-first</td><td>The app works from local data and syncs in the background.</td></tr>
+  <tr><td>Source of truth</td><td>The one place that owns a piece of data.</td></tr>
+  <tr><td>Idempotent</td><td>Doing it twice has the same effect as doing it once.</td></tr>
+  <tr><td>Backoff and jitter</td><td>Waiting longer after each failure, with a little randomness.</td></tr>
+  <tr><td>Cursor</td><td>A token that marks where the last page ended.</td></tr>
+  <tr><td>Outbox</td><td>A queue of local changes waiting to be sent.</td></tr>
+  <tr><td>Optimistic update</td><td>Show the result at once and fix it later if the server disagrees.</td></tr>
+  <tr><td>Staged rollout</td><td>Releasing to a small share of users first.</td></tr>
+  <tr><td>Kill switch</td><td>A remote flag that turns a feature off.</td></tr>
+  <tr><td>CDN</td><td>Servers near the user that cache static files such as images.</td></tr>
+</table>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

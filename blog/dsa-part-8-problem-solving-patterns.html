@@ -222,24 +222,67 @@
 <li>You must change an array <strong>in place</strong>, with no extra array (remove duplicates, move zeros).</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> Opposite ends: find two numbers that add up to 9 in a sorted array
-
-   index:  0   1   2   3   4   5
-         +---+---+---+---+---+---+
-         | 1 | 2 | 4 | 7 | 8 | 11|
-         +---+---+---+---+---+---+
-           ^                   ^
-           l                   r        1 + 11 = 12  too big   -&gt; move r left
-           ^               ^
-           l               r            1 + 8  = 9   found it
-
- Same direction: remove duplicates in place (w = where to write, r = what we read)
-
-         +---+---+---+---+---+---+
-         | 1 | 1 | 2 | 2 | 2 | 3 |
-         +---+---+---+---+---+---+
-               ^   ^
-               w   r      a[r] differs from a[w-1]: write it, move w</pre></div><figcaption>Left and right pointers close in on each other; a read pointer runs ahead of a write pointer.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 470" role="img" aria-label="Two pointer patterns: opposite ends on a sorted array, and a read and write pointer moving the same direction"><text class="b" x="40" y="24">Opposite ends: find two numbers that add up to 9 in a sorted array</text>
+<rect class="boxo" x="40" y="60" width="54" height="38" rx="6"/>
+<text class="c" x="67.0" y="84.0">1</text>
+<text class="sub c" x="67" y="54">0</text>
+<rect class="box" x="100" y="60" width="54" height="38" rx="6"/>
+<text class="c" x="127.0" y="84.0">2</text>
+<text class="sub c" x="127" y="54">1</text>
+<rect class="box" x="160" y="60" width="54" height="38" rx="6"/>
+<text class="c" x="187.0" y="84.0">4</text>
+<text class="sub c" x="187" y="54">2</text>
+<rect class="box" x="220" y="60" width="54" height="38" rx="6"/>
+<text class="c" x="247.0" y="84.0">7</text>
+<text class="sub c" x="247" y="54">3</text>
+<rect class="box" x="280" y="60" width="54" height="38" rx="6"/>
+<text class="c" x="307.0" y="84.0">8</text>
+<text class="sub c" x="307" y="54">4</text>
+<rect class="boxo" x="340" y="60" width="54" height="38" rx="6"/>
+<text class="c" x="367.0" y="84.0">11</text>
+<text class="sub c" x="367" y="54">5</text>
+<path d="M67,124 L67,105" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="67" y="140" fill="#f59e0b">l</text>
+<path d="M367,124 L367,105" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="367" y="140" fill="#f59e0b">r</text>
+<text x="430" y="138">1 + 11 = 12  too big  -&gt; move r left</text>
+<rect class="boxg" x="40" y="190" width="54" height="38" rx="6"/>
+<text class="c" x="67.0" y="214.0">1</text>
+<rect class="box" x="100" y="190" width="54" height="38" rx="6"/>
+<text class="c" x="127.0" y="214.0">2</text>
+<rect class="box" x="160" y="190" width="54" height="38" rx="6"/>
+<text class="c" x="187.0" y="214.0">4</text>
+<rect class="box" x="220" y="190" width="54" height="38" rx="6"/>
+<text class="c" x="247.0" y="214.0">7</text>
+<rect class="boxg" x="280" y="190" width="54" height="38" rx="6"/>
+<text class="c" x="307.0" y="214.0">8</text>
+<rect class="box" x="340" y="190" width="54" height="38" rx="6"/>
+<text class="c" x="367.0" y="214.0">11</text>
+<path d="M67,254 L67,235" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="67" y="270" fill="#f59e0b">l</text>
+<path d="M307,254 L307,235" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="307" y="270" fill="#f59e0b">r</text>
+<text class="b" x="430" y="268">1 + 8  = 9   found it</text>
+<path class="rule" d="M40,308 L680,308"/>
+<text class="b" x="40" y="338">Same direction: remove duplicates in place (w = where to write, r = what we read)</text>
+<rect class="box" x="40" y="358" width="54" height="38" rx="6"/>
+<text class="c" x="67.0" y="382.0">1</text>
+<rect class="boxo" x="100" y="358" width="54" height="38" rx="6"/>
+<text class="c" x="127.0" y="382.0">1</text>
+<rect class="boxb" x="160" y="358" width="54" height="38" rx="6"/>
+<text class="c" x="187.0" y="382.0">2</text>
+<rect class="box" x="220" y="358" width="54" height="38" rx="6"/>
+<text class="c" x="247.0" y="382.0">2</text>
+<rect class="box" x="280" y="358" width="54" height="38" rx="6"/>
+<text class="c" x="307.0" y="382.0">2</text>
+<rect class="box" x="340" y="358" width="54" height="38" rx="6"/>
+<text class="c" x="367.0" y="382.0">3</text>
+<path d="M127,422 L127,403" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="127" y="438" fill="#f59e0b">w</text>
+<path d="M187,422 L187,403" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="187" y="438" fill="#3b82f6">r</text>
+<text class="sub" x="430" y="424">a[r] differs from a[w-1]:</text>
+<text class="sub" x="430" y="442">write it, move w</text></svg><figcaption>Left and right pointers close in on each other; a read pointer runs ahead of a write pointer.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>To find a pair summing to a target, brute force tries every pair: two nested loops, <code>O(n&sup2;)</code> time. With a sorted array we can reason: if the sum is too small, only a bigger left number can help, so move <code>l</code> right. If it is too big, move <code>r</code> left. Every step throws away one candidate for good, so the cost is <code>O(n)</code> time and <code>O(1)</code> space.</p>
@@ -408,21 +451,87 @@ fun main() {
 <li>A value is repeatedly replaced by a function of itself, and you wonder if it ends or loops (the &ldquo;happy number&rdquo; idea).</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> Middle: when fast falls off the end, slow is halfway.
-
-   1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; null
-   s,f
-        s    f
-             s         f          fast jumped two each time
-   middle = 3
-
- Cycle: fast laps slow, like two runners on a circular track.
-
-   1 -&gt; 2 -&gt; 3 -&gt; 4
-             ^    |
-             +----+       slow moves 1, fast moves 2.
-                          Inside the loop the gap shrinks by 1 each step,
-                          so they must meet.</pre></div><figcaption>Fast moves two steps per slow step. On a loop the gap closes by one each round.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 480" role="img" aria-label="Fast and slow pointers: finding the middle of a list and detecting a cycle"><text class="b" x="40" y="24">Middle: when fast falls off the end, slow is halfway.</text>
+<rect class="box" x="40" y="44" width="52" height="36" rx="6"/>
+<text class="c" x="66.0" y="67.0">1</text>
+<path class="arrow" d="M94,62 L128,62"/>
+<rect class="box" x="132" y="44" width="52" height="36" rx="6"/>
+<text class="c" x="158.0" y="67.0">2</text>
+<path class="arrow" d="M186,62 L220,62"/>
+<rect class="box" x="224" y="44" width="52" height="36" rx="6"/>
+<text class="c" x="250.0" y="67.0">3</text>
+<path class="arrow" d="M278,62 L312,62"/>
+<rect class="box" x="316" y="44" width="52" height="36" rx="6"/>
+<text class="c" x="342.0" y="67.0">4</text>
+<path class="arrow" d="M370,62 L404,62"/>
+<rect class="box" x="408" y="44" width="52" height="36" rx="6"/>
+<text class="c" x="434.0" y="67.0">5</text>
+<path class="arrow" d="M462,62 L496,62"/>
+<rect class="ghost" x="500" y="44" width="52" height="36" rx="6"/>
+<text class="sub c" x="526" y="67">null</text>
+<path d="M66,102 L66,85" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="66" y="118" fill="#f59e0b">s,f</text>
+<text class="sub" x="580" y="66">start</text>
+<rect class="box" x="40" y="134" width="52" height="36" rx="6"/>
+<text class="c" x="66.0" y="157.0">1</text>
+<path class="arrow" d="M94,152 L128,152"/>
+<rect class="box" x="132" y="134" width="52" height="36" rx="6"/>
+<text class="c" x="158.0" y="157.0">2</text>
+<path class="arrow" d="M186,152 L220,152"/>
+<rect class="box" x="224" y="134" width="52" height="36" rx="6"/>
+<text class="c" x="250.0" y="157.0">3</text>
+<path class="arrow" d="M278,152 L312,152"/>
+<rect class="box" x="316" y="134" width="52" height="36" rx="6"/>
+<text class="c" x="342.0" y="157.0">4</text>
+<path class="arrow" d="M370,152 L404,152"/>
+<rect class="box" x="408" y="134" width="52" height="36" rx="6"/>
+<text class="c" x="434.0" y="157.0">5</text>
+<path class="arrow" d="M462,152 L496,152"/>
+<rect class="ghost" x="500" y="134" width="52" height="36" rx="6"/>
+<text class="sub c" x="526" y="157">null</text>
+<path d="M158,192 L158,175" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="158" y="208" fill="#f59e0b">s</text>
+<path d="M250,192 L250,175" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="250" y="208" fill="#3b82f6">f</text>
+<rect class="box" x="40" y="224" width="52" height="36" rx="6"/>
+<text class="c" x="66.0" y="247.0">1</text>
+<path class="arrow" d="M94,242 L128,242"/>
+<rect class="box" x="132" y="224" width="52" height="36" rx="6"/>
+<text class="c" x="158.0" y="247.0">2</text>
+<path class="arrow" d="M186,242 L220,242"/>
+<rect class="boxg" x="224" y="224" width="52" height="36" rx="6"/>
+<text class="c" x="250.0" y="247.0">3</text>
+<path class="arrow" d="M278,242 L312,242"/>
+<rect class="box" x="316" y="224" width="52" height="36" rx="6"/>
+<text class="c" x="342.0" y="247.0">4</text>
+<path class="arrow" d="M370,242 L404,242"/>
+<rect class="box" x="408" y="224" width="52" height="36" rx="6"/>
+<text class="c" x="434.0" y="247.0">5</text>
+<path class="arrow" d="M462,242 L496,242"/>
+<rect class="ghost" x="500" y="224" width="52" height="36" rx="6"/>
+<text class="sub c" x="526" y="247">null</text>
+<path d="M250,282 L250,265" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="250" y="298" fill="#f59e0b">s</text>
+<path d="M434,282 L434,265" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="434" y="298" fill="#3b82f6">f</text>
+<text class="b" x="40" y="318">fast jumped two each time; middle = 3</text>
+<path class="rule" d="M40,338 L680,338"/>
+<text class="b" x="40" y="366">Cycle: fast laps slow, like two runners on a circular track.</text>
+<rect class="boxp" x="40" y="390" width="52" height="36" rx="6"/>
+<text class="c" x="66.0" y="413.0">1</text>
+<path class="arrow" d="M94,408 L128,408"/>
+<rect class="boxp" x="132" y="390" width="52" height="36" rx="6"/>
+<text class="c" x="158.0" y="413.0">2</text>
+<path class="arrow" d="M186,408 L220,408"/>
+<rect class="boxp" x="224" y="390" width="52" height="36" rx="6"/>
+<text class="c" x="250.0" y="413.0">3</text>
+<path class="arrow" d="M278,408 L312,408"/>
+<rect class="boxp" x="316" y="390" width="52" height="36" rx="6"/>
+<text class="c" x="342.0" y="413.0">4</text>
+<path class="arrow" d="M342,428 Q296,484 252,432"/>
+<text class="sub" x="400" y="400">slow moves 1, fast moves 2.</text>
+<text class="sub" x="400" y="420">Inside the loop the gap shrinks by 1 each step,</text>
+<text class="sub" x="400" y="440">so they must meet.</text></svg><figcaption>Fast moves two steps per slow step. On a loop the gap closes by one each round.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>To find the middle the naive way, walk once to count the nodes, then walk again to the halfway point: two passes, <code>O(n)</code> time. Fast and slow does it in one pass, still <code>O(n)</code> but simpler. To detect a cycle the naive way, store every node you visit in a hash set and stop if you see one twice: <code>O(n)</code> time but <code>O(n)</code> extra space. Fast and slow needs only two variables: <code>O(1)</code> space.</p>
@@ -618,18 +727,107 @@ fun isHappy(n: Int): Boolean {
 <li>A fixed size <code>k</code> (fixed window), or a rule the stretch must satisfy (variable window).</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> Fixed window, k = 3. Slide right: add the new item, drop the old one.
-
-   [ 2  1  5 ] 1  3  2        sum = 8
-     2 [ 1  5  1 ] 3  2       sum = 8 - 2 + 1 = 7
-     2  1 [ 5  1  3 ] 2       sum = 7 - 1 + 3 = 9   &lt;- best so far
-
- Variable window: grow on the right, shrink on the left when the rule breaks.
-
-   s = "abcabcbb"
-   [a b c] a b c b b          window "abc"  length 3
-    a [b c a] b c b b         'a' repeats, left jumps past the old 'a'
-                  [c b] b     keep going; remember the best length</pre></div><figcaption>Brackets mark the window. Only the two edges change on each step.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 480" role="img" aria-label="Sliding windows: a fixed window of size 3 and a variable window over the string abcabcbb"><text class="b" x="40" y="24">Fixed window, k = 3. Slide right: add the new item, drop the old one.</text>
+<rect class="boxb" x="40" y="46" width="44" height="36" rx="6"/>
+<text class="c" x="62.0" y="69.0">2</text>
+<rect class="boxb" x="88" y="46" width="44" height="36" rx="6"/>
+<text class="c" x="110.0" y="69.0">1</text>
+<rect class="boxb" x="136" y="46" width="44" height="36" rx="6"/>
+<text class="c" x="158.0" y="69.0">5</text>
+<rect class="box" x="184" y="46" width="44" height="36" rx="6"/>
+<text class="c" x="206.0" y="69.0">1</text>
+<rect class="box" x="232" y="46" width="44" height="36" rx="6"/>
+<text class="c" x="254.0" y="69.0">3</text>
+<rect class="box" x="280" y="46" width="44" height="36" rx="6"/>
+<text class="c" x="302.0" y="69.0">2</text>
+<rect class="ghost" x="36" y="41" width="148" height="46" rx="10" stroke="#3b82f6" style="stroke-dasharray:none"/>
+<text x="370" y="70">sum = 8</text>
+<rect class="box" x="40" y="108" width="44" height="36" rx="6"/>
+<text class="c" x="62.0" y="131.0">2</text>
+<rect class="boxb" x="88" y="108" width="44" height="36" rx="6"/>
+<text class="c" x="110.0" y="131.0">1</text>
+<rect class="boxb" x="136" y="108" width="44" height="36" rx="6"/>
+<text class="c" x="158.0" y="131.0">5</text>
+<rect class="boxb" x="184" y="108" width="44" height="36" rx="6"/>
+<text class="c" x="206.0" y="131.0">1</text>
+<rect class="box" x="232" y="108" width="44" height="36" rx="6"/>
+<text class="c" x="254.0" y="131.0">3</text>
+<rect class="box" x="280" y="108" width="44" height="36" rx="6"/>
+<text class="c" x="302.0" y="131.0">2</text>
+<rect class="ghost" x="84" y="103" width="148" height="46" rx="10" stroke="#3b82f6" style="stroke-dasharray:none"/>
+<text x="370" y="132">sum = 8 - 2 + 1 = 7</text>
+<rect class="box" x="40" y="170" width="44" height="36" rx="6"/>
+<text class="c" x="62.0" y="193.0">2</text>
+<rect class="box" x="88" y="170" width="44" height="36" rx="6"/>
+<text class="c" x="110.0" y="193.0">1</text>
+<rect class="boxg" x="136" y="170" width="44" height="36" rx="6"/>
+<text class="c" x="158.0" y="193.0">5</text>
+<rect class="boxg" x="184" y="170" width="44" height="36" rx="6"/>
+<text class="c" x="206.0" y="193.0">1</text>
+<rect class="boxg" x="232" y="170" width="44" height="36" rx="6"/>
+<text class="c" x="254.0" y="193.0">3</text>
+<rect class="box" x="280" y="170" width="44" height="36" rx="6"/>
+<text class="c" x="302.0" y="193.0">2</text>
+<rect class="ghost" x="132" y="165" width="148" height="46" rx="10" stroke="#10b981" style="stroke-dasharray:none"/>
+<text x="370" y="194">sum = 7 - 1 + 3 = 9</text>
+<text class="b" x="560" y="194" fill="#10b981">best so far</text>
+<path class="rule" d="M40,236 L680,236"/>
+<text class="b" x="40" y="266">Variable window: grow on the right, shrink on the left when the rule breaks.</text>
+<text class="sub" x="40" y="292">s = "abcabcbb"</text>
+<rect class="boxb" x="40" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="58.0" y="329.0">a</text>
+<rect class="boxb" x="80" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="98.0" y="329.0">b</text>
+<rect class="boxb" x="120" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="138.0" y="329.0">c</text>
+<rect class="box" x="160" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="178.0" y="329.0">a</text>
+<rect class="box" x="200" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="218.0" y="329.0">b</text>
+<rect class="box" x="240" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="258.0" y="329.0">c</text>
+<rect class="box" x="280" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="298.0" y="329.0">b</text>
+<rect class="box" x="320" y="306" width="36" height="36" rx="6"/>
+<text class="c" x="338.0" y="329.0">b</text>
+<rect class="ghost" x="36" y="301" width="124" height="46" rx="10" stroke="#3b82f6" style="stroke-dasharray:none"/>
+<text x="370" y="330">window "abc"  length 3</text>
+<rect class="box" x="40" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="58.0" y="391.0">a</text>
+<rect class="boxo" x="80" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="98.0" y="391.0">b</text>
+<rect class="boxo" x="120" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="138.0" y="391.0">c</text>
+<rect class="boxo" x="160" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="178.0" y="391.0">a</text>
+<rect class="box" x="200" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="218.0" y="391.0">b</text>
+<rect class="box" x="240" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="258.0" y="391.0">c</text>
+<rect class="box" x="280" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="298.0" y="391.0">b</text>
+<rect class="box" x="320" y="368" width="36" height="36" rx="6"/>
+<text class="c" x="338.0" y="391.0">b</text>
+<rect class="ghost" x="76" y="363" width="124" height="46" rx="10" stroke="#3b82f6" style="stroke-dasharray:none"/>
+<text x="370" y="392">'a' repeats, left jumps past the old 'a'</text>
+<rect class="box" x="40" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="58.0" y="453.0">a</text>
+<rect class="box" x="80" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="98.0" y="453.0">b</text>
+<rect class="box" x="120" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="138.0" y="453.0">c</text>
+<rect class="box" x="160" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="178.0" y="453.0">a</text>
+<rect class="box" x="200" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="218.0" y="453.0">b</text>
+<rect class="boxg" x="240" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="258.0" y="453.0">c</text>
+<rect class="boxg" x="280" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="298.0" y="453.0">b</text>
+<rect class="box" x="320" y="430" width="36" height="36" rx="6"/>
+<text class="c" x="338.0" y="453.0">b</text>
+<rect class="ghost" x="236" y="425" width="84" height="46" rx="10" stroke="#10b981" style="stroke-dasharray:none"/>
+<text x="370" y="454">keep going; remember the best length</text></svg><figcaption>Brackets mark the window. Only the two edges change on each step.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>The naive way looks at every window and adds its items up from scratch. For windows of size <code>k</code> that is about <code>n * k</code> steps. Sliding keeps the sum and updates it with one addition and one subtraction, so it is <code>O(n)</code>. For variable windows, brute force checks every start and end pair (and then checks the rule inside), <code>O(n&sup2;)</code> or <code>O(n&sup3;)</code>. The sliding version moves each edge only forward, so each edge makes at most <code>n</code> moves: <code>O(n)</code> total.</p>
@@ -799,16 +997,47 @@ fun main() {
 <li>A grid and many rectangle-sum questions (the 2D version).</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> a        :   3   1   4   1   5
- prefix p : 0   3   4   8   9  14        p[i] = sum of the first i items
-            ^   ^   ^   ^   ^   ^
-            p0  p1  p2  p3  p4  p5
-
- sum of a[1..3] (1 + 4 + 1 = 6)  =  p[4] - p[1]  =  9 - 3  =  6
-
- Subarray sum = k: a range ends at "now" when
-     p[now] - p[earlier] = k      i.e.   p[earlier] = p[now] - k
- so ask a hash map: "how many earlier prefixes equal p[now] - k?"</pre></div><figcaption>A range sum is the prefix at the end minus the prefix just before the start.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 400" role="img" aria-label="Prefix sums of 3 1 4 1 5 and how a range sum is a difference of two prefixes"><text class="b" x="110" y="78" text-anchor="end">prefix p</text>
+<text class="b" x="110" y="142" text-anchor="end">a</text>
+<rect class="boxp" x="130" y="56" width="64" height="36" rx="6"/>
+<text class="c" x="162.0" y="79.0">0</text>
+<text class="sub c" x="162" y="48">p0</text>
+<rect class="boxo" x="210" y="56" width="64" height="36" rx="6"/>
+<text class="c" x="242.0" y="79.0">3</text>
+<text class="sub c" x="242" y="48">p1</text>
+<rect class="boxp" x="290" y="56" width="64" height="36" rx="6"/>
+<text class="c" x="322.0" y="79.0">4</text>
+<text class="sub c" x="322" y="48">p2</text>
+<rect class="boxp" x="370" y="56" width="64" height="36" rx="6"/>
+<text class="c" x="402.0" y="79.0">8</text>
+<text class="sub c" x="402" y="48">p3</text>
+<rect class="boxo" x="450" y="56" width="64" height="36" rx="6"/>
+<text class="c" x="482.0" y="79.0">9</text>
+<text class="sub c" x="482" y="48">p4</text>
+<rect class="boxp" x="530" y="56" width="64" height="36" rx="6"/>
+<text class="c" x="562.0" y="79.0">14</text>
+<text class="sub c" x="562" y="48">p5</text>
+<rect class="boxb" x="170" y="116" width="64" height="36" rx="6"/>
+<text class="c" x="202.0" y="139.0">3</text>
+<text class="sub c" x="202" y="170">a[0]</text>
+<rect class="boxo" x="250" y="116" width="64" height="36" rx="6"/>
+<text class="c" x="282.0" y="139.0">1</text>
+<text class="sub c" x="282" y="170">a[1]</text>
+<rect class="boxo" x="330" y="116" width="64" height="36" rx="6"/>
+<text class="c" x="362.0" y="139.0">4</text>
+<text class="sub c" x="362" y="170">a[2]</text>
+<rect class="boxo" x="410" y="116" width="64" height="36" rx="6"/>
+<text class="c" x="442.0" y="139.0">1</text>
+<text class="sub c" x="442" y="170">a[3]</text>
+<rect class="boxb" x="490" y="116" width="64" height="36" rx="6"/>
+<text class="c" x="522.0" y="139.0">5</text>
+<text class="sub c" x="522" y="170">a[4]</text>
+<text class="sub" x="130" y="200">p[i] = sum of the first i items</text>
+<text class="b" x="40" y="240">sum of a[1..3]  (1 + 4 + 1 = 6)  =  p[4] - p[1]  =  9 - 3  =  6</text>
+<rect class="boxg" x="40" y="262" width="640" height="106" rx="12"/>
+<text class="b" x="60" y="290">Subarray sum = k: a range ends at "now" when</text>
+<text x="60" y="318">p[now] - p[earlier] = k      i.e.      p[earlier] = p[now] - k</text>
+<text x="60" y="346">so ask a hash map: "how many earlier prefixes equal p[now] - k?"</text></svg><figcaption>A range sum is the prefix at the end minus the prefix just before the start.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>The naive way adds up the range each time you are asked: <code>O(n)</code> per query, so <code>O(n * q)</code> for <code>q</code> queries. With a prefix array: <code>O(n)</code> once to build, then <code>O(1)</code> per query. It costs <code>O(n)</code> extra space.</p>
@@ -882,14 +1111,23 @@ fun main() {
 
 <h3>A brief look at two dimensions</h3>
 <p>For a grid, let <code>p[r][c]</code> be the sum of the rectangle from the top-left corner to just before row <code>r</code>, column <code>c</code>. Any inner rectangle is then four lookups: take the big one, subtract the strip above and the strip to the left, and add back the corner you subtracted twice.</p>
-<figure class="fig"><div class="diagram"><pre> rect(r1,c1 .. r2,c2) = P[r2+1][c2+1]  -  P[r1][c2+1]  -  P[r2+1][c1]  +  P[r1][c1]
-
-      c1        c2
-   +-----------------+
-   |  corner  | above |      big rectangle  minus  above  minus  left
-   |----------+-------+      plus corner (it was removed twice)
-   |  left    | WANT  |
-   +----------+-------+</pre></div></figure>
+<figure class="fig"><svg viewBox="0 0 720 240" role="img" aria-label="2D prefix sum: rectangle equals big prefix minus above minus left plus corner"><text class="b" x="40" y="24">rect(r1,c1 .. r2,c2) = P[r2+1][c2+1]  -  P[r1][c2+1]  -  P[r2+1][c1]  +  P[r1][c1]</text>
+<rect class="boxp" x="90" y="64" width="140" height="70" rx="0"/>
+<text class="c" x="160" y="104">corner</text>
+<rect class="boxr" x="230" y="64" width="220" height="70" rx="0"/>
+<text class="c" x="340" y="104">above</text>
+<rect class="boxr" x="90" y="134" width="140" height="90" rx="0"/>
+<text class="c" x="160" y="184">left</text>
+<rect class="boxg" x="230" y="134" width="220" height="90" rx="0"/>
+<text class="b c" x="340" y="184">WANT</text>
+<text class="sub c" x="230" y="54">c1</text>
+<text class="sub c" x="450" y="54">c2</text>
+<text class="sub" x="80" y="138" text-anchor="end">r1</text>
+<text class="sub" x="80" y="228" text-anchor="end">r2</text>
+<text x="500" y="110">big rectangle  minus  above</text>
+<text x="500" y="134">minus  left</text>
+<text x="500" y="170">plus corner</text>
+<text class="sub" x="500" y="192">(it was removed twice)</text></svg><figcaption>The rectangle sum is the big prefix block, minus the strip above and the strip to the left, plus the corner that was removed twice.</figcaption></figure>
 <div class="try demo"><h3>Run it: rectangle sums on a grid</h3>
 <pre><code>class GridSum(g: Array&lt;IntArray&gt;) {
     private val rows = g.size
@@ -1001,12 +1239,34 @@ fun main() {
 </ul>
 <h3>A new problem: the longest run of consecutive numbers</h3>
 <p>Given unsorted numbers, find the length of the longest run of consecutive values (like 1, 2, 3, 4), in any order. The naive way sorts first: <code>O(n log n)</code>. With a set we can do <code>O(n)</code>: only start counting at a number whose predecessor is missing, because that number is the start of a run.</p>
-<figure class="fig"><div class="diagram"><pre> numbers: 100  4  200  1  3  2          set = {100, 4, 200, 1, 3, 2}
-
-   100 : 99 not in set  -&gt; start of a run.  101? no.   run length 1
-     4 :  3 is in set   -&gt; not a start, skip
-   200 : 199 not in set -&gt; start.  201? no.            run length 1
-     1 :  0 not in set  -&gt; start.  2, 3, 4 are in set. run length 4   &lt;- best</pre></div><figcaption>Each number is walked over as part of exactly one run, so the total work is linear.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 320" role="img" aria-label="Longest consecutive run: walk only from numbers whose predecessor is not in the set"><text class="sub" x="40" y="22">numbers</text>
+<rect class="boxb" x="40" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="65.0" y="52.0">100</text>
+<rect class="boxb" x="96" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="121.0" y="52.0">4</text>
+<rect class="boxb" x="152" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="177.0" y="52.0">200</text>
+<rect class="boxb" x="208" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="233.0" y="52.0">1</text>
+<rect class="boxb" x="264" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="289.0" y="52.0">3</text>
+<rect class="boxb" x="320" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="345.0" y="52.0">2</text>
+<text class="b" x="410" y="53">set = {100, 4, 200, 1, 3, 2}</text>
+<rect class="boxg" x="40" y="96" width="64" height="34" rx="6"/>
+<text class="c" x="72.0" y="118.0">100</text>
+<text x="124" y="118">99 not in set  -&gt; start of a run.  101? no.   run length 1</text>
+<rect class="boxr" x="40" y="148" width="64" height="34" rx="6"/>
+<text class="c" x="72.0" y="170.0">4</text>
+<text x="124" y="170">3 is in set  -&gt; not a start, skip</text>
+<rect class="boxg" x="40" y="200" width="64" height="34" rx="6"/>
+<text class="c" x="72.0" y="222.0">200</text>
+<text x="124" y="222">199 not in set  -&gt; start.  201? no.   run length 1</text>
+<rect class="boxg" x="40" y="252" width="64" height="34" rx="6"/>
+<text class="c" x="72.0" y="274.0">1</text>
+<text x="124" y="274">0 not in set  -&gt; start.  2, 3, 4 are in set.  run length 4</text>
+<rect class="ghost" x="36" y="248" width="640" height="42" rx="10" stroke="#10b981" style="stroke-dasharray:none"/>
+<text class="b" x="600" y="274" fill="#10b981">best</text></svg><figcaption>Each number is walked over as part of exactly one run, so the total work is linear.</figcaption></figure>
 <div class="try demo"><h3>Run it: longest consecutive run with a set</h3>
 <p>The inner <code>while</code> looks scary, but it only runs from the start of a run, never from the middle.</p>
 <pre><code>fun longestConsecutive(a: IntArray): Int {
@@ -1057,16 +1317,70 @@ fun main() {
 <li>The check is <strong>monotonic</strong>: if a value works, every bigger value also works (for &ldquo;smallest&rdquo; problems). So the answers look like <code>no no no yes yes yes</code>.</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> candidate answers:   1   2   3   4   5   6   7   8   9  10
- does it work?        no  no  no  no  no  YES YES YES YES YES
-                                          ^
-                                    smallest that works
-
-   lo=1 ............................................ hi=10
-   mid=5: no  -&gt; lo = 6
-   mid=8: yes -&gt; hi = 8
-   mid=7: yes -&gt; hi = 7
-   mid=6: yes -&gt; hi = 6        lo == hi: answer 6</pre></div><figcaption>Halve the range of answers, keep the half that must contain the boundary between no and yes.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 400" role="img" aria-label="Binary search on the answer: speeds 1 to 10, the first that works is 6, found by halving lo and hi"><text class="sub" x="40" y="22">candidate answers</text>
+<rect class="boxb" x="40" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="67.0" y="52.0">1</text>
+<rect class="boxb" x="102" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="129.0" y="52.0">2</text>
+<rect class="boxb" x="164" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="191.0" y="52.0">3</text>
+<rect class="boxb" x="226" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="253.0" y="52.0">4</text>
+<rect class="boxb" x="288" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="315.0" y="52.0">5</text>
+<rect class="boxb" x="350" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="377.0" y="52.0">6</text>
+<rect class="boxb" x="412" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="439.0" y="52.0">7</text>
+<rect class="boxb" x="474" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="501.0" y="52.0">8</text>
+<rect class="boxb" x="536" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="563.0" y="52.0">9</text>
+<rect class="boxb" x="598" y="30" width="54" height="34" rx="6"/>
+<text class="c" x="625.0" y="52.0">10</text>
+<text class="sub" x="40" y="94">does it work?</text>
+<rect class="boxr" x="40" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="67.0" y="124.0">no</text>
+<rect class="boxr" x="102" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="129.0" y="124.0">no</text>
+<rect class="boxr" x="164" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="191.0" y="124.0">no</text>
+<rect class="boxr" x="226" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="253.0" y="124.0">no</text>
+<rect class="boxr" x="288" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="315.0" y="124.0">no</text>
+<rect class="boxg" x="350" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="377.0" y="124.0">YES</text>
+<rect class="boxg" x="412" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="439.0" y="124.0">YES</text>
+<rect class="boxg" x="474" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="501.0" y="124.0">YES</text>
+<rect class="boxg" x="536" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="563.0" y="124.0">YES</text>
+<rect class="boxg" x="598" y="102" width="54" height="34" rx="6"/>
+<text class="c" x="625.0" y="124.0">YES</text>
+<path d="M377,160 L377,141" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="377" y="176" fill="#10b981">smallest that works</text>
+<path class="rule" d="M40,200 L680,200"/>
+<rect class="boxb" x="40" y="216" width="70" height="32" rx="6"/>
+<text class="c" x="75.0" y="237.0">lo=1</text>
+<rect class="boxb" x="610" y="216" width="70" height="32" rx="6"/>
+<text class="c" x="645.0" y="237.0">hi=10</text>
+<path class="rule" d="M118,232 L602,232" stroke-dasharray="2 5"/>
+<rect class="boxo" x="40" y="262" width="70" height="22" rx="6"/>
+<text class="c" x="75.0" y="278.0">mid=5</text>
+<text x="124" y="279">no  -&gt;  lo = 6</text>
+<rect class="boxo" x="40" y="298" width="70" height="22" rx="6"/>
+<text class="c" x="75.0" y="314.0">mid=8</text>
+<text x="124" y="315">yes  -&gt;  hi = 8</text>
+<rect class="boxo" x="40" y="334" width="70" height="22" rx="6"/>
+<text class="c" x="75.0" y="350.0">mid=7</text>
+<text x="124" y="351">yes  -&gt;  hi = 7</text>
+<rect class="boxo" x="40" y="370" width="70" height="22" rx="6"/>
+<text class="c" x="75.0" y="386.0">mid=6</text>
+<text x="124" y="387">yes  -&gt;  hi = 6</text>
+<rect class="boxg" x="300" y="370" width="260" height="30" rx="6"/>
+<text class="b c" x="430.0" y="390.0">lo == hi: answer 6</text></svg><figcaption>Halve the range of answers, keep the half that must contain the boundary between no and yes.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>The naive way tries every candidate answer from the smallest up, running the check each time. If the answers range up to <code>M</code> and the check costs <code>O(n)</code>, that is <code>O(M * n)</code>. Binary search needs only about <code>log M</code> checks: <code>O(n log M)</code>.</p>
@@ -1221,19 +1535,80 @@ fun main() {
 <li>Bars or buildings, and the biggest rectangle, or the span an item controls.</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> temps:  73  74  75  71  69  72  76  73       days until warmer?
-
- i=0 73: stack []            push 0                 stack (indexes): [0]
- i=1 74: 74 &gt; 73, pop 0 -&gt; answer[0] = 1; push 1    [1]
- i=2 75: 75 &gt; 74, pop 1 -&gt; answer[1] = 1; push 2    [2]
- i=3 71: 71 &lt; 75, just push                         [2, 3]
- i=4 69: just push                                  [2, 3, 4]
- i=5 72: pop 4 (ans 1), pop 3 (ans 2); 72 &lt; 75 push [2, 5]
- i=6 76: pop 5 (ans 1), pop 2 (ans 4); push         [6]
- i=7 73: push                                       [6, 7]  never warmer: 0
-
- Stack holds items still waiting for something bigger. Temperatures on it
- only go down from bottom to top.</pre></div><figcaption>The stack keeps the items that are still waiting for an answer. A bigger arrival answers all the smaller ones on top.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 500" role="img" aria-label="Monotonic stack on temperatures 73 74 75 71 69 72 76 73, showing the stack after each step"><text class="sub" x="40" y="22">temps</text>
+<rect class="boxb" x="40" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="65.0" y="52.0">73</text>
+<rect class="boxb" x="96" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="121.0" y="52.0">74</text>
+<rect class="boxb" x="152" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="177.0" y="52.0">75</text>
+<rect class="boxb" x="208" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="233.0" y="52.0">71</text>
+<rect class="boxb" x="264" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="289.0" y="52.0">69</text>
+<rect class="boxb" x="320" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="345.0" y="52.0">72</text>
+<rect class="boxb" x="376" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="401.0" y="52.0">76</text>
+<rect class="boxb" x="432" y="30" width="50" height="34" rx="6"/>
+<text class="c" x="457.0" y="52.0">73</text>
+<text class="b" x="500" y="53">days until warmer?</text>
+<text class="sub" x="500" y="100">stack (indexes)</text>
+<text class="sub" x="40" y="100">step</text>
+<rect class="boxo" x="40" y="112" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="131.0">i=0  73</text>
+<text x="138" y="131">stack []   push 0</text>
+<rect class="boxp" x="500" y="112" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="131.0">0</text>
+<rect class="boxo" x="40" y="150" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="169.0">i=1  74</text>
+<text x="138" y="169">74 &gt; 73, pop 0 -&gt; answer[0] = 1; push 1</text>
+<rect class="boxp" x="500" y="150" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="169.0">1</text>
+<rect class="boxo" x="40" y="188" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="207.0">i=2  75</text>
+<text x="138" y="207">75 &gt; 74, pop 1 -&gt; answer[1] = 1; push 2</text>
+<rect class="boxp" x="500" y="188" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="207.0">2</text>
+<rect class="boxo" x="40" y="226" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="245.0">i=3  71</text>
+<text x="138" y="245">71 &lt; 75, just push</text>
+<rect class="boxp" x="500" y="226" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="245.0">2</text>
+<rect class="boxp" x="536" y="226" width="32" height="28" rx="6"/>
+<text class="c" x="552.0" y="245.0">3</text>
+<rect class="boxo" x="40" y="264" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="283.0">i=4  69</text>
+<text x="138" y="283">just push</text>
+<rect class="boxp" x="500" y="264" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="283.0">2</text>
+<rect class="boxp" x="536" y="264" width="32" height="28" rx="6"/>
+<text class="c" x="552.0" y="283.0">3</text>
+<rect class="boxp" x="572" y="264" width="32" height="28" rx="6"/>
+<text class="c" x="588.0" y="283.0">4</text>
+<rect class="boxo" x="40" y="302" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="321.0">i=5  72</text>
+<text x="138" y="321">pop 4 (ans 1), pop 3 (ans 2); 72 &lt; 75 push</text>
+<rect class="boxp" x="500" y="302" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="321.0">2</text>
+<rect class="boxp" x="536" y="302" width="32" height="28" rx="6"/>
+<text class="c" x="552.0" y="321.0">5</text>
+<rect class="boxo" x="40" y="340" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="359.0">i=6  76</text>
+<text x="138" y="359">pop 5 (ans 1), pop 2 (ans 4); push</text>
+<rect class="boxp" x="500" y="340" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="359.0">6</text>
+<rect class="boxo" x="40" y="378" width="84" height="28" rx="6"/>
+<text class="c" x="82.0" y="397.0">i=7  73</text>
+<text x="138" y="397">push</text>
+<rect class="boxp" x="500" y="378" width="32" height="28" rx="6"/>
+<text class="c" x="516.0" y="397.0">6</text>
+<rect class="boxp" x="536" y="378" width="32" height="28" rx="6"/>
+<text class="c" x="552.0" y="397.0">7</text>
+<text class="sub" x="620" y="397">never warmer: 0</text>
+<rect class="ghost" x="40" y="424" width="640" height="56" rx="10"/>
+<text class="sub" x="56" y="448">Stack holds items still waiting for something bigger. Temperatures on it</text>
+<text class="sub" x="56" y="466">only go down from bottom to top.</text></svg><figcaption>The stack keeps the items that are still waiting for an answer. A bigger arrival answers all the smaller ones on top.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>The naive way scans to the right from every item until it finds a bigger one: <code>O(n&sup2;)</code> in the worst case (a list that only goes down). With a monotonic stack every item is pushed once and popped at most once, so it is <code>O(n)</code> time and <code>O(n)</code> space. The loop inside a loop is fooled by its own look: the total number of pops can never exceed the number of pushes.</p>
@@ -1385,21 +1760,54 @@ fun main() {
 <li>&ldquo;Merge overlapping&hellip;&rdquo;, &ldquo;insert a new&hellip;&rdquo;, &ldquo;how many at the same time?&rdquo;, &ldquo;do any conflict?&rdquo;</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> Merge after sorting by start:
-
-   time:  1  2  3  4  5  6  7  8  9 10
-   A      [=======]
-   B         [===========]
-   C                           [====]
-   merged [===========]               &lt;- A and B overlap: 1..6
-                               [====] &lt;- C stays alone: 8..10
-
- Meeting rooms: sweep through the sorted starts and sorted ends.
-
-   starts: 0  5 15       ends: 10 20 30       a start before the next end -&gt; a new room
-   (0,30) (5,10) (15,20)                      an end first -&gt; a room frees up
-   at time 5 : 2 rooms busy
-   at time 10: 1 freed, 15 starts: 2 busy again       maximum = 2 rooms</pre></div><figcaption>After sorting, one pass is enough: each interval either extends the last one or starts a new one.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 570" role="img" aria-label="Interval merging after sorting by start, and counting meeting rooms with sorted starts and ends"><text class="b" x="40" y="24">Merge after sorting by start:</text>
+<text class="sub c" x="90" y="50">1</text>
+<text class="sub c" x="150" y="50">2</text>
+<text class="sub c" x="210" y="50">3</text>
+<text class="sub c" x="270" y="50">4</text>
+<text class="sub c" x="330" y="50">5</text>
+<text class="sub c" x="390" y="50">6</text>
+<text class="sub c" x="450" y="50">7</text>
+<text class="sub c" x="510" y="50">8</text>
+<text class="sub c" x="570" y="50">9</text>
+<text class="sub c" x="630" y="50">10</text>
+<text class="sub" x="10" y="50">time</text>
+<rect class="boxb" x="90" y="62" width="180" height="26" rx="6"/>
+<text class="b" x="10" y="80">A</text>
+<rect class="boxb" x="150" y="98" width="240" height="26" rx="6"/>
+<text class="b" x="10" y="116">B</text>
+<rect class="boxp" x="510" y="134" width="120" height="26" rx="6"/>
+<text class="b" x="10" y="152">C</text>
+<path class="rule" d="M40,178 L680,178"/>
+<text class="b" x="10" y="214">merged</text>
+<rect class="boxg" x="90" y="198" width="300" height="26" rx="6"/>
+<text class="sub" x="404" y="216">&lt;- A and B overlap: 1..6</text>
+<rect class="boxg" x="510" y="234" width="120" height="26" rx="6"/>
+<text class="sub" x="496" y="252" text-anchor="end">C stays alone: 8..10 -&gt;</text>
+<path class="rule" d="M40,290 L680,290"/>
+<text class="b" x="40" y="320">Meeting rooms: sweep through the sorted starts and sorted ends.</text>
+<text class="sub" x="40" y="350">intervals</text>
+<text x="120" y="350">(0,30)  (5,10)  (15,20)</text>
+<text class="sub" x="40" y="386">starts</text>
+<rect class="boxb" x="120" y="368" width="44" height="28" rx="6"/>
+<text class="c" x="142.0" y="387.0">0</text>
+<rect class="boxb" x="170" y="368" width="44" height="28" rx="6"/>
+<text class="c" x="192.0" y="387.0">5</text>
+<rect class="boxb" x="220" y="368" width="44" height="28" rx="6"/>
+<text class="c" x="242.0" y="387.0">15</text>
+<text class="sub" x="40" y="424">ends</text>
+<rect class="boxo" x="120" y="406" width="44" height="28" rx="6"/>
+<text class="c" x="142.0" y="425.0">10</text>
+<rect class="boxo" x="170" y="406" width="44" height="28" rx="6"/>
+<text class="c" x="192.0" y="425.0">20</text>
+<rect class="boxo" x="220" y="406" width="44" height="28" rx="6"/>
+<text class="c" x="242.0" y="425.0">30</text>
+<text class="sub" x="320" y="386">a start before the next end  -&gt; a new room</text>
+<text class="sub" x="320" y="424">an end first  -&gt; a room frees up</text>
+<text x="40" y="470">at time 5 : 2 rooms busy</text>
+<text x="40" y="498">at time 10: 1 freed, 15 starts: 2 busy again</text>
+<rect class="boxg" x="40" y="516" width="200" height="32" rx="6"/>
+<text class="b c" x="140.0" y="537.0">maximum = 2 rooms</text></svg><figcaption>After sorting, one pass is enough: each interval either extends the last one or starts a new one.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>Without sorting, merging means comparing every interval with every other one, repeatedly: about <code>O(n&sup2;)</code>. Sorting costs <code>O(n log n)</code> and then the merge is a single <code>O(n)</code> pass, so <code>O(n log n)</code> overall. Counting meeting rooms naively checks every time point against every meeting; the sweep sorts the starts and the ends separately and walks both lists, <code>O(n log n)</code> in total.</p>
@@ -1567,17 +1975,79 @@ fun main() {
 <li>The data may be a stream, too big to keep all of it.</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> k = 3, numbers arrive: 5  1  9  3  7  8
-
-   keep a MIN-heap that never holds more than k items.
-   when it grows past k, throw away the smallest (the weakest on the board).
-
-   add 5   [5]
-   add 1   [1 5]
-   add 9   [1 5 9]
-   add 3   [1 3 5 9]  -&gt; too many, drop 1  -&gt; [3 5 9]
-   add 7   [3 5 7 9]  -&gt; drop 3            -&gt; [5 7 9]
-   add 8   [5 7 8 9]  -&gt; drop 5            -&gt; [7 8 9]    the three largest</pre></div><figcaption>For the k largest we use a min-heap: the smallest of the winners sits on top, ready to be kicked out.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 388" role="img" aria-label="Top k largest with a min-heap of size 3 as numbers 5 1 9 3 7 8 arrive"><text class="b" x="40" y="24">k = 3, numbers arrive: 5  1  9  3  7  8</text>
+<text class="sub" x="40" y="48">keep a MIN-heap that never holds more than k items.</text>
+<text class="sub" x="40" y="66">when it grows past k, throw away the smallest (the weakest on the board).</text>
+<rect class="boxb" x="40" y="88" width="76" height="32" rx="6"/>
+<text class="c" x="78.0" y="109.0">add 5</text>
+<rect class="boxp" x="136" y="88" width="36" height="32" rx="6"/>
+<text class="c" x="154.0" y="109.0">5</text>
+<rect class="boxb" x="40" y="134" width="76" height="32" rx="6"/>
+<text class="c" x="78.0" y="155.0">add 1</text>
+<rect class="boxp" x="136" y="134" width="36" height="32" rx="6"/>
+<text class="c" x="154.0" y="155.0">1</text>
+<rect class="boxp" x="176" y="134" width="36" height="32" rx="6"/>
+<text class="c" x="194.0" y="155.0">5</text>
+<rect class="boxb" x="40" y="180" width="76" height="32" rx="6"/>
+<text class="c" x="78.0" y="201.0">add 9</text>
+<rect class="boxp" x="136" y="180" width="36" height="32" rx="6"/>
+<text class="c" x="154.0" y="201.0">1</text>
+<rect class="boxp" x="176" y="180" width="36" height="32" rx="6"/>
+<text class="c" x="194.0" y="201.0">5</text>
+<rect class="boxp" x="216" y="180" width="36" height="32" rx="6"/>
+<text class="c" x="234.0" y="201.0">9</text>
+<rect class="boxb" x="40" y="226" width="76" height="32" rx="6"/>
+<text class="c" x="78.0" y="247.0">add 3</text>
+<rect class="boxr" x="136" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="154.0" y="247.0">1</text>
+<rect class="boxp" x="176" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="194.0" y="247.0">3</text>
+<rect class="boxp" x="216" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="234.0" y="247.0">5</text>
+<rect class="boxp" x="256" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="274.0" y="247.0">9</text>
+<text class="sub" x="316" y="247">-&gt; too many, drop 1  -&gt;</text>
+<rect class="boxp" x="470" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="488.0" y="247.0">3</text>
+<rect class="boxp" x="510" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="528.0" y="247.0">5</text>
+<rect class="boxp" x="550" y="226" width="36" height="32" rx="6"/>
+<text class="c" x="568.0" y="247.0">9</text>
+<rect class="boxb" x="40" y="272" width="76" height="32" rx="6"/>
+<text class="c" x="78.0" y="293.0">add 7</text>
+<rect class="boxr" x="136" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="154.0" y="293.0">3</text>
+<rect class="boxp" x="176" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="194.0" y="293.0">5</text>
+<rect class="boxp" x="216" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="234.0" y="293.0">7</text>
+<rect class="boxp" x="256" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="274.0" y="293.0">9</text>
+<text class="sub" x="316" y="293">-&gt; too many, drop 3  -&gt;</text>
+<rect class="boxp" x="470" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="488.0" y="293.0">5</text>
+<rect class="boxp" x="510" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="528.0" y="293.0">7</text>
+<rect class="boxp" x="550" y="272" width="36" height="32" rx="6"/>
+<text class="c" x="568.0" y="293.0">9</text>
+<rect class="boxb" x="40" y="318" width="76" height="32" rx="6"/>
+<text class="c" x="78.0" y="339.0">add 8</text>
+<rect class="boxr" x="136" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="154.0" y="339.0">5</text>
+<rect class="boxp" x="176" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="194.0" y="339.0">7</text>
+<rect class="boxp" x="216" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="234.0" y="339.0">8</text>
+<rect class="boxp" x="256" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="274.0" y="339.0">9</text>
+<text class="sub" x="316" y="339">-&gt; too many, drop 5  -&gt;</text>
+<rect class="boxg" x="470" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="488.0" y="339.0">7</text>
+<rect class="boxg" x="510" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="528.0" y="339.0">8</text>
+<rect class="boxg" x="550" y="318" width="36" height="32" rx="6"/>
+<text class="c" x="568.0" y="339.0">9</text>
+<text class="b" x="470" y="372" fill="#10b981">the three largest</text></svg><figcaption>For the k largest we use a min-heap: the smallest of the winners sits on top, ready to be kicked out.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>The naive way sorts everything, <code>O(n log n)</code>, then takes the first <code>k</code>. The heap never holds more than <code>k</code> items, so every push or pop costs <code>O(log k)</code> and the total is <code>O(n log k)</code> with <code>O(k)</code> space. When <code>k</code> is small compared to <code>n</code>, this is a real saving, and it works on streams.</p>
@@ -1649,13 +2119,49 @@ fun main() {
 <p>Sometimes the rules say: do it in the same array, with <code>O(1)</code> extra space. Two small ideas cover a lot of ground.</p>
 <h3>The Dutch national flag</h3>
 <p><strong>The clue:</strong> the array has only a few distinct values (like 0, 1 and 2) and you must group them together in one pass. Keep three zones with three pointers: everything before <code>lo</code> is 0, everything from <code>hi + 1</code> on is 2, and <code>mid</code> scans the unknown middle.</p>
-<figure class="fig"><div class="diagram"><pre>   0 0 0 | 1 1 1 | ? ? ? ? | 2 2
-         ^       ^         ^
-         lo      mid       hi
-
-   a[mid] == 0 : swap with lo, lo++, mid++
-   a[mid] == 1 : mid++
-   a[mid] == 2 : swap with hi, hi--          (mid stays: the swapped-in value is unknown)</pre></div><figcaption>Three zones and one scanner. One pass, no extra array.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 300" role="img" aria-label="Dutch national flag: zones of 0s, 1s, unknown and 2s with lo, mid and hi pointers"><rect class="boxb" x="60" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="78.0" y="64.0">0</text>
+<rect class="boxb" x="100" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="118.0" y="64.0">0</text>
+<rect class="boxb" x="140" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="158.0" y="64.0">0</text>
+<path class="rule" d="M186,38 L186,80"/>
+<rect class="boxg" x="194" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="212.0" y="64.0">1</text>
+<rect class="boxg" x="234" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="252.0" y="64.0">1</text>
+<rect class="boxg" x="274" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="292.0" y="64.0">1</text>
+<path class="rule" d="M320,38 L320,80"/>
+<rect class="ghost" x="328" y="40" width="36" height="38" rx="6"/>
+<text class="sub c" x="346" y="65">?</text>
+<rect class="ghost" x="368" y="40" width="36" height="38" rx="6"/>
+<text class="sub c" x="386" y="65">?</text>
+<rect class="ghost" x="408" y="40" width="36" height="38" rx="6"/>
+<text class="sub c" x="426" y="65">?</text>
+<rect class="ghost" x="448" y="40" width="36" height="38" rx="6"/>
+<text class="sub c" x="466" y="65">?</text>
+<path class="rule" d="M494,38 L494,80"/>
+<rect class="boxp" x="502" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="520.0" y="64.0">2</text>
+<rect class="boxp" x="542" y="40" width="36" height="38" rx="6"/>
+<text class="c" x="560.0" y="64.0">2</text>
+<path d="M212,104 L212,85" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="212" y="120" fill="#f59e0b">lo</text>
+<path d="M346,104 L346,85" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="346" y="120" fill="#3b82f6">mid</text>
+<path d="M466,104 L466,85" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+<text class="b c" x="466" y="120" fill="#ef4444">hi</text>
+<rect class="boxb" x="40" y="156" width="130" height="30" rx="6"/>
+<text class="c" x="105.0" y="176.0">a[mid] == 0</text>
+<text x="190" y="177">swap with lo, lo++, mid++</text>
+<rect class="boxg" x="40" y="200" width="130" height="30" rx="6"/>
+<text class="c" x="105.0" y="220.0">a[mid] == 1</text>
+<text x="190" y="221">mid++</text>
+<rect class="boxp" x="40" y="244" width="130" height="30" rx="6"/>
+<text class="c" x="105.0" y="264.0">a[mid] == 2</text>
+<text x="190" y="265">swap with hi, hi--</text>
+<text class="sub" x="190" y="284">(mid stays: the swapped-in value is unknown)</text></svg><figcaption>Three zones and one scanner. One pass, no extra array.</figcaption></figure>
 
 <h3>Cyclic sort</h3>
 <p><strong>The clue:</strong> numbers are in a known range such as <code>0..n</code> or <code>1..n</code>, and you must find the missing or duplicate one. Since value <code>v</code> belongs at index <code>v</code>, put each number straight into its home by swapping. Then any index whose value is wrong tells you the answer. Each swap fixes at least one number for good, so it is <code>O(n)</code> time, <code>O(1)</code> space.</p>
@@ -1747,20 +2253,57 @@ fun main() {
 <li>A small set of yes/no options, stored as one number (a <strong>bitmask</strong>), for example all subsets of 10 items as the numbers 0 to 1023.</li>
 </ul>
 <h3>The picture</h3>
-<figure class="fig"><div class="diagram"><pre> XOR cancels equal numbers:  x xor x = 0   and   x xor 0 = x
-
-   4 xor 1 xor 2 xor 1 xor 2
- = 4 xor (1 xor 1) xor (2 xor 2)
- = 4 xor 0 xor 0
- = 4                                         the single number
-
- n and (n - 1) clears the lowest 1-bit:
-
-   n      = 0 1 1 0 0       (12)
-   n - 1  = 0 1 0 1 1       (11)
-   n &amp; n-1= 0 1 0 0 0       (8)     one 1-bit removed
-
- power of two = exactly one 1-bit, so  n &gt; 0 and (n and (n-1)) == 0</pre></div><figcaption>XOR makes pairs vanish. Subtracting one flips the lowest 1-bit and the zeros below it.</figcaption></figure>
+<figure class="fig"><svg viewBox="0 0 720 500" role="img" aria-label="XOR cancels equal numbers, and n and n-1 clears the lowest 1-bit, which tests for a power of two"><text class="b" x="40" y="24">XOR cancels equal numbers:  x xor x = 0   and   x xor 0 = x</text>
+<rect class="boxp" x="40" y="40" width="430" height="128" rx="12"/>
+<text x="60" y="68">4 xor 1 xor 2 xor 1 xor 2</text>
+<text x="60" y="96">= 4 xor (1 xor 1) xor (2 xor 2)</text>
+<text x="60" y="124">= 4 xor 0 xor 0</text>
+<text class="b" x="60" y="152">= 4</text>
+<rect class="boxg" x="500" y="120" width="120" height="34" rx="6"/>
+<text class="b c" x="560.0" y="142.0">4</text>
+<text class="sub" x="500" y="112">the single number</text>
+<path class="rule" d="M40,190 L680,190"/>
+<text class="b" x="40" y="218">n and (n - 1) clears the lowest 1-bit:</text>
+<text class="b" x="150" y="263" text-anchor="end">n</text>
+<rect class="box" x="170" y="240" width="38" height="34" rx="6"/>
+<text class="c" x="189.0" y="262.0">0</text>
+<rect class="box" x="214" y="240" width="38" height="34" rx="6"/>
+<text class="c" x="233.0" y="262.0">1</text>
+<rect class="boxo" x="258" y="240" width="38" height="34" rx="6"/>
+<text class="c" x="277.0" y="262.0">1</text>
+<rect class="box" x="302" y="240" width="38" height="34" rx="6"/>
+<text class="c" x="321.0" y="262.0">0</text>
+<rect class="box" x="346" y="240" width="38" height="34" rx="6"/>
+<text class="c" x="365.0" y="262.0">0</text>
+<text x="400" y="263">(12)</text>
+<text class="b" x="150" y="313" text-anchor="end">n - 1</text>
+<rect class="box" x="170" y="290" width="38" height="34" rx="6"/>
+<text class="c" x="189.0" y="312.0">0</text>
+<rect class="box" x="214" y="290" width="38" height="34" rx="6"/>
+<text class="c" x="233.0" y="312.0">1</text>
+<rect class="boxo" x="258" y="290" width="38" height="34" rx="6"/>
+<text class="c" x="277.0" y="312.0">0</text>
+<rect class="boxo" x="302" y="290" width="38" height="34" rx="6"/>
+<text class="c" x="321.0" y="312.0">1</text>
+<rect class="boxo" x="346" y="290" width="38" height="34" rx="6"/>
+<text class="c" x="365.0" y="312.0">1</text>
+<text x="400" y="313">(11)</text>
+<text class="b" x="150" y="363" text-anchor="end">n &amp; n-1</text>
+<rect class="box" x="170" y="340" width="38" height="34" rx="6"/>
+<text class="c" x="189.0" y="362.0">0</text>
+<rect class="box" x="214" y="340" width="38" height="34" rx="6"/>
+<text class="c" x="233.0" y="362.0">1</text>
+<rect class="boxg" x="258" y="340" width="38" height="34" rx="6"/>
+<text class="c" x="277.0" y="362.0">0</text>
+<rect class="box" x="302" y="340" width="38" height="34" rx="6"/>
+<text class="c" x="321.0" y="362.0">0</text>
+<rect class="box" x="346" y="340" width="38" height="34" rx="6"/>
+<text class="c" x="365.0" y="362.0">0</text>
+<text x="400" y="363">(8)</text>
+<text class="sub" x="450" y="363">one 1-bit removed</text>
+<rect class="boxg" x="40" y="420" width="640" height="60" rx="12"/>
+<text x="60" y="446">power of two = exactly one 1-bit, so</text>
+<text class="b" x="60" y="468">n &gt; 0 and (n and (n-1)) == 0</text></svg><figcaption>XOR makes pairs vanish. Subtracting one flips the lowest 1-bit and the zeros below it.</figcaption></figure>
 
 <h3>Naive versus pattern</h3>
 <p>To find the number that appears once, you could count with a hash map: <code>O(n)</code> time and <code>O(n)</code> space. XOR does it in <code>O(n)</code> time and <code>O(1)</code> space. To count set bits you could loop over all 32 positions. The <code>n and (n - 1)</code> trick loops only as many times as there are 1-bits.</p>
@@ -1915,8 +2458,8 @@ fun countOnes(n: Int): Int {
 
 <h2 id="catalogue">14. Complete pattern catalogue</h2>
 
-<p>The sections above teach the most common patterns in depth. To make sure nothing is missing, this catalogue merges two popular cheat sheets: <a href="https://www.grokkingthecodinginterview.com/blog/dsa-patterns-cheat-sheet" target="_blank" rel="noopener">Grokking the Coding Interview</a> (30 common and 11 advanced patterns) and <a href="https://algoark.io/cheatsheet" target="_blank" rel="noopener">AlgoArk</a> (29 patterns), plus the Dutch flag from section 11. Duplicates are merged, which leaves <strong>49 patterns</strong>.</p>
-<p>The <span class="pop">&#9733; Popular</span> mark is my judgment, not a measured statistic: <strong>23 patterns</strong> that you will meet in most interview loops and in everyday code. Neither source ranks its patterns; Grokking only suggests starting with two pointers, sliding window, hash maps and prefix sums. The <em>Where</em> column links to the section of this series that teaches the pattern. Patterns marked <em>Summary here</em> are not taught in this series, so the table row is the summary: the clue, the idea and the cost. Open a family to see its list; popular patterns come first.</p>
+<p>The sections above teach the most common patterns in depth. To make sure nothing is missing, this catalogue merges two popular cheat sheets: the Grokking patterns cheat sheet (30 common and 11 advanced patterns) and <a href="https://algoark.io/cheatsheet" target="_blank" rel="noopener">AlgoArk</a> (29 patterns), plus the Dutch flag from section 11. Duplicates are merged, which leaves <strong>49 patterns</strong>.</p>
+<p>The <span class="pop">&#9733; Popular</span> mark is my judgment, not a measured statistic: <strong>23 patterns</strong> that you will meet again and again in everyday code. Neither source ranks its patterns; Grokking only suggests starting with two pointers, sliding window, hash maps and prefix sums. The <em>Where</em> column links to the section of this series that teaches the pattern. Patterns marked <em>Summary here</em> are not taught in this series, so the table row is the summary: the clue, the idea and the cost. Open a family to see its list; popular patterns come first.</p>
 <details class="conv"><summary><span>Arrays and strings<small>12 patterns, 6 popular</small></span></summary>
 <table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
 <tr><td><strong>Two pointers</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Sorted input, pair or triple, both ends, in-place edits</td><td>O(n); O(1)</td><td>&#9733;</td><td><a href="#two-pointers">This part §2</a></td></tr>

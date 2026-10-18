@@ -198,19 +198,22 @@
 
 <p>How fast is a piece of code? Seconds depend on your laptop, the language and what else is running. Computer scientists count something steadier: <strong>how many basic steps the work takes as the input grows</strong>. We call the input size <code>n</code>.</p>
 <p>Big-O notation keeps only the part that matters when <code>n</code> gets large. It drops constants and smaller terms, because <code>3n + 10</code> and <code>n</code> grow the same way: in a straight line. We write that as <code>O(n)</code>, read &ldquo;order n&rdquo;.</p>
-<figure class="fig"><div class="diagram"><pre> steps
-   ^
-   |                                          / O(n^2)
-   |                                       /
-   |                                    /          ___---  O(n log n)
-   |                                /      __---
-   |                             /   __---       ________  O(n)
-   |                          /__---   ________--
-   |                    __--------_---
-   |       _______------___----
-   |  ___--___________________________________  O(log n)
-   | /.................................................... O(1)
-   +--------------------------------------------------&gt; n (input size)</pre></div><figcaption>The shapes of the common growth rates. Small inputs hide the differences; large inputs make them huge.</figcaption></figure>
+<figure class="fig">
+<svg viewBox="0 0 700 340" role="img" aria-label="Growth curves of O(1), O(log n), O(n), O(n log n) and O(n^2) as input size n grows">
+<path class="arrow" d="M60,300 L60,16"/><path class="arrow" d="M60,300 L670,300"/>
+<text class="sub" x="70" y="24">steps</text><text class="sub" x="590" y="322">n (input size)</text>
+<path d="M60,275 L560,275" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+<path d="M60,295 Q110,245 560,212" fill="none" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"/>
+<path d="M60,298 L560,150" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+<path d="M60,298 Q300,230 560,80" fill="none" stroke="#a855f7" stroke-width="3" stroke-linecap="round"/>
+<path d="M60,298 Q330,290 470,30" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+<text class="b" x="572" y="279" fill="#10b981" style="fill:#10b981">O(1)</text>
+<text class="b" x="572" y="216" style="fill:#06b6d4">O(log n)</text>
+<text class="b" x="572" y="154" style="fill:#3b82f6">O(n)</text>
+<text class="b" x="572" y="84" style="fill:#a855f7">O(n log n)</text>
+<text class="b" x="482" y="36" style="fill:#ef4444">O(n&#178;)</text>
+</svg>
+<figcaption>The shapes of the common growth rates. Small inputs hide the differences; large inputs make them huge.</figcaption></figure>
 <table><tr><th>Class</th><th>Name</th><th>Example</th><th>Doubling n does&hellip;</th></tr><tr><td>O(1)</td><td>constant</td><td>read <code>list[5]</code></td><td>nothing</td></tr><tr><td>O(log n)</td><td>logarithmic</td><td>binary search</td><td>adds one step</td></tr><tr><td>O(n)</td><td>linear</td><td>find the maximum</td><td>doubles the work</td></tr><tr><td>O(n log n)</td><td>linearithmic</td><td>good sorting</td><td>a little more than doubles</td></tr><tr><td>O(n&sup2;)</td><td>quadratic</td><td>compare every pair</td><td>quadruples the work</td></tr><tr><td>O(2&#8319;)</td><td>exponential</td><td>try every subset</td><td>squares the work</td></tr></table>
 
 <h3>Reading Big-O from code</h3>
