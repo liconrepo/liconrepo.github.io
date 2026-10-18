@@ -164,7 +164,7 @@
       transition: border-color .18s;
     }
     .contact-form input:focus, .contact-form textarea:focus { border-color: var(--border-h); }
-    .contact-form textarea { min-height: 140px; resize: vertical; }
+    .contact-form textarea { height: 124px; min-height: 124px; max-height: 124px; resize: none; overflow-y: auto; }
     .contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .contact-form button { justify-self: start; cursor: pointer; font: inherit; }
     @media(max-width:720px){ .contact-row { grid-template-columns: 1fr; } }
@@ -216,7 +216,7 @@
     .tray-grip { display: flex; justify-content: center; padding: 10px 0 4px; cursor: grab; touch-action: none; }
     .tray-grip i { width: 38px; height: 4px; border-radius: 2px; background: var(--muted); opacity: .55; }
     @media(prefers-reduced-motion: reduce) { .tray.anim { transition: none; } }
-    .tablet-body { padding: 10px 26px 18px; min-height: 520px; }
+    .tablet-body { padding: 10px 26px 18px; height: 520px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
     .tv:not([hidden]) { animation: tvIn .28s ease both; }
     @keyframes tvIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
     .tablet .contact-form { max-width: none; }
@@ -243,7 +243,7 @@
     .tv-clear { display: block; margin: 0 auto; padding: 8px 18px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); color: var(--sub); font: inherit; font-size: calc(12px * var(--fs, 1)); cursor: pointer; }
     .tv-clear:hover { border-color: var(--border-h); color: var(--text); }
     .rc-empty { color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
-    @media(max-width:720px){ .tablet { padding: 10px; border-radius: 24px; } .tablet::before { display: none; } .tablet-body { padding: 8px 14px 14px; min-height: 0; } .tablet-nav { gap: 36px; } .tablet-status .tv-title { display: none; } }
+    @media(max-width:720px){ .tablet { padding: 10px; border-radius: 24px; } .tablet::before { display: none; } .tablet-body { padding: 8px 14px 14px; height: 520px; } .tablet-nav { gap: 36px; } .tablet-status .tv-title { display: none; } }
 
 
     .sp-top { display: flex; gap: 8px; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); }
@@ -896,25 +896,25 @@
       <div class="exp-card reveal" style="--c:#d4244f">
         <div class="exp-date">Feb 2020 &ndash; Present</div>
         <div class="exp-dur" data-since="2020-02"></div>
-        <div class="exp-co"><span class="exp-logo"><img src="logos/rakuten.svg" alt="" width="22" height="22" loading="lazy"></span><div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo"><img src="logos/e39f4ccf-92dd-498b-8d27-cb496224af0b.svg" alt="" width="22" height="22" loading="lazy"></span><div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Tokyo, Japan</div>
       </div>
       <div class="exp-card reveal d1" style="--c:#d4244f">
         <div class="exp-date">Feb 2018 &ndash; Jan 2020</div>
         <div class="exp-dur">2 yrs</div>
-        <div class="exp-co"><span class="exp-logo tight"><img src="logos/mercari.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="logos/9c65415d-b428-43bd-975c-1a9f1c47488d.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Tokyo, Japan</div>
       </div>
       <div class="exp-card reveal d2" style="--c:#f2542d">
         <div class="exp-date">Aug 2015 &ndash; Jan 2018</div>
         <div class="exp-dur">2 yrs 6 mos</div>
-        <div class="exp-co"><span class="exp-logo tight"><img src="logos/sun-asterisk.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="logos/f286ae30-30f5-4340-a59e-1eea0d0e45d0.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Hanoi, Vietnam</div>
       </div>
       <div class="exp-card reveal d3" style="--c:#00a878">
         <div class="exp-date">Nov 2014 &ndash; Jul 2015</div>
         <div class="exp-dur">9 mos</div>
-        <div class="exp-co"><span class="exp-logo tight"><img src="logos/lantas.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
+        <div class="exp-co"><span class="exp-logo tight"><img src="logos/f8c9752f-7ee6-4f13-a97c-938a00e1e6f9.png" alt="" width="40" height="40" loading="lazy"></span><div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div></div>
         <div class="exp-meta">Dhaka, Bangladesh</div>
       </div>
     </div>
@@ -1461,7 +1461,7 @@
     <p class="section-label">Education</p>
     <div class="edu-card reveal">
       <div class="edu-badge">
-        <img src="ru-logo.svg" alt="University of Rajshahi logo" width="56" height="56" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:14px;font-weight:700;color:#1a2540\'>RU</span>')">
+        <img src="logos/310e1d46-9e86-4477-895f-403f9d5a40c9.svg" alt="University of Rajshahi logo" width="56" height="56" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentHTML('beforeend','<span style=\'font-size:14px;font-weight:700;color:#1a2540\'>RU</span>')">
       </div>
       <div class="edu-text">
         <div class="edu-degree">Bachelor of Science &mdash; Computer Science &amp; Engineering</div>
