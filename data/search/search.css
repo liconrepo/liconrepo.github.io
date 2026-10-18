@@ -46,9 +46,8 @@
 .search-item mark { background: rgba(250,204,21,0.45); color: inherit; border-radius: 3px; }
 .search-empty { padding: 24px; text-align: center; color: var(--muted); font-size: calc(13px * var(--fs, 1)); }
 .search-hint { padding: 8px 16px; border-top: 1px solid var(--border); font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
-.search-btn:focus-visible, .search-item:focus-visible, .hamburger:focus-visible { outline: 2px solid var(--accent, #3b82f6); outline-offset: 2px; }
+.search-btn:focus-visible, .search-item:focus-visible { outline: 2px solid var(--accent, #3b82f6); outline-offset: 2px; }
 .search-hit { outline: 2px solid rgba(250,204,21,0.8); outline-offset: 4px; border-radius: 10px; transition: outline-color .6s; }
-.hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--muted); font-size: calc(20px * var(--fs, 1)); }
 
 .sp-top { display: flex; gap: 8px; padding: 14px 14px 12px; border-bottom: 1px solid var(--border); }
 .sp-input { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; color: var(--muted);
@@ -72,8 +71,9 @@
 }
 
 @media (max-width: 720px) {
-  .hamburger { display: block; }
-  .search-btn:not(.settings-btn) { display: none; }
+  /* phones: the Search button shrinks to just the magnifier */
+  .search-btn .sb-label, .search-btn kbd { display: none; }
+  .search-btn { padding: 8px 10px; }
 }
 
 [data-theme="dark"] .search-overlay { background: rgba(0,0,0,0.6); }

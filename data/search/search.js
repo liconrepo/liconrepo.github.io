@@ -36,7 +36,7 @@
     if (nav) {
       var back = nav.querySelector('a:not(.logo)');
       var wrap = document.createElement('div'); wrap.className = 'nav-right';
-      wrap.innerHTML = '<button type="button" class="search-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sb-label">Search</span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K') + '</kbd></button><button type="button" class="hamburger" aria-label="Search">&#9776;</button>';
+      wrap.innerHTML = '<button type="button" class="search-btn" aria-label="Search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sb-label">Search</span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K') + '</kbd></button>';
       wrap.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', openSearch); });
       if (back) { nav.replaceChild(wrap, back); wrap.appendChild(back); back.style.marginLeft = '6px'; } else nav.appendChild(wrap);
     }
