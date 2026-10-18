@@ -67,7 +67,7 @@
     }
 
     /* all content above bg */
-    nav, .hero-wrap, .stats-wrap, .container, footer { position: relative; z-index: 1; }
+    nav, .hero-wrap, .container, footer { position: relative; z-index: 1; }
 
     /* ────────────────── NAV ────────────────── */
     nav {
@@ -246,8 +246,6 @@
     [data-theme="dark"] .avatar-ring { border-color: rgba(255,255,255,0.1); }
     [data-theme="dark"] .tag { background: rgba(255,255,255,0.04); }
     [data-theme="dark"] .tag:hover { background: rgba(255,255,255,0.08); }
-    [data-theme="dark"] .exp-line { background: linear-gradient(to top, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.07) 60%, transparent 100%); }
-    [data-theme="dark"] .exp-line::after { background: #a1a1aa; }
     [data-theme="dark"] .blog-card:hover,
     [data-theme="dark"] .interest-chip:hover { box-shadow: 0 16px 40px rgba(0,0,0,0.5); }
     [data-theme="dark"] .footer-watermark { color: rgba(255,255,255,0.07); }
@@ -380,7 +378,6 @@
     .btn-ghost:hover { color: var(--text); border-color: var(--border-h); background: var(--card-h); transform: translateY(-1px); }
 
     /* ────────────────── STATS ────────────────── */
-    .stats-wrap { max-width: 860px; margin: 0 auto; padding: 0 40px 72px; }
     .stats {
       display: grid; grid-template-columns: repeat(4,1fr);
       border: 1px solid var(--border); border-radius: 16px;
@@ -435,63 +432,28 @@
     .country-name { font-size: calc(15px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.2px; }
     .country-companies { font-size: calc(11px * var(--fs, 1)); color: var(--muted); letter-spacing: .2px; line-height: 1.6; }
 
-    /* ────────────────── EXPERIENCE (timeline) ────────────────── */
-    .exp-list { position: relative; display: flex; flex-direction: column; gap: 72px; padding: 8px 0; }
-    .exp-line {
-      position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%);
-      background: linear-gradient(to top, var(--border-h) 0%, var(--border) 60%, transparent 100%);
+    /* ────────────────── EXPERIENCE (compact table with duration bars) ────────────────── */
+    .exp-list { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--card); }
+    .exp-head, .exp-card {
+      display: grid; grid-template-columns: 160px 100px minmax(0, 1fr) 150px; column-gap: 16px; align-items: center; padding: 16px 22px;
     }
-    .exp-line::after {
-      content: ''; position: absolute; bottom: 0; left: 50%; width: 10px; height: 10px; border-radius: 50%;
-      background: var(--sub); transform: translate(-50%, 50%);
-      animation: timelinePulse 1.5s ease-in-out infinite;
+    .exp-head { padding-top: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); font-size: calc(10px * var(--fs, 1)); font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); }
+    .exp-card { transition: background .2s; }
+    .exp-card + .exp-card { border-top: 1px solid var(--border); }
+    .exp-card:hover { background: var(--card-h); }
+    .exp-date { font-size: calc(12px * var(--fs, 1)); font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--sub); }
+    .exp-date .now { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--c); animation: expNow 1.6s ease-in-out infinite; }
+    @keyframes expNow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 50%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+    .exp-dur { font-size: calc(13px * var(--fs, 1)); color: var(--sub); }
+    .exp-company { font-size: calc(15px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.2px; }
+    .exp-title   { font-size: calc(12px * var(--fs, 1)); color: var(--muted); margin-top: 2px; }
+    .exp-meta    { font-size: calc(13px * var(--fs, 1)); color: var(--sub); }
+    @media(max-width:720px){
+      .exp-head { display: none; }
+      .exp-card { grid-template-columns: 1fr; row-gap: 4px; padding: 16px 18px; }
     }
-    @keyframes timelinePulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(113,113,122,0.45); }
-      50%     { box-shadow: 0 0 0 8px rgba(113,113,122,0); }
-    }
-    .exp-card { position: relative; display: grid; grid-template-columns: 1fr 1fr; column-gap: 64px; }
-    .exp-info { min-width: 0; }
-    .exp-card:nth-child(odd) .exp-info  { grid-column: 1; text-align: right; }
-    .exp-card:nth-child(even) .exp-info { grid-column: 2; }
-    .exp-date {
-      font-size: calc(12px * var(--fs, 1)); font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--c);
-    }
-    .exp-title   { font-size: calc(20px * var(--fs, 1)); font-weight: 700; color: var(--text); letter-spacing: -.4px; line-height: 1.25; margin-top: 8px; }
-    .exp-company { font-size: calc(14px * var(--fs, 1)); font-weight: 500; color: var(--c); margin-top: 4px; }
-    .exp-meta    { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 8px; }
-    .exp-marker {
-      position: absolute; top: 2px; left: 50%; width: 36px; height: 36px; margin-left: -18px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .exp-marker-ring {
-      position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--c); opacity: .35;
-      animation: markerRing 2.5s ease-out infinite;
-    }
-    @keyframes markerRing {
-      0%   { transform: scale(.85); opacity: .6; }
-      100% { transform: scale(1.4); opacity: 0; }
-    }
-    .exp-marker-icon {
-      position: relative; width: 36px; height: 36px; border-radius: 50%; background: var(--c); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 3px var(--bg), 0 0 20px 4px color-mix(in srgb, var(--c) 30%, transparent);
-      transition: transform .3s, box-shadow .3s;
-    }
-    .exp-card:hover .exp-marker-icon { transform: scale(1.15); }
-    .exp-marker-icon svg { width: 16px; height: 16px; }
 
     /* ────────────────── SKILLS ────────────────── */
-    .skills-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
-    .skill-group {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 22px; transition: border-color .2s;
-    }
-    .skill-group:hover { border-color: var(--border-h); }
-    .skill-group h3 {
-      font-size: calc(10px * var(--fs, 1)); font-weight: 600; letter-spacing: 1.8px;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
-    }
     .tags { display: flex; flex-wrap: wrap; gap: 7px; }
     .tag {
       background: rgba(0,0,0,0.03); border: 1px solid var(--border);
@@ -609,7 +571,6 @@
     /* stretched link: the title link covers the whole card; the other links sit above it */
     .oss-name::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
     .oss-links a { position: relative; z-index: 1; }
-    .oss-license { font-size: calc(10px * var(--fs, 1)); color: var(--muted); letter-spacing: .6px; text-transform: uppercase; }
     .oss-desc { font-size: calc(13px * var(--fs, 1)); color: var(--sub); margin-top: 8px; line-height: 1.7; }
     .oss-links { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; font-size: calc(13px * var(--fs, 1)); }
     .oss-links a { color: var(--sub); text-decoration: none; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
@@ -692,7 +653,61 @@
     .footer-copy { color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: .2px; }
 
     /* Avatar entrance */
-    .avatar-wrap { animation: avatarIn 1s cubic-bezier(.16,1,.3,1) both; }
+
+
+    /* ────────────────── SKILLS TREE ────────────────── */
+    .stree { font-size: calc(13px * var(--fs, 1)); }
+    .st-root { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: var(--text); color: var(--bg); font-weight: 600; letter-spacing: -.1px; }
+    .st-root::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #e11d48; }
+    .st-groups { list-style: none; margin: 0 0 0 20px; padding: 0 0 0 20px; }
+    .st-group { position: relative; padding: 3px 0; }
+    .st-group::before { content: ''; position: absolute; left: -20px; top: 20px; width: 16px; border-top: 1.5px solid var(--border-h); }
+    .st-group::after { content: ''; position: absolute; left: -20px; top: 0; bottom: 0; border-left: 1.5px solid var(--border-h); }
+    .st-group:last-child::after { bottom: auto; height: 21px; }
+    .st-groups { padding-top: 4px; margin-top: 0; }
+    .st-btn { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); font: inherit; font-weight: 500; cursor: pointer; text-align: left; transition: all .18s; }
+    .st-btn:hover { border-color: var(--border-h); background: var(--card-h); }
+    .st-group.open > .st-btn { border-color: rgba(225,29,72,0.45); background: rgba(225,29,72,0.07); }
+    .st-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .st-caret { color: var(--muted); font-size: 11px; transition: transform .2s; }
+    .st-group.open .st-caret { transform: rotate(90deg); color: #e11d48; }
+    .st-leaves { display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; max-height: 0; overflow: hidden; margin-left: 14px; padding-left: 14px; border-left: 1.5px solid rgba(225,29,72,0.4); opacity: 0; transition: max-height .35s ease, opacity .25s, margin .25s, padding .25s; }
+    .st-group.open > .st-leaves { max-height: 600px; opacity: 1; margin-top: 8px; margin-bottom: 4px; padding-top: 2px; padding-bottom: 2px; }
+    .st-leaves .tag { padding: 3px 9px; font-size: calc(11px * var(--fs, 1)); }
+
+    /* ────────────────── SKILLS HUB + TREE (desktop); the plain tree above is the small-screen fallback ────────────────── */
+    .rm { display: flex; align-items: center; justify-content: center; gap: 32px; width: min(1200px, calc(100vw - 48px)); margin-left: calc((100% - min(1200px, 100vw - 48px)) / 2); min-height: 280px; }
+    .rm-hubcol { flex-shrink: 0; width: 400px; }
+    .rm-stage { position: relative; width: 400px; height: 400px; }
+    .rm-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .rm-lines line { stroke: var(--border-h); stroke-width: 1.5; stroke-dasharray: 3 5; transition: stroke .25s; }
+    .rm-lines line.on { stroke: var(--c); stroke-dasharray: none; }
+    .rm-hub, .rm-petal { position: absolute; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font: inherit; cursor: pointer; transition: transform .35s cubic-bezier(.16,1,.3,1), opacity .25s, background .25s, border-color .25s, box-shadow .25s; }
+    .rm-hub { left: 200px; top: 200px; width: 108px; height: 108px; margin: -54px 0 0 -54px; background: var(--text); color: var(--bg); border: none; font-weight: 700; font-size: calc(17px * var(--fs, 1)); line-height: 1.2; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .rm-hub:hover { transform: scale(1.06); }
+    .rm-hub.on { box-shadow: 0 0 0 5px color-mix(in srgb, var(--text) 18%, transparent), 0 10px 30px rgba(0,0,0,0.2); }
+    .rm-net { width: 100%; height: 420px; display: block; cursor: grab; touch-action: pan-y; }
+    .rm-net.dragging { cursor: grabbing; }
+    .rm-petal { width: 100px; height: 100px; margin: -50px 0 0 -50px; background: var(--card); color: var(--text); border: 1.5px solid var(--border-h); font-size: calc(12.5px * var(--fs, 1)); font-weight: 600; line-height: 1.25; padding: 0; }
+    .rm-petal:hover { transform: scale(1.1); border-color: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent); }
+    .rm-petal.on { transform: scale(1.14); background: var(--c); border-color: var(--c); color: #fff; box-shadow: 0 10px 28px color-mix(in srgb, var(--c) 45%, transparent); }
+    .rm.has-sel .rm-petal:not(.on) { opacity: .5; }
+    .rm-panel { flex: 0 0 600px; width: 600px; min-height: 420px; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 18px; border: 1.5px dashed transparent; transition: border-color .25s; }
+    .rm-panel.empty { justify-content: center; align-items: center; border-color: var(--border-h); }
+    .rm-empty { margin: 0; font-size: calc(13px * var(--fs, 1)); color: var(--muted); }
+        .rm-root { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 600; font-size: calc(13px * var(--fs, 1)); }
+    .rm-cols { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+    .rm-branch { list-style: none; margin: 0 0 0 16px; padding: 0 0 0 16px; }
+    .rm-branch li { position: relative; padding: 3px 0; opacity: 0; transform: translateX(-8px); transition: opacity .3s, transform .35s cubic-bezier(.16,1,.3,1); }
+    .rm-branch li.in { opacity: 1; transform: none; }
+    .rm-branch li::before { content: ''; position: absolute; left: -16px; top: 50%; width: 12px; border-top: 1.5px solid var(--c); }
+    .rm-branch li::after { content: ''; position: absolute; left: -16px; top: 0; bottom: 0; border-left: 1.5px solid var(--c); }
+    .rm-branch li:first-child::after { top: -8px; }
+    .rm-branch li:last-child::after { bottom: 50%; }
+    .rm-branch .tag { padding: 4px 10px; font-size: calc(12px * var(--fs, 1)); }
+    @media(max-width:860px){ .rm { flex-direction: column; width: auto; margin-left: 0; } .rm-hubcol { max-width: 100%; } .rm-panel { flex: none; width: 100%; min-height: 120px; } }
+    .stree { display: none; }
+    @media(max-width:720px){ .rm { display: none; } .stree { display: block; } }
 
     /* ────────────────── RESPONSIVE ────────────────── */
     @media(max-width:720px){
@@ -704,27 +719,11 @@
       .hero-text h1 { font-size: calc(38px * var(--fs, 1)); letter-spacing: -1.4px; }
       .hero-text .tagline { max-width: 100%; }
       .hero-links { justify-content: center; }
-      .avatar { width: 140px; height: 140px; }
-      .stats-wrap { padding: 0 20px 52px; }
-      .stats { grid-template-columns: repeat(2,1fr); }
-      .stat-card:nth-child(1){ border-radius: 15px 0 0 0; }
-      .stat-card:nth-child(2){ border-radius: 0 15px 0 0; }
-      .stat-card:nth-child(3){ border-radius: 0 0 0 15px; }
-      .stat-card:nth-child(4){ border-radius: 0 0 15px 0; }
-      .skills-grid { grid-template-columns: 1fr; }
-      .skills-grid .skill-group[style] { grid-column: span 1; }
       .blog-grid { grid-template-columns: 1fr; }
       .series-parts { grid-template-columns: 1fr; }
       .lead-grid { grid-template-columns: 1fr; }
       .edu-card { flex-direction: column; text-align: center; }
-      .exp-list { gap: 40px; }
-      .exp-line, .exp-marker-ring { display: none; }
-      .exp-card { display: block; border-left: 3px solid var(--c); padding-left: 20px; border-radius: 2px; }
-      .exp-card:nth-child(odd) .exp-info { text-align: left; }
-      .exp-marker { position: static; margin: 0 0 10px; width: 30px; height: 30px; }
-      .exp-marker-icon { width: 30px; height: 30px; }
       .container { padding: 0 20px; }
-      .footprint { flex-direction: column; }
       .interests-row { flex-wrap: wrap; }
       .interest-chip { flex: calc(50% - 7px); }
     }
@@ -808,7 +807,7 @@
   </div>
   <div class="hero-text">
     <h1>Khairul Alam</h1>
-    <div class="role">Senior Software Engineer (Android)<br>11+ Years Building Scalable Mobile Applications<span class="cursor"></span></div>
+    <div class="role">Software Engineer (Android)<br>11+ Years Building Scalable Mobile Applications<span class="cursor"></span></div>
     <div class="location"><svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;opacity:.5"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 6.75A1.75 1.75 0 1 1 6 3.25a1.75 1.75 0 0 1 0 3.5z" fill="currentColor"/></svg>Tokyo, Japan &nbsp;&middot;&nbsp; Currently at Rakuten</div>
     <div class="tagline">
       I'm passionate about building thoughtful digital experiences where great design, solid engineering, and real-world impact come together. I believe the best products are not only functional and reliable, but also intuitive, purposeful, and carefully crafted.
@@ -819,45 +818,7 @@
     <div class="hero-links">
       <a href="mailto:licon.cseru10@gmail.com" class="btn btn-primary">Email</a>
       <a href="https://www.linkedin.com/in/khairul-alam-licon/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn</a>
-      <a href="https://viblo.asia/u/licon" target="_blank" rel="noopener" class="btn btn-ghost">Blog</a>
       <a href="https://github.com/liconrepo" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
-    </div>
-  </div>
-</div>
-
-<!-- STATS -->
-<div class="stats-wrap">
-  <div class="stats reveal" style="margin-bottom:10px">
-    <div class="stat-card">
-      <div class="stat-num" data-count="11" data-suffix="+">0</div>
-      <div class="stat-label">Years Experience</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" data-count="4">0</div>
-      <div class="stat-label">Companies</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" data-count="44">0</div>
-      <div class="stat-label">Technical Blogs</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" data-count="50" data-suffix="K+">0</div>
-      <div class="stat-label">Blog Views</div>
-    </div>
-  </div>
-
-  <div class="footprint reveal">
-    <div class="country-card jp">
-      <div class="country-name">Japan</div>
-      <div class="country-companies">Rakuten, Inc. · Mercari, Inc.</div>
-    </div>
-    <div class="country-card vn">
-      <div class="country-name">Vietnam</div>
-      <div class="country-companies">Sun Asterisk Vietnam Co., Ltd.</div>
-    </div>
-    <div class="country-card bd">
-      <div class="country-name">Bangladesh</div>
-      <div class="country-companies">Lantas Technologies, Inc.</div>
     </div>
   </div>
 </div>
@@ -868,48 +829,31 @@
     <p class="section-label">Work Experience</p>
 
     <div class="exp-list">
-      <div class="exp-line"></div>
-
-      <div class="exp-card reveal" style="--c:#d4547e">
-        <div class="exp-marker"><span class="exp-marker-ring"></span><span class="exp-marker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/></svg></span></div>
-        <div class="exp-info">
-          <div class="exp-date">Feb 2020 &ndash; Present</div>
-          <div class="exp-title">Senior Software Engineer (Android)</div>
-          <div class="exp-company">Rakuten, Inc.</div>
-          <div class="exp-meta">Tokyo, Japan</div>
-        </div>
+      <div class="exp-head"><span>Period</span><span>Duration</span><span>Company</span><span>Location</span></div>
+      <div class="exp-card reveal" style="--c:#d4244f">
+        <div class="exp-date"><span class="now"></span>Feb 2020 &ndash; Present</div>
+        <div class="exp-dur" data-since="2020-02"></div>
+        <div><div class="exp-company">Rakuten, Inc.</div><div class="exp-title">Senior Software Engineer (Android)</div></div>
+        <div class="exp-meta">Tokyo, Japan</div>
       </div>
-
-      <div class="exp-card reveal d1" style="--c:#3b82f6">
-        <div class="exp-marker"><span class="exp-marker-ring"></span><span class="exp-marker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/></svg></span></div>
-        <div class="exp-info">
-          <div class="exp-date">Feb 2018 &ndash; Jan 2020</div>
-          <div class="exp-title">Software Engineer (Android)</div>
-          <div class="exp-company">Mercari, Inc.</div>
-          <div class="exp-meta">Tokyo, Japan</div>
-        </div>
+      <div class="exp-card reveal d1" style="--c:#d4244f">
+        <div class="exp-date">Feb 2018 &ndash; Jan 2020</div>
+        <div class="exp-dur">2 yrs</div>
+        <div><div class="exp-company">Mercari, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div>
+        <div class="exp-meta">Tokyo, Japan</div>
       </div>
-
-      <div class="exp-card reveal d2" style="--c:#10b981">
-        <div class="exp-marker"><span class="exp-marker-ring"></span><span class="exp-marker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/></svg></span></div>
-        <div class="exp-info">
-          <div class="exp-date">Aug 2015 &ndash; Jan 2018</div>
-          <div class="exp-title">Software Engineer (Android)</div>
-          <div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div>
-          <div class="exp-meta">Hanoi, Vietnam</div>
-        </div>
+      <div class="exp-card reveal d2" style="--c:#f2542d">
+        <div class="exp-date">Aug 2015 &ndash; Jan 2018</div>
+        <div class="exp-dur">2 yrs 6 mos</div>
+        <div><div class="exp-company">Sun Asterisk Vietnam Co., Ltd.</div><div class="exp-title">Software Engineer (Android)</div></div>
+        <div class="exp-meta">Hanoi, Vietnam</div>
       </div>
-
-      <div class="exp-card reveal d3" style="--c:#f59e0b">
-        <div class="exp-marker"><span class="exp-marker-ring"></span><span class="exp-marker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/></svg></span></div>
-        <div class="exp-info">
-          <div class="exp-date">Nov 2014 &ndash; Jul 2015</div>
-          <div class="exp-title">Software Engineer (Android)</div>
-          <div class="exp-company">Lantas Technologies, Inc.</div>
-          <div class="exp-meta">Dhaka, Bangladesh</div>
-        </div>
+      <div class="exp-card reveal d3" style="--c:#00a878">
+        <div class="exp-date">Nov 2014 &ndash; Jul 2015</div>
+        <div class="exp-dur">9 mos</div>
+        <div><div class="exp-company">Lantas Technologies, Inc.</div><div class="exp-title">Software Engineer (Android)</div></div>
+        <div class="exp-meta">Dhaka, Bangladesh</div>
       </div>
-
     </div>
   </div>
 </section>
@@ -918,12 +862,17 @@
 <section id="skills">
   <div class="container">
     <p class="section-label">Technical Skills</p>
-    <div class="skills-grid">
-
-      <div class="skill-group reveal">
-        <h3>Programming &amp; Architecture</h3>
-        <div class="tags">
-          <span class="tag"><i class="devicon-kotlin-plain colored"></i>Kotlin</span>
+    <div class="rm reveal" id="radialMenu">
+      <div class="rm-hubcol"><div class="rm-stage" id="rmStage"><svg class="rm-lines" viewBox="0 0 400 400" aria-hidden="true" id="rmLines"></svg></div></div>
+      <div class="rm-panel" id="rmPanel" aria-live="polite"></div>
+    </div>
+    <div class="stree reveal" id="stree">
+      <div class="st-root">Skills</div>
+      <ul class="st-groups" id="stGroups">
+        <li class="st-group">
+          <button class="st-btn" aria-expanded="false"><span class="st-name">Programming &amp; Architecture</span><span class="st-caret" aria-hidden="true">▸</span></button>
+          <div class="st-leaves">
+<span class="tag"><i class="devicon-kotlin-plain colored"></i>Kotlin</span>
           <span class="tag"><i class="devicon-java-plain colored"></i>Java</span>
           <span class="tag"><i class="devicon-android-plain colored"></i>MVVM</span>
           <span class="tag"><i class="devicon-android-plain colored"></i>MVP</span>
@@ -936,13 +885,12 @@
           <span class="tag"><img class="si" src="https://cdn.simpleicons.org/googlechrome" alt="">MiniApps</span>
           <span class="tag"><i class="devicon-react-original colored"></i>React</span>
           <span class="tag"><i class="devicon-javascript-plain colored"></i>JavaScript</span>
-        </div>
-      </div>
-
-      <div class="skill-group reveal d1" style="grid-column: span 2">
-        <h3>Android &amp; Development Tools</h3>
-        <div class="tags">
-          <span class="tag"><i class="devicon-android-plain colored"></i>Android SDK</span>
+          </div>
+        </li>
+        <li class="st-group">
+          <button class="st-btn" aria-expanded="false"><span class="st-name">Android &amp; Development Tools</span><span class="st-caret" aria-hidden="true">▸</span></button>
+          <div class="st-leaves">
+<span class="tag"><i class="devicon-android-plain colored"></i>Android SDK</span>
           <span class="tag"><img class="si" src="https://cdn.simpleicons.org/jetpackcompose" alt="">Jetpack Compose</span>
           <span class="tag"><i class="devicon-android-plain colored"></i>ViewModel</span>
           <span class="tag"><i class="devicon-android-plain colored"></i>LiveData</span>
@@ -970,13 +918,12 @@
           <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase Performance</span>
           <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase App Distribution</span>
           <span class="tag"><i class="devicon-firebase-plain colored"></i>Firebase A/B Testing</span>
-        </div>
-      </div>
-
-      <div class="skill-group reveal d2">
-        <h3>Testing Tools</h3>
-        <div class="tags">
-          <span class="tag"><i class="devicon-junit-plain colored"></i>JUnit</span>
+          </div>
+        </li>
+        <li class="st-group">
+          <button class="st-btn" aria-expanded="false"><span class="st-name">Testing Tools</span><span class="st-caret" aria-hidden="true">▸</span></button>
+          <div class="st-leaves">
+<span class="tag"><i class="devicon-junit-plain colored"></i>JUnit</span>
           <span class="tag"><i class="devicon-android-plain colored"></i>Robolectric</span>
           <span class="tag"><i class="devicon-java-plain colored"></i>Mockito</span>
           <span class="tag"><i class="devicon-kotlin-plain colored"></i>Kluent</span>
@@ -987,43 +934,40 @@
           <span class="tag"><i class="devicon-android-plain colored"></i>Stetho</span>
           <span class="tag"><i class="devicon-postman-plain colored"></i>Postman</span>
           <span class="tag"><span class="ti">⬡</span>Charles Proxy</span>
-        </div>
-      </div>
-
-      <div class="skill-group reveal d3">
-        <h3>CI/CD &amp; Deployment</h3>
-        <div class="tags">
-          <span class="tag"><i class="devicon-circleci-plain colored"></i>CircleCI</span>
+          </div>
+        </li>
+        <li class="st-group">
+          <button class="st-btn" aria-expanded="false"><span class="st-name">CI/CD &amp; Deployment</span><span class="st-caret" aria-hidden="true">▸</span></button>
+          <div class="st-leaves">
+<span class="tag"><i class="devicon-circleci-plain colored"></i>CircleCI</span>
           <span class="tag"><img class="si" src="https://cdn.simpleicons.org/githubactions" alt="">GitHub Actions</span>
           <span class="tag"><i class="devicon-android-plain colored"></i>DeployGate</span>
           <span class="tag"><i class="devicon-azuredevops-plain colored"></i>AppCenter</span>
           <span class="tag"><i class="devicon-google-plain colored"></i>Google Play Console</span>
-        </div>
-      </div>
-
-      <div class="skill-group reveal d1">
-        <h3>Collaboration &amp; Productivity</h3>
-        <div class="tags">
-          <span class="tag"><i class="devicon-jira-plain colored"></i>Jira</span>
+          </div>
+        </li>
+        <li class="st-group">
+          <button class="st-btn" aria-expanded="false"><span class="st-name">Collaboration &amp; Productivity</span><span class="st-caret" aria-hidden="true">▸</span></button>
+          <div class="st-leaves">
+<span class="tag"><i class="devicon-jira-plain colored"></i>Jira</span>
           <span class="tag"><i class="devicon-figma-plain colored"></i>Figma</span>
           <span class="tag"><img class="si" src="https://cdn.simpleicons.org/zapier" alt="">Zapier</span>
           <span class="tag"><i class="devicon-git-plain colored"></i>Git</span>
           <span class="tag"><i class="devicon-github-original colored"></i>GitHub</span>
           <span class="tag"><i class="devicon-slack-plain colored"></i>Slack</span>
-        </div>
-      </div>
-
-      <div class="skill-group reveal d2">
-        <h3>AI &amp; Developer Productivity</h3>
-        <div class="tags">
-          <span class="tag"><span class="ti">✦</span>Claude Code</span>
+          </div>
+        </li>
+        <li class="st-group">
+          <button class="st-btn" aria-expanded="false"><span class="st-name">AI &amp; Developer Productivity</span><span class="st-caret" aria-hidden="true">▸</span></button>
+          <div class="st-leaves">
+<span class="tag"><span class="ti">✦</span>Claude Code</span>
           <span class="tag"><span class="ti">✦</span>Codex</span>
           <span class="tag"><span class="ti">✦</span>AI-Assisted Development</span>
           <span class="tag"><span class="ti">✦</span>AI Debugging &amp; Log Analysis</span>
           <span class="tag"><span class="ti">✦</span>Token-Efficient LLM Workflows</span>
-        </div>
-      </div>
-
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </section>
@@ -1036,7 +980,6 @@
       <div class="oss-card">
         <div class="oss-head">
           <a class="oss-name" href="https://github.com/liconrepo/MobileDesignSystem" target="_blank" rel="noopener">Mobile Design System</a>
-          <span class="oss-license">MIT License</span>
         </div>
         <p class="oss-desc">A small, opinionated, View-based design system for Android in Kotlin, with no Jetpack Compose dependency. Three tiers of tokens, one theme for many brands, light and dark from the same tokens, and accessibility as a default. Built to be read, copied and adapted. Contributions are welcome: fork the repo and open a pull request.</p>
         <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Design system</span><span class="blog-tag">Design tokens</span><span class="blog-tag">Accessibility</span></div>
@@ -1607,8 +1550,8 @@
     { sel: '.hero-text',          section: 'About',      title: () => 'About Khairul Alam' },
     { sel: '.stat-card',          section: 'Highlights', title: el => el.textContent.replace(/\s+/g, ' ').trim() },
     { sel: '.exp-card',           section: 'Experience', title: el => el.querySelector('.exp-title').textContent },
-    { sel: '.skill-group',        section: 'Skills',     title: el => (el.querySelector('h3,h4,.skill-title,.skill-label') || el.firstElementChild).textContent },
-    { sel: '.skill-group .tag',   section: 'Skills',     title: el => el.textContent },
+    { sel: '.st-group',           section: 'Skills',     title: el => el.querySelector('.st-name').textContent },
+    { sel: '.st-leaves .tag',     section: 'Skills',     title: el => el.textContent },
     { sel: '.oss-card',           section: 'Open Source', title: el => el.querySelector('.oss-name').textContent },
     { sel: '.series-card',        section: 'Writing',   title: el => el.querySelector('.series-title').textContent },
     { sel: '.series-part',        section: 'Writing',    title: el => 'Claude Code series, Part ' + el.querySelector('.sp-num').textContent + ': ' + el.querySelector('.sp-title').textContent, link: true },
@@ -1715,6 +1658,7 @@
   }
   function goTo(it) {
     closeSearch();
+    if (!it.el.offsetParent && it.el.closest('#stree')) it = { ...it, el: document.getElementById('radialMenu') };
     if (it.el.closest('#archive')) setArchive(true);
     const seriesBox = it.el.closest('.series-parts');
     if (seriesBox) setSeries(seriesBox, true);
@@ -1744,6 +1688,188 @@
       const it = sHits[sActive];
       if (it.link && !(e.metaKey || e.ctrlKey)) openItem(it); else goTo(it);
     }
+  });
+
+  /* Skills tree — one group open at a time */
+  (function () {
+    const items = [...document.querySelectorAll('#stGroups .st-group')];
+    let cur = -1;
+    function open(i) {
+      cur = i;
+      items.forEach((li, k) => { li.classList.toggle('open', k === i); li.querySelector('.st-btn').setAttribute('aria-expanded', String(k === i)); });
+    }
+    items.forEach((li, i) => li.querySelector('.st-btn').addEventListener('click', () => open(cur === i ? -1 : i)));
+  })();
+
+  /* Skills hub + tree — hub with one petal per group; picking a petal shows that group's chips as a tree. Built from the tree markup. */
+  (function () {
+    const root = document.getElementById('radialMenu'), stage = document.getElementById('rmStage');
+    const lines = document.getElementById('rmLines'), panel = document.getElementById('rmPanel');
+    const lis = [...document.querySelectorAll('#stGroups .st-group')];
+    if (!root || !lis.length) return;
+    const C = 200, RP = 138, NS = 'http://www.w3.org/2000/svg';
+    const COLORS = ['#e11d48', '#d97706', '#059669', '#0284c7', '#7c3aed', '#db2777'];
+    const SHORT = ['Programming', 'Android', 'Testing', 'CI/CD', 'Collab.', 'AI'];
+    const groups = lis.map((li, i) => ({
+      short: SHORT[i] || li.querySelector('.st-name').textContent.split(' &')[0], full: li.querySelector('.st-name').textContent,
+      color: COLORS[i % COLORS.length], ang: -90 + (360 / lis.length) * i, tags: [...li.querySelectorAll('.tag')]
+    }));
+    const hub = document.createElement('button');
+    hub.className = 'rm-hub'; hub.textContent = 'Skills';
+    hub.setAttribute('aria-label', 'Skills: show the whole network');
+    stage.appendChild(hub);
+    let cur = -1;
+    const petals = groups.map((g, i) => {
+      const x = C + RP * Math.cos(g.ang * Math.PI / 180), y = C + RP * Math.sin(g.ang * Math.PI / 180);
+      const ln = document.createElementNS(NS, 'line');
+      ln.setAttribute('x1', C); ln.setAttribute('y1', C); ln.setAttribute('x2', x); ln.setAttribute('y2', y); ln.style.setProperty('--c', g.color);
+      lines.appendChild(ln);
+      const b = document.createElement('button');
+      b.className = 'rm-petal'; b.style.cssText = 'left:' + x + 'px;top:' + y + 'px;--c:' + g.color;
+      b.textContent = g.short;
+      b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', g.full);
+      b.onclick = () => select(i);
+      stage.appendChild(b);
+      return { b, ln };
+    });
+    const DEF = Math.max(0, groups.findIndex(g => g.short === 'Android'));   // Android is always the default selection
+    hub.onclick = () => showNet();
+
+    function select(i) {
+      stopNet(); hub.classList.remove('on');
+      cur = i;
+      root.classList.toggle('has-sel', i >= 0);
+      petals.forEach((p, k) => { p.b.classList.toggle('on', k === i); p.b.setAttribute('aria-expanded', String(k === i)); p.ln.classList.toggle('on', k === i); });
+      panel.textContent = '';
+      panel.classList.toggle('empty', i < 0);
+      if (i < 0) { const e = document.createElement('p'); e.className = 'rm-empty'; e.textContent = 'Select a category to see its skills.'; panel.appendChild(e); return; }
+      const g = groups[i], n = g.tags.length;
+      panel.style.setProperty('--c', g.color);
+      const r = document.createElement('div'); r.className = 'rm-root';
+      r.textContent = g.full; panel.appendChild(r);
+      const cols = document.createElement('div'); cols.className = 'rm-cols'; panel.appendChild(cols);
+      const items = [];
+      // balanced columns: 6 or fewer -> 1 column; otherwise at least 2, at most ~10 per column (13 -> 7+6, 28 -> 10+9+9, 10 -> 5+5)
+      const nc = n <= 6 ? 1 : Math.max(2, Math.ceil(n / 10)), base = Math.floor(n / nc), extra = n % nc;
+      let at = 0;
+      for (let c = 0; c < nc; c++) {
+        const size = base + (c < extra ? 1 : 0), ul = document.createElement('ul'); ul.className = 'rm-branch';
+        g.tags.slice(at, at + size).forEach(t => { const li = document.createElement('li'); li.appendChild(t.cloneNode(true)); ul.appendChild(li); items.push(li); });
+        at += size; cols.appendChild(ul);
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => items.forEach((li, k) => { li.style.transitionDelay = (k * 18) + 'ms'; li.classList.add('in'); })));
+    }
+
+    /* Whole-skills floating 3D network (opened from the hub) */
+    let netRaf = 0;
+    function stopNet() { cancelAnimationFrame(netRaf); netRaf = 0; }
+    function showNet() {
+      stopNet();
+      cur = -1; root.classList.add('has-sel');
+      hub.classList.add('on');
+      petals.forEach(p => { p.b.classList.remove('on'); p.b.setAttribute('aria-expanded', 'false'); p.ln.classList.remove('on'); });
+      panel.textContent = ''; panel.classList.remove('empty');
+      const W = 600, H = 420, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const cv = document.createElement('canvas'); cv.className = 'rm-net'; cv.width = W * dpr; cv.height = H * dpr;
+      cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Floating 3D network of all skills. Drag to rotate, click a group to open it.');
+      panel.appendChild(cv);
+      const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      const axes = [[0, -1, 0], [1, 0, 0], [0, 0, 1], [0, 0, -1], [-1, 0, 0], [0, 1, 0]], GR = 128;
+      const nodes = [{ x: 0, y: 0, z: 0, core: true, label: 'Skills', ph: 0 }], edges = [];
+      groups.forEach((g, gi) => {
+        const a = axes[gi % axes.length], gn = nodes.length;
+        nodes.push({ x: a[0] * GR, y: a[1] * GR, z: a[2] * GR, gi, grp: true, label: g.short, ph: rnd() * 6.28 });
+        edges.push([0, gn]);
+        const first = nodes.length;
+        g.tags.forEach((t, k) => {
+          const u = rnd() * 2 - 1, th = rnd() * 6.283, r = Math.sqrt(1 - u * u), d = 34 + rnd() * 24;
+          nodes.push({ x: a[0] * GR + r * Math.cos(th) * d, y: a[1] * GR + u * d, z: a[2] * GR + r * Math.sin(th) * d, gi, label: t.textContent.trim(), ph: rnd() * 6.28 });
+          edges.push([gn, nodes.length - 1]);
+        });
+        for (let m = first; m < nodes.length; m++) {          // each skill also links to its nearest sibling
+          let best = -1, bd = 1e9;
+          for (let o = first; o < nodes.length; o++) if (o !== m) { const dd = Math.hypot(nodes[m].x - nodes[o].x, nodes[m].y - nodes[o].y, nodes[m].z - nodes[o].z); if (dd < bd) { bd = dd; best = o; } }
+          if (best >= 0 && m < best) edges.push([m, best]);
+        }
+      });
+      const gnodes = nodes.map((n, i) => n.grp ? i : -1).filter(i => i >= 0);
+      gnodes.forEach((a, i) => gnodes.forEach((b, j) => { if (j > i && Math.hypot(nodes[a].x - nodes[b].x, nodes[a].y - nodes[b].y, nodes[a].z - nodes[b].z) < GR * 1.5) edges.push([a, b]); }));
+      let yaw = 0.6, pitch = -0.3, hover = -1, drag = null, t = 0, pulses = [], cs = null;
+      const proj = (n) => {
+        const fx = still ? 0 : Math.sin(t * 0.9 + n.ph) * 4, fy = still ? 0 : Math.cos(t * 0.7 + n.ph * 1.3) * 4;
+        const x = n.x + fx, y = n.y + fy, z = n.z, cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+        const x1 = x * cy + z * sy, z1 = -x * sy + z * cy, y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, k = 620 / (620 - z2);
+        return { x: W / 2 + x1 * k, y: H / 2 + y2 * k, k, d: Math.max(0, Math.min(1, (z2 + 190) / 380)) };
+      };
+      function frame() {
+        t += 0.016; if (!drag && hover < 0 && !still) yaw += 0.0035;
+        if (!cs || ((t * 60) | 0) % 120 === 0) { const c = getComputedStyle(root); cs = { text: c.getPropertyValue('--text').trim() || '#1c1c20', sub: c.getPropertyValue('--sub').trim() || '#52525b', card: c.getPropertyValue('--card').trim() || '#efeff1' }; }
+        ctx.clearRect(0, 0, W, H);
+        const P = nodes.map(proj);
+        ctx.lineWidth = 1;
+        edges.slice().sort((a, b) => (P[a[0]].d + P[a[1]].d) - (P[b[0]].d + P[b[1]].d)).forEach(([a, b]) => {
+          const col = nodes[a].core || nodes[b].core ? cs.sub : groups[nodes[b].gi !== undefined ? nodes[b].gi : nodes[a].gi].color, hot = hover === a || hover === b;
+          ctx.globalAlpha = (hot ? 0.9 : 0.12 + 0.4 * (P[a].d + P[b].d) / 2); ctx.strokeStyle = col; ctx.lineWidth = hot ? 1.6 : 1;
+          ctx.beginPath(); ctx.moveTo(P[a].x, P[a].y); ctx.lineTo(P[b].x, P[b].y); ctx.stroke();
+        });
+        if (!still && pulses.length < 14 && Math.random() < 0.25) pulses.push({ e: edges[(Math.random() * edges.length) | 0], f: 0, r: Math.random() < 0.5 });
+        pulses = pulses.filter(p => (p.f += 0.02) < 1);
+        pulses.forEach(p => {
+          const A = P[p.e[p.r ? 1 : 0]], B = P[p.e[p.r ? 0 : 1]], gi = nodes[p.e[1]].gi !== undefined ? nodes[p.e[1]].gi : nodes[p.e[0]].gi;
+          ctx.globalAlpha = 0.5 + 0.5 * (A.d + B.d) / 2; ctx.fillStyle = gi !== undefined ? groups[gi].color : cs.text;
+          ctx.beginPath(); ctx.arc(A.x + (B.x - A.x) * p.f, A.y + (B.y - A.y) * p.f, 2.2, 0, 6.283); ctx.fill();
+        });
+        nodes.map((n, i) => i).sort((a, b) => P[a].d - P[b].d).forEach(i => {
+          const n = nodes[i], q = P[i], on = hover === i, r = (n.core ? 11 : n.grp ? 9 : 4.2) * q.k * (on ? 1.4 : 1);
+          ctx.globalAlpha = 0.4 + 0.6 * q.d;
+          ctx.fillStyle = n.core ? cs.text : groups[n.gi].color;
+          ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.283); ctx.fill();
+          if (n.grp || n.core) { ctx.globalAlpha = 0.15 + 0.15 * q.d; ctx.beginPath(); ctx.arc(q.x, q.y, r * 1.8, 0, 6.283); ctx.fill(); }
+        });
+        ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+        nodes.forEach((n, i) => {
+          if (!(n.grp || n.core) || hover === i) return;
+          const q = P[i]; ctx.globalAlpha = 0.5 + 0.5 * q.d; ctx.fillStyle = n.core ? cs.card : cs.text; ctx.font = (n.core ? '700 10px' : '700 12px') + ' Inter, system-ui, sans-serif';
+          ctx.fillText(n.label, q.x, n.core ? q.y : q.y - 18 * q.k);
+        });
+        if (hover >= 0) {                                   // hover pill
+          const n = nodes[hover], q = P[hover]; ctx.font = '600 12px Inter, system-ui, sans-serif';
+          const w = ctx.measureText(n.label).width + 18, px = Math.max(4, Math.min(W - w - 4, q.x - w / 2)), py = Math.max(4, q.y - 36);
+          ctx.globalAlpha = 1; ctx.fillStyle = cs.card; ctx.strokeStyle = n.core ? cs.text : groups[n.gi].color; ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.roundRect(px, py, w, 24, 12); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = cs.text; ctx.fillText(n.label, px + w / 2, py + 12.5);
+        }
+        ctx.globalAlpha = 1;
+        if (!still || drag) netRaf = requestAnimationFrame(frame); else netRaf = 0;
+      }
+      function pick(e) {
+        const rc = cv.getBoundingClientRect(), k = W / rc.width, mx = (e.clientX - rc.left) * k, my = (e.clientY - rc.top) * k;
+        let best = -1, bd = 13; nodes.forEach((n, i) => { const q = proj(n), d = Math.hypot(q.x - mx, q.y - my); if (d < bd) { bd = d; best = i; } });
+        return best;
+      }
+      let moved = 0;
+      cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; moved = 0; cv.setPointerCapture(e.pointerId); cv.classList.add('dragging'); if (!netRaf) netRaf = requestAnimationFrame(frame); });
+      cv.addEventListener('pointermove', e => {
+        if (drag) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; moved += Math.abs(dx) + Math.abs(dy); yaw += dx * 0.008; pitch = Math.max(-1.2, Math.min(1.2, pitch + dy * 0.008)); drag = { x: e.clientX, y: e.clientY }; }
+        else { hover = pick(e); cv.style.cursor = hover >= 0 ? 'pointer' : ''; if (!netRaf) netRaf = requestAnimationFrame(frame); }
+      });
+      cv.addEventListener('pointerup', e => {
+        drag = null; cv.classList.remove('dragging');
+        if (moved < 5) { const i = pick(e); if (i >= 0 && nodes[i].gi !== undefined) select(nodes[i].gi); }
+      });
+      cv.addEventListener('pointerleave', () => { if (!drag) hover = -1; });
+      frame();
+    }
+    select(DEF);
+  })();
+
+  /* Experience: duration of the current role, counted up to today (months inclusive) */
+  document.querySelectorAll('.exp-dur[data-since]').forEach(el => {
+    const [y, m] = el.dataset.since.split('-').map(Number), n = new Date();
+    const t = (n.getFullYear() - y) * 12 + (n.getMonth() + 1 - m) + 1, yr = Math.floor(t / 12), mo = t % 12;
+    el.textContent = [yr ? yr + (yr > 1 ? ' yrs' : ' yr') : '', mo ? mo + (mo > 1 ? ' mos' : ' mo') : ''].filter(Boolean).join(' ');
   });
 </script>
 </body>
