@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Build and Ship a Desktop App with Java SE: A Hands-On Guide for CS Students — Khairul Alam</title>
+  <meta name="description" content="A hands-on guide for computer science students: build a desktop app with Java SE and Swing, learn event-driven programming, test it, and package and distribute it with jar, jlink and jpackage. Includes a reading map for the Deitel and Deitel Java How to Program book." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Java SE &middot; For CS students</p>
+    <h1>Build and Ship a Desktop App with Java SE: A Hands-On Guide for CS Students</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~35 min read</span></div>
+    <div class="tags"><span class="tag">Java SE</span><span class="tag">Desktop apps</span><span class="tag">Swing</span><span class="tag">JavaFX</span><span class="tag">jpackage</span><span class="tag">Students</span></div>
+
+    <p class="lede">Most computer science courses teach Java with programs that print text. Real software has windows, buttons, files and an installer. This guide takes you from an empty folder to a working desktop app, then to something you can email to a friend or put on GitHub as a download. You will write the app with plain Java SE, test the logic, and package it with the tools that ship inside the JDK. A reading map near the start shows which topics of the Deitel and Deitel book (<em>Java How to Program</em>) line up with each step.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>A desktop app is <strong>event-driven</strong>: a loop waits for clicks and keys, and your code reacts. That idea is the real lesson.</li>
+        <li><strong>Swing</strong> is already inside the JDK, so a first app needs no downloads. <strong>JavaFX</strong> is the modern alternative, but it is a separate download.</li>
+        <li>Keep <strong>logic</strong> (save, load, rules) in plain classes and <strong>screens</strong> in others. Then you can test the logic with JUnit.</li>
+        <li>Never do slow work on the event thread, or the window freezes. Use <code>SwingWorker</code> (or <code>Platform.runLater</code> in JavaFX).</li>
+        <li>Package with <code>jar</code> for a quick share, and with <code>jpackage</code> for a real installer that includes Java, so users do not need to install it.</li>
+        <li>You must build the installer <strong>on each operating system</strong> you target. A GitHub Actions matrix can do that for you.</li>
+        <li>A project ladder and a portfolio checklist are at the end.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#why">What you will build, and why desktop still matters</a></li>
+        <li><a href="#book">Using the Deitel and Deitel book with this guide</a></li>
+        <li><a href="#setup">Set up your tools</a></li>
+        <li><a href="#events">How a desktop app works: events</a></li>
+        <li><a href="#hello">Your first window</a></li>
+        <li><a href="#notes">Build the Notes app, step by step</a></li>
+        <li><a href="#threads">Keep the window responsive</a></li>
+        <li><a href="#fx">Swing or JavaFX?</a></li>
+        <li><a href="#structure">Structure the project and test it</a></li>
+        <li><a href="#polish">Polish: look, settings and accessibility</a></li>
+        <li><a href="#jar">Package a JAR</a></li>
+        <li><a href="#ship">Ship it: jlink and jpackage</a></li>
+        <li><a href="#release">Publish releases and automate builds</a></li>
+        <li><a href="#mistakes">Common mistakes</a></li>
+        <li><a href="#ladder">Projects to practise, and a portfolio checklist</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="why">1. What you will build, and why desktop still matters</h2>
+    <p>We will build <strong>Notes</strong>, a small desktop app. You type a note, press Enter, and it appears in a list. You can delete a note. When you close the app and open it again, your notes are still there, because they are saved to a file in your home folder. It is small enough to finish in one sitting, and it touches almost everything a bigger app needs: a window, buttons, lists, input, files, error messages, and a way to package it.</p>
+    <p>Why bother with desktop when so much software lives on the web or on phones? Because it teaches things that other platforms hide behind frameworks:</p>
+    <ul>
+      <li><strong>Event-driven programming.</strong> Your <code>main</code> method returns almost at once, and the program then lives on in listeners. This is how Android, web front ends and games work too.</li>
+      <li><strong>Threads in the real world.</strong> You will meet the rule that the UI thread must never be blocked, with a visible window to prove it.</li>
+      <li><strong>Files, paths and the operating system.</strong> Where to store data, and how to behave on Windows, macOS and Linux.</li>
+      <li><strong>Packaging.</strong> What it takes to turn source code into something another person can double-click.</li>
+    </ul>
+    <p>Desktop apps are also still everywhere: IDEs, music tools, lab equipment software, internal business tools, and teaching tools. Java is a good fit because one source code runs on all three major systems.</p>
+
+    <h3>Java SE, JDK and JRE in one minute</h3>
+    <table class="gloss">
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td>Java SE</td><td>Java Standard Edition: the core language and libraries, including the GUI toolkit Swing. This is what you use for desktop apps.</td></tr>
+      <tr><td>JDK</td><td>Java Development Kit: the compiler (<code>javac</code>), the runtime and the tools (<code>jar</code>, <code>jlink</code>, <code>jpackage</code>). You install this to write programs.</td></tr>
+      <tr><td>JRE / runtime</td><td>What runs a compiled program. Users used to install it separately. Today you can bundle it inside your app (section 12).</td></tr>
+      <tr><td>LTS</td><td>Long-term support release. Versions 17 and 21 are LTS releases. Pick one for coursework so your code does not move under you.</td></tr>
+    </table>
+
+    <h2 id="book">2. Using the Deitel and Deitel book with this guide</h2>
+    <p><em>Java How to Program</em> by Paul Deitel and Harvey Deitel (published by Pearson) is one of the most widely used Java textbooks in university courses. It teaches by showing complete, runnable programs, and it ships its source code online. This guide is a project that sits on top of that kind of course: the book explains each language feature, and this guide shows how they join together in one application.</p>
+    <div class="note"><p><strong>Which edition?</strong> The publisher&rsquo;s site (deitel.com) currently lists <em>Java How to Program</em> 11th edition in an Early Objects and a Late Objects version, and a newer 12th edition with an &ldquo;objects-natural&rdquo; approach. Chapter numbers and titles differ by edition, so use the table of contents of <em>your</em> edition. The topic names below are the stable part.</p></div>
+    <table>
+      <tr><th>Step in this guide</th><th>Java idea</th><th>Look for this topic in the book</th></tr>
+      <tr><td>The Notes model and screens</td><td>Classes, objects, methods, constructors</td><td>Introduction to classes and objects; methods in depth</td></tr>
+      <tr><td>The list of notes</td><td>Collections, <code>ArrayList</code>, generics</td><td>Arrays and ArrayLists; generic collections</td></tr>
+      <tr><td>Splitting logic from the screen</td><td>Interfaces, composition, inheritance</td><td>Inheritance; polymorphism; interfaces; composition vs inheritance</td></tr>
+      <tr><td>Reading and saving notes</td><td>Files, paths, streams</td><td>Files, input and output streams (the NIO classes)</td></tr>
+      <tr><td>&ldquo;Could not save&rdquo; messages</td><td>Exceptions, <code>try</code> and <code>catch</code></td><td>Exception handling</td></tr>
+      <tr><td>Buttons, lists and layouts</td><td>GUI components and event handling</td><td>The JavaFX GUI chapters in recent editions; the optional Swing GUI chapters</td></tr>
+      <tr><td>Lambdas such as <code>e -&gt; addNote()</code></td><td>Lambdas and functional interfaces</td><td>Lambdas and streams</td></tr>
+      <tr><td>Not freezing the window</td><td>Threads and concurrency</td><td>Concurrency</td></tr>
+      <tr><td>Storing data in a database (an exercise)</td><td>JDBC</td><td>Database access with JDBC (online chapter in some editions)</td></tr>
+    </table>
+    <h3>How to get the most out of the book</h3>
+    <ul>
+      <li><strong>Type the examples.</strong> Do not paste them. Your fingers learn the syntax, and typing forces you to read every line.</li>
+      <li><strong>Download the book&rsquo;s source code</strong> from the publisher&rsquo;s site and run the finished programs, then break them on purpose.</li>
+      <li><strong>Do the exercises, then this guide&rsquo;s project.</strong> The exercises give you accuracy, and a project gives you finishing power.</li>
+      <li><strong>Use JShell</strong> (type <code>jshell</code> in a terminal) to try a single line of Java without writing a class.</li>
+    </ul>
+    <p>Recent editions teach the GUI with JavaFX and keep Swing as optional or online material, while older editions teach Swing. This guide builds in Swing first because it needs nothing extra to install, then shows JavaFX side by side. The ideas (components, layouts, events) carry over almost unchanged.</p>
+
+    <h2 id="setup">3. Set up your tools</h2>
+    <ol>
+      <li><strong>Install a JDK</strong> (version 21 is a good choice; 17 also works). Free builds include Eclipse Temurin from Adoptium, and the builds from Oracle, Microsoft, Amazon and others. Your course may name one.</li>
+      <li><strong>Pick an editor.</strong> IntelliJ IDEA Community, NetBeans, Eclipse or VS Code with the Java extension are all fine. An IDE helps with errors and auto-complete. We will also use the terminal, so you understand what the IDE does for you.</li>
+      <li><strong>Check the install</strong> in a terminal:</li>
+    </ol>
+<pre><code>java -version
+javac -version
+jpackage --version</code></pre>
+    <p>If <code>java</code> works but <code>javac</code> does not, you installed a runtime but not the JDK. Install the JDK. If the commands are not found at all, the JDK&rsquo;s <code>bin</code> folder is not on your PATH.</p>
+    <h3>Project layout</h3>
+<pre><code>notes-app/
+  src/
+    notes/
+      NoteStore.java      &lt;- saves and loads notes (no GUI code)
+      NotesApp.java       &lt;- the window
+  test/                   &lt;- unit tests, later
+  out/                    &lt;- compiled classes (created by javac)
+  dist/                   &lt;- the finished JAR (created later)</code></pre>
+    <p>The folder name under <code>src</code> must match the <code>package</code> line at the top of each file. A file starting with <code>package notes;</code> must live in <code>src/notes/</code>.</p>
+
+    <h2 id="events">4. How a desktop app works: events</h2>
+    <p>A console program runs from the first line to the last, and then it ends. A desktop program does something different. After it builds the window, it starts an <strong>event loop</strong>: a loop that waits for the user to do something. Each click, key press or mouse move becomes an <strong>event</strong> placed in a queue. A single thread, the <strong>event dispatch thread</strong> (EDT), takes events from the queue one by one and calls the <strong>listener</strong> you registered for that event. Your code runs only inside those listeners.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="A user click goes into the event queue, the event dispatch thread takes it out, calls your listener, and the screen is repainted.">
+        <rect class="boxb" x="8"   y="40" width="108" height="56" rx="12"/><text class="b c" x="62"  y="64">User</text><text class="sub c" x="62"  y="82">click or key</text>
+        <rect class="box"  x="148" y="40" width="108" height="56" rx="12"/><text class="b c" x="202" y="64">Event queue</text><text class="sub c" x="202" y="82">waiting events</text>
+        <rect class="boxo" x="288" y="40" width="108" height="56" rx="12"/><text class="b c" x="342" y="64">Event thread</text><text class="sub c" x="342" y="82">takes one event</text>
+        <rect class="boxg" x="428" y="40" width="96" height="56" rx="12"/><text class="b c" x="476" y="64">Listener</text><text class="sub c" x="476" y="82">your code</text>
+        <rect class="boxp" x="556" y="40" width="76" height="56" rx="12"/><text class="b c" x="594" y="64">Repaint</text><text class="sub c" x="594" y="82">new screen</text>
+        <path class="arrow" d="M118,68 L144,68"/><path class="arrow" d="M258,68 L284,68"/><path class="arrow" d="M398,68 L424,68"/><path class="arrow" d="M526,68 L552,68"/>
+        <text class="sub c" x="320" y="132">Everything above runs on one thread. If your listener is slow, the whole window waits.</text>
+      </svg>
+      <figcaption>The key rule of GUI programming: keep listeners short, because the same thread also draws the window.</figcaption>
+    </figure>
+    <div class="analogy">
+      <p><strong>Analogy.</strong> A cafe with one waiter. Customers (events) line up, and the waiter serves them one at a time. If the waiter goes to the kitchen to cook a three-hour stew, nobody else gets served, even to be handed a glass of water. That frozen cafe is what a frozen window looks like.</p>
+    </div>
+
+    <h2 id="hello">5. Your first window</h2>
+    <p>Save this as <code>src/notes/Hello.java</code>:</p>
+<pre><code>package notes;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import java.awt.FlowLayout;
+
+public class Hello {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -&gt; {                    // build the window on the event thread
+            JFrame frame = new JFrame("Hello");
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.setLayout(new FlowLayout());
+
+            JButton button = new JButton("Click me");
+            int[] clicks = {0};
+            button.addActionListener(e -&gt; button.setText("Clicked " + (++clicks[0]) + " times"));
+
+            frame.add(button);
+            frame.setSize(300, 120);
+            frame.setLocationRelativeTo(null);               // centre on screen
+            frame.setVisible(true);
+        });
+    }
+}</code></pre>
+    <p>Compile and run it from the project folder:</p>
+<pre><code>mkdir -p out
+javac -d out src/notes/Hello.java
+java -cp out notes.Hello</code></pre>
+    <p>On Windows PowerShell, use <code>mkdir out</code> if it does not exist and the same <code>javac</code> and <code>java</code> lines. Here is what each part does:</p>
+    <ul>
+      <li><code>JFrame</code> is the window. <code>setVisible(true)</code> shows it.</li>
+      <li><code>SwingUtilities.invokeLater</code> runs the code on the event thread. Swing is not thread-safe, so building the window anywhere else is a bug that shows up randomly.</li>
+      <li><code>EXIT_ON_CLOSE</code> stops the program when the window closes. Without it the window disappears but the program keeps running.</li>
+      <li>The <code>-&gt;</code> arrow is a <strong>lambda</strong>: a short way to write a listener. It is a shortcut for an anonymous class that implements <code>ActionListener</code>.</li>
+      <li>The array <code>int[] clicks = {0}</code> is a small trick. A lambda can only use local variables that do not change, but the <em>contents</em> of an array can change.</li>
+    </ul>
+
+    <h2 id="notes">6. Build the Notes app, step by step</h2>
+    <h3>Step 1: the storage class (no GUI)</h3>
+    <p>We begin with the part that has no windows in it. It saves a list of notes to a text file, one line per note, and loads them again. Because it does not touch Swing, it is easy to test, and later you could swap it for a database without changing the screen.</p>
+<pre><code>package notes;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+/** Loads and saves notes as one line of text per note. */
+public class NoteStore {
+
+    private final Path file;
+
+    public NoteStore(Path file) {
+        this.file = file;
+    }
+
+    /** The normal location: a hidden folder in the user's home directory. */
+    public static NoteStore inUserHome() {
+        Path dir = Path.of(System.getProperty("user.home"), ".notes-app");
+        return new NoteStore(dir.resolve("notes.txt"));
+    }
+
+    public List&lt;String&gt; load() throws IOException {
+        if (Files.notExists(file)) {
+            return new ArrayList&lt;&gt;();                       // first run: no file yet
+        }
+        return new ArrayList&lt;&gt;(Files.readAllLines(file));
+    }
+
+    public void save(List&lt;String&gt; notes) throws IOException {
+        Files.createDirectories(file.getParent());           // make the folder if needed
+        Files.write(file, notes);
+    }
+}</code></pre>
+    <p>Notice three decisions that matter for real apps. The file lives in the user&rsquo;s <strong>home folder</strong>, not next to the program, because installed apps are often in read-only places. The code uses <code>Path</code> and <code>Files</code>, which handle Windows backslashes and Linux slashes for you. And the methods <strong>declare</strong> <code>throws IOException</code>, so the caller must decide what to show the user when something fails.</p>
+
+    <h3>Step 2: the window</h3>
+<pre><code>package notes;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.io.IOException;
+import java.util.Collections;
+
+public class NotesApp {
+
+    private final NoteStore store = NoteStore.inUserHome();
+    private final DefaultListModel&lt;String&gt; model = new DefaultListModel&lt;&gt;();   // the data behind the list
+    private final JTextField input = new JTextField();
+    private final JLabel status = new JLabel(" ");
+
+    private void show() {
+        JFrame frame = new JFrame("Notes");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        JList&lt;String&gt; list = new JList&lt;&gt;(model);
+        JButton add = new JButton("Add");
+        JButton delete = new JButton("Delete");
+
+        // Layout: status on top, list in the middle, input row at the bottom
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        buttons.add(add);
+        buttons.add(delete);
+
+        JPanel bottom = new JPanel(new BorderLayout(6, 6));
+        bottom.add(input, BorderLayout.CENTER);
+        bottom.add(buttons, BorderLayout.EAST);
+
+        JPanel root = new JPanel(new BorderLayout(8, 8));
+        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        root.add(status, BorderLayout.NORTH);
+        root.add(new JScrollPane(list), BorderLayout.CENTER);
+        root.add(bottom, BorderLayout.SOUTH);
+
+        // Events
+        add.addActionListener(e -&gt; addNote());
+        input.addActionListener(e -&gt; addNote());              // pressing Enter in the text field
+        delete.addActionListener(e -&gt; deleteNote(list.getSelectedIndex()));
+
+        loadNotes();
+
+        frame.setContentPane(root);
+        frame.setSize(420, 360);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        input.requestFocusInWindow();
+    }
+
+    private void addNote() {
+        String text = input.getText().strip();
+        if (text.isEmpty()) {
+            return;                                           // ignore blank notes
+        }
+        model.addElement(text);
+        input.setText("");
+        saveNotes();
+    }
+
+    private void deleteNote(int index) {
+        if (index &lt; 0) {
+            status.setText("Select a note first.");
+            return;
+        }
+        model.remove(index);
+        saveNotes();
+    }
+
+    private void loadNotes() {
+        try {
+            store.load().forEach(model::addElement);
+            status.setText(model.size() + " notes");
+        } catch (IOException ex) {
+            status.setText("Could not read notes: " + ex.getMessage());
+        }
+    }
+
+    private void saveNotes() {
+        try {
+            store.save(Collections.list(model.elements()));
+            status.setText(model.size() + " notes saved");
+        } catch (IOException ex) {
+            status.setText("Could not save: " + ex.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -&gt; new NotesApp().show());
+    }
+}</code></pre>
+<pre><code>javac -d out src/notes/NoteStore.java src/notes/NotesApp.java
+java -cp out notes.NotesApp</code></pre>
+    <p>Try it: add a few notes, close the window, run it again. They come back. You can look at the saved file in the <code>.notes-app</code> folder in your home directory.</p>
+    <h3>What to notice in this code</h3>
+    <ul>
+      <li><strong>Model and view.</strong> <code>DefaultListModel</code> holds the data and <code>JList</code> displays it. When you change the model, the list updates itself. This idea (data separate from display) is behind almost every GUI library.</li>
+      <li><strong>Layout managers.</strong> We never gave a pixel position. <code>BorderLayout</code> puts components in five regions, <code>FlowLayout</code> lines them up in a row. Layout managers make windows resize and survive different fonts and screen densities.</li>
+      <li><strong>Errors become messages.</strong> A failed save does not crash the app. It shows a message in the status label.</li>
+      <li><strong>The class is a bit big.</strong> That is fine for a first version, and section 9 shows how to make it more testable.</li>
+    </ul>
+    <div class="good">
+      <strong>Try these changes (each one teaches something)</strong>
+      <ul>
+        <li>Add a <strong>Clear all</strong> button, and ask for confirmation with <code>JOptionPane.showConfirmDialog</code>.</li>
+        <li>Make double-click on a note open it in a dialog for editing.</li>
+        <li>Show the note count in the window title.</li>
+        <li>Sort the notes alphabetically with a stream: <code>list.stream().sorted()</code>.</li>
+      </ul>
+    </div>
+
+    <h2 id="threads">7. Keep the window responsive</h2>
+    <p>Our file is tiny, so reading it takes microseconds. Real apps load large files, call web services or crunch numbers, and that can take seconds. If you do it inside a listener, you are the three-hour stew in the cafe: the window cannot repaint, buttons look dead, and the operating system may label the program &ldquo;not responding&rdquo;.</p>
+    <p>The rules are simple:</p>
+    <ol>
+      <li><strong>Slow work goes on a background thread.</strong></li>
+      <li><strong>Touching the UI goes on the event thread.</strong></li>
+    </ol>
+    <p>Swing gives you <code>SwingWorker</code> to do both. It runs <code>doInBackground</code> on a worker thread and <code>done</code> back on the event thread:</p>
+<pre><code>// needs: import javax.swing.SwingWorker; import java.util.List;
+private void loadNotesInBackground() {
+    status.setText("Loading...");
+    new SwingWorker&lt;List&lt;String&gt;, Void&gt;() {
+        @Override
+        protected List&lt;String&gt; doInBackground() throws Exception {
+            return store.load();                              // background thread: no UI code here
+        }
+
+        @Override
+        protected void done() {                               // event thread again: safe to touch the UI
+            try {
+                get().forEach(model::addElement);
+                status.setText(model.size() + " notes");
+            } catch (Exception ex) {
+                status.setText("Could not load: " + ex.getMessage());
+            }
+        }
+    }.execute();
+}</code></pre>
+    <table>
+      <tr><th></th><th>Swing</th><th>JavaFX</th></tr>
+      <tr><td><strong>The UI thread is called</strong></td><td>Event dispatch thread (EDT)</td><td>JavaFX Application Thread</td></tr>
+      <tr><td><strong>Start the UI</strong></td><td><code>SwingUtilities.invokeLater</code></td><td><code>Application.launch</code> and <code>start</code></td></tr>
+      <tr><td><strong>Run something on the UI thread</strong></td><td><code>SwingUtilities.invokeLater</code></td><td><code>Platform.runLater</code></td></tr>
+      <tr><td><strong>Background task helper</strong></td><td><code>SwingWorker</code></td><td><code>Task</code> and <code>Service</code></td></tr>
+    </table>
+    <p>The concept (never block the UI thread; only touch components on it) is the same in both. It is also the same rule that Android has for its main thread.</p>
+
+    <h2 id="fx">8. Swing or JavaFX?</h2>
+    <table>
+      <tr><th></th><th>Swing</th><th>JavaFX</th></tr>
+      <tr><td><strong>Where it comes from</strong></td><td>Part of the JDK (<code>java.desktop</code> module)</td><td>Separate project (OpenJFX), not in the JDK since Java 11</td></tr>
+      <tr><td><strong>Setup</strong></td><td>None</td><td>Add the library with Maven or Gradle, or download the SDK</td></tr>
+      <tr><td><strong>Look</strong></td><td>Dated by default, but can be modernised (for example with FlatLaf)</td><td>Modern by default, styled with CSS</td></tr>
+      <tr><td><strong>Layout and design tools</strong></td><td>Layout managers in code; IDE form designers</td><td>Layouts in code or FXML files; Scene Builder drag-and-drop tool</td></tr>
+      <tr><td><strong>Graphics, animation, media</strong></td><td>Basic</td><td>Strong: 2D, 3D, animation, charts, media</td></tr>
+      <tr><td><strong>Packaging</strong></td><td>Simple: a normal JAR</td><td>More steps: the libraries must be on the module path</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Small tools, coursework, quick delivery, mature codebases</td><td>New apps with rich visuals, if you accept the extra setup</td></tr>
+    </table>
+    <p>The same Notes window in JavaFX looks like this. Compare it with the Swing version: a <code>Stage</code> replaces <code>JFrame</code>, a <code>Scene</code> holds the content, and <code>setOnAction</code> replaces <code>addActionListener</code>.</p>
+<pre><code>import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class HelloFx extends Application {
+    @Override
+    public void start(Stage stage) {
+        Label label = new Label("0 clicks");
+        Button button = new Button("Click me");
+        int[] clicks = {0};
+        button.setOnAction(e -&gt; label.setText(++clicks[0] + " clicks"));
+
+        stage.setScene(new Scene(new VBox(10, label, button), 240, 120));
+        stage.setTitle("Hello JavaFX");
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}</code></pre>
+    <p>The easiest way to run JavaFX is through Maven. Add the library and the run plugin to <code>pom.xml</code> (take the version numbers from <a href="https://openjfx.io/" target="_blank" rel="noopener">openjfx.io</a>), then run <code>mvn javafx:run</code>:</p>
+<pre><code>&lt;dependencies&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.openjfx&lt;/groupId&gt;
+    &lt;artifactId&gt;javafx-controls&lt;/artifactId&gt;
+    &lt;version&gt;VERSION&lt;/version&gt;
+  &lt;/dependency&gt;
+&lt;/dependencies&gt;
+&lt;build&gt;
+  &lt;plugins&gt;
+    &lt;plugin&gt;
+      &lt;groupId&gt;org.openjfx&lt;/groupId&gt;
+      &lt;artifactId&gt;javafx-maven-plugin&lt;/artifactId&gt;
+      &lt;version&gt;VERSION&lt;/version&gt;
+      &lt;configuration&gt;&lt;mainClass&gt;HelloFx&lt;/mainClass&gt;&lt;/configuration&gt;
+    &lt;/plugin&gt;
+  &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+    <div class="callout">
+      <strong>Which should you learn first?</strong>
+      <p>If your book and course teach JavaFX, follow them: it is the better skill for new work. If you want the shortest path from zero to an installer, build with Swing first: nothing extra to install, and the packaging steps in sections 11 and 12 are simpler. Either way, the event loop, listeners, layouts and threading rules transfer completely.</p>
+    </div>
+
+    <h2 id="structure">9. Structure the project and test it</h2>
+    <p>A common beginner problem is a single enormous class where the buttons, the file code and the rules are tangled together. You cannot test any of it without opening a window. The fix is the same separation we used for <code>NoteStore</code>:</p>
+    <ul>
+      <li><strong>Model:</strong> data and rules in plain classes with no GUI imports.</li>
+      <li><strong>View:</strong> the window, the components and the layout.</li>
+      <li><strong>Controller or presenter:</strong> the glue that reacts to events by calling the model and updating the view. In a small app, the listeners in the view are enough.</li>
+    </ul>
+    <p>A good test: could you run the model code from a plain <code>main</code> method that shows no window? If yes, you can test it.</p>
+    <h3>A first unit test with JUnit 5</h3>
+    <p>JUnit is the standard Java test library. This test saves notes to a temporary folder and reads them back. The <code>@TempDir</code> parameter gives each test its own clean folder, which is deleted afterwards, so the test never touches your real notes.</p>
+<pre><code>import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+
+class NoteStoreTest {
+
+    @Test
+    void savesAndReloadsNotes(@TempDir Path dir) throws IOException {
+        NoteStore store = new NoteStore(dir.resolve("notes.txt"));
+
+        store.save(List.of("buy milk", "call mum"));
+
+        assertEquals(List.of("buy milk", "call mum"), store.load());
+    }
+
+    @Test
+    void missingFileMeansNoNotes(@TempDir Path dir) throws IOException {
+        NoteStore store = new NoteStore(dir.resolve("does-not-exist.txt"));
+
+        assertTrue(store.load().isEmpty());
+    }
+}</code></pre>
+    <p>The easiest way to run it is a build tool. Maven and Gradle download JUnit for you and run <code>mvn test</code> or <code>gradle test</code>. If you want the long version of testing (the test pyramid, JUnit 4 and 5, mocking, UI tests and TDD), read <a href="android-testing-guide.html">Testing Android Apps</a>. It is written for Android, but the JUnit parts apply to any Java project.</p>
+    <p>Testing the window itself is harder. Libraries such as <a href="https://github.com/assertj/assertj-swing" target="_blank" rel="noopener">AssertJ Swing</a> (for Swing) and <a href="https://github.com/TestFX/TestFX" target="_blank" rel="noopener">TestFX</a> (for JavaFX) can click buttons from tests. A small number of those, plus many tests of the model, is a good balance.</p>
+
+    <h2 id="polish">10. Polish: look, settings and accessibility</h2>
+    <h3>A better look</h3>
+    <p>Swing defaults to a plain cross-platform look. One line changes it to the look of the current operating system, and a free library called FlatLaf gives it a modern, flat style:</p>
+<pre><code>// Option A: the system look (call this before creating any window)
+UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+// Option B: FlatLaf (add the com.formdev:flatlaf library first)
+FlatLightLaf.setup();</code></pre>
+    <h3>Remember user settings</h3>
+    <p>Window size, last folder, preferred theme. The simplest built-in tool is <code>java.util.prefs.Preferences</code>, which stores values in the right place on each operating system:</p>
+<pre><code>Preferences prefs = Preferences.userNodeForPackage(NotesApp.class);
+int width = prefs.getInt("width", 420);       // second argument is the default
+prefs.putInt("width", frame.getWidth());</code></pre>
+    <h3>Make it usable for everyone</h3>
+    <ul>
+      <li><strong>Keyboard first.</strong> Every action should work without a mouse. Use mnemonics (<code>button.setMnemonic('A')</code>), a default button (<code>frame.getRootPane().setDefaultButton(add)</code>) and a sensible tab order.</li>
+      <li><strong>Label inputs</strong> with <code>JLabel</code> and <code>setLabelFor</code>, and set accessible names so screen readers can announce controls.</li>
+      <li><strong>Do not rely on colour alone</strong> to show state, and keep text readable at larger system font sizes.</li>
+      <li><strong>Confirm destructive actions</strong> (delete, overwrite) and make errors say what to do next.</li>
+      <li><strong>A real icon.</strong> Provide it as PNG for the window, and as .ico (Windows) and .icns (macOS) for the installer.</li>
+    </ul>
+
+    <h2 id="jar">11. Package a JAR</h2>
+    <p>A <strong>JAR</strong> file is a ZIP archive of compiled classes plus a small manifest that names the class to start. It is the simplest thing you can hand to someone who already has Java.</p>
+<pre><code>mkdir -p dist
+jar --create --file dist/notes.jar --main-class notes.NotesApp -C out .
+java -jar dist/notes.jar</code></pre>
+    <p>Explaining the command: <code>--file</code> is the archive to create, <code>--main-class</code> writes the manifest entry that <code>java -jar</code> reads, and <code>-C out .</code> means &ldquo;change into <code>out</code> and add everything&rdquo;. If you use a library such as FlatLaf, the JAR needs it too, either on the class path (<code>java -cp dist/notes.jar:lib/flatlaf.jar ...</code>) or bundled with a build plugin.</p>
+    <div class="bad">
+      <strong>Why a JAR alone is not a good way to ship</strong>
+      <ul>
+        <li>The user must already have a suitable Java installed, and the right version.</li>
+        <li>Double-clicking a JAR works on some systems and not on others.</li>
+        <li>There is no icon, no Start-menu entry, and no uninstaller.</li>
+      </ul>
+    </div>
+    <p>A JAR is still useful for classmates, graders and developer tools. For everyone else, build an installer.</p>
+
+    <h2 id="ship">12. Ship it: jlink and jpackage</h2>
+    <p>Two tools inside the JDK do the heavy work.</p>
+    <ul>
+      <li><strong><code>jlink</code></strong> builds a <em>custom runtime</em>: a small copy of Java containing only the modules your app needs.</li>
+      <li><strong><code>jpackage</code></strong> takes your JAR and a runtime and produces a native installer: <code>.msi</code> or <code>.exe</code> on Windows, <code>.dmg</code> or <code>.pkg</code> on macOS, <code>.deb</code> or <code>.rpm</code> on Linux. The result carries its own Java, so the user installs nothing else.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Pipeline: source files are compiled by javac into classes, packed by jar into a JAR, then jpackage together with a jlink runtime produces a native installer.">
+        <rect class="boxb" x="8"   y="50" width="104" height="54" rx="12"/><text class="b c" x="60"  y="74">.java</text><text class="sub c" x="60"  y="92">source</text>
+        <rect class="box"  x="140" y="50" width="104" height="54" rx="12"/><text class="b c" x="192" y="74">.class</text><text class="sub c" x="192" y="92">javac</text>
+        <rect class="boxo" x="272" y="50" width="104" height="54" rx="12"/><text class="b c" x="324" y="74">.jar</text><text class="sub c" x="324" y="92">jar</text>
+        <rect class="boxp" x="404" y="50" width="104" height="54" rx="12"/><text class="b c" x="456" y="74">jpackage</text><text class="sub c" x="456" y="92">+ jlink runtime</text>
+        <rect class="boxg" x="536" y="50" width="96" height="54" rx="12"/><text class="b c" x="584" y="74">Installer</text><text class="sub c" x="584" y="92">.msi .dmg .deb</text>
+        <path class="arrow" d="M114,77 L136,77"/><path class="arrow" d="M246,77 L268,77"/><path class="arrow" d="M378,77 L400,77"/><path class="arrow" d="M510,77 L532,77"/>
+        <text class="sub c" x="320" y="146">Each arrow is one command. The last step must run on the operating system you are building for.</text>
+      </svg>
+      <figcaption>From source code to a double-clickable installer, using only tools from the JDK.</figcaption>
+    </figure>
+    <h3>Step 1: find out which modules you need</h3>
+<pre><code>jdeps --print-module-deps --ignore-missing-deps dist/notes.jar
+# prints: java.base,java.desktop</code></pre>
+    <p>Java is split into modules. A Swing app needs <code>java.desktop</code>, plus the always-present <code>java.base</code>. Everything else (database drivers, the compiler, XML tools) can be left out, which keeps your download small.</p>
+    <h3>Step 2: build the installer</h3>
+    <p>Put the JAR (and any libraries) in a folder, here <code>dist</code>. Then run the command for your system. The pieces in common are the app name, version, input folder and main class.</p>
+<pre><code># macOS
+jpackage --type dmg --name Notes --app-version 1.0.0 --vendor "Your Name" \
+  --input dist --main-jar notes.jar --main-class notes.NotesApp \
+  --add-modules java.desktop --icon packaging/notes.icns --dest installers
+
+# Windows (PowerShell: use ` at the end of a line instead of \)
+jpackage --type msi --name Notes --app-version 1.0.0 --vendor "Your Name" `
+  --input dist --main-jar notes.jar --main-class notes.NotesApp `
+  --add-modules java.desktop --icon packaging\notes.ico `
+  --win-menu --win-shortcut --win-dir-chooser --dest installers
+
+# Linux (Debian, Ubuntu)
+jpackage --type deb --name notes --app-version 1.0.0 --vendor "Your Name" \
+  --input dist --main-jar notes.jar --main-class notes.NotesApp \
+  --add-modules java.desktop --icon packaging/notes.png \
+  --linux-shortcut --dest installers</code></pre>
+    <p>Useful options: <code>--type app-image</code> builds a plain folder with the app and its runtime (no installer tools needed, good for a first test), <code>--java-options "-Xmx512m"</code> passes settings to the JVM, and <code>--runtime-image</code> uses a runtime you made yourself with <code>jlink</code>. When your project uses extra libraries, put them in the <code>--input</code> folder and list them in the JAR&rsquo;s class path, or use the module path options described in the jpackage documentation.</p>
+    <table>
+      <tr><th>You build on&hellip;</th><th>You get</th><th>You must also have</th></tr>
+      <tr><td><strong>Windows</strong></td><td><code>.msi</code> or <code>.exe</code> installer</td><td>The WiX Toolset (see the jpackage documentation for the version your JDK supports)</td></tr>
+      <tr><td><strong>macOS</strong></td><td><code>.dmg</code> or <code>.pkg</code></td><td>Xcode command-line tools. The version number must start with 1 or higher (not 0.x)</td></tr>
+      <tr><td><strong>Linux</strong></td><td><code>.deb</code> or <code>.rpm</code></td><td><code>dpkg</code> (Debian family) or <code>rpmbuild</code> (Red Hat family)</td></tr>
+    </table>
+    <div class="note"><p><strong>No cross-compiling.</strong> <code>jpackage</code> builds for the system it runs on. To make a Windows installer you run it on Windows, and a Mac installer on a Mac. If you do not own all three, use a build service (next section).</p></div>
+    <h3>What your users will see</h3>
+    <ul>
+      <li><strong>Size.</strong> A bundled Swing app is typically tens of megabytes, mostly the Java runtime. When I ran the macOS command above on this exact Notes app (JDK 17), the <code>.dmg</code> was about 31 MB and the unpacked app about 78 MB. That is normal.</li>
+      <li><strong>Security warnings.</strong> An installer without a digital signature triggers warnings: Windows SmartScreen on Windows, Gatekeeper on macOS. Users can still open it, but they must click through. Removing the warning needs a code-signing certificate on Windows, and an Apple Developer account plus <em>notarization</em> on macOS. Both cost money, and they are optional for coursework and portfolio projects. Mention the warning in your README so users are not scared.</li>
+      <li><strong>Updates.</strong> A plain installer does not update itself. For a student project, publishing a new version on your releases page is enough.</li>
+    </ul>
+
+    <h2 id="release">13. Publish releases and automate builds</h2>
+    <p>Put the project on GitHub and attach your installers to a <strong>Release</strong>: a page with a version tag, release notes and downloadable files. Anyone can then download your app from a stable link, and it makes a strong item for a CV or portfolio.</p>
+    <p>Because <code>jpackage</code> must run on each target system, a GitHub Actions <strong>matrix</strong> job is the practical answer: it runs the same steps on a Mac, a Windows and a Linux machine in the cloud and saves each installer.</p>
+<pre><code># .github/workflows/package.yml
+name: Package installers
+on:
+  push:
+    tags: ["v*"]            # run when you push a tag such as v1.0.0
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - { os: macos-latest,   type: dmg }
+          - { os: windows-latest, type: msi }
+          - { os: ubuntu-latest,  type: deb }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Compile and make the JAR
+        run: |
+          mkdir -p out dist installers
+          javac -d out src/notes/*.java
+          jar --create --file dist/notes.jar --main-class notes.NotesApp -C out .
+      - name: Build the installer
+        run: |
+          jpackage --type ${{ matrix.type }} --name Notes --app-version 1.0.0 \
+            --input dist --main-jar notes.jar --main-class notes.NotesApp \
+            --add-modules java.desktop --dest installers
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.os }}
+          path: installers/*</code></pre>
+    <p>Check that each runner image has the tools it needs (for example WiX on Windows), and read the logs of your first run carefully, because the first run on a new system usually needs a fix or two. To publish the files on the Release page, add a step that uploads them to the release for the tag.</p>
+    <h3>Things not to use</h3>
+    <ul>
+      <li><strong>Java applets</strong> (windows inside a web page) no longer work in browsers.</li>
+      <li><strong>Java Web Start</strong> (launching apps from a link) was removed from Java in version 11.</li>
+      <li><strong>&ldquo;Please install Java first&rdquo;</strong> as the install instruction. Bundle the runtime with <code>jpackage</code> instead.</li>
+    </ul>
+
+    <h2 id="mistakes">14. Common mistakes</h2>
+    <table>
+      <tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr>
+      <tr><td>Long work inside a listener</td><td>The window freezes, then the OS says &ldquo;not responding&rdquo;</td><td>Move it to <code>SwingWorker</code> (or a JavaFX <code>Task</code>)</td></tr>
+      <tr><td>Changing components from another thread</td><td>Random glitches or exceptions that appear once in a hundred runs</td><td>Update only on the event thread: <code>invokeLater</code> or <code>Platform.runLater</code></td></tr>
+      <tr><td>Building the UI outside <code>invokeLater</code></td><td>Works on your machine, fails on someone else&rsquo;s</td><td>Start every Swing app from <code>SwingUtilities.invokeLater</code></td></tr>
+      <tr><td>Hard-coded file paths such as <code>C:\Users\me\notes.txt</code></td><td>Breaks on any other computer</td><td>Use <code>user.home</code> and <code>Path.of</code>, or <code>Preferences</code></td></tr>
+      <tr><td>Saving next to the program</td><td>Fails when installed in a read-only folder</td><td>Store data in the user&rsquo;s home or app-data folder</td></tr>
+      <tr><td>Pixel positions (<code>setBounds</code>) everywhere</td><td>Broken layouts on other screens and fonts</td><td>Use layout managers</td></tr>
+      <tr><td>One giant <code>main</code> class</td><td>Nothing is testable, and every change is risky</td><td>Split model and view, and test the model</td></tr>
+      <tr><td>Swallowing exceptions (<code>catch (Exception e) {}</code>)</td><td>Failures are silent</td><td>Show a message, or at least log the error</td></tr>
+      <tr><td>Only testing from the IDE</td><td>The app works in the IDE and fails after packaging</td><td>Run the installed app on a clean machine or account</td></tr>
+      <tr><td>Forgetting <code>EXIT_ON_CLOSE</code></td><td>The window closes but the process stays alive</td><td>Set the default close operation</td></tr>
+      <tr><td>Ignoring high-resolution screens</td><td>Blurry or tiny UI</td><td>Use a recent JDK, vector or large icons, and layout managers</td></tr>
+    </table>
+
+    <h2 id="ladder">15. Projects to practise, and a portfolio checklist</h2>
+    <p>Learning sticks when you build things that grow. Each project adds one new idea:</p>
+    <table>
+      <tr><th>#</th><th>Project</th><th>New ideas</th></tr>
+      <tr><td>1</td><td>Counter and calculator</td><td>Buttons, labels, layouts, simple events</td></tr>
+      <tr><td>2</td><td><strong>Notes</strong> (this guide)</td><td>Lists, files, exceptions, packaging</td></tr>
+      <tr><td>3</td><td>To-do list with due dates and filters</td><td>Models, sorting, <code>java.time</code> dates, tables</td></tr>
+      <tr><td>4</td><td>Image viewer or simple drawing tool</td><td>Custom painting, mouse events, file dialogs</td></tr>
+      <tr><td>5</td><td>Expense tracker with a chart</td><td>JDBC and SQLite, or CSV files; charts</td></tr>
+      <tr><td>6</td><td>Chat client for a small server you also write</td><td>Sockets, threads, background updates to the UI</td></tr>
+      <tr><td>7</td><td>Game of life, Sudoku or a board game</td><td>Timers, animation, game loops, state machines</td></tr>
+    </table>
+    <div class="good">
+      <strong>Portfolio checklist (so a stranger can try your app in two minutes)</strong>
+      <ul>
+        <li>A <strong>README</strong> with a one-line description, a screenshot, how to run from source, and how to install.</li>
+        <li>A <strong>Release</strong> with installers for at least one system, and a note about any security warning.</li>
+        <li>A clear <strong>folder structure</strong> and a few unit tests of the model.</li>
+        <li>A short <strong>&ldquo;what I learned&rdquo;</strong> section: the hardest bug, and what you would do next.</li>
+        <li>A licence file, so others know if they may reuse your code.</li>
+      </ul>
+    </div>
+
+    <h2 id="takeaways">16. Takeaways and glossary</h2>
+    <ul>
+      <li>A desktop app is an event loop plus listeners. Keep listeners fast.</li>
+      <li>Swing needs nothing beyond the JDK. JavaFX is more modern but needs extra setup.</li>
+      <li>Separate logic from screens, so you can test the logic.</li>
+      <li>Store data in the user&rsquo;s folder, and use <code>Path</code> instead of hard-coded strings.</li>
+      <li>A JAR is for developers. <code>jpackage</code> makes the installer for everyone else.</li>
+      <li>Build on each operating system you support, ideally with a CI matrix.</li>
+      <li>Use the Deitel and Deitel book for the language, and projects like this one for finishing skills.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Event</td><td>Something the user or system did: a click, a key press, a timer firing.</td></tr>
+      <tr><td>Listener</td><td>Code you register to run when a particular event happens.</td></tr>
+      <tr><td>Event dispatch thread (EDT)</td><td>The one thread that handles Swing events and drawing.</td></tr>
+      <tr><td>Layout manager</td><td>An object that positions components for you and adapts to the window size.</td></tr>
+      <tr><td>Lambda</td><td>A short, unnamed function, often used as a listener.</td></tr>
+      <tr><td>SwingWorker</td><td>A Swing helper that runs work in the background and returns the result to the event thread.</td></tr>
+      <tr><td>JAR</td><td>A ZIP-style archive of compiled Java classes and a manifest.</td></tr>
+      <tr><td>Module</td><td>A named part of Java or of your app (for example <code>java.desktop</code>).</td></tr>
+      <tr><td>jlink</td><td>The JDK tool that builds a small custom Java runtime.</td></tr>
+      <tr><td>jpackage</td><td>The JDK tool that builds a native installer with the runtime included.</td></tr>
+      <tr><td>Code signing</td><td>Proving who made an installer, so operating systems warn less.</td></tr>
+      <tr><td>CI matrix</td><td>A build that runs the same steps on several operating systems.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://deitel.com/books/" target="_blank" rel="noopener">Deitel &amp; Associates: books and source code</a> (<em>Java How to Program</em>, with downloadable examples)</li>
+      <li><a href="https://dev.java/learn/" target="_blank" rel="noopener">dev.java: learn Java</a> &middot; <a href="https://adoptium.net/" target="_blank" rel="noopener">Eclipse Temurin JDK downloads</a></li>
+      <li><a href="https://docs.oracle.com/javase/tutorial/uiswing/" target="_blank" rel="noopener">Oracle&rsquo;s Swing tutorial</a> &middot; <a href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html" target="_blank" rel="noopener">SwingWorker API</a></li>
+      <li><a href="https://openjfx.io/" target="_blank" rel="noopener">OpenJFX (JavaFX)</a> &middot; <a href="https://gluonhq.com/products/scene-builder/" target="_blank" rel="noopener">Scene Builder</a> &middot; <a href="https://www.formdev.com/flatlaf/" target="_blank" rel="noopener">FlatLaf</a></li>
+      <li><a href="https://docs.oracle.com/en/java/javase/21/jpackage/" target="_blank" rel="noopener">The jpackage guide</a> &middot; <a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jlink.html" target="_blank" rel="noopener">jlink</a> &middot; <a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jdeps.html" target="_blank" rel="noopener">jdeps</a></li>
+      <li><a href="https://wixtoolset.org/" target="_blank" rel="noopener">WiX Toolset</a> (Windows installers) &middot; <a href="https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution" target="_blank" rel="noopener">Notarizing macOS software</a></li>
+      <li><a href="https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository" target="_blank" rel="noopener">GitHub Releases</a> &middot; <a href="https://github.com/actions/setup-java" target="_blank" rel="noopener">setup-java action</a> &middot; <a href="https://maven.apache.org/" target="_blank" rel="noopener">Maven</a> &middot; <a href="https://gradle.org/" target="_blank" rel="noopener">Gradle</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

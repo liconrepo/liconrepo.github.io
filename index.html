@@ -482,6 +482,7 @@
       text-transform: uppercase; color: var(--muted); margin-bottom: 32px;
       display: flex; align-items: center; gap: 14px;
     }
+    .section-label .sec-count { padding: 1px 9px; border: 1px solid var(--border-h); border-radius: 999px; font-size: calc(11px * var(--fs, 1)); font-weight: 600; letter-spacing: .4px; color: var(--sub); text-transform: none; background: var(--card); }
     .section-label::after {
       content: ''; flex: 1; height: 1px;
       background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
@@ -1061,8 +1062,15 @@
   <div class="container">
     <p class="section-label">Technical Writing</p>
 
-    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">5 posts</span></p>
+    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">6 posts</span></p>
     <div class="blog-grid new-grid">
+      <a href="blog/java-desktop-app-guide.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Build and Ship a Desktop App with Java SE: A Hands-On Guide for CS Students</div>
+        <div class="blog-summary">Build a Notes app with Java SE and Swing, learn event-driven programming and threading, test it with JUnit, and package it with jar, jlink and jpackage. Includes a reading map for the Deitel and Deitel book.</div>
+        <div class="blog-tags"><span class="blog-tag">Java SE</span><span class="blog-tag">Swing</span><span class="blog-tag">JavaFX</span><span class="blog-tag">jpackage</span><span class="blog-tag">Students</span></div>
+        <div class="blog-footer"><span class="views-badge">~35 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
       <a href="blog/android-testing-guide.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
         <div class="blog-title">Testing Android Apps: The Test Pyramid, JUnit, UI Automation and TDD</div>
@@ -2146,6 +2154,18 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && open) { settle(false); bar.focus(); } });
     document.addEventListener('pointerdown', e => { if (open && !drag && !tray.contains(e.target) && !bar.contains(e.target)) settle(false); });
     setP(0);
+  })();
+
+  /* Counts next to the Open Source and Technical Writing headings, worked out from the page itself */
+  (function () {
+    const label = text => [...document.querySelectorAll('.section-label')].find(l => l.textContent.trim() === text);
+    const add = (el, n, unit) => { if (!el || !n) return; const b = document.createElement('span'); b.className = 'sec-count'; b.textContent = n + ' ' + (n === 1 ? unit : unit + 's'); b.setAttribute('aria-label', n + ' ' + unit + (n === 1 ? '' : 's')); el.appendChild(b); };
+    add(label('Open Source'), document.querySelectorAll('.oss-card').length, 'project');
+    const articles = document.querySelectorAll('#blogs .blog-grid .blog-card.featured').length;
+    const parts = [...document.querySelectorAll('.series-toggle[data-count]')].reduce((n, b) => n + (+b.dataset.count || 0), 0);
+    const arch = [...document.querySelectorAll('#blogs .blog-cat')].find(c => /Archive/.test(c.textContent));
+    const archived = arch ? parseInt((arch.querySelector('.bc-sub') || {}).textContent, 10) || 0 : 0;
+    add(label('Technical Writing'), articles + parts + archived, 'post');
   })();
 </script>
 </body>
