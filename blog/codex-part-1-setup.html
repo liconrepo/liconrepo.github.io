@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Meet Codex and set it up: interfaces, first session, models — Codex series part 1</title>
+  <meta name="description" content="What Codex is, the official ways to use it, how to install the Codex CLI, sign in, run a first session, stay safe with approvals and the sandbox, change the model and use config.toml. Part 1 of 8." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="1">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Series &middot; Part 1 of 8</p>
+    <h1>Meet Codex and set it up: the interfaces, the first session, and choosing a model</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~31 min read</span></div>
+    <div class="tags"><span class="tag">Codex</span><span class="tag">OpenAI</span><span class="tag">Setup</span><span class="tag">Models</span><span class="tag">config.toml</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a class="on" href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Every time I start work on a project with an AI assistant, I catch myself explaining the same things again: how to build it, which folders matter, which style we follow. This eight-part series is about ending that habit with one small file called <code>AGENTS.md</code>. Before the file makes sense, though, you need the basics, so Part 1 covers what Codex is, the official ways to use it, how to install and sign in, how much freedom to give it, and how to pick a model.</p>
+
+    <div class="note"><p><strong>Codex changes quickly.</strong> This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages. Model names, plan limits and even command lists move from month to month, so where a fact is date-sensitive I say &ldquo;as of 18 October 2026&rdquo; and link the page it came from.</p></div>
+
+    <div class="callout">
+      <strong>Start here: your first 15 minutes</strong>
+      <ol>
+        <li><strong>Check your account.</strong> Codex works with a ChatGPT account (Free, Go, Plus, Pro, Business, Enterprise or Edu, with different features per plan) or with an OpenAI API key. See <a href="#signin">section 4</a>.</li>
+        <li><strong>Open a terminal.</strong> Never used one? The ChatGPT desktop app and the IDE extension are the two ways in that need no command line (<a href="#interfaces">section 2</a>).</li>
+        <li><strong>Install and check it.</strong> One command from <a href="#install">section 3</a>, then <code>codex --version</code>.</li>
+        <li><strong>Make a throwaway project in git</strong> and create a branch first (<code>git switch -c try-codex</code>), so anything Codex changes can be undone.</li>
+        <li><strong>Start it.</strong> Run <code>cd your-project</code>, then <code>codex</code>, and choose <strong>Sign in with ChatGPT</strong> (or another available method) the first time.</li>
+        <li><strong>Ask before you change.</strong> Try &ldquo;Tell me about this project&rdquo; (the docs&rsquo; own first prompt) and read the answer.</li>
+        <li><strong>Try one tiny change</strong>, such as &ldquo;add a one-line description to README.md&rdquo;. Then run <code>/diff</code> to see exactly what changed.</li>
+        <li><strong>Know how to stop.</strong> <kbd>Ctrl</kbd>+<kbd>C</kbd> or <code>/exit</code> closes the session. <a href="#stop">Section 5</a> covers the other controls.</li>
+      </ol>
+      <p><a href="#install">Section 3</a> to <a href="#first">section 5</a> explain each step, and the <a href="#safe">&ldquo;Stay safe on day one&rdquo;</a> list is worth reading before you approve anything.</p>
+    </div>
+
+    <h3>Words you will see</h3>
+    <table class="gloss">
+      <tr><th>Word</th><th>In plain words</th></tr>
+      <tr><td>Prompt</td><td>The message you type to Codex.</td></tr>
+      <tr><td>Token</td><td>A small chunk of text, roughly three-quarters of a word. Limits and costs are counted in tokens.</td></tr>
+      <tr><td>Context window</td><td>The amount of text Codex can look at at once: your messages, the files it read, and its own replies. A fresh chat starts nearly empty.</td></tr>
+      <tr><td>Chat</td><td>One conversation with Codex. The docs also use the word &ldquo;session&rdquo; for a CLI conversation, and older material says &ldquo;thread&rdquo; or &ldquo;task&rdquo;.</td></tr>
+      <tr><td>AGENTS.md</td><td>A text file in your project that gives Codex lasting instructions, so you do not have to repeat yourself.</td></tr>
+      <tr><td>Model</td><td>The AI behind Codex. Bigger ones think harder but are slower and use more of your allowance.</td></tr>
+      <tr><td>Sandbox</td><td>A fenced area the operating system enforces around the commands Codex runs.</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>The series at a glance (Parts 1 to 4 are the beginner level)</strong>
+      <ul>
+        <li><strong>Part 1 (this one):</strong> what Codex is, the official surfaces, setup, sign-in, first session, approvals and sandbox, changing the model and <code>config.toml</code>.</li>
+        <li><strong>Part 2:</strong> why Codex forgets between chats, what <code>AGENTS.md</code> is, where it lives, and how to write a good one.</li>
+        <li><strong>Part 3:</strong> how the file saves tokens, helps you onboard onto a new project or feature, and the mistakes to avoid.</li>
+        <li><strong>Part 4:</strong> the Codex models, the API, and the official links in one place.</li>
+        <li><strong>Parts 5 to 8 (advanced):</strong> day-to-day prompting, git and troubleshooting; extending Codex with MCP, skills, plugins and subagents; automation, CI and team setup; and Codex beyond code with a learning path.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 1</strong></summary>
+      <ol>
+        <li><a href="#what">What is Codex?</a></li>
+        <li><a href="#interfaces">The official ways to use it</a></li>
+        <li><a href="#install">Installing Codex</a></li>
+        <li><a href="#signin">Signing in: ChatGPT account or API key</a></li>
+        <li><a href="#first">Your first session</a></li>
+        <li><a href="#commands">Slash commands worth knowing</a></li>
+        <li><a href="#modes">Approvals, sandbox and permission modes</a></li>
+        <li><a href="#model">Changing the model and reasoning effort</a></li>
+        <li><a href="#settings">config.toml and where it lives</a></li>
+        <li><a href="#next">What comes next</a></li>
+      </ol>
+    </details>
+
+    <h2 id="what">1. What is Codex?</h2>
+    <p><strong>Codex</strong> is OpenAI&rsquo;s coding agent. You describe a goal in plain language, and Codex reads your project, edits files and runs commands to get there, within limits you set. The documentation&rsquo;s glossary describes the agent as the part that &ldquo;reasons over context, uses tools, and completes a task&rdquo;. Underneath is a large language model, the same kind of &ldquo;very fancy autocomplete&rdquo; I described in my <a href="private-ai-chat-android.html">Android AI chat post</a>: it reads your input as tokens and writes a reply one token at a time.</p>
+    <p>Two names get mixed up, so let me separate them:</p>
+    <table>
+      <tr><th>Name</th><th>What it is</th></tr>
+      <tr><td><strong>The model</strong></td><td>The &ldquo;brain&rdquo;. OpenAI offers several, in different sizes, and you can choose which one Codex uses (section 8).</td></tr>
+      <tr><td><strong>Codex</strong></td><td>The agent wrapped around a model. It can read your project, edit files, and run commands, with your permission. This series is about it.</td></tr>
+    </table>
+    <p>Codex also lives inside the ChatGPT desktop app. In the docs&rsquo; quickstart, you pick <strong>Codex</strong> from the ChatGPT dropdown when you want software development with codebase context and developer tools, and you pick ChatGPT for other work. This series is mostly about the coding side.</p>
+    <div class="analogy"><strong>A chat helper versus a teammate</strong>
+      <p>A normal chat window is like texting a smart friend: they only know what you paste in. Codex is more like a teammate sitting at your computer: it can open the files itself, search the code, run the tests and show you the result. The catch is that this teammate arrives with a blank memory for every new chat. Fixing that is the whole point of this series.</p>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="The Codex agent and its model sit in the middle. Around it are the CLI, the IDE extension, the ChatGPT desktop app and Codex cloud.">
+        <rect class="boxp" x="236" y="86" width="168" height="70" rx="16"/><text class="b c" x="320" y="116">Codex agent</text><text class="sub c" x="320" y="136">plus the model you pick</text>
+        <rect class="boxg" x="14" y="14" width="190" height="62" rx="12"/><text class="b c" x="109" y="40">Codex CLI</text><text class="sub c" x="109" y="60">in your terminal</text>
+        <rect class="boxb" x="436" y="14" width="190" height="62" rx="12"/><text class="b c" x="531" y="40">IDE extension</text><text class="sub c" x="531" y="60">beside your code</text>
+        <rect class="boxo" x="14" y="166" width="190" height="62" rx="12"/><text class="b c" x="109" y="192">ChatGPT desktop app</text><text class="sub c" x="109" y="212">projects, parallel chats</text>
+        <rect class="box" x="436" y="166" width="190" height="62" rx="12"/><text class="b c" x="531" y="192">Codex cloud</text><text class="sub c" x="531" y="212">tasks run on OpenAI&rsquo;s side</text>
+        <path class="arrow" d="M236,104 L170,78"/><path class="arrow" d="M404,104 L470,78"/><path class="arrow" d="M236,138 L170,164"/><path class="arrow" d="M404,138 L470,164"/>
+      </svg>
+      <figcaption>One agent, reached through different doors. The CLI is the door this part focuses on.</figcaption>
+    </figure>
+
+    <h2 id="interfaces">2. The official ways to use it</h2>
+    <p>Codex is not tied to one window. OpenAI ships it in several places. The CLI and the IDE extension share the same configuration layers, so a habit you learn in one carries over to the other.</p>
+    <table>
+      <tr><th>Surface</th><th>Good for</th></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/codex/cli" target="_blank" rel="noopener">Codex CLI</a></td><td>Use Codex from your terminal and scripts. Type <code>codex</code> inside your project folder. This is the surface most of this series shows.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/codex/ide" target="_blank" rel="noopener">IDE extension</a></td><td>Work with Codex beside your code. The docs list Visual Studio Code, Cursor, Windsurf and VS Code Insiders (extension), plus Xcode and JetBrains IDEs (their own integrations).</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/app" target="_blank" rel="noopener">ChatGPT desktop app</a></td><td>A standalone window for projects, local files, parallel chats and longer tasks. No terminal needed. Available for macOS, Windows and (as a preview) Linux.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/cloud" target="_blank" rel="noopener">Codex cloud</a></td><td>Run coding tasks in the cloud inside an environment you set up, then review the changes and open a pull request. It requires signing in with ChatGPT.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/mobile" target="_blank" rel="noopener">Codex on mobile</a></td><td>Start tasks, approve actions and review work from your phone. Tasks run in the cloud or on a connected computer. Availability depends on rollout and your workspace settings.</td></tr>
+    </table>
+    <p>The docs also describe a non-interactive mode, <code>codex exec</code>, for scripts and CI. We meet it in Part 7.</p>
+
+    <h3>What the maturity labels mean</h3>
+    <p>Some features carry a <a href="https://learn.chatgpt.com/docs/feature-maturity" target="_blank" rel="noopener">maturity label</a>. You will see these words in the docs, and in this series:</p>
+    <table>
+      <tr><th>Label</th><th>Meaning in the docs</th><th>What to do</th></tr>
+      <tr><td>Experimental</td><td>Unstable; OpenAI may remove or change it.</td><td>Use at your own risk.</td></tr>
+      <tr><td>Beta</td><td>Ready for broad testing; some aspects may change.</td><td>OK for evaluation and pilots; expect small changes.</td></tr>
+      <tr><td>Stable</td><td>Fully supported and consistent over time.</td><td>Safe for production use.</td></tr>
+      <tr><td>Deprecated</td><td>Still available, no longer recommended.</td><td>Avoid new use and plan to migrate.</td></tr>
+    </table>
+    <p>For example, as of 18 October 2026 the command reference marks <code>codex</code>, <code>codex exec</code> and <code>codex resume</code> as stable, and <code>codex cloud</code> as experimental. The Linux desktop app is described as a preview, and permission profiles as beta.</p>
+    <div class="note"><p>Features and install steps change often. Treat the <a href="https://learn.chatgpt.com/docs/codex/cli" target="_blank" rel="noopener">official Codex CLI page</a> and the <a href="https://learn.chatgpt.com/docs/quickstart" target="_blank" rel="noopener">quickstart</a> as the source of truth, and use this post for the ideas behind them. The core of Codex is also developed in the open at <a href="https://github.com/openai/codex" target="_blank" rel="noopener">github.com/openai/codex</a>; the docs say the IDE extension and Codex cloud are not open source.</p></div>
+
+    <h2 id="install">3. Installing Codex</h2>
+    <h3>Before you install</h3>
+    <ul>
+      <li><strong>A way to sign in:</strong> a ChatGPT account, or an OpenAI API key. Plans differ in what they include. As of 18 October 2026 the pricing page lists Codex on the web, in the CLI, in the IDE extension and on iOS under Plus, and lists the desktop app with GPT-6 Luna under Free and Go, subject to rollout. See the <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">pricing page</a> for current plans and limits.</li>
+      <li><strong>A project folder</strong> to work in, ideally one under git.</li>
+      <li><strong>Optional: git itself.</strong> The Windows app docs call Git the tool that powers the review panel and lets you inspect or revert changes.</li>
+    </ul>
+    <div class="note"><p>New to the terminal? Skip it for now: install the ChatGPT desktop app or the IDE extension instead. The CLI will still be here when you are ready. The docs do not publish a minimum macOS, Windows or Linux version for the CLI, so if the installer fails, start with the official <a href="https://learn.chatgpt.com/docs/codex/cli" target="_blank" rel="noopener">CLI page</a>.</p></div>
+
+    <h3>Pick the install command for your system</h3>
+    <table>
+      <tr><th>System</th><th>Command</th><th>Notes</th></tr>
+      <tr><td>macOS, Linux</td><td><code>curl -fsSL https://chatgpt.com/codex/install.sh | sh</code></td><td>The standalone installer. Running it again updates Codex.</td></tr>
+      <tr><td>Windows, PowerShell</td><td><code>powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"</code></td><td>Start it from a <em>new</em> PowerShell window. Running it again updates Codex.</td></tr>
+      <tr><td>Homebrew</td><td><code>brew install --cask codex</code></td><td>Update with <code>brew upgrade --cask codex</code>.</td></tr>
+      <tr><td>npm</td><td><code>npm install -g @openai/codex</code></td><td>Re-run the same command to update.</td></tr>
+    </table>
+    <p>You can also run <code>codex update</code>, which the command reference says checks for and applies an update when your installed release supports self-update.</p>
+
+    <h3>Windows: native, WSL or the desktop app</h3>
+    <p>On Windows you have three official routes:</p>
+    <ul>
+      <li><strong>Native CLI:</strong> the PowerShell command above. The Windows desktop app runs natively using PowerShell and the <a href="https://learn.chatgpt.com/docs/windows/windows-sandbox" target="_blank" rel="noopener">Windows sandbox</a>.</li>
+      <li><strong>WSL2 (Windows Subsystem for Linux):</strong> choose it when you need Linux-native tooling or your repositories already live in WSL2. In an elevated PowerShell or Windows Terminal run <code>wsl --install</code> (Ubuntu is a common choice), then <code>wsl</code> to open a Linux shell, and install Codex inside it with the macOS/Linux command. WSL1 is not supported: the docs say it worked through Codex 0.114, and from 0.115 the Linux sandbox uses <code>bubblewrap</code>.</li>
+      <li><strong>The ChatGPT desktop app:</strong> download it from the <a href="https://chatgpt.com/download/" target="_blank" rel="noopener">download page</a>, or run <code>winget install --id 9PLM9XGG6VKS -s msstore</code>. By default its agent runs in PowerShell; in <strong>Settings</strong> you can switch the agent to WSL and restart the app.</li>
+    </ul>
+<pre><code># Inside an elevated PowerShell (WSL route)
+wsl --install
+wsl
+
+# Then, inside the WSL shell
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+codex</code></pre>
+    <p>The docs also advise keeping repositories under your Linux home folder (for example <code>~/code/my-app</code>) rather than under <code>/mnt/c</code>, because Windows-mounted paths can be slower and cause more symlink and permission issues.</p>
+
+    <h3>Linux: CLI and desktop app</h3>
+    <p>On Linux the CLI uses the same installer as macOS. Codex&rsquo;s sandbox on Linux and WSL2 relies on <code>bubblewrap</code>, which the docs ask you to install first:</p>
+<pre><code># Debian / Ubuntu
+sudo apt install bubblewrap
+
+# Fedora
+sudo dnf install bubblewrap</code></pre>
+    <p>The ChatGPT desktop app for Linux is a preview. The docs list Ubuntu 24.04 LTS and 26.04 LTS, Debian 13, Fedora 43 and 44, and current Arch Linux, each for x64 and ARM64. Packages are a <code>.deb</code> (Ubuntu, Debian), an <code>.rpm</code> (Fedora) or an install script (Arch); follow the <a href="https://learn.chatgpt.com/docs/linux/linux-app" target="_blank" rel="noopener">Linux desktop app guide</a> for the exact download and install steps.</p>
+
+    <h3>Check that it worked</h3>
+    <p>Open a <em>new</em> terminal window and run:</p>
+<pre><code>codex --version</code></pre>
+    <p>It prints a version number. For a fuller health check, run <code>codex doctor</code>. The docs say it generates a diagnostic report covering installation, configuration, authentication, runtime, Git, terminal, app-server and chat inventory. Add <code>--summary</code> for just the grouped check rows and the final count.</p>
+
+    <h3>If you see &ldquo;command not found&rdquo; or &ldquo;not recognized&rdquo;</h3>
+    <p>This is the most common first-day problem with any command-line tool. It usually means your terminal cannot find the <code>codex</code> program. The part of the docs that covers it is brief, so here is what they support, in order:</p>
+    <ol>
+      <li><strong>Open a new terminal window.</strong> The docs&rsquo; Windows troubleshooting table gives this as the first fix when <code>codex</code> is not recognized after installation, because an already-open window does not see the updated PATH (the list of folders your terminal searches for commands).</li>
+      <li><strong>Check whether the command exists at all.</strong> The WSL page uses this on Linux-style shells:
+<pre><code>which codex || echo "codex not found"</code></pre>
+        On Windows PowerShell, <code>Get-Command codex</code> shows where it is found, and the docs suggest it for spotting competing standalone and npm copies when the wrong version starts.</li>
+      <li><strong>Check the PATH of the right account.</strong> The docs warn that an install done under a different account (for example a system account in a managed setup) does not install into your own profile.</li>
+      <li><strong>In WSL, install it inside WSL.</strong> The WSL page&rsquo;s own fix for &ldquo;cannot find codex&rdquo; is to verify the binary exists and is on PATH <em>inside</em> WSL. If it is missing, run the macOS/Linux installer in the WSL shell and repeat the <code>which</code> check above.</li>
+    </ol>
+    <p>The docs do not print a specific folder to add to PATH, so I will not guess one. If the steps above do not fix it, re-run the installer, or install with Homebrew or npm instead, then open a new terminal. Still stuck? <code>codex doctor</code> is built for this, and the <a href="https://github.com/openai/codex/issues" target="_blank" rel="noopener">issue tracker</a> is where the docs send bug reports.</p>
+
+    <h2 id="signin">4. Signing in: ChatGPT account or API key</h2>
+    <p>According to the <a href="https://learn.chatgpt.com/docs/auth" target="_blank" rel="noopener">authentication page</a>, Codex supports two ways to sign in when using OpenAI models. The desktop app, CLI and IDE extension support both. Codex cloud needs ChatGPT.</p>
+    <table>
+      <tr><th>Method</th><th>What it means</th><th>How in the CLI</th></tr>
+      <tr><td>Sign in with ChatGPT</td><td>Subscription access. Usage follows your ChatGPT workspace permissions and settings. This is the default.</td><td>Run <code>codex</code> (or <code>codex login</code>) and finish the browser flow.</td></tr>
+      <tr><td>API key</td><td>Usage-based access, billed through your OpenAI Platform account at standard API rates. Some features that rely on ChatGPT workspace access or cloud services are limited or unavailable.</td><td><code>printenv OPENAI_API_KEY | codex login --with-api-key</code></td></tr>
+    </table>
+    <p>Get an API key from the <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI dashboard</a>. The docs pipe the key in through stdin so it does not end up in your shell history as a typed argument. Compare which features each method supports on the <a href="https://learn.chatgpt.com/docs/pricing#feature-availability" target="_blank" rel="noopener">feature availability</a> table.</p>
+
+    <h3>Start it and sign in</h3>
+    <ol class="steps">
+      <li><strong>Go to your project.</strong> Codex works relative to the folder you start it in, so this matters.
+<pre><code>cd ~/projects/my-app</code></pre></li>
+      <li><strong>Start it.</strong>
+<pre><code>codex</code></pre></li>
+      <li><strong>Sign in.</strong> The first run asks you to choose <strong>Sign in with ChatGPT</strong> or another available method. For ChatGPT sign-in a browser window opens, and after you sign in the browser returns your credentials to Codex.</li>
+    </ol>
+    <figure class="fig">
+      <svg viewBox="0 0 640 120" role="img" aria-label="Setup flow: install, open the project folder, run codex, sign in, start working.">
+        <rect class="boxb" x="6"   y="26" width="108" height="62" rx="12"/><text class="b c" x="60"  y="52">Install</text><text class="sub c" x="60"  y="72">one command</text>
+        <rect class="boxp" x="140" y="26" width="108" height="62" rx="12"/><text class="b c" x="194" y="52">cd project</text><text class="sub c" x="194" y="72">pick a folder</text>
+        <rect class="boxg" x="274" y="26" width="108" height="62" rx="12"/><text class="b c" x="328" y="52">codex</text><text class="sub c" x="328" y="72">start a chat</text>
+        <rect class="boxo" x="408" y="26" width="108" height="62" rx="12"/><text class="b c" x="462" y="52">Sign in</text><text class="sub c" x="462" y="72">first run only</text>
+        <rect class="box"  x="542" y="26" width="92"  height="62" rx="12"/><text class="b c" x="588" y="52">Ask</text><text class="sub c" x="588" y="72">start working</text>
+        <path class="arrow" d="M116,57 L138,57"/><path class="arrow" d="M250,57 L272,57"/><path class="arrow" d="M384,57 L406,57"/><path class="arrow" d="M518,57 L540,57"/>
+      </svg>
+      <figcaption>Five steps from nothing to your first question.</figcaption>
+    </figure>
+
+    <h3>Good to know about sign-in</h3>
+    <ul>
+      <li><strong>Check or end it.</strong> <code>codex login status</code> prints the active sign-in method. <code>codex logout</code> (or <code>/logout</code> inside a chat) clears the stored credentials. Use it on a shared machine.</li>
+      <li><strong>Login is cached.</strong> Codex stores it locally, in a plaintext file at <code>~/.codex/auth.json</code> or in your operating system&rsquo;s credential store. The CLI and IDE extension share the cache. Treat <code>auth.json</code> like a password: do not commit it, paste it into tickets, or share it in chat. The <code>cli_auth_credentials_store</code> setting (<code>file</code>, <code>keyring</code>, <code>auto</code> or <code>ephemeral</code>) chooses where it goes.</li>
+      <li><strong>No browser on the machine?</strong> On a remote or headless computer, the docs prefer device code login, which they label beta: run <code>codex login --device-auth</code>, open the link on another device and enter the one-time code. It must be enabled in your ChatGPT security settings or workspace permissions first.</li>
+      <li><strong>Your sign-in method decides the rules.</strong> The docs say it determines which admin controls and data-handling policies apply: ChatGPT workspace settings for ChatGPT sign-in, your API organisation&rsquo;s settings for an API key.</li>
+    </ul>
+
+    <h2 id="first">5. Your first session</h2>
+    <p>Once you run <code>codex</code> in a project folder, you get a prompt. You type in plain language. A good first message is not &ldquo;write me a feature&rdquo;, it is a question that lets Codex look around. The CLI page&rsquo;s own first example is exactly that:</p>
+<pre><code>Tell me about this project</code></pre>
+    <p>If you want a safe place to practise, make a throwaway project first. This is the checklist I would follow on day one:</p>
+    <ol class="steps">
+      <li><strong>Create a playground in git.</strong>
+<pre><code>mkdir ~/codex-playground &amp;&amp; cd ~/codex-playground
+git init
+printf '# Playground\n' &gt; README.md
+git add . &amp;&amp; git commit -m "start"
+git switch -c try-codex</code></pre></li>
+      <li><strong>Start Codex</strong> with <code>codex</code> and, if asked, decide whether to trust the folder. If you are unsure, do not trust it yet: the docs say Codex may start in read-only until you explicitly trust the working directory.</li>
+      <li><strong>Ask a question.</strong> &ldquo;Tell me about this project.&rdquo; Nothing should change yet.</li>
+      <li><strong>Check where you stand.</strong> Type <code>/status</code>. The docs say it shows the active model, approval policy, writable roots and remaining context.</li>
+      <li><strong>Ask for one tiny change.</strong> &ldquo;Add a one-line description under the title in README.md.&rdquo; Read any approval request before you answer it.</li>
+      <li><strong>Inspect the result.</strong> Type <code>/diff</code> to see the git diff, including files git is not tracking yet.</li>
+      <li><strong>Keep or discard.</strong> Happy? <code>git commit -am "try codex"</code>. Not happy? <code>git restore README.md</code>, or just delete the playground.</li>
+      <li><strong>Leave and come back.</strong> Quit with <code>/exit</code>, then run <code>codex resume</code> (see below) to reopen a recent chat.</li>
+    </ol>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>~/projects/my-app &mdash; codex</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">Tell me about this project</span>
+
+<span class="t-o">&#9679;</span> I'll look at the project files first.
+  <span class="t-dim">read README.md</span>
+  <span class="t-dim">read app/build.gradle.kts</span>
+  <span class="t-dim">search "MainActivity"</span>
+
+<span class="t-o">&#9679;</span> This is an Android app that shows a list of notes.
+  <span class="t-g">&#8226;</span> UI is in <span class="t-p">app/src/main/java/.../ui/</span> (Jetpack Compose)
+  <span class="t-g">&#8226;</span> Data is stored with Room in <span class="t-p">.../data/</span>
+  <span class="t-g">&#8226;</span> Run it with <span class="t-b">./gradlew installDebug</span>
+
+<span class="t-dim">&gt;</span> <span class="t-dim">_</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup, not a live capture. Codex reads files itself, then summarises. Wording and layout vary by version.</figcaption>
+    </figure>
+    <p>Notice what happened. You did not paste any code. Codex chose which files to read. When it wants to do something outside its sandbox boundary, such as edit a file outside the workspace or use the network, it stops and asks you first. Section 7 explains exactly when.</p>
+    <p>Two prompt habits from the official <a href="https://learn.chatgpt.com/guides/best-practices" target="_blank" rel="noopener">best practices guide</a> pay off immediately. First, a good default prompt has four parts: the <strong>goal</strong>, the <strong>context</strong> (use <code>@</code> to search for a file and add its path), any <strong>constraints</strong>, and a <strong>done when</strong> condition such as &ldquo;tests pass&rdquo;. Second, for anything hard or vague, ask Codex to plan before it codes (the <code>/plan</code> command in section 6).</p>
+
+    <h3 id="stop">How to stop, interrupt and quit</h3>
+    <table>
+      <tr><th>You want to</th><th>Do this</th></tr>
+      <tr><td>Leave Codex</td><td>Press <kbd>Ctrl</kbd>+<kbd>C</kbd> or type <code>/exit</code> (the same as <code>/quit</code>). Save or commit anything important first.</td></tr>
+      <tr><td>Give new instructions while Codex is working</td><td>Press <kbd>Enter</kbd> to inject them into the current turn, or <kbd>Tab</kbd> to queue a follow-up prompt or slash command for the next turn.</td></tr>
+      <tr><td>Change your mind about your last message</td><td>Press <kbd>Esc</kbd> twice with an empty prompt to edit the previous message and fork the chat from that point.</td></tr>
+      <tr><td>Stop long-running commands Codex started</td><td><code>/ps</code> shows background terminals and their recent output; <code>/stop</code> stops them all.</td></tr>
+      <tr><td>Start a fresh conversation</td><td>Type <code>/new</code> (same CLI session) or <code>/clear</code> (clears the terminal view too).</td></tr>
+      <tr><td>Come back to an earlier conversation</td><td>Run <code>codex resume</code> (picker), <code>codex resume --last</code> (most recent in this folder), or type <code>/resume</code> inside Codex.</td></tr>
+      <tr><td>Step back from a bad edit</td><td>Use git: review with <code>/diff</code>, then restore files or switch branch.</td></tr>
+    </table>
+    <p>One honest gap: the pages I checked do not name a default key that interrupts just the current turn. They do show that the interrupt key is configurable (<code>interrupt_turn</code> under <code>[tui.keymap.chat]</code> in <code>config.toml</code>, with <code>f12</code> as the example), and that <code>/keymap</code> lets you inspect and change shortcut bindings. Open <code>/keymap</code> to see what your version uses.</p>
+
+    <h3 id="safe">Stay safe on day one</h3>
+    <div class="callout">
+      <strong>A short checklist before you approve anything</strong>
+      <ul>
+        <li><strong>Work on a git branch.</strong> Run <code>git switch -c try-codex</code> first and commit anything you care about. The docs themselves advise creating Git checkpoints before and after a task so you can revert changes.</li>
+        <li><strong>Keep the defaults while you learn.</strong> By default Codex keeps network access off and limits writes to the workspace. Check with <code>/status</code>.</li>
+        <li><strong>Read each approval request.</strong> Look especially at shell commands and anything that leaves the workspace. Say no if you are not sure.</li>
+        <li><strong>Start with questions or plan mode,</strong> not edits, in a project you do not know.</li>
+        <li><strong>Treat web results and fetched pages as untrusted.</strong> The docs warn that prompt injection (hidden instructions in content the agent reads) can make an agent follow untrusted instructions, so be careful when you enable live web search or network access.</li>
+        <li><strong>Keep secrets out of reach.</strong> Do not paste passwords or keys into chat, and never share <code>~/.codex/auth.json</code>.</li>
+        <li><strong>Avoid the full-bypass options</strong> <code>--dangerously-bypass-approvals-and-sandbox</code> (alias <code>--yolo</code>) and <code>--sandbox danger-full-access</code>. The docs say to use the first only inside an externally hardened environment, and describe it as no sandbox and no approvals.</li>
+        <li><strong>Check your workplace rules.</strong> What Codex reads is processed by OpenAI&rsquo;s service. If the code is your employer&rsquo;s, make sure using an AI tool on it is allowed, and remember that your sign-in method decides which data-handling policy applies.</li>
+      </ul>
+    </div>
+
+    <h2 id="commands">6. Slash commands worth knowing</h2>
+    <p>Typing <code>/</code> in the prompt opens a menu of commands that control the chat itself rather than talk to the model. Type a few letters to filter the list. If a chat is already running, you can type a slash command and press <kbd>Tab</kbd> to queue it for the next turn. These are the ones I use most. The full list is in the official <a href="https://learn.chatgpt.com/docs/developer-commands?surface=cli" target="_blank" rel="noopener">CLI reference</a>:</p>
+    <table>
+      <tr><th>Command</th><th>What it does</th></tr>
+      <tr><td><code>/status</code></td><td>Shows the active model, approval policy, writable roots and token usage.</td></tr>
+      <tr><td><code>/permissions</code></td><td>Sets what Codex can do without asking first, such as switching between Auto and Read Only.</td></tr>
+      <tr><td><code>/model</code></td><td>Chooses the active model, and the reasoning effort when available.</td></tr>
+      <tr><td><code>/plan</code></td><td>Switches to plan mode, optionally with a prompt, for example <code>/plan Propose a migration plan for this service</code>.</td></tr>
+      <tr><td><code>/init</code></td><td>Generates an <code>AGENTS.md</code> scaffold in the current directory (Part 2).</td></tr>
+      <tr><td><code>/diff</code></td><td>Shows the git diff, including files git is not tracking yet.</td></tr>
+      <tr><td><code>/review</code></td><td>Asks Codex to review your working tree and summarise issues, focusing on behaviour changes and missing tests.</td></tr>
+      <tr><td><code>/new</code>, <code>/clear</code></td><td>Start a new chat. <code>/clear</code> also clears the terminal first.</td></tr>
+      <tr><td><code>/resume</code></td><td>Reloads a saved chat from a picker.</td></tr>
+      <tr><td><code>/compact</code></td><td>Summarises the visible chat to free up context. Details in <a href="codex-part-3-tokens-onboarding.html">Part 3</a>.</td></tr>
+      <tr><td><code>/mention</code></td><td>Attaches a file or folder to the chat so Codex inspects it next.</td></tr>
+      <tr><td><code>/usage</code></td><td>Shows your account&rsquo;s token usage, or lets you use an available rate-limit reset.</td></tr>
+      <tr><td><code>/debug-config</code></td><td>Prints config layers and policy diagnostics, handy when a setting does not seem to apply.</td></tr>
+      <tr><td><code>/exit</code>, <code>/quit</code></td><td>Exit the CLI.</td></tr>
+    </table>
+    <p>Beyond these, the reference lists commands for <code>/fork</code>, <code>/side</code>, <code>/goal</code>, <code>/mcp</code>, <code>/skills</code>, <code>/hooks</code> and more. We meet most of them in Parts 5 to 7. Some commands appear only when available: for example <code>/fast</code> shows up only if the current model offers a Fast tier.</p>
+
+    <h2 id="modes">7. Approvals, sandbox and permission modes</h2>
+    <p>Earlier you saw that Codex can stop and ask. The docs explain this as two separate controls that work together:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="Two layers: the sandbox mode decides what Codex can technically do; the approval policy decides when Codex must ask before crossing that line.">
+        <rect class="boxb" x="14" y="14" width="292" height="150" rx="14"/><text class="b" x="32" y="42">Sandbox mode</text>
+        <text class="sub" x="32" y="70">What Codex CAN do technically</text>
+        <text class="sub" x="32" y="96">Where it may write files</text><text class="sub" x="32" y="116">Whether commands can use the network</text><text class="sub" x="32" y="136">Enforced by the operating system</text>
+        <rect class="boxo" x="334" y="14" width="292" height="150" rx="14"/><text class="b" x="352" y="42">Approval policy</text>
+        <text class="sub" x="352" y="70">WHEN Codex must stop and ask you</text>
+        <text class="sub" x="352" y="96">Before leaving the sandbox</text><text class="sub" x="352" y="116">Before using the network</text><text class="sub" x="352" y="136">Before commands outside a trusted set</text>
+        <text class="sub c" x="320" y="192">The sandbox draws the line. The approval policy decides who says yes when Codex wants to cross it.</text>
+      </svg>
+      <figcaption>Two layers, one safety model. Changing one does not silently change the other.</figcaption>
+    </figure>
+
+    <h3>The three sandbox modes</h3>
+    <table>
+      <tr><th>Sandbox mode (<code>--sandbox</code>)</th><th>What it allows</th></tr>
+      <tr><td><code>read-only</code></td><td>Codex can read files and run commands inside a read-only sandbox. It cannot write to your project. Good for chatting, planning and review.</td></tr>
+      <tr><td><code>workspace-write</code></td><td>Codex can also edit files in the workspace (the current directory plus temporary directories like <code>/tmp</code>). Network access stays off unless you turn it on.</td></tr>
+      <tr><td><code>danger-full-access</code></td><td>Removes the sandbox restrictions. Not recommended outside an isolated environment.</td></tr>
+    </table>
+    <p>Even in <code>workspace-write</code>, some paths stay read-only inside the workspace: <code>.git</code>, and <code>.agents</code>, <code>.codex</code> and <code>.aws</code> when they exist as directories.</p>
+
+    <h3>The approval policy</h3>
+    <p>The two values you can pass to <code>--ask-for-approval</code> (<code>-a</code>) are <code>on-request</code>, where Codex runs what the sandbox allows and asks when it needs to go beyond it, and <code>never</code>, which turns approval prompts off. The docs stress that <code>never</code> still works within whatever sandbox you chose, so you keep control of how much autonomy there is. They also mention a <code>granular</code> form for keeping some prompt categories interactive and rejecting others, and say the older <code>untrusted</code> value has been retired and can stop the client from starting if it is still in your config.</p>
+
+    <h3>The combinations you will actually use</h3>
+    <p>The docs call the default preset <strong>Auto</strong>. In the CLI you pick between the presets with <code>/permissions</code>. In the desktop app and IDE extension the permissions control sits below the composer, where the docs call the starting mode <strong>Ask for approval</strong>.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Three setups: Read Only for reviewing, Auto (workspace-write with on-request approvals) for normal work, and full access with no sandbox and no approvals, which is not recommended.">
+        <rect class="boxg" x="10" y="14" width="196" height="150" rx="14"/><text class="b" x="26" y="42">Read Only</text>
+        <text class="sub" x="26" y="68">read-only sandbox,</text><text class="sub" x="26" y="88">ask when it needs more.</text>
+        <text class="sub" x="26" y="118">Reads and answers.</text><text class="sub" x="26" y="138">Does not edit your files.</text>
+        <rect class="boxb" x="222" y="14" width="196" height="150" rx="14"/><text class="b" x="238" y="42">Auto (default preset)</text>
+        <text class="sub" x="238" y="68">workspace-write + on-request.</text><text class="sub" x="238" y="88">Reads, edits and runs</text><text class="sub" x="238" y="108">commands in the workspace.</text><text class="sub" x="238" y="128">Asks to go outside it or to</text><text class="sub" x="238" y="148">use the network.</text>
+        <rect class="boxr" x="434" y="14" width="196" height="150" rx="14"/><text class="b" x="450" y="42">Full access</text>
+        <text class="sub" x="450" y="68">danger-full-access, no</text><text class="sub" x="450" y="88">approvals (--yolo).</text>
+        <text class="sub" x="450" y="118">No sandbox, no prompts.</text><text class="sub" x="450" y="138">Not recommended.</text>
+        <path class="arrow" d="M14,196 L626,196"/>
+        <text class="sub" x="14" y="218">you decide every step</text><text class="sub" x="626" y="218" style="text-anchor:end">Codex moves faster, with fewer limits</text>
+        <text class="sub c" x="320" y="240">Plan mode (/plan) is separate: it is about thinking first, not about autonomy.</text>
+      </svg>
+      <figcaption>Three common setups. Switch between the first two at any time with /permissions.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Intent</th><th>Flags</th><th>Effect</th></tr>
+      <tr><td>Auto (default preset)</td><td>no flags, or <code>--sandbox workspace-write --ask-for-approval on-request</code></td><td>Read, edit and run commands in the workspace. Approval needed to edit outside it or to use the network.</td></tr>
+      <tr><td>Safe read-only browsing</td><td><code>--sandbox read-only --ask-for-approval on-request</code></td><td>Read files and run commands in the read-only sandbox. Actions outside it can need approval.</td></tr>
+      <tr><td>Auto-review</td><td><code>--approve-for-me</code></td><td>Same workspace-write boundary, but eligible approval requests go to an automatic reviewer instead of to you. In the desktop app this is <strong>Approve for me</strong>.</td></tr>
+      <tr><td>Dangerous full access</td><td><code>--dangerously-bypass-approvals-and-sandbox</code> (alias <code>--yolo</code>)</td><td>No sandbox, no approvals. The docs mark it not recommended.</td></tr>
+    </table>
+    <p>The <code>--approve-for-me</code> row comes from the command reference; the same behaviour is also written in the docs as <code>-c approvals_reviewer=auto_review</code>. The reviewer only looks at actions that already need approval, uses extra model calls, and can make mistakes, so the docs say it does not replace isolation or your own oversight. While you are learning, keep approvals on you.</p>
+
+    <h3>What Codex does on first launch</h3>
+    <p>The docs say Codex detects whether your folder is version-controlled and recommends <strong>Auto</strong> for version-controlled folders and <code>read-only</code> for folders that are not. That is one more reason to put your practice project in git. To accept the defaults, simply run <code>codex</code>. To set them explicitly:</p>
+<pre><code>codex --sandbox workspace-write --ask-for-approval on-request
+codex --sandbox read-only --ask-for-approval on-request</code></pre>
+
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/permissions</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/permissions</span>
+
+ Select approval preset
+ <span class="t-g">&#10003;</span> Auto        <span class="t-dim">edit and run in the workspace, ask beyond it</span>
+   Read Only   <span class="t-dim">read and answer, review edits first</span>
+   <span class="t-dim">(more choices may appear for your setup)</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. The preset names Auto and Read Only come from the docs; the layout and descriptions here are mine and vary by version, plan and organisation policy.</figcaption>
+    </figure>
+
+    <h3>Plan mode: think first</h3>
+    <p>Separately from permissions, <code>/plan</code> switches the chat into plan mode: Codex proposes an execution plan before implementation starts. You can add a prompt inline, for example <code>/plan Propose a migration plan for this service</code>. It is unavailable while Codex is already working. Why it matters: a plan is cheap to correct, and code is not. Catching a wrong assumption in step 2 of a plan costs you one sentence. Catching it after twenty edited files costs a lot of tokens and time. I use it for anything touching several files, new features, and any code I do not know well.</p>
+    <table>
+      <tr><th>Situation</th><th>Setup I would pick</th></tr>
+      <tr><td>First day with Codex, or unfamiliar project</td><td>Read Only or the default Auto, with git checkpoints</td></tr>
+      <tr><td>Big or vague change across many files</td><td><code>/plan</code> first, then Auto</td></tr>
+      <tr><td>Small, clear edit with tests to catch mistakes</td><td>Auto</td></tr>
+      <tr><td>Exploring or reviewing code, no changes wanted</td><td>Read Only</td></tr>
+      <tr><td>Long task you will check at the end</td><td>Auto, and consider automatic review once you know what it does</td></tr>
+    </table>
+    <div class="note"><p>Managed machines add another layer. Your organisation may enforce constraints, for example by disallowing <code>approval_policy = "never"</code> or <code>sandbox_mode = "danger-full-access"</code>, and local settings cannot override that. If a mode is missing or greyed out, ask your administrator before you blame your config. The Windows and Linux sandbox details are in the <a href="https://learn.chatgpt.com/docs/sandboxing" target="_blank" rel="noopener">sandbox page</a> and <a href="https://learn.chatgpt.com/docs/agent-approvals-security" target="_blank" rel="noopener">approvals and security page</a>.</p></div>
+
+    <h2 id="model">8. Changing the model and reasoning effort</h2>
+    <p>Codex can run on different models. A larger model reasons better about hard problems but is slower and uses more of your allowance. A smaller one is quick and fine for simple, repeatable tasks. Matching the model to the job is one of the easiest ways to work faster and spend less. The docs&rsquo; model page says to start with the default reasoning effort and raise it when the task needs deeper planning or analysis.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="A scale from fast and light to slow and strong: lower reasoning effort for quick, well-scoped tasks, medium for most work, high or above for hard multi-step tasks.">
+        <text class="sub" x="14" y="22">Reasoning effort trade-off</text>
+        <rect class="bar-g" x="14" y="36" width="190" height="34" rx="8"/><text class="c" x="109" y="58" style="fill:#fff">Low</text>
+        <rect class="bar-b" x="224" y="36" width="190" height="34" rx="8"/><text class="c" x="319" y="58" style="fill:#fff">Medium</text>
+        <rect class="bar-o" x="434" y="36" width="192" height="34" rx="8"/><text class="c" x="530" y="58" style="fill:#fff">High and above</text>
+        <text class="sub c" x="109" y="96">faster, fewer tokens</text><text class="sub c" x="319" y="96">balanced</text><text class="sub c" x="530" y="96">deeper, slower</text>
+        <text class="sub c" x="109" y="124">quick, well-scoped</text><text class="sub c" x="109" y="142">tasks</text>
+        <text class="sub c" x="319" y="124">tasks that need more</text><text class="sub c" x="319" y="142">planning</text>
+        <text class="sub c" x="530" y="124">difficult multi-step</text><text class="sub c" x="530" y="142">work with trade-offs</text>
+        <path class="arrow" d="M14,172 L626,172"/><text class="sub" x="14" y="186">more depth, time and usage &#8594;</text>
+      </svg>
+      <figcaption>A rule of thumb from the docs, not a law. Start at the default, step down for easy work, step up when stuck.</figcaption>
+    </figure>
+
+    <h3>How to choose</h3>
+<pre><code># 1. Inside a chat: pick a model and reasoning effort from the popup
+/model
+
+# 2. When you start Codex (this launch only)
+codex --model gpt-6.1-sol
+codex -m gpt-6-luna
+
+# 3. Saved in config.toml (see section 9)
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+
+# 4. Any single setting for one launch
+codex -c model_reasoning_effort=high</code></pre>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/model</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/model</span>
+
+ Choose a model
+ <span class="t-g">&#10003;</span> gpt-6.1-sol
+   gpt-6-luna
+   <span class="t-dim">(only models available to your account appear)</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. The picker only shows models available to your account and workspace, so your list will differ. Run <code>/status</code> afterwards to confirm the change.</figcaption>
+    </figure>
+    <p>Command-line flags beat saved settings for that launch. In the picker, the CLI can show more reasoning options if you select <strong>More reasoning&hellip;</strong> after choosing a model.</p>
+
+    <h3>Which models, as of 18 October 2026</h3>
+    <p>Per the <a href="https://learn.chatgpt.com/docs/models" target="_blank" rel="noopener">models page</a>, the docs recommend <strong>GPT-6.1 Sol</strong> (<code>gpt-6.1-sol</code>) when it is available to your account and client for complex coding and agentic work, and <strong>GPT-6 Luna</strong> (<code>gpt-6-luna</code>) for focused, repeatable tasks. Astra is described as the choice when a task needs the strongest capability across steps and tools. Availability depends on rollout, your sign-in method, your client and, for Enterprise and Edu, whether an administrator enabled a model. If a model is not listed in your picker, pick another.</p>
+    <div class="note"><p><strong>Retirements to know about.</strong> The docs say GPT-5.5 retired from Codex for ChatGPT sign-in on 14 October 2026 (API-key sessions were not affected), and that <code>gpt-5.3-codex-spark</code> retired on 14 September 2026. If an old script or config still names a retired model, replace it with an available one. The full model story, including the API, is in <a href="codex-part-4-models-api-links.html">Part 4</a>.</p></div>
+
+    <h3>Reasoning effort</h3>
+    <p>Effort levels have friendly names in the apps and plain names in config. The docs say Light in the desktop app, ChatGPT Work on the web and the IDE extension is called <strong>Low</strong> in the CLI. In <code>config.toml</code>, <code>model_reasoning_effort</code> takes values such as <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code> or <code>ultra</code>, but only the levels your model and client actually support. Guidance from the docs:</p>
+    <ul>
+      <li><strong>Low</strong> for quick, well-scoped tasks.</li>
+      <li><strong>Medium</strong> for tasks that need more planning.</li>
+      <li><strong>High</strong> and <strong>Extra High</strong> for difficult work with multiple steps, sources or trade-offs.</li>
+      <li><strong>Max</strong> gives the model more time on a single hard task; <strong>Ultra</strong> uses subagents to work on parts of a task in parallel. The docs say most tasks need neither, and that Luna supports up to Max but not Ultra.</li>
+    </ul>
+    <p>Higher effort takes longer and uses more tokens, so raise it on purpose. Reasoning efforts also do not map exactly between model generations, so the docs suggest trying a familiar task at a lower setting and adjusting.</p>
+    <p>One more control: <code>/fast</code> toggles a Fast service tier on or off and saves your choice, but only when the current model offers one.</p>
+
+    <h2 id="settings">9. config.toml and where it lives</h2>
+    <p>Beyond the model, you can save preferences in a <code>config.toml</code> file (TOML is a simple <code>key = "value"</code> text format). Per the <a href="https://learn.chatgpt.com/docs/config-file/config-basic" target="_blank" rel="noopener">config basics</a> page, your personal defaults live in <code>~/.codex/config.toml</code>, and you can scope settings to a project with a <code>.codex/config.toml</code> file in the repo. Codex loads project <code>.codex/</code> layers only when you trust the project. The CLI and the IDE extension share the same layers. In the extension, click the gear icon, then <strong>Codex Settings &gt; Open config.toml</strong>. The Codex home folder is <code>$CODEX_HOME</code>, which defaults to <code>~/.codex</code>; the app on Windows uses <code>%USERPROFILE%\.codex</code>.</p>
+    <p>When settings disagree, Codex resolves them in this order, highest first:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 260" role="img" aria-label="Configuration precedence from highest to lowest: command-line flags, project config, profile files, user config, cloud-managed and system config, built-in defaults.">
+        <rect class="boxr" x="10" y="10" width="620" height="38" rx="10"/><text class="b" x="26" y="34">1. CLI flags and -c overrides</text><text class="sub" x="620" y="34" style="text-anchor:end">wins</text>
+        <rect class="boxo" x="10" y="54" width="620" height="38" rx="10"/><text class="b" x="26" y="78">2. Project: .codex/config.toml (trusted projects only)</text>
+        <rect class="boxp" x="10" y="98" width="620" height="38" rx="10"/><text class="b" x="26" y="122">3. Profile file chosen with --profile (~/.codex/NAME.config.toml)</text>
+        <rect class="boxb" x="10" y="142" width="620" height="38" rx="10"/><text class="b" x="26" y="166">4. User: ~/.codex/config.toml</text>
+        <rect class="boxg" x="10" y="186" width="620" height="38" rx="10"/><text class="b" x="26" y="210">5 and 6. Cloud-managed defaults, then system config (/etc/codex/config.toml on Unix)</text>
+        <rect class="box" x="10" y="230" width="620" height="24" rx="10"/><text class="sub" x="26" y="247">7. Built-in defaults</text>
+      </svg>
+      <figcaption>Think of it as layers: built-in defaults, your global habits, the project&rsquo;s rules, then whatever you type on the command line.</figcaption>
+    </figure>
+    <div class="doc"><div class="doc-bar">~/.codex/config.toml</div>
+<pre><code>model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"</code></pre></div>
+    <p>That small file says: use GPT-6.1 Sol at medium effort by default, ask for approval when going beyond the sandbox, let commands write inside the workspace, and use cached web search results. Every key above is one the docs list as commonly changed. Here is what the less obvious ones mean:</p>
+    <table>
+      <tr><th>Key</th><th>What it does</th></tr>
+      <tr><td><code>model</code></td><td>The default model for the CLI and IDE. If you leave it out, Codex uses a recommended model.</td></tr>
+      <tr><td><code>model_reasoning_effort</code></td><td>The default reasoning effort, when the model supports it.</td></tr>
+      <tr><td><code>approval_policy</code></td><td>When Codex pauses to ask: <code>on-request</code> or <code>never</code> (section 7).</td></tr>
+      <tr><td><code>sandbox_mode</code></td><td><code>read-only</code>, <code>workspace-write</code> or <code>danger-full-access</code>.</td></tr>
+      <tr><td><code>web_search</code></td><td><code>"cached"</code> (default: pre-indexed results from an OpenAI-maintained cache, which lowers exposure to prompt injection), <code>"indexed"</code>, <code>"live"</code> (same as <code>--search</code>) or <code>"disabled"</code>.</td></tr>
+      <tr><td><code>[sandbox_workspace_write]</code> <code>network_access = true</code></td><td>Lets commands in the workspace-write sandbox reach the network. Off by default, so enable it only if you need it.</td></tr>
+    </table>
+    <p>Do not mix the old and new styles: the docs say permission profiles (<code>default_permissions</code>, beta) do not compose with the older <code>sandbox_mode</code> settings, so use one or the other. If something does not apply, run <code>/debug-config</code> to see which layer won. For every available key, see the <a href="https://learn.chatgpt.com/docs/config-file/config-reference" target="_blank" rel="noopener">configuration reference</a>.</p>
+    <p>Notice that <code>config.toml</code> configures <em>behaviour</em>. It does not tell Codex anything about <em>your project</em>. For that, we need a different kind of file.</p>
+
+    <h2 id="next">10. What comes next</h2>
+    <p>You can now install Codex, sign in, talk to it, control what it may do, and switch models. But start a new chat and Codex has forgotten what you taught it. That is not a bug; it is how language models work. In Part 2 we fix it with <code>AGENTS.md</code>. Part 3 shows how that saves tokens and speeds up onboarding, and Part 4 covers the Codex models, the API and the official links.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Codex</td><td>OpenAI&rsquo;s coding agent, available in the CLI, IDE extension, ChatGPT desktop app and the cloud.</td></tr>
+      <tr><td>CLI</td><td>Command-line interface: using a program by typing in a terminal.</td></tr>
+      <tr><td>PATH</td><td>The list of folders your terminal searches for commands. &ldquo;command not found&rdquo; often means the install folder is missing from it or the terminal needs reopening.</td></tr>
+      <tr><td>Slash command</td><td>A <code>/something</code> command that controls the chat.</td></tr>
+      <tr><td>Sandbox mode</td><td>What Codex can technically touch: <code>read-only</code>, <code>workspace-write</code> or <code>danger-full-access</code>.</td></tr>
+      <tr><td>Approval policy</td><td>When Codex must stop and ask you: <code>on-request</code> or <code>never</code>.</td></tr>
+      <tr><td>Workspace</td><td>The current directory plus temporary directories like <code>/tmp</code>, where Codex may write by default.</td></tr>
+      <tr><td>Reasoning effort</td><td>How much thinking the model applies: low, medium, high and above.</td></tr>
+      <tr><td>Plan mode</td><td>A mode (<code>/plan</code>) where Codex proposes a plan before implementation starts.</td></tr>
+      <tr><td>config.toml</td><td>The file that stores your preferences, at user (<code>~/.codex/</code>) or project (<code>.codex/</code>) level.</td></tr>
+      <tr><td>Maturity label</td><td>Experimental, beta, stable or deprecated: how much to trust a feature to stay the same.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="next" href="codex-part-2-agents-md.html"><small>Next &middot; Part 2 &rarr;</small>AGENTS.md: the project memory</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

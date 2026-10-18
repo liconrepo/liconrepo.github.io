@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Automation and teams: codex exec, the GitHub Action and managed configuration — Codex series part 7 (advanced)</title>
+  <meta name="description" content="Run Codex non-interactively with codex exec, in CI and the GitHub Action, review pull requests automatically, then set Codex up for a team with shared files, requirements and access tokens. Part 7 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="7">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Advanced &middot; Part 7 of 8</p>
+    <h1>Automation and teams: scripts, CI, pull request reviews, and team-wide setup</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~31 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">Automation</span><span class="tag">CI/CD</span><span class="tag">GitHub Action</span><span class="tag">Teams</span><span class="tag">Managed configuration</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a class="on" href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Everything so far assumed you, a terminal and a conversation. The next step is Codex without the conversation: running from a script, a scheduled task or a pull request, and then rolling it out to a whole team with shared conventions and organisation rules. This part covers <code>codex exec</code>, the GitHub Action, automatic code review, scheduled tasks, a short look at the SDK and App Server, and team and admin setup. Automation means Codex acts with nobody watching, so the safety advice here matters more than anywhere else in the series.</p>
+
+    <div class="callout">
+      <strong>Part 7 in 60 seconds</strong>
+      <ul>
+        <li><code>codex exec "prompt"</code> runs Codex once, non-interactively. Progress goes to <code>stderr</code>, the final answer goes to <code>stdout</code>, and <code>--json</code> gives you an event stream.</li>
+        <li>By default <code>codex exec</code> runs in a <strong>read-only</strong> sandbox. Grant only what the job needs, for example <code>--sandbox workspace-write</code>.</li>
+        <li>In GitHub, use the Codex GitHub Action (<code>openai/codex-action@v1</code>) instead of installing and authenticating the CLI yourself. Mention <code>@codex review</code> on a pull request for a review.</li>
+        <li>For a team: commit a shared <code>AGENTS.md</code>, shared <code>.codex/</code> configuration, rules and skills, and let admins enforce policy with <code>requirements.toml</code>.</li>
+        <li>Never put keys in a repository, treat pull request text as untrusted input, and keep a human in the merge step.</li>
+      </ul>
+    </div>
+
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages. Team and admin features in particular depend on your plan and workspace settings.</p></div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 7</strong></summary>
+      <ol>
+        <li><a href="#exec">Non-interactive mode: codex exec</a></li>
+        <li><a href="#unattended">Running unattended safely</a></li>
+        <li><a href="#scripts">Scripts, pipes and codex review</a></li>
+        <li><a href="#schedule">Scheduled tasks</a></li>
+        <li><a href="#gha">The Codex GitHub Action</a></li>
+        <li><a href="#review">Automatic code review of pull requests</a></li>
+        <li><a href="#builders">For builders: the SDK and the App Server</a></li>
+        <li><a href="#team">Setting up a team</a></li>
+        <li><a href="#admin">For admins: requirements, tokens and oversight</a></li>
+        <li><a href="#security">A security checklist</a></li>
+        <li><a href="#rollout">A rollout checklist</a></li>
+        <li><a href="#end7">Wrap-up and glossary</a></li>
+        <li><a href="#links7">Links and official docs</a></li>
+      </ol>
+    </details>
+
+    <h2 id="exec">1. Non-interactive mode: codex exec</h2>
+    <p><strong>Non-interactive mode</strong> lets you run Codex from scripts, such as continuous integration (CI) jobs, without opening the interactive terminal screen (the TUI). You start it with <code>codex exec</code>. The short form is <code>codex e</code>. Pass the task as a single argument:</p>
+<pre><code>codex exec "summarize the repository structure and list the top 5 risky areas"</code></pre>
+    <p>While it runs, Codex streams progress to <code>stderr</code> and prints only the <strong>final agent message</strong> to <code>stdout</code>. That makes the result easy to redirect or pipe:</p>
+<pre><code>codex exec "generate release notes for the last 10 commits" | tee release-notes.md</code></pre>
+    <ul>
+      <li><strong>Use it for:</strong> pipelines (CI, pre-merge checks, scheduled jobs), output you pipe into other tools, and runs with explicit, pre-set sandbox and approval settings.</li>
+      <li><strong>No saved session:</strong> add <code>--ephemeral</code> if you do not want session files written to disk.</li>
+      <li><strong>Git repository required:</strong> Codex wants to run inside a Git repository, to prevent destructive changes. <code>--skip-git-repo-check</code> overrides that when you are sure the environment is safe.</li>
+      <li><strong>Required MCP server:</strong> if you mark an MCP server <code>required = true</code> and it fails to start, <code>codex exec</code> exits with an error instead of carrying on without it (Part 6).</li>
+    </ul>
+
+    <h3>The flags you will use most</h3>
+    <p>These come from the CLI command reference for <code>codex exec</code>. Run <code>codex exec --help</code> for the list your installed version supports.</p>
+    <table>
+      <tr><th>Flag</th><th>What it does</th></tr>
+      <tr><td><code>--sandbox, -s</code></td><td>Sandbox policy for commands Codex generates: <code>read-only</code>, <code>workspace-write</code> or <code>danger-full-access</code>. Defaults to your configuration.</td></tr>
+      <tr><td><code>--json</code></td><td>Print newline-delimited JSON events instead of formatted text.</td></tr>
+      <tr><td><code>--output-last-message, -o</code></td><td>Write the final message to a file (it is still printed to <code>stdout</code>).</td></tr>
+      <tr><td><code>--output-schema</code></td><td>Path to a JSON Schema file describing the shape of the final answer.</td></tr>
+      <tr><td><code>--model, -m</code></td><td>Override the configured model for this run.</td></tr>
+      <tr><td><code>--cd, -C</code></td><td>Set the workspace root before running the task.</td></tr>
+      <tr><td><code>--profile, -p</code></td><td>Layer a profile file on top of your base user config.</td></tr>
+      <tr><td><code>-c, --config key=value</code></td><td>Inline configuration override for this run (repeatable).</td></tr>
+      <tr><td><code>--ephemeral</code></td><td>Run without persisting session files.</td></tr>
+      <tr><td><code>--ignore-user-config</code></td><td>Do not load <code>$CODEX_HOME/config.toml</code>. Authentication still uses <code>CODEX_HOME</code>.</td></tr>
+      <tr><td><code>--ignore-rules</code></td><td>Do not load user or project <code>.rules</code> files for this run.</td></tr>
+      <tr><td><code>--approve-for-me</code></td><td>Use automatic approval review with <code>on-request</code> approvals and the <code>workspace-write</code> sandbox. Conflicts with <code>--sandbox</code> and <code>--yolo</code>.</td></tr>
+      <tr><td><code>--yolo</code></td><td>Short for <code>--dangerously-bypass-approvals-and-sandbox</code>. No approvals, no sandbox. Only inside an isolated runner.</td></tr>
+      <tr><td><code>--skip-git-repo-check</code></td><td>Allow running outside a Git repository.</td></tr>
+    </table>
+    <div class="note"><p><code>--full-auto</code> is no longer supported. If an old script uses it, change it to <code>--sandbox workspace-write</code>, or to <code>--approve-for-me</code> if you want approval requests routed through automatic review.</p></div>
+
+    <h3>Machine-readable output</h3>
+    <p>With <code>--json</code>, <code>stdout</code> becomes a stream of JSON objects, one per line (JSON Lines). Event types include <code>thread.started</code>, <code>turn.started</code>, <code>turn.completed</code>, <code>turn.failed</code>, <code>item.*</code> and <code>error</code>. Items cover agent messages, reasoning, command executions, file changes, MCP tool calls, web searches and plan updates. Example (shortened) stream from the docs:</p>
+<pre><code>codex exec --json "summarize the repo structure" | jq
+
+# example output, one JSON object per line
+{"type":"thread.started","thread_id":"0199a213-81c0-7800-8aa1-bbab2a035a53"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"Repo contains docs, sdk, and examples directories."}}
+{"type":"turn.completed","usage":{"input_tokens":24763,"cached_input_tokens":24448,"output_tokens":122,"reasoning_output_tokens":0}}</code></pre>
+    <h3>A structured answer with --output-schema</h3>
+    <p>When a later step needs stable fields, give Codex a JSON Schema and ask for the answer to match it. First the schema file:</p>
+    <div class="doc"><div class="doc-bar">schema.json</div>
+<pre><code>{
+  "type": "object",
+  "properties": {
+    "project_name": { "type": "string" },
+    "programming_languages": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "required": ["project_name", "programming_languages"],
+  "additionalProperties": false
+}</code></pre></div>
+<pre><code>codex exec "Extract project metadata" \
+  --output-schema ./schema.json \
+  -o ./project-metadata.json</code></pre>
+    <p>The docs note that a prompt is required when you use images, <code>--output-schema</code>, <code>--output-last-message</code> or <code>--ephemeral</code>.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="A script or CI job pipes input into codex exec, which streams progress to stderr and prints the final message to stdout, which goes to the next tool or a file.">
+        <rect class="box" x="6" y="30" width="130" height="70" rx="12"/><text class="b c" x="71" y="58">Input</text><text class="sub c" x="71" y="78">log, diff, file</text>
+        <path class="arrow" d="M138,65 L168,65"/>
+        <rect class="boxp" x="170" y="30" width="150" height="70" rx="12"/><text class="b c" x="245" y="58">codex exec</text><text class="sub c" x="245" y="78">one non-interactive run</text>
+        <path class="arrow" d="M322,65 L352,65"/>
+        <rect class="boxg" x="354" y="30" width="140" height="70" rx="12"/><text class="b c" x="424" y="58">stdout</text><text class="sub c" x="424" y="78">final message or JSONL</text>
+        <path class="arrow" d="M496,65 L526,65"/>
+        <rect class="boxo" x="528" y="30" width="106" height="70" rx="12"/><text class="b c" x="581" y="58">Next step</text><text class="sub c" x="581" y="78">jq, file, CI</text>
+        <text class="sub c" x="320" y="136">Progress streams to stderr, so it does not pollute the result you pipe on.</text>
+      </svg>
+      <figcaption>Codex becomes one more command-line tool in a pipeline.</figcaption>
+    </figure>
+
+    <h3>Resume a run</h3>
+    <p>For a two-stage pipeline, continue the previous session with the <code>resume</code> subcommand. <code>--last</code> picks the most recent session from the current directory; you can also pass a session ID.</p>
+<pre><code>codex exec "review the change for race conditions"
+codex exec resume --last "fix the race conditions you found"</code></pre>
+
+    <h3>Authentication in automation</h3>
+    <p><code>codex exec</code> reuses your saved CLI sign-in by default. In CI you usually provide credentials explicitly. The docs give three routes:</p>
+    <table>
+      <tr><th>Route</th><th>How</th><th>Notes from the docs</th></tr>
+      <tr><td><strong>GitHub Actions</strong></td><td>Use the Codex GitHub Action (section 5)</td><td>Designed to reduce API key exposure: it installs Codex, starts a Responses API proxy and runs Codex with a configurable safety strategy.</td></tr>
+      <tr><td><strong>API key</strong></td><td><code>CODEX_API_KEY=&lt;api-key&gt; codex exec --json "triage open bug reports"</code></td><td>The sensible default for automation: simple to provision and rotate. Set it only for the invocation that needs it, and make sure no untrusted code runs in the same environment. <code>CODEX_API_KEY</code> also works with <code>codex review</code> and the TypeScript SDK.</td></tr>
+      <tr><td><strong>Access token</strong></td><td><code>CODEX_ACCESS_TOKEN</code> (Business and Enterprise workspaces)</td><td>Authenticates as a ChatGPT workspace identity. See section 9.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Do not hand the key to repository code</strong>
+      <p>The docs say not to set <code>OPENAI_API_KEY</code> or <code>CODEX_API_KEY</code> as a <em>job-level</em> environment variable in workflows that check out or run repository-controlled code. Build scripts, tests, dependency hooks or a compromised action in the same job could read it.</p>
+    </div>
+    <p>There is also an advanced path for running CI as your Codex <em>account</em> instead of an API key, for example enterprise teams on trusted runners. It relies on <code>~/.codex/auth.json</code>, which the docs say to treat like a password, and they say not to use it for public or open-source repositories. Read the official page before trying it (linked in section 13).</p>
+
+    <h2 id="unattended">2. Running unattended safely</h2>
+    <p>In an interactive session you are the safety net. In a script nobody is watching, so decide in advance what Codex may do. Remember from Part 5 that two controls work together: the <strong>sandbox</strong> (what Codex can technically do) and the <strong>approval policy</strong> (when it must ask). For <code>codex exec</code> the docs give these starting points:</p>
+    <table>
+      <tr><th>Goal</th><th>Setting</th><th>Effect</th></tr>
+      <tr><td>Analyse only</td><td>Nothing extra (the default), or <code>--sandbox read-only</code></td><td>Codex can read files and run commands inside the read-only sandbox.</td></tr>
+      <tr><td>Let it edit files</td><td><code>--sandbox workspace-write</code></td><td>Read files, edit inside the workspace and run commands there. Network access stays off by default.</td></tr>
+      <tr><td>Edit, with approval requests reviewed automatically</td><td><code>--approve-for-me</code></td><td>Automatic approval review, <code>on-request</code> approvals, <code>workspace-write</code> sandbox.</td></tr>
+      <tr><td>Broad access</td><td><code>--sandbox danger-full-access</code></td><td>No filesystem restriction. Use only in a controlled environment such as an isolated CI runner or container.</td></tr>
+      <tr><td>No protection at all</td><td><code>--yolo</code></td><td>Bypasses approvals and the sandbox. Only inside an isolated runner.</td></tr>
+    </table>
+    <p>Two examples built from the docs:</p>
+<pre><code># A run that may edit files in the workspace, and nothing more
+codex exec --sandbox workspace-write "fix the failing unit test in the parser module"
+
+# A controlled run that ignores personal config and rule files on the machine
+codex exec --ignore-user-config --ignore-rules --sandbox read-only "list TODO comments by file"</code></pre>
+    <div class="callout">
+      <strong>Safety rules for automation</strong>
+      <ul>
+        <li><strong>Least privilege:</strong> start read-only, move to <code>workspace-write</code> only when the job must edit, and keep <code>danger-full-access</code> and <code>--yolo</code> for isolated runners.</li>
+        <li><strong>Set the sandbox on purpose.</strong> Do not rely on whatever a machine's config file says; pass <code>--sandbox</code> or use <code>--ignore-user-config</code> so every run behaves the same.</li>
+        <li><strong>Untrusted input is dangerous:</strong> text from pull requests, commit messages, issues or logs can contain hidden instructions (prompt injection). Do not give a job that reads untrusted input broad write or network permissions.</li>
+        <li><strong>Keep keys away from repository code,</strong> as described above.</li>
+        <li><strong>Review what it produced.</strong> Unattended does not mean unreviewed: use pull requests, not direct pushes.</li>
+        <li><strong>Add your own limits:</strong> set timeouts in your CI system. The docs do not describe a turn or budget cap for <code>codex exec</code>, so do not assume one exists.</li>
+      </ul>
+    </div>
+
+    <h2 id="scripts">3. Scripts, pipes and codex review</h2>
+    <h3>Two ways to pipe input</h3>
+    <p>If you give a prompt <em>and</em> pipe input, the prompt is the instruction and the piped text is extra context. If you leave out the prompt (or write <code>-</code>), the piped text is the whole prompt.</p>
+<pre><code># Prompt plus stdin: you write the instruction, the pipe supplies the data
+npm test 2&gt;&amp;1 \
+  | codex exec "summarize the failing tests and propose the smallest likely fix" \
+  | tee test-summary.md
+
+# Stdin is the prompt
+cat prompt.txt | codex exec -</code></pre>
+    <p>More patterns from the docs, all of the same shape (command output in, short text out):</p>
+<pre><code>tail -n 200 app.log \
+  | codex exec "identify the likely root cause, cite the most important errors, and suggest the next three debugging steps" \
+  &gt; log-triage.md
+
+# Draft a pull request comment from CI logs (replace the run and PR numbers)
+gh run view 123456 --log \
+  | codex exec "summarize the failure in 5 bullets for the pull request thread" \
+  | gh pr comment 789 --body-file -</code></pre>
+
+    <h3>Run a review from the command line</h3>
+    <p><code>codex review</code> runs a code review non-interactively. Choose exactly one target, or pass custom instructions as the prompt:</p>
+    <table>
+      <tr><th>Option</th><th>Reviews</th></tr>
+      <tr><td><code>--uncommitted</code></td><td>Staged, unstaged and untracked changes</td></tr>
+      <tr><td><code>--base BRANCH</code></td><td>Changes against a base branch</td></tr>
+      <tr><td><code>--commit SHA</code></td><td>The changes introduced by one commit (add <code>--title</code> to set the title in the summary)</td></tr>
+      <tr><td><code>PROMPT</code></td><td>Custom review instructions (<code>-</code> reads them from stdin)</td></tr>
+    </table>
+<pre><code>codex review --base main</code></pre>
+
+    <h3>Looping over many items</h3>
+    <p>The docs do not describe a built-in batch command for <code>codex exec</code>, so for a repetitive change you can simply loop. This is my own pattern, built from documented flags, not an official recipe:</p>
+<pre><code>for file in $(cat files.txt); do
+  codex exec --sandbox workspace-write --ephemeral \
+    "Migrate $file from the old logging helper to the new one. Reply OK or FAIL."
+done</code></pre>
+    <p>Do what you would do by hand: test the prompt on two or three files first, fix what goes wrong, then run it on the rest, and review the combined diff.</p>
+
+    <h2 id="schedule">4. Scheduled tasks</h2>
+    <p>If you want Codex to do something repeatedly, such as checking for new issues each morning, the docs describe <strong>scheduled tasks</strong>. They run in the background on a timetable you choose, and you review the runs in a view called <strong>Scheduled</strong>.</p>
+    <ul>
+      <li><strong>Where you manage them:</strong> in ChatGPT on the web or in the ChatGPT desktop app. The CLI and the IDE extension do not provide the Scheduled management screen, but they are good places to prepare and test the prompt, skill or script first.</li>
+      <li><strong>Desktop app:</strong> tasks can work with local projects and run in the project folder or in an isolated Git worktree. Keep the computer on and the app running when a task needs local files. Worktrees keep scheduled changes apart from your unfinished work; running in the local project can modify files you are still editing. Archive runs you no longer need, because frequent schedules can create many worktrees.</li>
+      <li><strong>Web:</strong> tasks can use uploaded files, connected tools, skills and plugins, but they cannot work in a folder on your computer and keep no local folder between runs.</li>
+      <li><strong>Standalone or in a chat:</strong> a standalone task starts a fresh chat each run. A task inside a chat returns to that chat and its context, which suits checking a long-running operation or continuing a review loop.</li>
+      <li><strong>Schedules:</strong> use the custom schedule controls, or for an advanced schedule edit the recurrence rule (RFC 5545 RRULE), for example <code>RRULE:FREQ=MONTHLY;BYMONTHDAY=1;BYHOUR=9;BYMINUTE=0</code>.</li>
+      <li><strong>Event triggers:</strong> on eligible plans, ChatGPT on the web and mobile can run a task when a supported Gmail, Slack or GitHub event happens (for GitHub, pull request activity that you can filter). One task can use several event triggers but cannot combine them with a time schedule. Admins in managed workspaces can control this with the <strong>Allow event-triggered scheduled tasks</strong> permission.</li>
+      <li><strong>Skills:</strong> use a skill to define what the task does, and invoke it in the prompt (in the desktop app, with <code>$skill-name</code>) when you do not want automatic tool selection.</li>
+    </ul>
+    <div class="callout">
+      <strong>Scheduled tasks run unattended</strong>
+      <ul>
+        <li>They use your <strong>default sandbox settings</strong>. In read-only mode, a tool call that needs to edit files or reach the network fails. In workspace-write mode, calls that need files outside the workspace or network access fail, though you can allow chosen commands to run outside the sandbox with <a href="#team">rules</a>.</li>
+        <li>With <strong>full access</strong>, background tasks carry elevated risk because Codex can change files, run commands and use the network without asking. The docs suggest workspace-write plus rules for specific commands instead.</li>
+        <li>Scheduled tasks use <code>approval_policy = "never"</code> when your organisation policy allows it. If admin requirements forbid that, they fall back to the approval behaviour of your selected permission mode.</li>
+      </ul>
+    </div>
+    <p>Test the prompt in a regular chat before you schedule it, review the first few runs, then adjust the prompt, tools or cadence. A scheduled task cannot ask you clarifying questions mid-run, so say what done looks like and what to report. Also check which model a task uses: the docs say GPT-5.5 retired from Codex with ChatGPT sign-in on 14 October 2026, and ask you to review scheduled tasks that used it.</p>
+
+    <h2 id="gha">5. The Codex GitHub Action</h2>
+    <p>The <strong>Codex GitHub Action</strong> (<code>openai/codex-action@v1</code>) runs Codex inside a GitHub Actions workflow. It installs the Codex CLI, starts the Responses API proxy when you give it an API key, and runs <code>codex exec</code> under the permissions you set. Use it to get Codex feedback on pull requests or releases, to gate changes on Codex-driven checks, or to run repeatable tasks such as code review, release prep and migrations.</p>
+    <h3>Prerequisites</h3>
+    <ul>
+      <li>Store your OpenAI key as a GitHub secret, for example <code>OPENAI_API_KEY</code>.</li>
+      <li>Use a Linux or macOS runner. On Windows you must set <code>safety-strategy: unsafe</code>.</li>
+      <li>Check out your code before the action, so Codex can read the repository.</li>
+      <li>Provide the task with either <code>prompt</code> (inline text) or <code>prompt-file</code> (a file in the repo), not both.</li>
+    </ul>
+    <h3>A working workflow: review every pull request</h3>
+    <p>This is the docs' example. It reviews new pull requests, captures Codex's answer and posts it as a comment. The first job has read-only repository permission; only the second job can write comments.</p>
+    <div class="doc"><div class="doc-bar">.github/workflows/codex-review.yml</div>
+<pre><code>name: Codex pull request review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  codex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      final_message: ${{ steps.run_codex.outputs.final-message }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run Codex
+        id: run_codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: .github/codex/prompts/review.md
+          output-file: codex-output.md
+
+  post_feedback:
+    runs-on: ubuntu-latest
+    needs: codex
+    if: needs.codex.outputs.final_message != ''
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Post Codex feedback
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: process.env.CODEX_FINAL_MESSAGE,
+            });
+        env:
+          CODEX_FINAL_MESSAGE: ${{ needs.codex.outputs.final_message }}</code></pre></div>
+    <p>Replace <code>.github/codex/prompts/review.md</code> with your own prompt file, or use the <code>prompt</code> input for inline text.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="A pull request triggers a workflow. Job one has read-only permission and runs Codex with the API key. Job two has write permission for comments but never sees the API key, and posts the result. A human reviews and merges.">
+        <rect class="box" x="6" y="40" width="120" height="76" rx="12"/><text class="b c" x="66" y="68">Pull request</text><text class="sub c" x="66" y="88">opened or</text><text class="sub c" x="66" y="104">updated</text>
+        <path class="arrow" d="M128,78 L156,78"/>
+        <rect class="boxp" x="158" y="40" width="160" height="76" rx="12"/><text class="b c" x="238" y="68">Job 1: Codex</text><text class="sub c" x="238" y="88">contents: read only,</text><text class="sub c" x="238" y="104">holds the API key</text>
+        <path class="arrow" d="M320,78 L348,78"/>
+        <rect class="boxb" x="350" y="40" width="150" height="76" rx="12"/><text class="b c" x="425" y="68">Job 2: post</text><text class="sub c" x="425" y="88">can write comments,</text><text class="sub c" x="425" y="104">has no API key</text>
+        <path class="arrow" d="M502,78 L530,78"/>
+        <rect class="boxg" x="532" y="40" width="102" height="76" rx="12"/><text class="b c" x="583" y="68">Comment</text><text class="sub c" x="583" y="88">on the PR</text>
+        <rect class="ghost" x="6" y="140" width="628" height="58" rx="12"/><text class="b" x="22" y="164">A human reviews and merges.</text><text class="sub" x="22" y="184">Split the job that holds the key from the job that holds write permission.</text>
+      </svg>
+      <figcaption>The two-job pattern the docs use: the job that sees the key cannot write, and the job that can write never sees the key.</figcaption>
+    </figure>
+
+    <h3>Action inputs worth knowing</h3>
+    <table>
+      <tr><th>Input</th><th>What it does</th></tr>
+      <tr><td><code>prompt</code> / <code>prompt-file</code></td><td>The task, inline or from a file such as <code>.github/codex/prompts/</code>.</td></tr>
+      <tr><td><code>codex-args</code></td><td>Extra CLI flags, as a JSON array (<code>["--ephemeral"]</code>) or a shell string (<code>--profile ci</code>). Pass <code>--output-schema</code> here for structured output.</td></tr>
+      <tr><td><code>model</code>, <code>effort</code></td><td>Pick the model and reasoning effort; leave empty for defaults.</td></tr>
+      <tr><td><code>sandbox</code></td><td><code>workspace-write</code>, <code>read-only</code> or <code>danger-full-access</code>. Choose the narrowest that lets the task finish.</td></tr>
+      <tr><td><code>output-file</code></td><td>Save the final message to disk. The action also exposes it as the <code>final-message</code> output.</td></tr>
+      <tr><td><code>codex-version</code></td><td>Pin a CLI release. Blank means the latest.</td></tr>
+      <tr><td><code>safety-strategy</code></td><td>Default <code>drop-sudo</code>: removes <code>sudo</code> before Codex runs (irreversible for that job, and it protects secrets in memory). <code>unprivileged-user</code> (with <code>codex-user</code>) runs Codex as a specific account. <code>unsafe</code> is required on Windows.</td></tr>
+      <tr><td><code>allow-users</code>, <code>allow-bots</code></td><td>Who may trigger the workflow. By default only users with write access can.</td></tr>
+    </table>
+    <p>Two cautions from the docs. First, <code>read-only</code> keeps Codex from changing files or using the network, but it still runs with elevated privileges, so do not rely on it alone to protect secrets. Second, Codex has broad access on GitHub-hosted runners unless you restrict it.</p>
+
+    <h3>Pattern: propose a fix when CI fails</h3>
+    <p>Non-interactive mode in the docs also includes a longer example that proposes a fix when your main CI workflow fails. The idea, in plain steps:</p>
+    <ol class="steps">
+      <li><strong>Trigger</strong> a follow-up workflow (<code>workflow_run</code>) when the workflow named &ldquo;CI&rdquo; completes with a failure.</li>
+      <li><strong>Check out</strong> the failing commit with read-only permission and without persisting credentials.</li>
+      <li><strong>Run setup commands first,</strong> such as installing dependencies, before the Codex step, so they never see the API key.</li>
+      <li><strong>Run the action</strong> with a prompt that says to reproduce the failure, make the minimal change, run the tests again and not refactor unrelated files.</li>
+      <li><strong>Save the result as a patch artifact</strong> (<code>git diff</code> uploaded as an artifact).</li>
+      <li><strong>In a separate job,</strong> which has write permission but no <code>OPENAI_API_KEY</code>, apply the patch and open a pull request that says &ldquo;Review the changes before merging.&rdquo;</li>
+    </ol>
+    <p>Copy the full YAML from the Non-interactive mode page (section 13) rather than retyping it, and adjust the setup and test commands to your stack.</p>
+
+    <h2 id="review">6. Automatic code review of pull requests</h2>
+    <p>Separate from the Action, Codex can review GitHub pull requests as a built-in feature. Codex reads the pull request diff, follows your repository guidance and posts a standard GitHub code review. In GitHub it flags only the most serious issues (the docs say P0 and P1) so the comments stay focused. A deeper <strong>Security Review</strong> is available in research preview.</p>
+    <ol class="steps">
+      <li><strong>Connect</strong> your GitHub repository to Codex. You need push or admin permission for the repository's settings.</li>
+      <li><strong>Open Codex settings</strong> (code review) at <code>chatgpt.com/settings/code-review</code>, choose the repository and turn on <strong>Automatic review</strong> under <strong>Review code</strong>.</li>
+      <li><strong>Or ask on demand:</strong> comment <code>@codex review</code> on a pull request. Codex reacts and posts a review. You can add a focus, such as <code>@codex review for issues in the database migration</code>.</li>
+    </ol>
+    <p>Personal preferences in the same settings page include <strong>Review trigger</strong>, which decides when automatic reviews run.</p>
+    <h3>Teach it your rules in AGENTS.md</h3>
+    <p>Codex searches the repository for <code>AGENTS.md</code> files (Part 2) and follows the code review rules it finds. Add a <code>## Code Review Rules</code> section to the file closest to the code the rules govern. Put repository-wide rules in the root file and service-specific rules in a nested one, such as <code>services/experiment_reporting/AGENTS.md</code>.</p>
+    <div class="doc"><div class="doc-bar">AGENTS.md</div>
+<pre><code>## Code Review Rules
+
+### Experiment cohorts
+
+- Do not filter treatment comparisons on post-exposure behavior, including conversion or retention.
+  Safe path: build cohorts from assignment or exposure; report conversion as an outcome.</code></pre></div>
+    <p>The docs' advice on writing such rules: start with two or three concise ones, focus on consequential and repository-specific behaviour, state the safe path or exception, keep rules scoped and durable, and <strong>leave mechanical checks such as formatting and lint to CI</strong>. They also say review rules guide Codex but do not replace tests, branch protections or required approvals.</p>
+    <h3>Other places Codex can be started from</h3>
+    <ul>
+      <li><strong>GitLab merge requests:</strong> there is a similar review integration. The docs describe it as a beta available on all ChatGPT plans, running in Codex cloud. Self-managed or Dedicated GitLab needs workspace-admin setup. See the official page for the steps.</li>
+      <li><strong>Slack:</strong> mention <code>@ChatGPT</code> in a channel. If your workspace has Cloud delegation enabled, repository work can be sent to a Codex cloud task and the result returned to the thread. A workspace owner or admin sets up the Slack app first.</li>
+      <li><strong>Linear:</strong> assign an issue to Codex or mention <code>@Codex</code> in a comment, and Codex creates a cloud chat and replies with progress. It is available on paid plans, and on Enterprise an admin must turn it on.</li>
+    </ul>
+    <p>These integrations depend on your plan and workspace settings, so confirm availability on the official pages before planning around them.</p>
+
+    <h2 id="builders">7. For builders: the SDK and the App Server</h2>
+    <p>Most readers can skip this section. If you want to control Codex from your own program rather than from a shell script, the docs describe two options:</p>
+    <table>
+      <tr><th>Option</th><th>What it is</th><th>Use it for</th></tr>
+      <tr><td><strong>Codex SDK</strong></td><td>A TypeScript library (<code>npm install @openai/codex-sdk</code>, Node.js 18 or later, used server-side) and a Python library (<code>pip install openai-codex</code>, Python 3.10 or later).</td><td>Automating coding tasks, including CI jobs, and building Codex into your own tools.</td></tr>
+      <tr><td><strong>App Server</strong></td><td>The interface Codex uses to power rich clients such as the VS Code extension. It speaks JSON-RPC 2.0 over <code>stdio</code> by default; a WebSocket transport exists but is experimental and unsupported for production.</td><td>Deep integrations that need authentication, conversation history, approvals and streamed agent events.</td></tr>
+    </table>
+    <p>The docs' rule of thumb: automating jobs or running in CI means the SDK; building a custom client means the App Server. A minimal TypeScript example from the docs:</p>
+<pre><code>import { Codex } from "@openai/codex-sdk";
+
+const codex = new Codex();
+const thread = codex.startThread();
+const result = await thread.run(
+  "Make a plan to diagnose and fix the CI failures"
+);
+
+console.log(result.finalResponse);</code></pre>
+    <p>Call <code>run()</code> again on the same thread to continue, or resume an earlier thread with <code>codex.resumeThread(threadId)</code>. The Python SDK exposes sandbox presets (<code>Sandbox.read_only</code>, <code>Sandbox.workspace_write</code>, <code>Sandbox.full_access</code>) that mirror the CLI sandbox modes. One removal to know about: the docs say the <code>codex mcp-server</code> command was removed, and existing integrations should use the App Server instead. For the full API, follow the SDK and App Server pages in section 13.</p>
+
+    <h2 id="team">8. Setting up a team</h2>
+    <p>A team gets the most from Codex when everyone starts from the same baseline and each person can still personalise. The building blocks are things you have already met:</p>
+    <table>
+      <tr><th>What</th><th>Where</th><th>Committed?</th><th>Who it affects</th></tr>
+      <tr><td>Project conventions, commands, gotchas, review rules</td><td><code>AGENTS.md</code> (nested files for subfolders)</td><td>Yes</td><td>Everyone on the repository</td></tr>
+      <tr><td>Shared defaults (model, approvals, sandbox, MCP servers)</td><td><code>.codex/config.toml</code> in the repo</td><td>Yes</td><td>Everyone who trusts the project</td></tr>
+      <tr><td>Command rules (what may run outside the sandbox)</td><td><code>.codex/rules/*.rules</code></td><td>Yes</td><td>Everyone who trusts the project</td></tr>
+      <tr><td>Shared workflows and know-how</td><td>Skills (Part 6)</td><td>Yes</td><td>Everyone</td></tr>
+      <tr><td>Personal preferences</td><td><code>~/.codex/AGENTS.md</code>, <code>~/.codex/config.toml</code>, <code>~/.codex/rules/</code></td><td>No (your home folder)</td><td>Only you</td></tr>
+    </table>
+    <p>Three facts from the docs explain how these layers combine:</p>
+    <ul>
+      <li><strong>AGENTS.md is layered.</strong> Codex reads your global file in <code>~/.codex</code> first, then walks from the project root down to your current folder, one file per directory. Files closer to where you work come later, so they win. Combined size stops at <code>project_doc_max_bytes</code> (32 KiB by default).</li>
+      <li><strong>Project config only loads for trusted projects.</strong> If a project is untrusted, Codex skips its <code>.codex/</code> layers, including config, hooks and rules. Your user and system config still load.</li>
+      <li><strong>Rules need care.</strong> A <code>prefix_rule</code> decides whether a command may run outside the sandbox: <code>allow</code>, <code>prompt</code> or <code>forbidden</code>, and when several rules match the most restrictive one wins. Rules are marked experimental in the docs. Test them with <code>codex execpolicy check</code> before relying on them.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="Configuration precedence from highest to lowest: command-line flags, project config, profile files, user config, cloud-managed defaults, system config, built-in defaults. Admin requirements.toml constrains all of them.">
+        <rect class="boxr" x="30"  y="8"   width="580" height="34" rx="9"/><text class="b c" x="320" y="30">requirements.toml: admin-enforced limits that cap every layer below</text>
+        <rect class="boxo" x="70"  y="50"  width="500" height="28" rx="9"/><text class="c" x="320" y="69">1. CLI flags and --config overrides</text>
+        <rect class="boxg" x="85"  y="82"  width="470" height="28" rx="9"/><text class="c" x="320" y="101">2. Project .codex/config.toml (trusted projects, closest folder wins)</text>
+        <rect class="boxb" x="100" y="114" width="440" height="28" rx="9"/><text class="c" x="320" y="133">3. Profile file chosen with --profile</text>
+        <rect class="box"  x="115" y="146" width="410" height="28" rx="9"/><text class="c" x="320" y="165">4. User config: ~/.codex/config.toml</text>
+        <rect class="box"  x="130" y="178" width="380" height="28" rx="9"/><text class="c" x="320" y="197">5. Cloud-managed config.toml defaults</text>
+        <rect class="box"  x="145" y="210" width="350" height="28" rx="9"/><text class="c" x="320" y="229">6. System config: /etc/codex/config.toml (Unix)</text>
+        <rect class="box"  x="160" y="242" width="320" height="24" rx="9"/><text class="c" x="320" y="259">7. Built-in defaults</text>
+      </svg>
+      <figcaption>Higher layers win for ordinary settings. Requirements are different: they constrain what the other layers may choose. Order from the config basics page.</figcaption>
+    </figure>
+    <p>Habits that work, mostly from the docs and Parts 2 and 3:</p>
+    <ul>
+      <li><strong>Treat these files like code.</strong> Review changes in pull requests, because a bad rule or default affects every future session.</li>
+      <li><strong>Turn mistakes into lines.</strong> When Codex gets something wrong that a teammate would also get wrong, add one line to <code>AGENTS.md</code>. The same goes for a point reviewers keep repeating, which can become a code review rule.</li>
+      <li><strong>Allow safe commands with rules,</strong> and use <code>forbidden</code> with a justification that names an alternative for risky ones.</li>
+      <li><strong>Pick a default sandbox and approval setting</strong> and write down when a read-only run is enough and when to review manually.</li>
+      <li><strong>Standardise through the repository.</strong> The admin guide suggests checking configuration, rules and skills into <code>.codex</code> or <code>.agents</code> so everyone gets the same defaults. It also says repository configuration can supply defaults but cannot grant workspace, model, API or connected-system access.</li>
+    </ul>
+
+    <h2 id="admin">9. For admins: requirements, tokens and oversight</h2>
+    <p>Shared files are conventions. If your organisation needs limits that users cannot override, the docs offer <strong>managed configuration</strong> for ChatGPT Enterprise. It has three pieces:</p>
+    <table>
+      <tr><th>Piece</th><th>What it is</th></tr>
+      <tr><td><strong>Requirements</strong></td><td>Admin-enforced constraints, in a <code>requirements.toml</code> file. Users cannot override them.</td></tr>
+      <tr><td><strong>Configuration defaults</strong></td><td>System or cloud-managed <code>config.toml</code> settings that users can still change.</td></tr>
+      <tr><td><strong>Legacy managed defaults</strong></td><td><code>managed_config.toml</code> starting values, re-applied each time a supported client starts.</td></tr>
+    </table>
+    <p>Managed configuration does not grant a seat or feature access; that comes from workspace roles and permissions.</p>
+    <h3>What requirements can constrain</h3>
+    <p>Requirements cover security-sensitive settings: approval policy, approvals reviewer, sandbox mode, permission profiles, web search mode, managed hooks, which MCP servers users can enable, and which plugin marketplaces they can use. If a user's configuration conflicts with a requirement, the local client falls back to a compatible value and tells the user. With an <code>mcp_servers</code> allowlist, a server is enabled only when both its name and identity match an approved entry.</p>
+    <p>This example from the docs blocks <code>--ask-for-approval never</code> and <code>--sandbox danger-full-access</code> (including <code>--yolo</code>):</p>
+    <div class="doc"><div class="doc-bar">requirements.toml</div>
+<pre><code>allowed_approval_policies = ["untrusted", "on-request"]
+allowed_sandbox_modes = ["read-only", "workspace-write"]</code></pre></div>
+    <p>For Codex 0.138.0 or later, the docs prefer <strong>permission profiles</strong> over the older sandbox-mode allowlist. This policy allows read-only and workspace access but not full access, because anything omitted from the table is denied:</p>
+    <div class="doc"><div class="doc-bar">requirements.toml</div>
+<pre><code>default_permissions = ":workspace"
+
+[allowed_permission_profiles]
+":read-only" = true
+":workspace" = true
+# ":danger-full-access" is omitted, so it is denied.</code></pre></div>
+    <div class="note"><p>Version matters: Codex 0.137.0 and earlier ignore <code>allowed_permission_profiles</code> and the managed <code>default_permissions</code>. The docs say to deploy these only after every managed client has upgraded. Also, <code>approval_policy = "untrusted"</code> is retired as an explicit setting; see the managed configuration page if an old config still uses it.</p></div>
+    <p>Admins can also force command prompts. This requirement makes common shell entry points ask first:</p>
+    <div class="doc"><div class="doc-bar">requirements.toml</div>
+<pre><code>allowed_approval_policies = ["on-request"]
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+
+[rules]
+prefix_rules = [
+  { pattern = [{ any_of = ["bash", "sh", "zsh"] }], decision = "prompt", justification = "Require explicit approval for shell entry points" },
+]</code></pre></div>
+    <h3>How requirements are delivered</h3>
+    <p>For local clients, requirements are applied from lower to higher priority in this order:</p>
+    <ol>
+      <li>System <code>requirements.toml</code>: <code>/etc/codex/requirements.toml</code> on Linux and macOS, or <code>%ProgramData%\OpenAI\Codex\requirements.toml</code> on Windows.</li>
+      <li>Requirements delivered in the cloud, from <strong>Agent Security</strong> in the Admin Console, when a user signs in with ChatGPT on a supported plan.</li>
+      <li>Legacy <code>managed_config.toml</code> fields that the client reinterprets as requirements.</li>
+      <li>macOS managed preferences (MDM), under <code>com.openai.codex:requirements_toml_base64</code>.</li>
+    </ol>
+    <p>Higher layers override lower ones for ordinary values, while some fields (rules, hooks, filesystem restrictions) have their own merge behaviour, so read the reference rather than guessing. Authentication requirements are special: <code>allowed_login_methods</code>, <code>allowed_chatgpt_workspaces</code>, <code>cli_auth_credentials_store</code> and <code>chatgpt_base_url</code> must be set locally (system file or macOS MDM), because Codex ignores them when they arrive from the cloud. The docs recommend testing one allowed and one blocked workflow on a real client before you roll out.</p>
+
+    <h3>Access tokens and service accounts</h3>
+    <p>Automation needs an identity. The docs describe two ways to use a ChatGPT workspace identity instead of an API key (both for ChatGPT Business and Enterprise; service accounts only on pay-as-you-go plans):</p>
+    <table>
+      <tr><th></th><th>Access token</th><th>Service account</th></tr>
+      <tr><td><strong>Represents</strong></td><td>The workspace member who created it</td><td>A non-human workspace identity, for example <code>release-automation</code></td></tr>
+      <tr><td><strong>Created</strong></td><td>In the admin console under Access tokens</td><td>Under Service accounts; a token is then created from the account's detail page</td></tr>
+      <tr><td><strong>Good for</strong></td><td><code>codex exec</code> jobs, local scripts and trusted app-server automation</td><td>CI runners, scheduled jobs and shared integrations that should not depend on an employee</td></tr>
+    </table>
+    <p>Using one is simple:</p>
+<pre><code># Ephemeral: nothing is saved on the machine
+export CODEX_ACCESS_TOKEN="&lt;access-token&gt;"
+codex exec --json "review this repository and summarize the top risks"
+
+# Or save a login (not for shared or temporary runners)
+printf '%s' "$CODEX_ACCESS_TOKEN" | codex login --with-access-token</code></pre>
+    <p>Rules the docs give for tokens:</p>
+    <ul>
+      <li>Choose a finite expiry (for example 7, 30, 60 or 90 days) and copy the token immediately, because you cannot view it again. Store it in a secret manager or CI secret store.</li>
+      <li>Rotate by creating a new token, updating the secret, running a smoke test, then revoking the old one.</li>
+      <li>Use access tokens only on trusted runners. Public CI, forked pull requests and shared machines can expose them.</li>
+      <li>Create tokens per workflow owner, not one shared person's token for unrelated teams.</li>
+      <li>Service-account tokens need Codex CLI 0.142.0 or later. Workspace owners and admins create service accounts and can share them with people or groups as <strong>User</strong>, <strong>Configure</strong> or <strong>Manager</strong>.</li>
+      <li>If a Platform API key works for your automation, the docs say to keep using API key auth.</li>
+    </ul>
+
+    <h3>Seeing usage and cost</h3>
+    <p>Where to look depends on how your team pays:</p>
+    <table>
+      <tr><th>Question</th><th>Where the docs point</th></tr>
+      <tr><td>Interactive usage and Codex analytics</td><td>Workspace analytics in the admin console</td></tr>
+      <tr><td>Programmatic, aggregated reporting</td><td>The Analytics API</td></tr>
+      <tr><td>Audit and investigation records</td><td>The Compliance API</td></tr>
+      <tr><td>Spend on eligible Codex activity under a workspace plan</td><td>ChatGPT usage limits and spend controls (user guardrails, workspace-level spend controls, notifications, depending on plan)</td></tr>
+      <tr><td>Spend on the OpenAI API Platform</td><td>Platform billing, which the workspace spend controls do <strong>not</strong> govern</td></tr>
+    </table>
+    <p>The docs are explicit that workspace usage controls apply only to eligible activity and do not cover all Codex usage. One more item: GPT-6 Astra Ultrafast is off by default in eligible Enterprise workspaces, existing per-user spend limits apply to it, and its higher usage rates can use up a budget faster. Plans and prices change, so use the pricing page rather than any number you read in an article. The admin rollout guide also suggests reviewing access, credit use and real workflows after launch.</p>
+
+    <h2 id="security">10. A security checklist</h2>
+    <p>This list is my own summary, built from the docs above and the security sections of the GitHub Action and non-interactive pages.</p>
+    <div class="callout">
+      <strong>Before you let Codex run unattended</strong>
+      <ul>
+        <li><strong>Least privilege.</strong> Read-only by default, <code>workspace-write</code> when it must edit, full access only in an isolated runner or container. Give the workflow token only the permissions the job needs (for example <code>contents: read</code>).</li>
+        <li><strong>Secrets.</strong> Keep keys in GitHub Secrets or a secret manager. Never commit them, never set them as job-level environment variables in a job that runs repository code, and rotate quickly if you suspect exposure. Treat <code>~/.codex/auth.json</code> and access tokens like passwords.</li>
+        <li><strong>Network access.</strong> The agent runs with network access off by default. Turn it on only when required, and check the destinations your jobs really need.</li>
+        <li><strong>Who can trigger it.</strong> Restrict the workflow to trusted events and users. By default the Action only allows users with write access; use <code>allow-users</code> and <code>allow-bots</code> deliberately.</li>
+        <li><strong>Untrusted text.</strong> Sanitise or avoid feeding pull request bodies, commit messages and issue text to a privileged job, and review hidden text such as HTML comments, to reduce prompt injection.</li>
+        <li><strong>Order of steps.</strong> Run Codex as the last step of a job, so later steps do not inherit unexpected state.</li>
+        <li><strong>Separate jobs by privilege.</strong> The job with the key should not hold write permission, and the job with write permission should not hold the key.</li>
+        <li><strong>Review before merge.</strong> Output goes to a pull request or a comment. A human reads it and runs your normal tests, branch protections and required approvals.</li>
+        <li><strong>Protect the fleet.</strong> Use <code>requirements.toml</code> so nobody can quietly pick a looser sandbox, and test that a blocked action is really blocked.</li>
+      </ul>
+    </div>
+    <p>For a deeper list, the docs link to the Action's security guidance on GitHub (section 13). Part 5 explained sandboxing and approvals in more detail.</p>
+
+    <h2 id="rollout">11. A rollout checklist</h2>
+    <p>This list is my own suggestion, built from the docs above:</p>
+    <ol class="steps">
+      <li><strong>Pilot with a few people</strong> and a small project, and measure cost and time saved before widening.</li>
+      <li><strong>Commit a shared baseline:</strong> a short <code>AGENTS.md</code> (including code review rules), safe defaults in <code>.codex/config.toml</code>, a few rules, and the skills your team actually repeats.</li>
+      <li><strong>Choose an identity for automation:</strong> API key, access token or a service account, and keep it in a secret store with a rotation date.</li>
+      <li><strong>Decide the guardrails:</strong> which sandbox and approval choices, which MCP servers, which plugins, and whether event-triggered scheduled tasks are allowed. Write them as <code>requirements.toml</code> and test on one machine.</li>
+      <li><strong>Set up cost visibility</strong> before launch: analytics, spend controls and the right billing view for your plan.</li>
+      <li><strong>Automate carefully:</strong> start with a read-only review job before any job that writes, and keep humans in the merge step.</li>
+      <li><strong>Review and prune monthly:</strong> <code>AGENTS.md</code>, rules, skills, plugins and tokens all drift.</li>
+    </ol>
+
+    <h2 id="end7">12. Wrap-up and glossary</h2>
+    <ol>
+      <li><code>codex exec</code> turns Codex into a command-line tool with text or JSON output, read-only by default.</li>
+      <li>Unattended runs need explicit, narrow sandbox settings and keys kept away from repository code.</li>
+      <li>The GitHub Action and <code>@codex review</code> bring Codex to pull requests, with humans reviewing the result.</li>
+      <li>Teams share conventions in committed files and enforce policy with <code>requirements.toml</code>.</li>
+      <li>Give automation its own identity, track cost from day one, and keep keys out of repositories.</li>
+    </ol>
+    <p>Part 6 covered extending Codex with skills, MCP servers and plugins, which you can now share with a team. Part 8, the last in the series, steps back from code: using Codex and ChatGPT for everyday work, plus a first-week learning plan and where to keep learning.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td><code>codex exec</code></td><td>Run Codex once without a conversation and print the final answer.</td></tr>
+      <tr><td>JSONL</td><td>JSON Lines: one JSON object per line, used for the <code>--json</code> event stream.</td></tr>
+      <tr><td>Sandbox</td><td>The technical limit on what commands Codex can touch.</td></tr>
+      <tr><td>Approval policy</td><td>The rule for when Codex must stop and ask you.</td></tr>
+      <tr><td>Runner</td><td>The machine (for example a GitHub-hosted one) that executes a CI job.</td></tr>
+      <tr><td>Workflow</td><td>A GitHub Actions file describing when and how a job runs.</td></tr>
+      <tr><td>Prompt injection</td><td>Hidden instructions in text that Codex reads, trying to steer it.</td></tr>
+      <tr><td><code>requirements.toml</code></td><td>An admin-enforced policy file that users cannot override.</td></tr>
+      <tr><td>Access token</td><td>A workspace credential scoped to Codex, for scripts and CI.</td></tr>
+      <tr><td>Service account</td><td>A non-human workspace identity for automation.</td></tr>
+      <tr><td>MDM</td><td>Mobile device management: tools that push policy to company computers.</td></tr>
+      <tr><td>SDK</td><td>A code library for controlling Codex from your own program.</td></tr>
+    </table>
+
+    <h2 id="links7">13. Links and official docs</h2>
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages.</p></div>
+    <ul>
+      <li><a href="https://developers.openai.com/codex/noninteractive" target="_blank" rel="noopener">Non-interactive mode (codex exec)</a>, including the CI auto-fix example</li>
+      <li><a href="https://developers.openai.com/codex/cli/reference" target="_blank" rel="noopener">CLI command reference</a></li>
+      <li><a href="https://developers.openai.com/codex/github-action" target="_blank" rel="noopener">Codex GitHub Action</a> and the <a href="https://github.com/openai/codex-action" target="_blank" rel="noopener">openai/codex-action repository</a>, with its <a href="https://github.com/openai/codex-action/blob/main/docs/security.md" target="_blank" rel="noopener">security guidance</a></li>
+      <li><a href="https://developers.openai.com/codex/auth/ci-cd-auth" target="_blank" rel="noopener">Maintain Codex account auth in CI/CD (advanced)</a></li>
+      <li><a href="https://developers.openai.com/codex/automations" target="_blank" rel="noopener">Scheduled tasks</a></li>
+      <li><a href="https://developers.openai.com/codex/integrations/github" target="_blank" rel="noopener">Review GitHub pull requests with Codex</a>, <a href="https://developers.openai.com/codex/integrations/slack" target="_blank" rel="noopener">Slack</a> and <a href="https://developers.openai.com/codex/integrations/linear" target="_blank" rel="noopener">Linear</a></li>
+      <li><a href="https://developers.openai.com/codex/sdk" target="_blank" rel="noopener">Codex SDK</a> and <a href="https://developers.openai.com/codex/app-server" target="_blank" rel="noopener">App Server</a></li>
+      <li><a href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">Custom instructions with AGENTS.md</a>, <a href="https://developers.openai.com/codex/config-basic" target="_blank" rel="noopener">Config basics</a> and <a href="https://developers.openai.com/codex/rules" target="_blank" rel="noopener">Rules</a></li>
+      <li><a href="https://developers.openai.com/codex/agent-approvals-security" target="_blank" rel="noopener">Agent approvals and security</a></li>
+      <li><a href="https://developers.openai.com/codex/enterprise/admin-setup" target="_blank" rel="noopener">Admin rollout guide</a>, <a href="https://developers.openai.com/codex/enterprise/managed-configuration" target="_blank" rel="noopener">Managed configuration</a>, <a href="https://developers.openai.com/codex/enterprise/access-tokens" target="_blank" rel="noopener">Access tokens</a>, <a href="https://developers.openai.com/codex/enterprise/service-accounts" target="_blank" rel="noopener">Service accounts</a>, <a href="https://developers.openai.com/codex/enterprise/usage-limits" target="_blank" rel="noopener">Usage limits and spend controls</a> and <a href="https://developers.openai.com/codex/enterprise/governance" target="_blank" rel="noopener">Governance</a></li>
+    </ul>
+
+    <div class="pager">
+      <a class="prev" href="codex-part-6-extend-and-surfaces.html"><small>&larr; Previous &middot; Part 6</small>Extending Codex</a>
+      <a class="next" href="codex-part-8-beyond-code-learning-path.html"><small>Next &middot; Part 8 &rarr;</small>Beyond code and your learning path</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

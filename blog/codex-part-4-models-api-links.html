@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Codex models, the API and official links: sign-in, model choice and links — Codex series part 4</title>
+  <meta name="description" content="Codex vs the OpenAI API, signing in with ChatGPT or an API key, the models available in Codex as of 18 October 2026, how to choose a model and reasoning effort, plans, and the official links in one place. Part 4 of 8." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="4">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Series &middot; Part 4 of 8</p>
+    <h1>Codex models, the API and official links</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~18 min read</span></div>
+    <div class="tags"><span class="tag">OpenAI API</span><span class="tag">Models</span><span class="tag">Reference</span><span class="tag">Official links</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a class="on" href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Parts 1 to 3 were about using Codex well. This part is the reference shelf at the end of the beginner level (Parts 5 to 8 go further): how Codex relates to the OpenAI API and the two ways to sign in, a first API call, the models you can pick in Codex as the docs list them on 18 October 2026 (including the ones that have just been retired), how to choose a model and a reasoning effort, how plans and pricing fit together, and the official pages I rely on, all in one place. Models and plans change often, so every table here is a dated snapshot and the linked docs are the source of truth.</p>
+
+    <div class="callout">
+      <strong>Part 4 in 60 seconds</strong>
+      <ul>
+        <li>Codex and the OpenAI API are different products. You can sign in to Codex with your ChatGPT account (subscription access) or with an API key (usage-based access).</li>
+        <li>The API needs an API key. Keep it in an environment variable, never inside an app you ship.</li>
+        <li>The docs now recommend GPT-6.1 Sol (<code>gpt-6.1-sol</code>) for complex coding and GPT-6 Luna (<code>gpt-6-luna</code>) for focused, repeatable tasks. GPT-6 Astra is the most capable model. GPT-5.5 left Codex with ChatGPT sign-in on 14 October 2026.</li>
+        <li>Switch model in the CLI with <code>/model</code>, <code>--model</code> or a <code>model</code> line in <code>config.toml</code>. More reasoning effort is better for hard work, slower, and uses more tokens.</li>
+        <li>The official links are grouped at the end, so you can bookmark one section.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 4</strong></summary>
+      <ol>
+        <li><a href="#which">Codex or the OpenAI API?</a></li>
+        <li><a href="#api">A first API call</a></li>
+        <li><a href="#models">Models in Codex (as of 18 October 2026)</a></li>
+        <li><a href="#switch">Switching models and reasoning effort</a></li>
+        <li><a href="#choose">Choosing a model and an effort</a></li>
+        <li><a href="#plans">Plans and pricing, at a high level</a></li>
+        <li><a href="#links">Official links</a></li>
+        <li><a href="#end">Series wrap-up and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="which">1. Codex or the OpenAI API?</h2>
+    <p>The same models can be reached through different doors. Which one you want depends on what you are trying to do. The docs describe Codex as working in the ChatGPT desktop app, the Codex CLI and the IDE extension, plus Codex cloud for tasks that run on the web. The OpenAI API is a separate door for building your own software.</p>
+    <table>
+      <tr><th>Door</th><th>Use it to</th><th>You sign in with</th></tr>
+      <tr><td><strong>Codex in the ChatGPT desktop app, CLI and IDE extension</strong></td><td>Work inside your own project: read the code, edit files, run commands.</td><td>ChatGPT (subscription access) or an API key (usage-based access)</td></tr>
+      <tr><td><strong>Codex cloud</strong></td><td>Run tasks in the cloud, with features such as GitHub code review and Slack.</td><td>ChatGPT only. The docs say Codex cloud requires signing in with ChatGPT.</td></tr>
+      <tr><td><strong>OpenAI API</strong></td><td>Build the models into your own app, website or backend. You send a request and get the reply back as data.</td><td>An API key, billed through your OpenAI Platform account</td></tr>
+      <tr><td><strong>Custom model provider or gateway</strong></td><td>Point Codex at a compatible endpoint your organisation runs.</td><td>Depends on the setup. The docs say a compatible Responses API endpoint is needed; Chat Completions-only endpoints are not supported.</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="One set of OpenAI models reached through Codex with ChatGPT sign-in, Codex with an API key, the OpenAI API directly, and custom providers.">
+        <rect class="boxp" x="216" y="86" width="208" height="66" rx="16"/><text class="b c" x="320" y="116">OpenAI models</text><text class="sub c" x="320" y="136">Astra &middot; Sol &middot; Luna</text>
+        <rect class="boxb" x="14" y="14" width="190" height="58" rx="12"/><text class="b c" x="109" y="38">Codex + ChatGPT</text><text class="sub c" x="109" y="58">subscription access</text>
+        <rect class="boxg" x="436" y="14" width="190" height="58" rx="12"/><text class="b c" x="531" y="38">Codex + API key</text><text class="sub c" x="531" y="58">usage-based access</text>
+        <rect class="boxo" x="14" y="170" width="190" height="58" rx="12"/><text class="b c" x="109" y="194">OpenAI API</text><text class="sub c" x="109" y="214">build your own app</text>
+        <rect class="box" x="436" y="170" width="190" height="58" rx="12"/><text class="b c" x="531" y="194">Custom provider</text><text class="sub c" x="531" y="214">Responses API endpoint</text>
+        <path class="arrow" d="M206,60 L230,90"/><path class="arrow" d="M434,60 L410,90"/><path class="arrow" d="M206,182 L230,150"/><path class="arrow" d="M434,182 L410,150"/>
+      </svg>
+      <figcaption>Same family of models, several doors. Pick the door for the job. Which models you see depends on the door, your plan and your client.</figcaption>
+    </figure>
+
+    <h3>Sign in with ChatGPT or with an API key</h3>
+    <p>The authentication docs say Codex supports two ways to sign in when using OpenAI models, and that the ChatGPT desktop app, the Codex CLI and the IDE extension support both for local work:</p>
+    <table>
+      <tr><th></th><th>Sign in with ChatGPT</th><th>Sign in with an API key</th></tr>
+      <tr><td><strong>What it is</strong></td><td>Subscription access through your ChatGPT plan.</td><td>Usage-based access through your OpenAI Platform account.</td></tr>
+      <tr><td><strong>How you pay</strong></td><td>Your plan, plus ChatGPT credits if you add them (see section 6).</td><td>Standard API rates instead of included plan credits.</td></tr>
+      <tr><td><strong>Rules and data handling</strong></td><td>Follows your ChatGPT workspace permissions and retention settings.</td><td>Follows your API organisation&rsquo;s retention and data-sharing settings.</td></tr>
+      <tr><td><strong>Features</strong></td><td>All of them, depending on plan. Needed for Codex cloud.</td><td>Local workflows work. Some features that rely on ChatGPT workspace or cloud services are limited or unavailable.</td></tr>
+      <tr><td><strong>Models</strong></td><td>Depends on your plan, client and workspace.</td><td>Follows the API models available to your key.</td></tr>
+    </table>
+    <p>In the CLI, the commands from the docs are:</p>
+    <div class="doc"><div class="doc-bar">terminal</div>
+<pre><code># ChatGPT sign-in: opens a browser window
+codex login
+
+# API key sign-in: pipe the key in from an environment variable
+printenv OPENAI_API_KEY | codex login --with-api-key
+
+# Show the active sign-in method (exits 0 when you are logged in)
+codex login status</code></pre></div>
+    <p>If you work on a remote or headless machine where the browser flow does not work, the docs describe a device-code option (<code>codex login --device-auth</code>, marked beta). The docs also recommend API keys for programmatic CLI workflows such as CI jobs, and warn you not to expose Codex execution in untrusted or public environments. Part 7 comes back to automation.</p>
+    <div class="note"><p>Treat <code>~/.codex/auth.json</code> like a password. The docs say it holds access tokens, so do not commit it, paste it into tickets or share it in chat.</p></div>
+
+    <h2 id="api">2. A first API call</h2>
+    <p>This is the same idea as the context window from Part 3: the API does not remember anything between calls, so your code sends what the model needs every time. The docs call the main endpoint the <strong>Responses API</strong>. I checked the steps below against the live developer quickstart on 18 October 2026.</p>
+    <ol class="steps">
+      <li><strong>Create an API key</strong> in the OpenAI dashboard (the quickstart has a button for it) and store it somewhere safe. Treat it like a password.</li>
+      <li><strong>Put the key in an environment variable</strong> so it never appears in your code. On macOS or Linux:
+<pre><code>export OPENAI_API_KEY="your_api_key_here"</code></pre>
+      On Windows the quickstart uses <code>setx OPENAI_API_KEY "your_api_key_here"</code>. Each official SDK reads this variable by itself.</li>
+      <li><strong>Install the SDK:</strong> <code>pip install openai</code> for Python (or <code>npm install openai</code> for JavaScript).</li>
+      <li><strong>Make a call.</strong> Create <code>example.py</code> with the code from the quickstart, then run <code>python example.py</code>:</li>
+    </ol>
+    <div class="doc"><div class="doc-bar">example.py (from the official quickstart)</div>
+<pre><code>from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+    model="gpt-6-astra",
+    input="Write a one-sentence bedtime story about a unicorn.",
+)
+
+print(response.output_text)</code></pre></div>
+    <p>The JavaScript version in the same quickstart does the same with <code>client.responses.create(&hellip;)</code> and prints <code>response.output_text</code>. The quickstart also shows examples for .NET, Java, Go and Ruby, and plain HTTP examples that send a request to <code>https://api.openai.com/v1/responses</code> with an <code>Authorization: Bearer</code> header. For the exact request and response shapes, use the <a href="https://developers.openai.com/api/reference/resources/responses" target="_blank" rel="noopener">Responses API reference</a> rather than my summary.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="Your app sends a request with a model name and an input to the Responses API and gets output back.">
+        <rect class="boxb" x="10" y="20" width="170" height="130" rx="14"/><text class="b" x="26" y="48">Your app</text><text class="sub" x="26" y="72">holds the API key</text><text class="sub" x="26" y="92">in an environment</text><text class="sub" x="26" y="112">variable</text>
+        <path class="arrow" d="M182,60 L296,60"/><text class="sub c" x="239" y="50">request</text>
+        <path class="arrow" d="M296,112 L182,112"/><text class="sub c" x="239" y="132">reply</text>
+        <rect class="boxp" x="298" y="20" width="332" height="130" rx="14"/><text class="b" x="314" y="46">Responses API</text>
+        <text class="sub" x="314" y="70">in:  model, input</text>
+        <text class="sub" x="314" y="92">out: response (read the text with</text>
+        <text class="sub" x="314" y="112">       output_text in the SDKs)</text>
+        <text class="sub" x="314" y="136">auth: your API key</text>
+      </svg>
+      <figcaption>One request in, one response out. Everything else (tools, images, streaming) builds on this shape.</figcaption>
+    </figure>
+    <div class="callout">
+      <strong>Never put your API key inside an app you ship</strong>
+      <p>Anyone can pull a key out of an app package or a web page. Keep it on a server you control, use environment variables for local work, and do not commit it to git. (More in the <a href="private-ai-chat-android.html#online">Android post on online models</a>.)</p>
+    </div>
+    <div class="note"><p>You do not need any of this to use Codex. Codex asks for a sign-in, not for code. The API is for when you want to build your own product on the models, or when you choose API-key sign-in for Codex itself.</p></div>
+
+    <h2 id="models">3. Models in Codex (as of 18 October 2026)</h2>
+    <p>This is how the Codex docs list the models on 18 October 2026. OpenAI changes the lineup often, so treat it as a snapshot and check the <a href="https://learn.chatgpt.com/docs/models" target="_blank" rel="noopener">Models page</a>, the <a href="https://developers.openai.com/api/docs/models" target="_blank" rel="noopener">API model catalog</a> and the dated <a href="https://learn.chatgpt.com/docs/whats-new" target="_blank" rel="noopener">What&rsquo;s new</a> page for the live status. The docs also stress that availability depends on the rollout, your sign-in method, your client, your plan and your workspace settings.</p>
+
+    <h3>Models to pick from</h3>
+    <table>
+      <tr><th>Model</th><th>ID to use</th><th>The docs describe it as</th></tr>
+      <tr><td>GPT-6 Astra</td><td><code>gpt-6-astra</code></td><td>The most capable model, for complex work across code, apps and research. Choose it when a task needs the strongest capability across steps and tools. It is also the model in the API quickstart.</td></tr>
+      <tr><td>GPT-6.1 Sol</td><td><code>gpt-6.1-sol</code></td><td>Near-Astra performance for complex work at a lower cost than Astra. Recommended for complex coding and agentic workflows, and for repeated, long-running work.</td></tr>
+      <tr><td>GPT-6 Sol</td><td><code>gpt-6-sol</code></td><td>Built to power complex coding and agentic workflows. It appears in the docs as the previous Sol model.</td></tr>
+      <tr><td>GPT-6 Luna</td><td><code>gpt-6-luna</code></td><td>The most efficient model, for focused, high-volume tasks such as summarising, extraction and focused coding. Recommended for clear, repeatable tasks.</td></tr>
+    </table>
+    <p>The docs also say GPT-5.6 Sol, GPT-5.6 Terra and GPT-5.6 Luna remain available during the rollout. In ChatGPT, GPT-6.1 Sol, GPT-6 Sol and GPT-6 Luna are available in Work and Codex, not in Chat. The GPT-6.1 Sol launch rollout covers Plus, Pro, Business, Enterprise and Edu in Codex in the desktop app and CLI; for Enterprise and Edu it is off by default until an administrator enables it, and Free and Go were not included at launch. Selecting a new model does not change workspace permissions or give you access to it.</p>
+
+    <h3>Retired and deprecated in Codex</h3>
+    <p>The &ldquo;What&rsquo;s new&rdquo; and Models pages carry dated retirement notices. If an old script or config still names one of these, update it.</p>
+    <table>
+      <tr><th>Model</th><th>Status in the docs</th></tr>
+      <tr><td><code>gpt-5.5</code></td><td>Retired from Codex for users signed in with ChatGPT on 14 October 2026 (noon PDT, 19:00 UTC). Replacement: <code>gpt-6.1-sol</code> on Plus, Pro, Business, Enterprise and Edu; <code>gpt-6-luna</code> in the desktop app on Free and Go. The OpenAI API and Codex sessions authenticated with an API key are not affected.</td></tr>
+      <tr><td><code>gpt-5.3-codex-spark</code></td><td>Retired on 14 September 2026. No longer available in the desktop app, CLI or IDE extension.</td></tr>
+      <tr><td><code>gpt-5.4</code> and <code>gpt-5.4-mini</code></td><td>Retired from Codex with ChatGPT sign-in on 31 August 2026. The Models page says to replace them with <code>gpt-6-sol</code> and <code>gpt-6-luna</code> when available to your plan and client. API-key sessions are not affected.</td></tr>
+      <tr><td><code>gpt-5.2</code> and <code>gpt-5.3-codex</code></td><td>Already deprecated in Codex when you sign in with ChatGPT. Update scripts, config files and <code>codex exec --model</code> commands that still use them.</td></tr>
+    </table>
+    <p>The pattern in the docs is the same each time: retirement applies to the ChatGPT sign-in path, and you should replace the model name in workspace defaults, saved model settings, managed configurations, custom agents, scheduled tasks and scripts. With an API key, model availability follows your API organisation and project instead, and the docs note that GPT-5.5 remains available through the API.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Lifecycle of a Codex model: available, recommended replacement announced, retirement date, retired and no longer selectable with ChatGPT sign-in.">
+        <rect class="boxg" x="6"   y="20" width="140" height="78" rx="12"/><text class="b c" x="76"  y="46">Available</text><text class="sub c" x="76"  y="66">listed in the</text><text class="sub c" x="76"  y="82">model picker</text>
+        <rect class="boxb" x="170" y="20" width="140" height="78" rx="12"/><text class="b c" x="240" y="46">Notice</text><text class="sub c" x="240" y="66">dated retirement</text><text class="sub c" x="240" y="82">note in What&rsquo;s new</text>
+        <rect class="boxo" x="334" y="20" width="140" height="78" rx="12"/><text class="b c" x="404" y="46">Replace it</text><text class="sub c" x="404" y="66">update configs,</text><text class="sub c" x="404" y="82">agents, scripts</text>
+        <rect class="boxr" x="498" y="20" width="136" height="78" rx="12"/><text class="b c" x="566" y="46">Retired</text><text class="sub c" x="566" y="66">gone from Codex</text><text class="sub c" x="566" y="82">with ChatGPT sign-in</text>
+        <path class="arrow" d="M148,59 L168,59"/><path class="arrow" d="M312,59 L332,59"/><path class="arrow" d="M476,59 L496,59"/>
+        <text class="sub c" x="320" y="138">API-key sessions are tracked separately. Check the API deprecations page for those.</text>
+      </svg>
+      <figcaption>How a retirement shows up in the docs. Read What&rsquo;s new regularly and search your config files for old model names.</figcaption>
+    </figure>
+
+    <h2 id="switch">4. Switching models and reasoning effort</h2>
+    <p>If you do not choose, Codex uses a recommended model. The docs describe these ways to choose one yourself:</p>
+    <table>
+      <tr><th>Where</th><th>How</th></tr>
+      <tr><td><strong>Inside a CLI session</strong></td><td>Type <code>/model</code> to switch models or adjust reasoning effort. To see Max or Ultra for a model, choose it, then select <strong>More reasoning&hellip;</strong>.</td></tr>
+      <tr><td><strong>When you launch the CLI</strong></td><td><code>codex --model gpt-6.1-sol</code>, or the alias <code>-m</code>.</td></tr>
+      <tr><td><strong>Non-interactive runs</strong></td><td><code>codex exec -m gpt-6.1-sol "Review the current changes"</code></td></tr>
+      <tr><td><strong>One-off override of any key</strong></td><td><code>codex --config model='"gpt-6.1-sol"'</code>. The value is parsed as TOML, so the inner quotes matter.</td></tr>
+      <tr><td><strong>Default for every session</strong></td><td>Add a <code>model</code> line to your <code>config.toml</code> (see below).</td></tr>
+      <tr><td><strong>Desktop app, web and IDE extension</strong></td><td>Use the model and reasoning control under the message box. In the desktop app you start with a <strong>Power</strong> setting (Smarter or Faster) and open <strong>Advanced</strong> to pick a model, reasoning effort or speed.</td></tr>
+    </table>
+    <div class="doc"><div class="doc-bar">~/.codex/config.toml</div>
+<pre><code>model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"</code></pre></div>
+    <p>The desktop app, the CLI and the IDE extension share the same <code>config.toml</code>. The docs list the <code>model_reasoning_effort</code> values <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code> and <code>ultra</code>, and add that the levels available depend on the model and client. Command-line flags and <code>--config</code> overrides beat the file for a single run. If you do not have access to the model in an example, use one you can see in your picker.</p>
+    <div class="note"><p>Rename-proof tip: search your <code>config.toml</code>, saved profiles, custom agent files and scripts for the old IDs listed in section 3 whenever a retirement notice appears.</p></div>
+
+    <h2 id="choose">5. Choosing a model and an effort</h2>
+    <p>The docs give a clear starting point: <strong>Luna is the most cost-efficient model, Astra the most powerful.</strong> If you do not need to think about usage or time, you can default to Astra. Otherwise, choose by the job:</p>
+    <table>
+      <tr><th>If you need&hellip;</th><th>Start with</th><th>Why (from the docs)</th></tr>
+      <tr><td>The hardest end-to-end work</td><td>GPT-6 Astra</td><td>Sustained reasoning and judgment across code, apps and research. Give it sources, constraints and checks.</td></tr>
+      <tr><td>Complex coding, repeated or long-running work, with cost in mind</td><td>GPT-6.1 Sol</td><td>Near-Astra performance at a lower cost. The docs suggest comparing it with Astra on the same task to see the quality and cost trade-off.</td></tr>
+      <tr><td>Clear, repeatable, high-volume tasks</td><td>GPT-6 Luna</td><td>Extraction, classification, transformation, structured summaries, focused coding.</td></tr>
+      <tr><td>A script or agent that must keep working after a retirement</td><td>A current ID from section 3</td><td>Old IDs stop working with ChatGPT sign-in.</td></tr>
+    </table>
+
+    <h3>Reasoning effort</h3>
+    <p>Reasoning effort is how much thinking the model does before answering. Higher effort can improve results on complex tasks, but it takes longer and uses more tokens (Part 3). The docs say to start with the default and raise it when the task needs deeper planning or analysis.</p>
+    <table>
+      <tr><th>Level</th><th>Use it for</th></tr>
+      <tr><td><strong>Light</strong> (app, web, IDE) or <strong>Low</strong> (CLI, <code>low</code> in config)</td><td>Quick, well-scoped tasks. The docs suggest starting here for Astra.</td></tr>
+      <tr><td><strong>Medium</strong></td><td>A balance of speed and depth, for tasks that need more planning.</td></tr>
+      <tr><td><strong>High</strong> and <strong>Extra High</strong> (<code>xhigh</code>)</td><td>Difficult work with several steps, sources or trade-offs. The docs suggest starting at High for Luna.</td></tr>
+      <tr><td><strong>Max</strong></td><td>More time on a single hard task, when depth matters more than speed or usage. Luna supports up to Max.</td></tr>
+      <tr><td><strong>Ultra</strong></td><td>Uses subagents to handle separate parts of a complex task in parallel. Pick it when you can split the work. Not supported by Luna, and most tasks do not need it.</td></tr>
+    </table>
+    <p>Two honest caveats from the docs. Reasoning efforts do not map exactly between model generations, so try a familiar task at a lower setting and adjust. And the guidance is a starting point: experiment with the same input, compare, and <strong>keep the lightest setting that meets your quality bar.</strong> Ask yourself how often the task runs, how fast you need it, how the output will be used and how much quality matters. The docs also describe Standard, Fast and Ultrafast speed modes where supported, which use your allowance at different rates (see the <a href="https://learn.chatgpt.com/docs/agent-configuration/speed" target="_blank" rel="noopener">Speed page</a>).</p>
+
+    <h2 id="plans">6. Plans and pricing, at a high level</h2>
+    <p>Prices and limits change more often than anything else in this post, so I only describe the shape here. The <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">Codex pricing page</a> is the source of truth. It says ChatGPT Work and Codex share usage, and that API token prices are separate from subscription usage, so you should not use API prices to estimate how much a plan includes.</p>
+    <table>
+      <tr><th>Plan or option</th><th>What the pricing page says</th></tr>
+      <tr><td><strong>Free</strong> and <strong>Go</strong></td><td>Light use. The docs list GPT-6 Luna at Standard speed in the desktop app, subject to rollout. Listed at $0 and $8 per month on 18 October 2026.</td></tr>
+      <tr><td><strong>Plus</strong></td><td>A few focused coding sessions each week. Codex on the web, in the CLI, in the IDE extension and on iOS, plus cloud features such as automatic code review and Slack. GPT-6.1 Sol and GPT-6 Luna. You can extend usage with ChatGPT credits. Listed at $20 per month.</td></tr>
+      <tr><td><strong>Pro</strong></td><td>Everything in Plus, with several tiers (the page lists $100, $200 and $500 per month) and more usage. Ultrafast mode is on the $500 tier.</td></tr>
+      <tr><td><strong>Business</strong>, <strong>Enterprise</strong> and <strong>Edu</strong></td><td>Workspaces with admin controls, SSO and more. Enterprise and Edu add things like audit logs and data retention and residency controls. Business and Enterprise pricing is per user; see the page.</td></tr>
+      <tr><td><strong>API key</strong></td><td>Good for automation in shared environments such as CI. You pay by API pricing, model availability follows your key, and cloud features such as GitHub code review and Slack are not included.</td></tr>
+    </table>
+    <p>Usage depends on the model, the size of the task, the context, tool use and caching, so the same-looking tasks can cost different amounts. Smaller, cheaper models such as Luna go further on a plan than Astra. The pricing page also has a usage estimate table, credit rates and answers to questions like &ldquo;where can I see my current usage limits&rdquo;. Check it, and your own usage dashboard, rather than trusting any number copied into a blog post (including mine).</p>
+
+    <h2 id="links">7. Official links</h2>
+    <p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages. Every link below returned HTTP 200 when I checked it. If a link breaks, the docs are indexed at <a href="https://learn.chatgpt.com/docs" target="_blank" rel="noopener">learn.chatgpt.com/docs</a> and the API docs at <a href="https://developers.openai.com/api/docs/models" target="_blank" rel="noopener">developers.openai.com</a>.</p>
+
+    <h3>Codex: getting started and sign-in</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs" target="_blank" rel="noopener">Codex docs home</a></td><td>The entry point to all the documentation.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/quickstart" target="_blank" rel="noopener">Quickstart</a></td><td>First steps with Codex (Part 1).</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/cli" target="_blank" rel="noopener">Codex CLI</a></td><td>Installing and using the command-line client.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/auth" target="_blank" rel="noopener">Authentication</a></td><td>Sign in with ChatGPT or an API key, device code, credential storage.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/config-file/config-basic" target="_blank" rel="noopener">Config basics</a></td><td><code>config.toml</code>, precedence and common settings.</td></tr>
+    </table>
+
+    <h3>Models, pricing and what changed</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/models" target="_blank" rel="noopener">Models</a></td><td>Recommended models, availability, retirements, switching.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">Pricing</a></td><td>Plans, credits, usage estimates, feature availability.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/agent-configuration/speed" target="_blank" rel="noopener">Speed</a></td><td>Standard, Fast and Ultrafast modes.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/whats-new" target="_blank" rel="noopener">What&rsquo;s new</a></td><td>Dated summaries of recent updates and retirement notices.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/changelog" target="_blank" rel="noopener">ChatGPT and Codex changelog</a></td><td>Every versioned update, bug fix and minor improvement.</td></tr>
+    </table>
+
+    <h3>OpenAI API</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/quickstart" target="_blank" rel="noopener">Developer quickstart</a></td><td>Create a key, install an SDK, make your first call.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/reference/resources/responses" target="_blank" rel="noopener">Responses API reference</a></td><td>The request and response details.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/models" target="_blank" rel="noopener">API model catalog</a></td><td>All models available through the API.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/guides/model-selection" target="_blank" rel="noopener">Model selection guide</a></td><td>Choosing between models for the API.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/pricing" target="_blank" rel="noopener">API pricing</a></td><td>Token prices for API usage.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/deprecations" target="_blank" rel="noopener">API deprecations</a></td><td>Status of deprecated API models.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/changelog" target="_blank" rel="noopener">API changelog</a></td><td>What changed in the API.</td></tr>
+      <tr><td><a href="https://developers.openai.com/api/docs/libraries" target="_blank" rel="noopener">Client libraries</a></td><td>Official SDKs, such as <a href="https://github.com/openai/openai-python" target="_blank" rel="noopener">openai-python</a> and <a href="https://github.com/openai/openai-node" target="_blank" rel="noopener">openai-node</a>.</td></tr>
+    </table>
+
+    <h3>Open source, community and support</h3>
+    <table>
+      <tr><th>Page</th><th>What it covers</th></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/open-source" target="_blank" rel="noopener">Open source</a></td><td>Which parts of Codex are open source (the CLI is; the IDE extension and Codex cloud are not).</td></tr>
+      <tr><td><a href="https://github.com/openai/codex" target="_blank" rel="noopener">openai/codex</a></td><td>The open-source Codex CLI repository, per the docs the primary home for Codex open-source development.</td></tr>
+      <tr><td><a href="https://github.com/openai/codex/issues" target="_blank" rel="noopener">Issues</a> and <a href="https://github.com/openai/codex/discussions" target="_blank" rel="noopener">Discussions</a></td><td>Bug reports, feature requests and the discussion forum. The repo takes issues but not external pull requests.</td></tr>
+      <tr><td><a href="https://developers.openai.com/community" target="_blank" rel="noopener">OpenAI developer community</a></td><td>Programs, meetups and support, including Codex Ambassadors.</td></tr>
+      <tr><td><a href="https://developers.openai.com/community/students" target="_blank" rel="noopener">Codex for Students</a></td><td>The students programme page. Check it for current eligibility and terms.</td></tr>
+      <tr><td><a href="https://developers.openai.com/community/codex-for-oss" target="_blank" rel="noopener">Codex for Open Source</a></td><td>For maintainers of widely used open-source projects. The docs say it offers API credits, ChatGPT Pro with Codex and selective access to Codex Security.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/resources" target="_blank" rel="noopener">Resources</a></td><td>Videos, community programs and other OpenAI resources.</td></tr>
+    </table>
+
+    <h2 id="end">8. Beginner-level wrap-up and glossary</h2>
+    <ol>
+      <li><strong>Part 1:</strong> <a href="codex-part-1-setup.html">set up Codex safely</a>, learn the modes and sign in.</li>
+      <li><strong>Part 2:</strong> give Codex lasting context with <a href="codex-part-2-agents-md.html">AGENTS.md</a>.</li>
+      <li><strong>Part 3:</strong> <a href="codex-part-3-tokens-onboarding.html">spend fewer tokens</a>, hand work off between sessions and onboard faster.</li>
+      <li><strong>Part 4:</strong> know your sign-in options, the model list and the official links.</li>
+      <li><strong>Next (advanced):</strong> <a href="codex-part-5-daily-workflow.html">Part 5</a> covers working with Codex day to day.</li>
+    </ol>
+    <p>Models are retired, plans move and the docs change often. Writing things down, and checking the official pages when something looks off, are the two habits that carry through all four parts.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>API</td><td>A way for one program to talk to another. The OpenAI API lets your code send requests to a model and read the replies.</td></tr>
+      <tr><td>API key</td><td>A secret string that identifies your account when you call the API. Treat it like a password.</td></tr>
+      <tr><td>Sign in with ChatGPT</td><td>Subscription access to Codex through your ChatGPT plan.</td></tr>
+      <tr><td>Responses API</td><td>The OpenAI API endpoint used in the quickstart: you send a model name and an input and get a response back.</td></tr>
+      <tr><td>SDK</td><td>An official library that makes API calls easier in a given language.</td></tr>
+      <tr><td>Model ID</td><td>The exact name to request or configure, such as <code>gpt-6.1-sol</code>.</td></tr>
+      <tr><td>Reasoning effort</td><td>How much thinking a model does before it answers. Higher is slower and uses more tokens.</td></tr>
+      <tr><td>Subagent</td><td>A helper agent that takes one part of a bigger task. Ultra mode uses them.</td></tr>
+      <tr><td>Credits</td><td>Extra usage you can add to some plans once the included allowance runs out.</td></tr>
+      <tr><td>Retired model</td><td>A model that can no longer be selected in a given product. Replace its name in your configs and scripts.</td></tr>
+    </table>
+
+    <div class="pager">
+      <a class="prev" href="codex-part-3-tokens-onboarding.html"><small>&larr; Previous &middot; Part 3</small>Fewer tokens, faster onboarding</a>
+      <a class="next" href="codex-part-5-daily-workflow.html"><small>Next &middot; Part 5 (Advanced) &rarr;</small>Working with Codex day to day</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

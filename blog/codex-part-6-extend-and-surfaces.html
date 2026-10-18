@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Extending Codex: MCP, subagents, skills, plugins, hooks, IDE, desktop and cloud — Codex series part 6 (advanced)</title>
+  <meta name="description" content="How to choose between AGENTS.md, rules, skills, MCP servers, subagents, hooks and plugins, plus a guide to the IDE extension, desktop app, Codex cloud, remote connections and worktrees. Part 6 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="6">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Advanced &middot; Part 6 of 8</p>
+    <h1>Extending Codex: MCP, subagents, skills, plugins, hooks, and choosing where to run it</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~33 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">MCP</span><span class="tag">Subagents</span><span class="tag">Skills</span><span class="tag">Plugins</span><span class="tag">Hooks</span><span class="tag">IDE</span><span class="tag">Cloud</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a class="on" href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">So far Codex has worked inside your project folder with the tools it ships with. Real projects also live in issue trackers, documentation sites and browsers, and real developers live in editors. This part covers the extension layer: how to choose between AGENTS.md, rules, skills, MCP servers, subagents, hooks and plugins, how to add and manage each one, and then where Codex can run: your editor, the desktop app, the cloud, a remote machine, or a separate Git worktree. Details come from the official documentation; my own advice is marked as such.</p>
+
+    <div class="callout">
+      <strong>Part 6 in 60 seconds</strong>
+      <ul>
+        <li>Pick the extension by the problem: always-on guidance goes in <code>AGENTS.md</code>, command permissions in rules, repeatable workflows in a skill, outside systems in MCP, noisy side work in a subagent, automatic checks in hooks, and shared bundles in a plugin.</li>
+        <li>Add an MCP server with <code>codex mcp add</code> or a <code>[mcp_servers.&lt;name&gt;]</code> table in <code>config.toml</code>. Check it with <code>/mcp</code>, and connect only servers you trust.</li>
+        <li>A subagent is a helper that does its own model and tool work and reports back. Ask for it directly. It costs more tokens, and it inherits your sandbox and approval settings.</li>
+        <li>A skill is a folder with a <code>SKILL.md</code> file. Repo skills live in <code>.agents/skills</code>; personal skills live in <code>~/.agents/skills</code>.</li>
+        <li>The IDE extension, desktop app, CLI and cloud share one configuration story but not every feature. The last tables in this part help you choose.</li>
+      </ul>
+    </div>
+
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages linked at the end.</p></div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 6</strong></summary>
+      <ol>
+        <li><a href="#match">Which extension for which problem?</a></li>
+        <li><a href="#mcp">MCP: connecting Codex to outside tools</a></li>
+        <li><a href="#agents">Subagents: helpers that work in parallel</a></li>
+        <li><a href="#skills">Skills: reusable workflows</a></li>
+        <li><a href="#plugins">Plugins and the marketplace</a></li>
+        <li><a href="#hooks">Hooks and rules: guardrails</a></li>
+        <li><a href="#surfaces">Your editor, desktop app, cloud and remote machines</a></li>
+        <li><a href="#worktrees">Worktrees: parallel chats in one repository</a></li>
+        <li><a href="#pick">Which surface should I use?</a></li>
+        <li><a href="#end6">Wrap-up and glossary</a></li>
+        <li><a href="#links6">Links and official docs</a></li>
+      </ol>
+    </details>
+
+    <h2 id="match">1. Which extension for which problem?</h2>
+    <p>The official customization guide says these layers are &ldquo;complementary, not competing&rdquo;: <code>AGENTS.md</code> shapes behaviour, memories carry local context forward, skills package repeatable processes, and MCP connects Codex to systems outside the local workspace. It also suggests an order to build them in: <code>AGENTS.md</code> first (<a href="codex-part-2-agents-md.html">Part 2</a>), then a plugin or skill when a reusable workflow exists, then MCP when a workflow needs an outside system, then subagents when you want to delegate noisy or specialised tasks. You do not need everything on day one. Here is the decision table I use. The &ldquo;use it when&rdquo; column follows the docs; the &ldquo;do not use it when&rdquo; column is my own reading of them.</p>
+    <table>
+      <tr><th>Tool</th><th>Use it when&hellip;</th><th>Do not use it when&hellip;</th></tr>
+      <tr><td><strong>AGENTS.md</strong></td><td>Codex keeps repeating a mistake, reads too many files, or you give the same pull request feedback twice. Build and test commands, review expectations, conventions.</td><td>The guidance is long, rarely needed, or a multi-step procedure. Keep this file small; move procedures to a skill.</td></tr>
+      <tr><td><strong>Rules</strong> (<code>.rules</code> files)</td><td>You want to decide which commands may run outside the sandbox: allow, prompt or forbid. Rules are marked experimental.</td><td>You want to teach Codex a coding convention. Rules control commands, not style.</td></tr>
+      <tr><td><strong>Skill</strong></td><td>A workflow is repeatable: release steps, a review routine, a docs update. It needs examples, references or helper scripts.</td><td>The instruction applies to every task (use <code>AGENTS.md</code>), or you need a live connection to a system (use MCP).</td></tr>
+      <tr><td><strong>MCP server</strong></td><td>Codex needs tools or data that live outside the repo: an issue tracker, design tool, browser, or shared documentation.</td><td>A plain command-line tool already does the job, or you cannot vouch for the server.</td></tr>
+      <tr><td><strong>Subagent</strong></td><td>A side task would flood the main chat with logs and search results, or independent read-heavy work can run in parallel.</td><td>The task is small, or several agents would edit the same files at once. Subagents use more tokens than a single-agent run.</td></tr>
+      <tr><td><strong>Hook</strong></td><td>Something must happen automatically at a lifecycle point: block a risky command, log activity, run a check when a turn stops.</td><td>You only need Codex to remember a preference (use <code>AGENTS.md</code>). Hooks run your code, so each one is a trust decision.</td></tr>
+      <tr><td><strong>Plugin</strong></td><td>You want to reuse or share a bundle of skills, MCP servers and other parts, or install a proven setup someone else built.</td><td>You are experimenting alone. Start with a skill folder and package it later.</td></tr>
+    </table>
+    <p>They combine well. The docs describe skills plus MCP as &ldquo;where it all comes together&rdquo;: the skill defines the workflow and names the MCP tools to use. The docs also say to pair <code>AGENTS.md</code> with infrastructure that enforces rules, such as pre-commit hooks, linters and type checkers.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 260" role="img" aria-label="Codex in the centre. Around it: AGENTS.md for always-on guidance, skills for repeatable workflows, MCP for outside systems, subagents for delegated work, and plugins that package them.">
+        <rect class="boxp" x="240" y="94" width="160" height="72" rx="16"/><text class="b c" x="320" y="124">Codex</text><text class="sub c" x="320" y="144">the agent loop</text>
+        <rect class="boxb" x="14" y="14" width="190" height="62" rx="12"/><text class="b c" x="109" y="40">AGENTS.md</text><text class="sub c" x="109" y="60">always-on guidance</text>
+        <rect class="boxg" x="436" y="14" width="190" height="62" rx="12"/><text class="b c" x="531" y="40">Skills</text><text class="sub c" x="531" y="60">repeatable workflows</text>
+        <rect class="boxo" x="14" y="184" width="190" height="62" rx="12"/><text class="b c" x="109" y="210">MCP servers</text><text class="sub c" x="109" y="230">outside systems</text>
+        <rect class="boxr" x="436" y="184" width="190" height="62" rx="12"/><text class="b c" x="531" y="210">Subagents</text><text class="sub c" x="531" y="230">delegated helpers</text>
+        <path class="arrow" d="M206,58 L246,98"/><path class="arrow" d="M434,58 L394,98"/><path class="arrow" d="M206,202 L246,162"/><path class="arrow" d="M434,202 L394,162"/>
+        <rect class="ghost" x="236" y="190" width="168" height="50" rx="12"/><text class="b c" x="320" y="212">Plugins</text><text class="sub c" x="320" y="230">package the rest</text>
+      </svg>
+      <figcaption>Each extension solves a different problem. Plugins are the packaging layer on top. Hooks and rules (section 6) act as guardrails around the loop.</figcaption>
+    </figure>
+
+    <h2 id="mcp">2. MCP: connecting Codex to outside tools</h2>
+    <p>The <strong>Model Context Protocol (MCP)</strong> lets Codex use tools and information from other systems. In the docs' words, an MCP server &ldquo;describes the available tools and handles their requests&rdquo;, for example looking up a ticket or retrieving documentation. The docs name three roles: the <strong>host</strong> is Codex, the <strong>client</strong> is the MCP connection inside Codex, and the <strong>server</strong> is the external tool or context provider. A server can expose <strong>tools</strong> (actions), <strong>resources</strong> (readable data) and <strong>prompts</strong> (reusable prompt templates). That split helps you judge trust: some servers only provide context, while others expose powerful actions.</p>
+    <div class="analogy"><strong>Think of it like a power strip with standard sockets</strong>
+      <p>Without a standard, every tool needs its own custom cable. MCP is the standard socket. Any service that offers an MCP server plugs into Codex the same way, and the server handles the details of talking to the real system.</p>
+    </div>
+
+    <h3>Adding a server from the command line</h3>
+    <p>For a server that runs as a local program (a <strong>stdio</strong> server), the documented form is below. Everything after <code>--</code> is the command that starts the server. The docs' own example adds Context7, which they describe as a free MCP server for developer documentation:</p>
+<pre><code>codex mcp add &lt;server-name&gt; --env VAR1=VALUE1 --env VAR2=VALUE2 -- &lt;stdio server-command&gt;
+
+# Example from the docs
+codex mcp add context7 -- npx -y @upstash/context7-mcp</code></pre>
+    <p>For a server you reach at an address (a <strong>streamable HTTP</strong> server), use <code>--url</code> instead of a command. The reference also lists <code>--bearer-token-env-var</code>, <code>--oauth-client-id</code> and <code>--oauth-resource</code> for HTTP servers.</p>
+<pre><code>codex mcp add example --url https://mcp.example.com</code></pre>
+    <p>The commands to manage servers:</p>
+    <table>
+      <tr><th>Command</th><th>What it does</th></tr>
+      <tr><td><code>codex mcp list</code></td><td>List configured servers. Add <code>--json</code> for machine-readable output.</td></tr>
+      <tr><td><code>codex mcp get &lt;name&gt;</code></td><td>Show one server's configuration (<code>--json</code> prints the raw entry).</td></tr>
+      <tr><td><code>codex mcp login &lt;name&gt;</code></td><td>Start an OAuth sign-in for an HTTP server that supports OAuth.</td></tr>
+      <tr><td><code>codex mcp logout &lt;name&gt;</code></td><td>Remove stored OAuth credentials for that server.</td></tr>
+      <tr><td><code>codex mcp remove &lt;name&gt;</code></td><td>Delete the stored server definition.</td></tr>
+      <tr><td><code>/mcp</code> (inside the TUI)</td><td>Show your active MCP servers and tools. <code>/mcp verbose</code> adds server diagnostics; <code>/mcp login &lt;name&gt;</code> signs in from the session.</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Codex connects to MCP servers over streamable HTTP or stdio. Each server fronts an outside system such as an issue tracker, a documentation site or a browser. Codex asks for tools by name and the server runs them.">
+        <rect class="boxp" x="10" y="70" width="150" height="90" rx="14"/><text class="b c" x="85" y="106">Codex</text><text class="sub c" x="85" y="126">asks for a tool</text>
+        <path class="arrow" d="M162,100 L250,60"/><path class="arrow" d="M162,115 L250,115"/><path class="arrow" d="M162,130 L250,170"/>
+        <rect class="boxo" x="252" y="32" width="160" height="52" rx="12"/><text class="b c" x="332" y="55">MCP server</text><text class="sub c" x="332" y="73">streamable HTTP</text>
+        <rect class="boxo" x="252" y="90" width="160" height="52" rx="12"/><text class="b c" x="332" y="113">MCP server</text><text class="sub c" x="332" y="131">streamable HTTP</text>
+        <rect class="boxo" x="252" y="148" width="160" height="52" rx="12"/><text class="b c" x="332" y="171">MCP server</text><text class="sub c" x="332" y="189">stdio (local process)</text>
+        <path class="arrow" d="M414,58 L470,58"/><path class="arrow" d="M414,116 L470,116"/><path class="arrow" d="M414,174 L470,174"/>
+        <rect class="box" x="472" y="32" width="156" height="52" rx="12"/><text class="b c" x="550" y="62">Issue tracker</text>
+        <rect class="box" x="472" y="90" width="156" height="52" rx="12"/><text class="b c" x="550" y="120">Documentation</text>
+        <rect class="box" x="472" y="148" width="156" height="52" rx="12"/><text class="b c" x="550" y="178">Browser</text>
+        <text class="sub c" x="320" y="222">You decide which servers to trust; the server does the work.</text>
+      </svg>
+      <figcaption>Codex asks for a tool by name. The MCP server turns that into a call to the real system. The systems shown are examples.</figcaption>
+    </figure>
+
+    <h3>Adding a server in config.toml</h3>
+    <p>Codex stores MCP configuration in <code>config.toml</code> next to its other settings: by default <code>~/.codex/config.toml</code>, or a project-scoped <code>.codex/config.toml</code> (trusted projects only). The ChatGPT desktop app, the CLI and the IDE extension share this configuration, so you set a server up once and switch between clients. Each server is a <code>[mcp_servers.&lt;name&gt;]</code> table. This is the docs' own Context7 example:</p>
+    <div class="doc"><div class="doc-bar">~/.codex/config.toml</div>
+<pre><code>[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+env_vars = ["LOCAL_TOKEN"]
+
+[mcp_servers.context7.env]
+MY_ENV_VAR = "MY_ENV_VALUE"</code></pre></div>
+    <p>For an HTTP server, give <code>url</code> instead of <code>command</code>. The docs' example uses an environment variable for the token, so the secret is not written into the file:</p>
+<pre><code>[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+bearer_token_env_var = "FIGMA_OAUTH_TOKEN"
+http_headers = { "X-Figma-Region" = "us-east-1" }</code></pre>
+    <p>A few other documented options, all optional:</p>
+    <ul>
+      <li><strong><code>enabled = false</code></strong> turns a server off without deleting it. <strong><code>required = true</code></strong> makes startup fail if that server cannot start.</li>
+      <li><strong><code>enabled_tools</code></strong> is an allow list of tools; <strong><code>disabled_tools</code></strong> is a deny list applied after it.</li>
+      <li><strong><code>default_tools_approval_mode</code></strong> sets how tools from this server are approved: <code>auto</code>, <code>prompt</code>, <code>writes</code> (prompts for tools not marked read-only) or <code>approve</code>. A per-tool <code>approval_mode</code> overrides it.</li>
+      <li><strong><code>startup_timeout_sec</code></strong> (default 10) and <strong><code>tool_timeout_sec</code></strong> (default 60) limit how long a server may take.</li>
+    </ul>
+    <p>You can also add servers in the apps. In the desktop app open <strong>Settings</strong>, then <strong>MCP servers</strong>, then <strong>Add server</strong>, enter a name, choose <strong>STDIO</strong> or <strong>Streamable HTTP</strong>, and save. The IDE extension has the same flow under the gear menu. For OAuth servers, select <strong>Authenticate</strong> when prompted.</p>
+
+    <h3>A safe first server</h3>
+    <ol class="steps">
+      <li><strong>Pick a read-only, documentation-style server.</strong> Context7 in the docs' example only fetches developer documentation. Start there, not with a server that can write to your systems.
+<pre><code>codex mcp add context7 -- npx -y @upstash/context7-mcp</code></pre></li>
+      <li><strong>Check it is registered.</strong>
+<pre><code>codex mcp list</code></pre></li>
+      <li><strong>Confirm Codex can see it.</strong> Start <code>codex</code> and type <code>/mcp</code>.</li>
+      <li><strong>Try one question</strong> that needs current documentation, and watch which tools Codex asks to use.</li>
+      <li><strong>Turn it off when you do not need it.</strong> Set <code>enabled = false</code> in its <code>config.toml</code> table, or run <code>codex mcp remove context7</code>.</li>
+    </ol>
+    <div class="callout">
+      <strong>Trust each server before you connect it</strong>
+      <ul>
+        <li>An MCP server is code you run, or a service that receives what Codex sends it. The docs say that when a plugin sends data through an MCP server, that service's terms and privacy policy apply.</li>
+        <li>Text that comes back from a server is content Codex reads. Treat web pages, tickets and documents as untrusted, because hidden instructions in them can try to steer an agent (this is called prompt injection).</li>
+        <li>Project-scoped <code>.codex/config.toml</code> loads only for trusted projects. Do not mark a stranger's repository as trusted just to try it.</li>
+        <li>Keep secrets out of files you commit. Use <code>bearer_token_env_var</code> or <code>env_vars</code> to pass them by environment variable. If you register an OAuth client secret, the docs warn that Codex saves it in <code>config.toml</code>, which you must keep private and out of version control.</li>
+        <li>Use <code>enabled_tools</code> and <code>default_tools_approval_mode = "prompt"</code> when a server offers more tools than you need.</li>
+      </ul>
+    </div>
+    <p>The docs list some commonly used servers, including OpenAI Docs MCP, Context7, Figma, Playwright, Chrome Developer Tools, Sentry and GitHub. I have not tested them here; check each one's own page before connecting it.</p>
+
+    <h2 id="agents">3. Subagents: helpers that work in parallel</h2>
+    <p>A <strong>subagent workflow</strong> is one where Codex spawns specialised agents in parallel and collects their results in one response. The docs' reason for it is context. If the main chat, where you set requirements and decisions, fills with exploration notes, test logs and stack traces, the session becomes less reliable over time. The docs call this <strong>context pollution</strong> and <strong>context rot</strong>. Subagents move the noisy work off the main thread and send back summaries instead of raw output.</p>
+    <p>Current Codex releases enable subagent workflows by default, and subagent activity shows up in the desktop app, the CLI and the IDE extension. Two honest caveats from the docs: subagent workflows use more tokens than a comparable single-agent run, because each subagent does its own model and tool work; and parallel agents are best for read-heavy tasks such as exploration, tests, triage and summarisation. Be more careful with parallel write-heavy work, because agents editing code at once can create conflicts.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Without subagents the main conversation fills with many file reads. With subagents the reads happen in separate threads and only summaries come back to the main thread.">
+        <text class="b" x="14" y="22">Without subagents</text>
+        <rect class="box" x="14" y="32" width="290" height="70" rx="12"/><text class="sub" x="28" y="56">Your main chat also holds</text><text class="sub" x="28" y="74">every file read and every log line</text>
+        <rect class="bar-o" x="14" y="108" width="290" height="12" rx="5"/><text class="sub" x="14" y="138">chat fills with noise</text>
+        <text class="b" x="336" y="22">With subagents</text>
+        <rect class="boxr" x="336" y="32" width="150" height="70" rx="12"/><text class="b c" x="411" y="58">Subagents</text><text class="sub c" x="411" y="78">explore, test, triage</text><text class="sub c" x="411" y="92">in their own threads</text>
+        <path class="arrow" d="M488,67 L528,67"/>
+        <rect class="boxg" x="530" y="32" width="96" height="70" rx="12"/><text class="b c" x="578" y="58">Summaries</text><text class="sub c" x="578" y="78">come back</text>
+        <rect class="bar-g" x="336" y="108" width="40" height="12" rx="5"/><text class="sub" x="336" y="138">main chat stays focused</text>
+        <rect class="ghost" x="14" y="162" width="612" height="76" rx="12"/><text class="b" x="30" y="188">Also good for</text><text class="sub" x="30" y="208">&#8226; reviewing one branch from several angles at once   &#8226; log analysis   &#8226; codebase exploration</text><text class="sub" x="30" y="226">Each subagent does its own model and tool work, so token use goes up.</text>
+      </svg>
+      <figcaption>Illustrative. The saving is in your main thread; the subagents still use tokens of their own.</figcaption>
+    </figure>
+
+    <h3>How to ask for one</h3>
+    <p>Current local Codex releases delegate when you ask directly, or when applicable <code>AGENTS.md</code> or skill instructions request it. The docs' advice for a good prompt: explain how to divide the work, whether Codex should wait for all agents, and what summary to return. This is their example:</p>
+<pre><code>Review this branch with parallel subagents. Spawn one subagent for security risks, one for test gaps, and one for maintainability. Wait for all three, then summarize the findings by category with file references.</code></pre>
+    <ul>
+      <li><strong>In the CLI:</strong> use <code>/subagents</code> to inspect and switch between agent threads while they run. The main thread collects the results into its final response. Approval requests can come from inactive agent threads; the overlay shows the source thread and you can press <kbd>o</kbd> to open it.</li>
+      <li><strong>In the desktop app:</strong> each subagent thread is surfaced so you can inspect its work and the summary it returned.</li>
+      <li><strong>In the IDE:</strong> when the background-agent panel is available, active subagents appear above the composer, where you can see status, stop all, or open one.</li>
+      <li><strong>Steering and stopping:</strong> ask Codex directly to steer a running subagent, stop it, or close completed agent threads.</li>
+    </ul>
+
+    <h3>Permissions and models</h3>
+    <ul>
+      <li><strong>Subagents inherit the parent turn's sandbox and approval settings</strong>, including changes made with <code>/permissions</code> or <code>--yolo</code>. A custom agent file cannot replace them, and agent instructions that say &ldquo;do not edit&rdquo; do not create a separate read-only sandbox. Choose the permission mode before you ask Codex to delegate.</li>
+      <li><strong>In non-interactive runs,</strong> an action that needs a new approval fails and the error goes back to the parent workflow.</li>
+      <li><strong>Model and effort:</strong> if you set nothing, a subagent inherits the parent's model and reasoning effort. You can request one in your prompt, set <code>[agents]</code> defaults, or set <code>model</code> and <code>model_reasoning_effort</code> in a custom agent file. The docs suggest <code>gpt-6.1-sol</code> for demanding agents (where your account has access) and <code>gpt-6-luna</code> as a faster, lower-cost option for narrow work. Higher reasoning effort raises response time and token use. Model availability changes, so check <a href="codex-part-4-models-api-links.html">Part 4</a> and the models page.</li>
+    </ul>
+
+    <h3>Custom agents</h3>
+    <p>Codex ships built-in agents: <code>default</code> (general-purpose fallback), <code>worker</code> (implementation and fixes) and <code>explorer</code> (read-heavy exploration). To define your own, add one standalone TOML file per agent under <code>~/.codex/agents/</code> (personal) or <code>.codex/agents/</code> (project). Every file must define <code>name</code>, <code>description</code> and <code>developer_instructions</code>. A custom agent can change model settings and instructions, but it inherits the parent's permissions, provider and MCP servers, and it cannot override them. Configure MCP servers in the parent session. If a custom agent has the same name as a built-in one, yours wins. This is adapted from the docs' PR review example:</p>
+    <div class="doc"><div class="doc-bar">.codex/agents/reviewer.toml</div>
+<pre><code>name = "reviewer"
+description = "PR reviewer focused on correctness, security, and missing tests."
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+developer_instructions = """
+Review code like an owner.
+Do not edit files.
+Prioritize correctness, security, behavior regressions, and missing test coverage.
+Lead with concrete findings, include reproduction steps when possible, and avoid style-only comments unless they hide a real bug.
+"""</code></pre></div>
+    <p>Global limits live under <code>[agents]</code> in <code>config.toml</code>. The documented fields are <code>agents.enabled</code> (default <code>true</code>), <code>agents.max_concurrent_threads_per_session</code>, <code>agents.default_subagent_model</code>, <code>agents.default_subagent_reasoning_effort</code> and <code>agents.interrupt_message</code>. The docs' advice on design: the best custom agents are narrow and opinionated, with one clear job.</p>
+
+    <h2 id="skills">4. Skills: reusable workflows</h2>
+    <p>A <strong>skill</strong> is a directory with a <code>SKILL.md</code> file plus optional scripts, references and assets. Skills build on an open agent skills standard (see the link section). The docs use the idea of <strong>progressive disclosure</strong> to keep context small: Codex starts with each skill's name and description, loads the full <code>SKILL.md</code> only when it chooses that skill, and reads references or runs scripts only when needed. In Codex the initial list also includes each skill's file path, and by default it uses at most 2% of the model's context window (8,000 characters when the window is unknown); if you install many skills, Codex shortens descriptions first and may omit some with a warning.</p>
+
+    <h3>The SKILL.md format</h3>
+    <p><code>SKILL.md</code> must include <code>name</code> and <code>description</code> in a short header. The instructions follow. This is the docs' own example:</p>
+    <div class="doc"><div class="doc-bar">.agents/skills/commit/SKILL.md</div>
+<pre><code>---
+name: commit
+description: Stage and commit changes in semantic groups. Use when the user wants to commit, organize commits, or clean up a branch before pushing.
+---
+
+1. Do not run `git add .`. Stage files in logical groups by purpose.
+2. Group into separate commits: feat → test → docs → refactor → chore.
+3. Write concise commit messages that match the change scope.
+4. Keep each commit focused and reviewable.</code></pre></div>
+
+    <h3>Where skills live</h3>
+    <table>
+      <tr><th>Scope</th><th>Location</th><th>Use it for</th></tr>
+      <tr><td>Repo</td><td><code>.agents/skills</code> (Codex scans it in every directory from your working directory up to the repository root)</td><td>Workflows for this project, checked in for your team</td></tr>
+      <tr><td>User</td><td><code>$HOME/.agents/skills</code></td><td>Your personal skills, available in every repo</td></tr>
+      <tr><td>Admin</td><td><code>/etc/codex/skills</code></td><td>Shared defaults on a machine or container</td></tr>
+      <tr><td>System</td><td>Bundled with Codex</td><td>Skills such as skill-creator and plan</td></tr>
+    </table>
+    <p>If two skills share the same <code>name</code>, Codex does not merge them. Symlinked skill folders are supported. Codex detects skill changes automatically; if an update does not appear, restart Codex.</p>
+
+    <h3>Creating and using a skill</h3>
+    <ol class="steps">
+      <li><strong>Let Codex draft it.</strong> The built-in creator asks what the skill does, when it should trigger, and whether it should stay instruction-only (the default) or include scripts.
+<pre><code>$skill-creator</code></pre></li>
+      <li><strong>Or write it yourself.</strong> Create a folder with a <code>SKILL.md</code> file under <code>.agents/skills/&lt;skill-name&gt;/</code> in your repo.</li>
+      <li><strong>Write a precise description.</strong> Codex chooses implicitly by matching your task to the <code>description</code>, so state when the skill should and should not trigger, and put the key use case first.</li>
+      <li><strong>Invoke it.</strong> In the CLI or IDE extension, run <code>/skills</code> or type <code>$</code> to mention a skill explicitly. Codex can also pick it on its own.</li>
+      <li><strong>Install curated skills</strong> for local use with <code>$skill-installer</code>, for example <code>$skill-installer linear</code>.</li>
+    </ol>
+    <ul>
+      <li><strong>Optional metadata:</strong> an <code>agents/openai.yaml</code> file can set display details, an invocation policy and tool dependencies. With <code>allow_implicit_invocation: false</code> (default is <code>true</code>), Codex will not pick the skill on its own, but an explicit <code>$skill</code> still works.</li>
+      <li><strong>Disable without deleting:</strong> add a <code>[[skills.config]]</code> entry with the skill's <code>path</code> and <code>enabled = false</code> to <code>~/.codex/config.toml</code>, then restart Codex.</li>
+      <li><strong>The docs' best practices:</strong> keep each skill focused on one job, prefer instructions over scripts unless you need deterministic behaviour, write imperative steps with explicit inputs and outputs, and test prompts against the description.</li>
+      <li><strong>Cloud:</strong> skills stored in your repository are available in cloud tasks, but personal skills from your computer are not synced to cloud environments.</li>
+    </ul>
+
+    <h2 id="plugins">5. Plugins and the marketplace</h2>
+    <p>Plugins bundle capabilities into reusable workflows. According to the docs they can include <strong>skills</strong>, <strong>MCP servers</strong>, browser extensions and <strong>hooks</strong>. Skills stay the authoring format; plugins are the installable distribution unit. ChatGPT and Codex use one universal plugin directory, so the same public plugins are discoverable from their supported surfaces.</p>
+    <div class="note"><p><strong>Where plugins work:</strong> plugins work in Codex in the ChatGPT desktop app, and the Codex CLI has its own plugin browser. The IDE extension does not support plugins. If you work alone on one project, you can skip this section for now: <code>AGENTS.md</code>, a few skills and a couple of MCP servers go a long way.</p></div>
+
+    <h3>Install and manage plugins</h3>
+    <ol class="steps">
+      <li><strong>Open the browser.</strong> In the desktop app, open the <strong>Plugins</strong> tab. In the CLI, start <code>codex</code> and type <code>/plugins</code>. The CLI browser groups plugins by marketplace; use the marketplace tabs to switch sources, open a plugin to inspect details, install or uninstall it, and press Space on an installed plugin to turn it on or off.
+<pre><code>codex
+/plugins</code></pre></li>
+      <li><strong>Install one.</strong> In the app, search or browse, open the details and select the plus button. Connect any MCP server when prompted; some plugins ask you to sign in during install, others wait until first use.</li>
+      <li><strong>Start a new session.</strong> Bundled skills and tools become available when you start a new chat or CLI session after installing.</li>
+      <li><strong>Use it.</strong> Describe the task, or type <code>@</code> to pick the plugin or one of its skills explicitly.</li>
+    </ol>
+    <p>From a shell, the documented commands are:</p>
+    <table>
+      <tr><th>Task</th><th>Command</th></tr>
+      <tr><td>Install a plugin from a configured marketplace</td><td><code>codex plugin add &lt;plugin&gt;</code> (use <code>--marketplace NAME</code> or <code>-m NAME</code>, or write <code>plugin@marketplace</code>)</td></tr>
+      <tr><td>List installed plugins</td><td><code>codex plugin list</code> (<code>--json</code> for scripts)</td></tr>
+      <tr><td>Remove an installed plugin</td><td><code>codex plugin remove &lt;plugin&gt;</code></td></tr>
+      <tr><td>Add a marketplace</td><td><code>codex plugin marketplace add owner/repo</code></td></tr>
+      <tr><td>See marketplaces in use</td><td><code>codex plugin marketplace list</code></td></tr>
+      <tr><td>Refresh Git marketplaces</td><td><code>codex plugin marketplace upgrade</code> (optionally with a marketplace name)</td></tr>
+      <tr><td>Remove a marketplace</td><td><code>codex plugin marketplace remove &lt;name&gt;</code></td></tr>
+    </table>
+
+    <h3>Marketplaces</h3>
+    <p>A <strong>marketplace</strong> is, in the docs' words, a JSON catalog of plugins. <code>codex plugin marketplace add</code> accepts GitHub shorthand (<code>owner/repo</code> or <code>owner/repo@ref</code>), HTTP or HTTPS Git URLs, SSH Git URLs, or a local marketplace root directory. These examples are from the docs:</p>
+<pre><code>codex plugin marketplace add owner/repo
+codex plugin marketplace add owner/repo --ref main
+codex plugin marketplace add https://github.com/example/plugins.git --sparse .agents/plugins
+codex plugin marketplace add ./local-marketplace-root</code></pre>
+    <p>Use <code>--ref</code> to pin a Git ref. Repeat <code>--sparse PATH</code> for a sparse checkout; it is valid only for Git sources. To keep your own curated list, the docs use <code>$REPO_ROOT/.agents/plugins/marketplace.json</code> for a repo-scoped list or <code>~/.agents/plugins/marketplace.json</code> for a personal one, with one entry per plugin under <code>plugins[]</code>. Administrators can define marketplaces in system or cloud-managed configuration (Part 7 touches on team setup).</p>
+
+    <h3>Building a plugin</h3>
+    <p>The docs' fastest path is the built-in plugin creator: <code>$plugin-creator</code> in Codex. It scaffolds a <code>.codex-plugin/plugin.json</code> manifest and can create a local marketplace entry for testing. Only that manifest is always created; <code>.mcp.json</code>, <code>skills/</code>, <code>hooks/</code>, <code>scripts/</code> and <code>assets/</code> are optional. For a portable package you can write a root <code>plugin.json</code> by hand. The packaging guide is linked at the end; I recommend reading it in full before you publish anything, because the manifest layouts have two supported forms.</p>
+    <div class="callout">
+      <strong>Read before you install</strong>
+      <ul>
+        <li>A plugin can bring skills, MCP servers and hooks. The docs say to review and trust plugin hooks before they run, and that when a plugin capability runs through a Codex host, that host's sandbox and approval policy still applies.</li>
+        <li>Uninstalling removes the plugin bundle from that environment. Separately connected MCP integrations remain connected until you disconnect them.</li>
+        <li>If you sign in to Codex with an API key, you can still browse and manage supported OpenAI-curated plugins, but some plugins are unavailable because their connection flows need unsupported OAuth capabilities.</li>
+        <li>Plugins marked <strong>Desktop only</strong> need the ChatGPT desktop app.</li>
+      </ul>
+    </div>
+
+    <h2 id="hooks">6. Hooks and rules: guardrails</h2>
+    <p><strong>Hooks</strong> are an extensibility framework: they run your scripts (or MCP tools) at set points in the agent loop. The docs list uses such as logging a chat, scanning prompts to block accidentally pasted API keys, running a custom check when a turn stops, or customising prompting in a certain directory. The events include <code>PreToolUse</code>, <code>PermissionRequest</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Stop</code>, <code>SessionStart</code>, <code>SessionEnd</code>, <code>SubagentStart</code> and <code>SubagentStop</code>, among others.</p>
+    <ul>
+      <li><strong>Where they live:</strong> <code>hooks.json</code> or inline <code>[hooks]</code> tables in <code>config.toml</code>, in the user layer (<code>~/.codex/</code>) or the project layer (<code>&lt;repo&gt;/.codex/</code>). Project-local hooks load only when the project <code>.codex/</code> layer is trusted. Plugins can bundle hooks too.</li>
+      <li><strong>Trust is required.</strong> Before a non-managed hook can run, Codex requires you to review and trust the exact hook definition. Trust is recorded against the hook's hash, so new or changed hooks are skipped until you trust them again. Use <code>/hooks</code> in the CLI to inspect sources, review hooks, trust them, or disable individual ones.</li>
+      <li><strong>All matching hooks run,</strong> and several for the same event start concurrently. <code>command</code> and <code>mcp_tool</code> handlers are supported.</li>
+      <li><strong>Timeouts:</strong> <code>timeout</code> is in seconds; if omitted, most hooks use 600.</li>
+    </ul>
+    <p>A trimmed version of the docs' <code>hooks.json</code> shape, which runs a policy script before any Bash command:</p>
+    <div class="doc"><div class="doc-bar">.codex/hooks.json</div>
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/pre_tool_use_policy.py\"",
+            "statusMessage": "Checking Bash command"
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre></div>
+    <p>The script itself is yours to write; the docs describe what it receives and may return. The docs also advise resolving repo-local hook paths from the git root, because Codex may be started from a subdirectory. A hook is code that runs on your machine, so treat adding one like adding a dependency. For one-off automation where you vet hook sources elsewhere, <code>--dangerously-bypass-hook-trust</code> skips the persisted-trust requirement; the name is a hint to avoid it otherwise.</p>
+
+    <h3>Rules: control which commands leave the sandbox</h3>
+    <p>Rules answer a narrower question: which commands may run outside the sandbox? Create a <code>.rules</code> file in a <code>rules/</code> folder next to an active config layer, for example <code>~/.codex/rules/default.rules</code>, then restart Codex. Each rule is a <code>prefix_rule</code> with a <code>pattern</code> and a <code>decision</code> of <code>allow</code>, <code>prompt</code> or <code>forbidden</code>. When several rules match, the most restrictive wins (<code>forbidden</code> beats <code>prompt</code> beats <code>allow</code>). This is the docs' example:</p>
+    <div class="doc"><div class="doc-bar">~/.codex/rules/default.rules</div>
+<pre><code>prefix_rule(
+    pattern = ["gh", "pr", "view"],
+    decision = "prompt",
+    justification = "Viewing PRs is allowed with approval",
+    match = ["gh pr view 7888", "gh pr view --repo openai/codex"],
+    not_match = ["gh pr --repo openai/codex view 7888"],
+)</code></pre></div>
+    <p>The <code>match</code> and <code>not_match</code> lists are inline tests that Codex checks when it loads the file. You can also test a rule file before relying on it with <code>codex execpolicy check --pretty --rules ~/.codex/rules/default.rules -- gh pr view 7888</code>. Rules and the <code>execpolicy</code> command are labelled experimental, so expect change. Project-local rules load only for trusted projects.</p>
+
+    <h2 id="surfaces">7. Your editor, desktop app, cloud and remote machines</h2>
+    <p>Codex runs in several places. The CLI, the IDE extension and the desktop app share the same configuration layers, so your <code>config.toml</code> and MCP servers carry across. What changes is where the work runs and how you interact with it.</p>
+
+    <h3>The IDE extension</h3>
+    <ul>
+      <li><strong>Install:</strong> choose your IDE on the official page. VS Code, Cursor and Windsurf use the Codex extension (identifier <code>openai.chatgpt</code> in the Visual Studio Marketplace). Xcode and JetBrains IDEs provide their own integrations, where you choose Codex as the agent in the coding assistant or AI Chat.</li>
+      <li><strong>Open it:</strong> in VS Code, Cursor or Windsurf choose the Codex icon; if it is not visible, open the Command Palette and run <strong>Codex: Open Codex Sidebar</strong>. Then open a project and ask Codex to explain the codebase, make a focused change or debug something. The docs suggest creating Git checkpoints before and after a task so you can revert.</li>
+      <li><strong>What it adds:</strong> your open files and selection become context for the prompt, you review edits beside the code, and you can delegate a longer task to Codex in the cloud.</li>
+      <li><strong>Commands (Command Palette):</strong> <code>chatgpt.newChat</code>, <code>chatgpt.newCodexPanel</code>, <code>chatgpt.addToThread</code> (selected range as context), <code>chatgpt.addFileToThread</code>, <code>chatgpt.openCommandMenu</code> and <code>chatgpt.openSidebar</code>. You can bind them to shortcuts.</li>
+      <li><strong>Slash commands</strong> (type <code>/</code> in the composer): <code>/status</code>, <code>/model</code>, <code>/reasoning</code>, <code>/plan</code>, <code>/review</code>, <code>/compact</code>, <code>/fork</code>, <code>/init</code>, <code>/mcp</code>, <code>/local</code>, <code>/cloud</code>, <code>/cloud-environment</code>, <code>/worktree</code>, <code>/side</code>, <code>/goal</code>, <code>/memories</code> and more. The full table is in the IDE slash-command docs.</li>
+      <li><strong>Settings:</strong> two layers. Agent behaviour (model, reasoning effort, permissions, sandbox, MCP servers) lives in <code>config.toml</code>: select the gear icon, then <strong>Codex Settings</strong>, then <strong>Open config.toml</strong>. Editor behaviour uses <code>chatgpt.*</code> keys in your editor's settings, for example <code>chatgpt.openOnStartup</code>, <code>chatgpt.followUpQueueMode</code> (<code>queue</code> or <code>steer</code>), <code>chatgpt.composerEnterBehavior</code> and <code>chatgpt.reviewDelivery</code> (<code>inline</code> or <code>detached</code>). Do not put <code>chatgpt.*</code> keys in <code>config.toml</code>.</li>
+      <li><strong>Windows:</strong> <code>chatgpt.runCodexInWindowsSubsystemForLinux</code> runs Codex in WSL when available.</li>
+      <li><strong>Limits:</strong> plugins are not supported in the IDE extension, and it does not render visualizations.</li>
+    </ul>
+
+    <h3>The desktop app</h3>
+    <ul>
+      <li><strong>What it is:</strong> the ChatGPT desktop app, available for macOS, Windows and Linux, where you select <strong>Codex</strong> from the ChatGPT dropdown for software development. You can start a chat, create a project, or open a folder.</li>
+      <li><strong>Why people use it:</strong> several projects and long-running chats in one place, the Plugins tab, a Skills view in the sidebar, MCP servers under <strong>Settings</strong>, worktrees, scheduled tasks, and keyboard shortcuts you can customise under <strong>Settings &gt; Keyboard Shortcuts</strong>.</li>
+      <li><strong>From the terminal:</strong> <code>codex app</code> launches the desktop app on macOS or Windows.</li>
+    </ul>
+
+    <h3>Codex cloud</h3>
+    <p>Codex cloud runs coding tasks in the cloud, so work can continue while your computer is asleep. You use it on the web, on mobile, or in the desktop app.</p>
+    <ol class="steps">
+      <li><strong>Create a cloud environment.</strong> An environment is the reusable setup tasks use: repositories, dependencies, tools and access settings. In a new task choose <strong>Work in</strong> &gt; <strong>Cloud</strong>, open <strong>Select environment</strong>, then <strong>Create environment</strong>. Select your GitHub repositories (connect GitHub if prompted) and choose <strong>Get started</strong>. Codex inspects the repositories, installs dependencies and tools, and tests the workflow.</li>
+      <li><strong>Review and publish.</strong> Check the setup report, save, and select <strong>Publish</strong>. The docs note that saving stores configuration, while publishing captures the prepared filesystem for new tasks. Environments can record an install script and a start skill.</li>
+      <li><strong>Delegate a task.</strong> Choose the published environment, describe the work, and send it. Each new task gets its own isolated workspace. From the IDE, the <code>/cloud</code> and <code>/cloud-environment</code> slash commands run a chat in the cloud and choose its environment. From a terminal, <code>codex cloud</code> opens an interactive picker, <code>codex cloud exec --env ENV_ID "&lt;task&gt;"</code> submits a task, and <code>codex cloud list</code> shows recent cloud chats. The docs label <code>codex cloud</code> experimental.</li>
+      <li><strong>Get results back.</strong> Review the changed files and test results, ask for follow-ups, then commit or open a pull request. To bring a cloud chat's most recent diff into your local repository, run <code>codex apply &lt;TASK_ID&gt;</code>; it exits non-zero if <code>git apply</code> fails, for example on conflicts. Reopen the same task from the web, mobile or desktop app to continue it. Saved VM state is recoverable for up to seven days after you last started a turn. Commit important work, because saved state does not replace source control.</li>
+    </ol>
+    <h4>Internet access and secrets</h4>
+    <ul>
+      <li><strong>Internet access is a setting on the environment.</strong> Turn on <strong>Allow Codex to access internet</strong>, then under <strong>Allow domains</strong> choose <strong>Package managers</strong> or <strong>Custom domains only</strong> and add hosts under <strong>Additional allowed domains</strong>. <strong>All (unrestricted)</strong> exists for workflows that need broader access. Allowing a domain does not give Codex credentials or permissions in that service.</li>
+      <li><strong>Legacy cloud environments</strong> state that agent internet access is off by default (setup scripts still have internet access). The docs list risks of enabling it: prompt injection from untrusted web content, code or secret exfiltration, malware or vulnerable dependencies, and licence-restricted content. Allow only the domains you need.</li>
+      <li><strong>Environment variables versus network secrets:</strong> a variable is passed directly to programs. A network secret is a credential sent to a specific HTTPS service; programs receive a placeholder and a proxy substitutes the real value for allowed destinations, so the raw credential does not sit in a local process or file.</li>
+      <li><strong>Defaults and limits:</strong> as documented in October 2026, default VMs are 2 vCPUs, 8 GiB memory and 8 GiB disk on Plus, and 4 vCPUs, 16 GiB and 32 GiB on Pro, Business and Enterprise. Computer and browser use are not currently supported in cloud environments. GitLab and self-hosted GitHub Enterprise Server are also on the roadmap, not supported. Check the cloud environments page for current numbers.</li>
+    </ul>
+
+    <h3>Remote connections</h3>
+    <p>Remote connections let you reach work that runs on another machine. The connected host provides the repository files, shell commands, MCP servers, skills and credentials, and its sandbox and approval settings still apply.</p>
+    <ul>
+      <li><strong>From your phone:</strong> in the ChatGPT mobile app open <strong>Codex</strong> (some apps still label it <strong>Remote</strong>) to work with chats on a connected Mac or Windows desktop. On the host, go to <strong>Settings</strong> &gt; <strong>Connections</strong> &gt; <strong>Control this Mac or PC</strong> and follow the setup, which shows a QR code to scan. Setup starts from the desktop app, not from the CLI or IDE extension. The host must be awake, online, and signed in to the same account and workspace.</li>
+      <li><strong>What you can do remotely:</strong> start or continue chats, steer active work, approve commands, review diffs and test results, and get notified when a task finishes or needs attention.</li>
+      <li><strong>SSH hosts:</strong> in the desktop app you can add remote projects from an SSH host. Add a <code>Host</code> entry to <code>~/.ssh/config</code>, confirm you can <code>ssh</code> to it, install and authenticate Codex on the remote host so <code>codex</code> is on its login-shell <code>PATH</code>, then open <strong>Settings &gt; Connections</strong>, enable the host and choose a remote project folder. Chats then run commands and write changes on the remote host.</li>
+      <li><strong>Handoff between hosts</strong> moves a chat and its Git state between your computer and a connected remote host. Handoff to a Codex cloud environment is not supported.</li>
+      <li><strong>Security:</strong> keep SSH hosts configured as you would for normal SSH, with trusted keys and least-privilege accounts. Do not expose app-server transports on a shared or public network; use a VPN or mesh networking tool to reach a remote machine.</li>
+    </ul>
+
+    <h2 id="worktrees">8. Worktrees: parallel chats in one repository</h2>
+    <p>A <strong>Git worktree</strong> is a second checkout of your repository that shares the same <code>.git</code> metadata. In the desktop app, worktrees let Codex run several independent chats in the same project without interfering with each other. They only work in projects that are part of a Git repository.</p>
+    <div class="analogy"><strong>Think of it like extra desks in the same office</strong>
+      <p>Your local checkout is the desk you sit at. A worktree is another desk with its own copy of every file, but all desks share the same filing cabinet of commits and branches. Codex can work at the second desk while you keep working at yours.</p>
+    </div>
+    <ol class="steps">
+      <li><strong>Choose Worktree.</strong> In the new chat view, select <strong>Worktree</strong> under the composer. You can optionally choose a local environment to run setup scripts.</li>
+      <li><strong>Pick the starting branch</strong> below the composer: <code>main</code>, a feature branch, or your current branch with uncommitted local changes.</li>
+      <li><strong>Send your prompt.</strong> Codex creates the worktree. By default it works in a detached HEAD, so your branches are not cluttered.</li>
+      <li><strong>Decide where to continue.</strong> Use <strong>Create branch here</strong> in the chat header to turn the worktree into a branch you can commit, push and open a pull request from, or use <strong>Hand off</strong> to move the chat and its code to your Local checkout.</li>
+    </ol>
+    <ul>
+      <li><strong>One branch, one place:</strong> Git allows a branch to be checked out in only one worktree at a time. If you create <code>feature/a</code> on a worktree, you cannot check it out locally. Use Handoff instead.</li>
+      <li><strong>Ignored files do not move.</strong> Handoff uses Git, so <code>.gitignore</code>d files do not follow the chat. List ignored files that new managed worktrees need, such as <code>.env</code>, in a <code>.worktreeinclude</code> file at the repository root. Codex copies only matching ignored files, and it automatically copies an ignored <code>AGENTS.override.md</code>.</li>
+      <li><strong>Where and how many:</strong> managed worktrees live under <code>$CODEX_HOME/worktrees</code> by default; you can change the root under <strong>Settings &gt; Worktrees</strong>. Codex keeps your most recent 15 managed worktrees by default and saves a snapshot before deleting one. Permanent worktrees are not deleted automatically.</li>
+      <li><strong>CLI and IDE:</strong> <code>codex exec --worktree "implement the next step"</code> runs in a managed worktree (local execution only). The IDE has <code>/worktree</code>. Scheduled tasks can also run on dedicated background worktrees in Git repositories (Part 7).</li>
+    </ul>
+
+    <h2 id="pick">9. Which surface should I use?</h2>
+    <table>
+      <tr><th>Surface</th><th>Runs on</th><th>Choose it when&hellip;</th></tr>
+      <tr><td><strong>Terminal (CLI)</strong></td><td>Your machine</td><td>You want scripting, <code>codex exec</code>, the plugin browser and slash commands like <code>/hooks</code> and <code>/subagents</code>, and the closest view of what Codex does.</td></tr>
+      <tr><td><strong>IDE extension</strong></td><td>Your machine (cloud on request)</td><td>You live in the editor and want open files and selections as context, and in-place review. Not for plugins.</td></tr>
+      <tr><td><strong>Desktop app</strong></td><td>Your machine, or an SSH host</td><td>You want projects, parallel chats, worktrees, plugins, scheduled tasks and a visual workspace.</td></tr>
+      <tr><td><strong>Codex cloud</strong></td><td>OpenAI-managed VMs</td><td>The task is long, can run while your computer sleeps, or needs the same prepared setup across tasks. You must connect GitHub, and the environment needs its own internet and secrets settings.</td></tr>
+      <tr><td><strong>Remote connection</strong></td><td>A connected Mac, Windows PC or SSH host</td><td>You want to approve, steer and review work from your phone while it runs on a machine that has your tools and credentials.</td></tr>
+      <tr><td><strong>Worktree</strong></td><td>Your machine or a remote host, inside the desktop app</td><td>You want a second, isolated copy of the repository for a parallel chat without disturbing your current branch.</td></tr>
+    </table>
+    <p>You can mix them. Because the CLI, IDE extension and desktop app share configuration, a common pattern is to explore in the editor, send a heavy job to the cloud, and bring the diff back with <code>codex apply</code>. My own advice: pick one surface and get fluent in it first (the CLI if you followed <a href="codex-part-1-setup.html">Part 1</a>); extra surfaces are easy to add later. The daily habits in <a href="codex-part-5-daily-workflow.html">Part 5</a> apply on every surface.</p>
+
+    <h2 id="end6">10. Wrap-up and glossary</h2>
+    <ol>
+      <li>Add extensions when a recurring problem appears, not before. Start with <code>AGENTS.md</code>.</li>
+      <li>MCP connects outside systems. Trust each server, keep secrets in environment variables, and use approval modes and tool allow lists.</li>
+      <li>Subagents protect the main thread and run in parallel, but they cost more tokens and inherit your sandbox and approvals.</li>
+      <li>Skills are folders with a <code>SKILL.md</code>; plugins package skills, MCP servers and more for sharing; marketplaces are catalogs of plugins.</li>
+      <li>Hooks run your code and rules gate commands. Review and trust every hook, and test every rule.</li>
+      <li>The surface changes where Codex runs and how you interact with it. Cloud tasks need an environment; worktrees need Git.</li>
+    </ol>
+    <p><a href="codex-part-7-automation-and-teams.html">Part 7</a> moves from one developer to many: running Codex non-interactively in scripts and CI, scheduled tasks, and setting it up for a team or organisation.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>MCP</td><td>Model Context Protocol, a standard way to connect Codex to outside tools and context.</td></tr>
+      <tr><td>MCP server</td><td>A local program (stdio) or web service (streamable HTTP) that offers Codex tools for one outside system.</td></tr>
+      <tr><td>Prompt injection</td><td>Hidden instructions in content (a web page, a ticket) that try to steer an AI.</td></tr>
+      <tr><td>Subagent</td><td>A delegated agent that Codex starts for one task and that reports back to the main thread.</td></tr>
+      <tr><td>Skill</td><td>A folder with a <code>SKILL.md</code> file describing a repeatable workflow.</td></tr>
+      <tr><td>Plugin / marketplace</td><td>An installable bundle of skills, MCP servers and more, and a catalog of such bundles.</td></tr>
+      <tr><td>Hook</td><td>A script or MCP tool that runs at a lifecycle point, such as before a tool call.</td></tr>
+      <tr><td>Cloud environment</td><td>The reusable setup (repositories, tools, access) that Codex cloud tasks start from.</td></tr>
+      <tr><td>Worktree</td><td>A second checkout of a Git repository that shares its commit history.</td></tr>
+      <tr><td>Handoff</td><td>Moving a chat and its Git state between Local and a worktree, or between hosts.</td></tr>
+    </table>
+
+    <h2 id="links6">Links and official docs</h2>
+    <p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages.</p>
+    <ul>
+      <li><a href="https://learn.chatgpt.com/docs/customization/overview">Customization overview</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/extend/mcp">Model Context Protocol in Codex</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/agent-configuration/subagents">Subagents</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/build-skills">Build skills</a> and the <a href="https://agentskills.io">agent skills standard</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/plugins">Plugins</a> and <a href="https://developers.openai.com/plugins/build/plugins">Package your plugin</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/hooks">Hooks</a> and <a href="https://learn.chatgpt.com/docs/agent-configuration/rules">Rules</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/codex/ide">Codex IDE extension</a>, its <a href="https://learn.chatgpt.com/docs/developer-settings?surface=ide">settings</a> and <a href="https://learn.chatgpt.com/docs/developer-commands?surface=ide">commands</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/app">ChatGPT desktop app</a> and <a href="https://learn.chatgpt.com/docs/environments/git-worktrees">Worktrees</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/cloud">Codex Cloud</a> and <a href="https://learn.chatgpt.com/docs/environments/cloud-environments">cloud environments</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/remote-connections">Remote connections</a></li>
+      <li><a href="https://github.com/openai/skills">openai/skills on GitHub</a></li>
+    </ul>
+
+    <div class="pager">
+      <a class="prev" href="codex-part-5-daily-workflow.html"><small>&larr; Previous &middot; Part 5</small>Working with Codex day to day</a>
+      <a class="next" href="codex-part-7-automation-and-teams.html"><small>Next &middot; Part 7 &rarr;</small>Automation and teams</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

@@ -551,6 +551,8 @@
     .blog-cat { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
     .blog-cat.first { margin-top: 0; }
     .blog-cat .bc-title { font-size: calc(15px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.2px; }
+    .blog-cat .bc-title .pin-ic, .blog-idx .pin-ic { vertical-align: -2px; margin-right: 6px; color: #e11d48; transform: rotate(35deg); }
+    .blog-idx .pin-ic { width: 12px; height: 12px; margin-right: 5px; vertical-align: -1px; }
     .blog-cat .bc-sub { font-size: calc(12px * var(--fs, 1)); color: var(--muted); }
     .blog-cat + .archive-btn, .blog-cat + #archiveBtn { margin-top: 0; }
     .blog-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
@@ -1062,7 +1064,18 @@
   <div class="container">
     <p class="section-label">Technical Writing</p>
 
-    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">6 posts</span></p>
+    <p class="blog-cat first"><span class="bc-title"><svg class="pin-ic" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg>Pinned</span><span class="bc-sub">1 post</span></p>
+    <div class="blog-grid new-grid">
+      <a href="blog/llm-models-directory.html" class="blog-card featured reveal">
+        <div class="blog-idx"><svg class="pin-ic" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg>Pinned &middot; Live list<span class="blog-new">NEW</span></div>
+        <div class="blog-title">LLM Models: a daily-updated list of language models</div>
+        <div class="blog-summary">Language models from companies around the world, on an interactive world map and in a searchable list: filter by free, paid or open weights, and compare prices, context size and release dates. Refreshed every day.</div>
+        <div class="blog-tags"><span class="blog-tag">LLM</span><span class="blog-tag">AI models</span><span class="blog-tag">Pricing</span><span class="blog-tag">Open weights</span></div>
+        <div class="blog-footer"><span class="views-badge">Updated daily</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+    </div>
+
+    <p class="blog-cat"><span class="bc-title">Articles</span><span class="bc-sub">5 posts</span></p>
     <div class="blog-grid new-grid">
       <a href="blog/java-desktop-app-guide.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
@@ -1092,13 +1105,6 @@
         <div class="blog-tags"><span class="blog-tag">System design</span><span class="blog-tag">Android</span><span class="blog-tag">Offline-first</span></div>
         <div class="blog-footer"><span class="views-badge">~30 min read</span><span class="blog-date">Oct 2026</span></div>
       </a>
-      <a href="blog/patterns-cheat-sheet.html" class="blog-card featured reveal">
-        <div class="blog-idx">Cheat sheet<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Patterns Cheat Sheet: Architecture, Design Patterns and DSA on One Page</div>
-        <div class="blog-summary">127 patterns in one searchable list: Android architecture, design principles, 53 software design patterns and 49 DSA patterns, each with a short description, a popular mark and a link to learn more.</div>
-        <div class="blog-tags"><span class="blog-tag">Cheat sheet</span><span class="blog-tag">Architecture</span><span class="blog-tag">Design patterns</span><span class="blog-tag">DSA</span></div>
-        <div class="blog-footer"><span class="views-badge">~10 min skim</span><span class="blog-date">Oct 2026</span></div>
-      </a>
       <a href="blog/private-ai-chat-android.html" class="blog-card featured reveal">
         <div class="blog-idx">Article</div>
         <div class="blog-title">Building a private AI chat app for Android: local models, online models, and shipping to Google Play</div>
@@ -1108,7 +1114,18 @@
       </a>
     </div>
 
-    <p class="blog-cat"><span class="bc-title">Series</span><span class="bc-sub">5 series, 40 parts</span></p>
+    <p class="blog-cat"><span class="bc-title">Cheatsheets</span><span class="bc-sub">1 post</span></p>
+    <div class="blog-grid new-grid">
+      <a href="blog/patterns-cheat-sheet.html" class="blog-card featured reveal">
+        <div class="blog-idx">Cheat sheet<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Patterns Cheat Sheet: Architecture, Design Patterns and DSA on One Page</div>
+        <div class="blog-summary">127 patterns in one searchable list: Android architecture, design principles, 53 software design patterns and 49 DSA patterns, each with a short description, a popular mark and a link to learn more.</div>
+        <div class="blog-tags"><span class="blog-tag">Cheat sheet</span><span class="blog-tag">Architecture</span><span class="blog-tag">Design patterns</span><span class="blog-tag">DSA</span></div>
+        <div class="blog-footer"><span class="views-badge">~10 min skim</span><span class="blog-date">Oct 2026</span></div>
+      </a>
+    </div>
+
+    <p class="blog-cat"><span class="bc-title">Series</span><span class="bc-sub">6 series, 48 parts</span></p>
     <div class="blog-grid new-grid">
       <div class="series-card reveal">
         <div class="blog-idx">Series &middot; 13 parts<span class="blog-new">NEW</span></div>
@@ -1336,6 +1353,58 @@
         </div>
         <div class="blog-tags"><span class="blog-tag">Claude Code</span><span class="blog-tag">CLAUDE.md</span><span class="blog-tag">Tokens</span><span class="blog-tag">MCP</span><span class="blog-tag">GitHub Actions</span><span class="blog-tag">Claude API</span></div>
         <div class="blog-footer"><span class="views-badge">~3 hours of reading</span><span class="blog-date">Oct 2026</span></div>
+      </div>
+      <div class="series-card reveal">
+        <div class="blog-idx">Series &middot; 8 parts<span class="blog-new">NEW</span></div>
+        <div class="blog-title series-title">Codex, from first install to a project that remembers</div>
+        <div class="blog-summary">A two-level series on OpenAI Codex, built like the Claude Code series. Beginner: getting started safely, giving Codex lasting memory with AGENTS.md, spending fewer tokens, and finding the official docs, models and API. Advanced: day-to-day prompting and git, MCP, subagents, skills and plugins, automation and teams, and a learning path. Reading time only: the exercises and the first-week plan add 20 to 40 minutes of hands-on practice a day. Checked against the official docs on 18 October 2026.</div>
+        <button type="button" class="archive-btn series-toggle" aria-expanded="false" aria-controls="series-codex" data-count="8"><span class="st-label">Show all 8 parts</span><span class="chev">&#9662;</span></button>
+        <div class="series-parts" id="series-codex" hidden>
+          <div class="series-level">Beginner <span>Parts 1 to 4 &middot; start here</span></div>
+          <a class="series-part" href="blog/codex-part-1-setup.html">
+            <span class="sp-num">1</span>
+            <span class="sp-body"><span class="sp-title">Meet Codex and set it up</span><span class="sp-desc">What Codex is, installing it, signing in, a safe first session, approvals and the sandbox, and choosing a model.</span></span>
+            <span class="sp-meta">~31 min</span>
+          </a>
+          <a class="series-part" href="blog/codex-part-2-agents-md.html">
+            <span class="sp-num">2</span>
+            <span class="sp-body"><span class="sp-title">AGENTS.md: the project memory</span><span class="sp-desc">Why Codex forgets, what AGENTS.md is, where it lives and how it is layered, how to write one, and growing into rules and skills.</span></span>
+            <span class="sp-meta">~22 min</span>
+          </a>
+          <a class="series-part" href="blog/codex-part-3-tokens-onboarding.html">
+            <span class="sp-num">3</span>
+            <span class="sp-body"><span class="sp-title">Fewer tokens, faster onboarding</span><span class="sp-desc">How usage and limits work, how to check what you spend, how the file saves tokens, handoff notes, and onboarding a project or feature.</span></span>
+            <span class="sp-meta">~31 min</span>
+          </a>
+          <a class="series-part" href="blog/codex-part-4-models-api-links.html">
+            <span class="sp-num">4</span>
+            <span class="sp-body"><span class="sp-title">Codex models, the API and official links</span><span class="sp-desc">Codex vs the OpenAI API, ChatGPT sign-in vs an API key, the models available, how to choose, plans and the official docs.</span></span>
+            <span class="sp-meta">~18 min</span>
+          </a>
+          <div class="series-level">Advanced <span>Parts 5 to 8 &middot; go deeper</span></div>
+          <a class="series-part" href="blog/codex-part-5-daily-workflow.html">
+            <span class="sp-num">5</span>
+            <span class="sp-body"><span class="sp-title">Working with Codex day to day</span><span class="sp-desc">Prompt patterns, explore-plan-implement-review-commit, git branches and worktrees, code review, steering and fixing problems.</span></span>
+            <span class="sp-meta">~23 min</span>
+          </a>
+          <a class="series-part" href="blog/codex-part-6-extend-and-surfaces.html">
+            <span class="sp-num">6</span>
+            <span class="sp-body"><span class="sp-title">Extending Codex</span><span class="sp-desc">MCP, subagents, skills, plugins and hooks, plus the IDE extension, desktop app, cloud and remote connections.</span></span>
+            <span class="sp-meta">~33 min</span>
+          </a>
+          <a class="series-part" href="blog/codex-part-7-automation-and-teams.html">
+            <span class="sp-num">7</span>
+            <span class="sp-body"><span class="sp-title">Automation and teams</span><span class="sp-desc">codex exec in scripts and CI, the GitHub Action, automatic pull request review, team setup and managed configuration.</span></span>
+            <span class="sp-meta">~31 min</span>
+          </a>
+          <a class="series-part" href="blog/codex-part-8-beyond-code-learning-path.html">
+            <span class="sp-num">8</span>
+            <span class="sp-body"><span class="sp-title">Beyond code and your learning path</span><span class="sp-desc">What Codex and ChatGPT can do beyond code, a first-week plan, exercises, official resources and a cheat sheet.</span></span>
+            <span class="sp-meta">~23 min</span>
+          </a>
+        </div>
+        <div class="blog-tags"><span class="blog-tag">Codex</span><span class="blog-tag">AGENTS.md</span><span class="blog-tag">Tokens</span><span class="blog-tag">MCP</span><span class="blog-tag">GitHub Actions</span><span class="blog-tag">OpenAI API</span></div>
+        <div class="blog-footer"><span class="views-badge">~3.5 hours of reading</span><span class="blog-date">Oct 2026</span></div>
       </div>
       <div class="series-card reveal">
         <div class="blog-idx">Series &middot; 4 parts<span class="blog-new">NEW</span></div>

@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AGENTS.md: the project memory Codex reads every time — Codex series part 2</title>
+  <meta name="description" content="Why Codex forgets between sessions, what an AGENTS.md file is, all the ways Codex remembers, where the file lives and how it is layered, how to create it with /init and what to write in it. Part 2 of 8." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="2">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Series &middot; Part 2 of 8</p>
+    <h1>AGENTS.md: the project memory that Codex reads every time</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~22 min read</span></div>
+    <div class="tags"><span class="tag">Codex</span><span class="tag">AGENTS.md</span><span class="tag">Memory</span><span class="tag">Context window</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a class="on" href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">In <a href="codex-part-1-setup.html">Part 1</a> we installed Codex and had a first session. Now the important question: what happens tomorrow? Open a new session and Codex has no idea what the project is, how you build it, or the three things you corrected yesterday. This part explains why that happens and how a plain text file solves it.</p>
+
+    <div class="callout">
+      <strong>Part 2 in 60 seconds</strong>
+      <ul>
+        <li>A model has no memory between conversations. Everything it &ldquo;knows&rdquo; must be in the text it is given.</li>
+        <li><code>AGENTS.md</code> is a markdown file that Codex reads before it does any work.</li>
+        <li>It can live in your Codex home folder (personal, <code>~/.codex</code>), the project root (shared), or sub-folders (specific). Files closer to your working folder win.</li>
+        <li>An <code>AGENTS.override.md</code> file takes priority over <code>AGENTS.md</code> in the same folder.</li>
+        <li><code>/init</code> drafts one for you. Codex reads a limited amount: 32 KiB by default.</li>
+        <li>Good files are short, specific and checkable. Bad ones are long, vague or out of date.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 2</strong></summary>
+      <ol>
+        <li><a href="#forget">Why Codex forgets</a></li>
+        <li><a href="#what">What AGENTS.md is</a></li>
+        <li><a href="#remember">All the ways Codex &ldquo;remembers&rdquo;</a></li>
+        <li><a href="#where">Where the file can live, and how Codex finds it</a></li>
+        <li><a href="#init">Creating one with /init</a></li>
+        <li><a href="#write">What to put in it</a></li>
+        <li><a href="#example">A complete example</a></li>
+        <li><a href="#nested">Nested files and overrides</a></li>
+        <li><a href="#grow">Growing up: rules, skills and linked notes</a></li>
+        <li><a href="#edit">Keeping it up to date</a></li>
+        <li><a href="#limits">What it cannot do</a></li>
+        <li><a href="#links">Links and official docs</a></li>
+      </ol>
+    </details>
+
+    <h2 id="forget">1. Why Codex forgets</h2>
+    <p>If you read my <a href="private-ai-chat-android.html#how-it-works">earlier post on how AI chat works</a>, this will sound familiar. A language model does not store your conversation. Every time you send a message, the app packs the conversation so far into one block of text, called the <strong>context</strong>, and hands it to the model. The model can only look at a fixed amount of text at once, the <strong>context window</strong>.</p>
+    <p>When you close the session, that block is gone. A new session starts with an empty window. The model is the same, but it is meeting you for the first time.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Two sessions side by side. Without AGENTS.md the second session starts empty. With AGENTS.md both sessions start with the project notes already in the window.">
+        <text class="b" x="14" y="22">Without a memory file</text>
+        <rect class="box" x="14" y="32" width="290" height="44" rx="10"/><text class="sub" x="26" y="59">Monday: you explain build, style, folders&hellip;</text>
+        <rect class="ghost" x="14" y="86" width="290" height="44" rx="10"/><text class="sub" x="26" y="113">Tuesday: empty window. Explain it all again.</text>
+        <text class="b" x="336" y="22">With AGENTS.md</text>
+        <rect class="boxp" x="336" y="32" width="290" height="44" rx="10"/><text class="sub" x="348" y="59">Monday: AGENTS.md loaded, then your task</text>
+        <rect class="boxp" x="336" y="86" width="290" height="44" rx="10"/><text class="sub" x="348" y="113">Tuesday: AGENTS.md loaded, then your task</text>
+        <rect class="boxg" x="14" y="150" width="612" height="84" rx="12"/>
+        <text class="b" x="30" y="178">The idea</text>
+        <text class="sub" x="30" y="200">Codex does not remember. The file is put back into the window for it,</text>
+        <text class="sub" x="30" y="218">automatically, when a session starts. You write it once.</text>
+      </svg>
+      <figcaption>The model forgets by design. AGENTS.md is how the project's knowledge gets back in front of it.</figcaption>
+    </figure>
+
+    <h2 id="what">2. What AGENTS.md is</h2>
+    <p>It is exactly what the name says: a file called <code>AGENTS.md</code>, written in markdown (the same simple format as a README). Per the official docs, &ldquo;Codex reads <code>AGENTS.md</code> files before doing any work.&rdquo; By layering global guidance with project-specific overrides, every task starts with the same expectations, no matter which repository you open. The text becomes standing instructions for the session.</p>
+    <div class="analogy"><strong>The sticky note on the monitor</strong>
+      <p>Imagine a contractor with perfect skills but no memory, who forgets everything overnight. You would not re-brief them every morning. You would leave a note on the monitor: &ldquo;Build with this command. Tests live here. We use tabs, not spaces. Never edit the generated folder.&rdquo; <code>AGENTS.md</code> is that note, and Codex reads it first every day.</p>
+    </div>
+    <p>It is different from your <code>README.md</code>. A README is written for humans who might contribute. An AGENTS.md is written for the coding assistant, and contains the things you would otherwise keep repeating in chat. The name is not unique to Codex: the official docs point to the <a href="https://agents.md" target="_blank" rel="noopener">AGENTS.md website</a> for more information about the format.</p>
+
+    <h2 id="remember">3. All the ways Codex &ldquo;remembers&rdquo;</h2>
+    <p>Before going further, one important fact: <strong>the model does not remember anything on its own.</strong> It is the same on day 10 as on day 1, and it forgets when a session ends. Everything that looks like memory is Codex putting saved text back into the context window, or saved settings changing how it behaves. The documentation describes these mechanisms:</p>
+    <table>
+      <tr><th>Kind of memory</th><th>How it works</th><th>Lasts how long</th></tr>
+      <tr><td><strong>The conversation (chat)</strong></td><td>Everything said so far is re-sent with each message (the context window). <code>/compact</code> replaces earlier turns with a summary to free space, and Codex also compacts chats automatically.</td><td>One chat. A new chat starts with an empty window.</td></tr>
+      <tr><td><strong>Saved chats</strong></td><td><code>/resume</code> (inside Codex) or <code>codex resume</code> (from the terminal) reloads a saved chat. The docs also describe <code>/fork</code> and <code>codex fork</code> to branch a chat.</td><td>Brings the old transcript back, which fills the window again.</td></tr>
+      <tr><td><strong>AGENTS.md files</strong></td><td>Read automatically before Codex does any work. Global, repository and nested folders are layered together.</td><td>Permanent: they are files on disk.</td></tr>
+      <tr><td><strong>Memories</strong></td><td>A feature that turns useful context from eligible earlier chats into local memory files under <code>~/.codex/memories/</code>. <strong>Off by default.</strong> Control per chat with <code>/memories</code>.</td><td>Until you delete them. Still saved text read back in, not the model learning.</td></tr>
+      <tr><td><strong>Skills</strong></td><td>A folder with a <code>SKILL.md</code> file: a reusable workflow. Codex sees the name and description first and loads the full instructions when the task matches or you invoke it.</td><td>Permanent while the folder exists.</td></tr>
+      <tr><td><strong>Rules</strong></td><td><code>.rules</code> files that control which commands Codex can run outside the sandbox. Marked experimental in the docs.</td><td>Permanent. Enforced by Codex, not just guidance.</td></tr>
+      <tr><td><strong>Config</strong></td><td><code>~/.codex/config.toml</code> holds saved behaviour such as settings and feature flags (for example <code>project_doc_max_bytes</code>).</td><td>Permanent.</td></tr>
+      <tr><td><strong>Custom prompts</strong></td><td>Markdown files in <code>~/.codex/prompts/</code> that you run as slash commands. <strong>Deprecated:</strong> the docs say to use skills instead.</td><td>Permanent, but local to your machine and not shared through the repository.</td></tr>
+    </table>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Files on disk such as AGENTS.md, skills, rules and config are loaded into the context window when a session starts. The conversation exists only inside the window and is lost when the chat ends.">
+        <rect class="boxp" x="10" y="14" width="250" height="150" rx="14"/><text class="b" x="26" y="42">Files on disk (lasting)</text>
+        <text class="sub" x="26" y="68">&#8226; AGENTS.md (global, project)</text><text class="sub" x="26" y="90">&#8226; skills (SKILL.md)</text><text class="sub" x="26" y="112">&#8226; rules and config.toml</text><text class="sub" x="26" y="134">&#8226; memories (if enabled)</text>
+        <path class="arrow" d="M262,90 L360,90"/><text class="sub c" x="311" y="80">loaded at</text><text class="sub c" x="311" y="116">session start</text>
+        <rect class="boxo" x="362" y="14" width="268" height="150" rx="14"/><text class="b" x="378" y="42">Context window (temporary)</text>
+        <text class="sub" x="378" y="68">&#8226; the notes above</text><text class="sub" x="378" y="90">&#8226; files Codex reads</text><text class="sub" x="378" y="112">&#8226; this conversation</text><text class="sub" x="378" y="134">&#8226; the plan it made</text>
+        <rect class="ghost" x="10" y="184" width="620" height="56" rx="12"/>
+        <text class="b" x="26" y="208">When the chat ends, the right side is wiped.</text><text class="sub" x="26" y="228">Only what was saved to the left side comes back next time.</text>
+      </svg>
+      <figcaption>Files are the memory. The context window is just where they are shown to Codex.</figcaption>
+    </figure>
+
+    <h3>The Memories feature in more detail</h3>
+    <p>Memories let Codex carry useful context from earlier work into future work. The official page is clear about their place: <em>keep required team guidance in <code>AGENTS.md</code> or checked-in documentation, and treat memories as a helpful recall layer, not as the only source for rules that must always apply.</em></p>
+    <ul>
+      <li><strong>Off by default.</strong> In the ChatGPT desktop app, open <strong>Settings &gt; Personalization</strong> and turn on <strong>Enable Codex memories</strong>. For a config-based setup, add this to <code>config.toml</code>:</li>
+    </ul>
+    <div class="doc"><div class="doc-bar">~/.codex/config.toml</div>
+<pre><code>[features]
+memories = true</code></pre></div>
+    <ul>
+      <li><strong>It works in the background.</strong> After you enable it, Codex can turn useful context from eligible earlier chats into local memory files. It skips active or short-lived sessions and redacts secrets from generated memory fields. A chat must be idle for a while first, so memories may not appear right when a chat ends.</li>
+      <li><strong>It is stored locally.</strong> The main files live under <code>~/.codex/memories/</code> (or under <code>CODEX_HOME</code> if you set it). The docs call them generated state: inspect them when troubleshooting, but do not rely on hand-editing them as your main control.</li>
+      <li><strong>You control it per chat.</strong> Type <code>/memories</code> to choose whether the current chat can use existing memories and whether it can contribute to future ones. That choice does not change your global settings.</li>
+      <li><strong>You can reset it.</strong> In the desktop app, <strong>Delete Codex memories</strong> clears the memory store of the selected machine.</li>
+      <li><strong>Settings exist for finer control,</strong> such as <code>memories.generate_memories</code> and <code>memories.use_memories</code> in the config reference.</li>
+      <li><strong>Do not store secrets in memories.</strong> Codex redacts secrets, but the docs still say to review the memory files before sharing your Codex home folder.</li>
+    </ul>
+    <p>Details: <a href="https://developers.openai.com/codex/memories" target="_blank" rel="noopener">Memories in the official docs</a>.</p>
+
+    <h3>What happens if you say &ldquo;remember this&rdquo;?</h3>
+    <p>By itself, nothing is guaranteed. Saying it does not change the model. Whether anything survives depends on whether Codex actually <em>writes a file</em>:</p>
+    <ul>
+      <li><strong>It edits a file</strong> (you see a diff for <code>AGENTS.md</code>). That text is read next session.</li>
+      <li><strong>It only replies &ldquo;Okay, I'll remember&rdquo;</strong> and no file changes. Nothing is saved from that sentence alone, and a fresh session will not know.</li>
+      <li><strong>Memories may pick something up later,</strong> but only if the feature is on, and it decides what is worth keeping.</li>
+    </ul>
+    <p>To check, look for the file edit in the session or run <code>git diff</code>. Part 3 shows a better way, an explicit handoff note.</p>
+
+    <h2 id="where">4. Where the file can live, and how Codex finds it</h2>
+    <p>You can have several, and Codex combines them. Each location has a different audience:</p>
+    <table>
+      <tr><th>Location</th><th>Who it is for</th><th>Typical content</th></tr>
+      <tr><td><code>~/.codex/AGENTS.md</code></td><td>You, in every project</td><td>Personal working agreements: &ldquo;prefer pnpm&rdquo;, &ldquo;ask before adding production dependencies&rdquo;.</td></tr>
+      <tr><td><code>~/.codex/AGENTS.override.md</code></td><td>You, as a temporary global override</td><td>Replaces the global file without deleting it. Remove it to restore the base file.</td></tr>
+      <tr><td><code>AGENTS.md</code> at the project root (typically the Git root)</td><td>Everyone on the project (you can commit it to git)</td><td>Build and test commands, layout, conventions.</td></tr>
+      <tr><td><code>AGENTS.md</code> or <code>AGENTS.override.md</code> in a sub-folder</td><td>Work inside that folder</td><td>Rules for one service or module, such as <code>services/payments/</code>.</td></tr>
+    </table>
+    <p>The &ldquo;Codex home folder&rdquo; defaults to <code>~/.codex</code>. If you set the <code>CODEX_HOME</code> environment variable, Codex uses that folder instead.</p>
+
+    <h3>How Codex builds the instruction chain</h3>
+    <p>According to the official docs, Codex builds its instruction chain when it starts (once per run; in the terminal interface that usually means once per launched session). The order is:</p>
+    <ol class="steps">
+      <li><strong>Global scope.</strong> In your Codex home folder, Codex reads <code>AGENTS.override.md</code> if it exists. Otherwise it reads <code>AGENTS.md</code>. It uses only the first non-empty file at this level.</li>
+      <li><strong>Project scope.</strong> Starting at the project root (typically the Git root), Codex walks down to your current working folder. If it cannot find a project root, it only checks the current folder. In each folder along the path it checks for <code>AGENTS.override.md</code>, then <code>AGENTS.md</code>, then any fallback names you configured. It includes <strong>at most one file per folder</strong>.</li>
+      <li><strong>Merge order.</strong> Codex joins the files from the root down, separated by blank lines. Files closer to your current folder override earlier guidance because they appear <strong>later</strong> in the combined prompt.</li>
+    </ol>
+    <figure class="fig">
+      <svg viewBox="0 0 640 290" role="img" aria-label="A folder tree. The Codex home folder has a global AGENTS.md, the project root has a shared AGENTS.md, and services/payments has an AGENTS.override.md. They are joined in that order into the context window.">
+        <rect class="box" x="14" y="14" width="290" height="262" rx="12"/>
+        <text class="b" x="28" y="40">Your computer</text>
+        <text class="sub" x="28" y="62">~/.codex/</text><rect class="boxp" x="40" y="70" width="240" height="26" rx="8"/><text class="c" x="160" y="88">1. AGENTS.md  (global)</text>
+        <text class="sub" x="28" y="122">my-project/  (Git root)</text><rect class="boxb" x="40" y="130" width="240" height="26" rx="8"/><text class="c" x="160" y="148">2. AGENTS.md  (team)</text>
+        <text class="sub" x="40" y="182">services/payments/</text><rect class="boxg" x="56" y="190" width="224" height="26" rx="8"/><text class="c" x="168" y="208">3. AGENTS.override.md</text>
+        <text class="sub" x="28" y="244">Read from the top down; later files</text><text class="sub" x="28" y="262">win because they come last.</text>
+        <path class="arrow" d="M306,83 L380,120"/><path class="arrow" d="M306,143 L380,140"/><path class="arrow" d="M306,203 L380,160"/>
+        <rect class="boxo" x="382" y="84" width="244" height="110" rx="16"/>
+        <text class="b c" x="504" y="122">Context window</text><text class="sub c" x="504" y="144">1 + 2 + 3, joined in order</text><text class="sub c" x="504" y="164">then your first message</text>
+      </svg>
+      <figcaption>Broad notes come first, narrow notes last. When they disagree, the narrow ones win.</figcaption>
+    </figure>
+    <p>A good split is: <strong>personal taste</strong> in the global file, <strong>how this project works</strong> at the root, and <strong>how this one area works</strong> in a nested file.</p>
+
+    <h3>Size limit and fallback names</h3>
+    <ul>
+      <li><strong>Size limit.</strong> Codex skips empty files and stops adding files once the combined size reaches <code>project_doc_max_bytes</code>, which is <strong>32 KiB by default</strong>. If you hit the cap, raise the limit or split instructions across nested folders.</li>
+      <li><strong>Fallback names.</strong> If your repository already uses another file name, list it in <code>project_doc_fallback_filenames</code>. Names not on the list are ignored.</li>
+    </ul>
+    <div class="doc"><div class="doc-bar">~/.codex/config.toml</div>
+<pre><code>project_doc_fallback_filenames = ["TEAM_GUIDE.md", ".agents.md"]
+project_doc_max_bytes = 65536</code></pre></div>
+    <p>With that config, Codex checks each folder in this order: <code>AGENTS.override.md</code>, <code>AGENTS.md</code>, <code>TEAM_GUIDE.md</code>, <code>.agents.md</code>. Restart Codex after changing the config.</p>
+
+    <h3>Checking what Codex loaded</h3>
+    <p>The docs suggest asking Codex itself. Start it with approvals off for a read-only question, from the folder you want to test:</p>
+    <div class="doc"><div class="doc-bar">terminal</div>
+<pre><code>codex --ask-for-approval never "Summarize the current instructions."
+
+# test a nested folder without cd-ing into it
+codex --cd services/payments --ask-for-approval never "List the instruction sources you loaded."</code></pre></div>
+    <p>Expected, per the docs: Codex reports the global file first, the repository root file second, and the nested file last. If instructions look stale, restart Codex in the target folder. It rebuilds the chain every run, so there is no cache to clear. If nothing loads, check that you are in the repository you expect (<code>codex status</code> shows the workspace root), that the file is not empty, and that no <code>AGENTS.override.md</code> higher up is hiding the normal file.</p>
+
+    <h2 id="init">5. Creating one with /init</h2>
+    <p>You do not have to start from a blank page. Run <code>/init</code> in the folder where you want Codex to look for persistent instructions. The docs describe it as the command that generates an <code>AGENTS.md</code> scaffold for the current folder.</p>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>/init</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">/init</span>
+
+<span class="t-o">&#9679;</span> Looking at your project&hellip;
+
+<span class="t-o">&#9679;</span> Created <span class="t-g">AGENTS.md</span>
+  <span class="t-dim">A starter scaffold for this folder.</span>
+  <span class="t-dim">Review it, then edit it to match how you build and test.</span></code></pre>
+      </div>
+      <figcaption>Illustrative mockup. The exact wording on screen will differ. Treat the generated file as a first draft that you review, not a finished product.</figcaption>
+    </figure>
+    <p>The docs call it &ldquo;a great starting point,&rdquo; but say you should edit the result to match how your team actually builds, tests, reviews and ships code. It cannot know your unwritten rules or what has gone wrong before, so that part is yours to add. The scaffold is something you can refine and commit for future sessions.</p>
+    <p>You can also create the global file by hand:</p>
+    <div class="doc"><div class="doc-bar">terminal, then ~/.codex/AGENTS.md</div>
+<pre><code>mkdir -p ~/.codex
+
+# ~/.codex/AGENTS.md
+## Working agreements
+
+- Always run `npm test` after modifying JavaScript files.
+- Prefer `pnpm` when installing dependencies.
+- Ask for confirmation before adding new production dependencies.</code></pre></div>
+
+    <h2 id="write">6. What to put in it</h2>
+    <p>The official best-practices page says a good <code>AGENTS.md</code> covers: repo layout and important directories, how to run the project, build, test and lint commands, engineering conventions and PR expectations, constraints and do-not rules, and what done means and how to verify work. My test for every line is simple: <em>would Codex get this wrong, or waste time finding it, without being told?</em> If not, leave it out.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Left: things worth including such as commands, structure, conventions, gotchas. Right: things to leave out such as obvious facts, long docs, secrets and rules a linter enforces.">
+        <rect class="boxg" x="10" y="10" width="304" height="230" rx="14"/><text class="b" x="26" y="38">Put in</text>
+        <text class="sub" x="26" y="66">&#10003; How to build, run and test</text>
+        <text class="sub" x="26" y="92">&#10003; Folder map: what lives where</text>
+        <text class="sub" x="26" y="118">&#10003; Conventions that differ from defaults</text>
+        <text class="sub" x="26" y="144">&#10003; Do-not rules and past mistakes</text>
+        <text class="sub" x="26" y="170">&#10003; Definition of done (tests, lint)</text>
+        <text class="sub" x="26" y="196">&#10003; Where to find deeper docs</text>
+        <rect class="boxr" x="326" y="10" width="304" height="230" rx="14"/><text class="b" x="342" y="38">Leave out</text>
+        <text class="sub" x="342" y="66">&#10007; What the code already shows clearly</text>
+        <text class="sub" x="342" y="92">&#10007; Whole manuals pasted in</text>
+        <text class="sub" x="342" y="118">&#10007; Passwords, keys, tokens</text>
+        <text class="sub" x="342" y="144">&#10007; Style a formatter already enforces</text>
+        <text class="sub" x="342" y="170">&#10007; Vague wishes like &ldquo;write good code&rdquo;</text>
+        <text class="sub" x="342" y="196">&#10007; Anything you will not keep updated</text>
+      </svg>
+      <figcaption>A short list of useful, true, specific lines beats a long list of everything.</figcaption>
+    </figure>
+    <p>Specific beats vague. Compare these two lines:</p>
+    <table>
+      <tr><th>Vague</th><th>Specific</th></tr>
+      <tr><td>Format code properly.</td><td>Run <code>./gradlew ktlintFormat</code> before committing.</td></tr>
+      <tr><td>Keep tests passing.</td><td>Run <code>./gradlew testDebugUnitTest</code>; all tests must pass before you say a task is done.</td></tr>
+      <tr><td>Follow our architecture.</td><td>UI calls a ViewModel, the ViewModel calls a Repository. Never touch the database from a screen.</td></tr>
+    </table>
+    <p>The docs add: &ldquo;Keep it practical. A short, accurate <code>AGENTS.md</code> is more useful than a long file full of vague rules. Start with the basics, then add new rules only after you notice repeated mistakes.&rdquo;</p>
+
+    <h2 id="example">7. A complete example</h2>
+    <p>Here is a realistic root file for the Android chat app from my earlier post. It is deliberately short. The commands are the ones a normal Gradle Android project uses; replace them with yours.</p>
+    <div class="doc"><div class="doc-bar">AGENTS.md</div>
+<pre><code># Private AI Chat (Android)
+
+Kotlin + Jetpack Compose app that chats with an on-device model
+(llama.cpp) or an online model, with fallback between them.
+
+## Commands
+- Build debug:   ./gradlew assembleDebug
+- Unit tests:    ./gradlew testDebugUnitTest
+- Lint/format:   ./gradlew ktlintFormat
+- Release bundle: ./gradlew :app:bundleRelease
+
+## Structure
+- app/ui/        Compose screens (no business logic)
+- app/chat/      ViewModels, builds the prompt
+- app/engine/    LlmEngine interface + local / online / rules impls
+- app/data/      Room database (chats, memories, settings)
+- native/        llama.cpp + JNI bridge (C++)
+
+## Conventions
+- Screens never call an engine directly: go through the ViewModel.
+- Every engine returns Flow&lt;String&gt; of text pieces.
+- All native calls run on the single dedicated native thread.
+- Use https only for online models; never log prompts or API keys.
+
+## Do not
+- Do not edit anything under app/build/ or generated/.
+- Do not add a production dependency without asking first.
+
+## Gotchas
+- The native build must target plain armv8-a, or older phones crash (SIGILL).
+- Test release builds on a real device: R8 can strip JNI classes.
+
+## Definition of done
+- Unit tests pass and ktlint is clean.
+- New user-visible strings are in strings.xml.</code></pre></div>
+    <p>It is about thirty-five lines. It answers the questions Codex would otherwise spend time on: how to build, where things live, what not to touch, and the two traps that already cost me a day each.</p>
+    <p>For a JavaScript or Node project the shape is the same. Only the commands change, for example <code>npm run lint</code>, <code>npm test</code> and &ldquo;document public utilities in <code>docs/</code> when you change behavior&rdquo;.</p>
+
+    <h2 id="nested">8. Nested files and overrides</h2>
+    <p>As a project grows, one team needs different rules from the rest. Put a file in that team's folder. The docs use a payments service as the example:</p>
+    <div class="doc"><div class="doc-bar">services/payments/AGENTS.override.md</div>
+<pre><code># services/payments/AGENTS.override.md
+
+## Payments service rules
+
+- Use `make test-payments` instead of `npm test`.
+- Never rotate API keys without notifying the security channel.</code></pre></div>
+    <p>Start Codex from that folder and it reads the global file, then the root file, then this one last. Because later text wins, the payments rule about tests beats the general one. A few details worth remembering:</p>
+    <ul>
+      <li>An <code>AGENTS.override.md</code> in a folder is checked <em>before</em> <code>AGENTS.md</code> in that folder, and only one of the two is used per folder.</li>
+      <li>&ldquo;Codex stops searching once it reaches your current directory&rdquo;, so place overrides as close to specialised work as possible.</li>
+      <li>A stray override higher in the tree is the usual reason wrong guidance appears. Rename or remove it to fall back to the regular file.</li>
+      <li>If you use Codex code review on GitHub, the docs say to add a <code>## Code Review Rules</code> section to the <code>AGENTS.md</code> closest to the code it governs. Keep those rules concise, and leave formatting and lint checks to CI.</li>
+    </ul>
+
+    <h2 id="grow">9. Growing up: rules, skills and linked notes</h2>
+    <p>One AGENTS.md is enough for a small project. As a project grows, a single file turns into a long list that fills the 32 KiB budget and is hard to maintain. The docs suggest two moves: split instructions across nested folders (section 8), and keep the main file concise while referencing task-specific markdown files for things like planning, code review or architecture. Beyond that, Codex has separate places for other kinds of knowledge:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 300" role="img" aria-label="A project containing AGENTS.md, an optional nested AGENTS.md, a skills folder with a skill holding SKILL.md, and a rules folder with a default.rules file under the Codex home or project .codex folder.">
+        <rect class="box" x="10" y="10" width="360" height="280" rx="12"/>
+        <text class="b" x="26" y="36">my-project/</text>
+        <rect class="boxp" x="26" y="48" width="326" height="24" rx="7"/><text x="38" y="65">AGENTS.md  (always-on notes)</text>
+        <rect class="boxp" x="26" y="78" width="326" height="24" rx="7"/><text x="38" y="95">services/payments/AGENTS.override.md</text>
+        <text class="sub" x="26" y="126">.agents/skills/create-release-notes/</text>
+        <rect class="boxg" x="44" y="132" width="308" height="22" rx="7"/><text x="56" y="148">SKILL.md  (plus optional extra files)</text>
+        <text class="sub" x="26" y="180">.codex/rules/  (when the project .codex layer is trusted)</text>
+        <rect class="boxb" x="44" y="186" width="308" height="22" rx="7"/><text x="56" y="202">default.rules  (command prefix rules)</text>
+        <text class="sub" x="26" y="232">docs/architecture.md, docs/release.md</text>
+        <text class="sub" x="26" y="252">(plain notes that AGENTS.md points to)</text>
+        <rect class="ghost" x="388" y="10" width="242" height="280" rx="12"/>
+        <text class="b" x="402" y="38">Why split it up?</text>
+        <text class="sub" x="402" y="64">Smaller always-loaded file,</text><text class="sub" x="402" y="84">detail loaded only when needed,</text><text class="sub" x="402" y="104">and each file has one owner.</text>
+        <text class="b" x="402" y="148">Remember</text>
+        <text class="sub" x="402" y="174">AGENTS.md and skills are</text><text class="sub" x="402" y="194">guidance. Rules and sandbox</text><text class="sub" x="402" y="214">settings are enforced.</text>
+      </svg>
+      <figcaption>A generic example layout. Names are only examples; use whatever fits your project.</figcaption>
+    </figure>
+
+    <h3>The pieces, one by one</h3>
+    <table>
+      <tr><th>Piece</th><th>What it is</th><th>Loaded</th><th>Guaranteed?</th></tr>
+      <tr><td><code>AGENTS.md</code></td><td>Core notes: commands, structure, key conventions.</td><td>When the session starts, up to the size limit</td><td>No, it is guidance</td></tr>
+      <tr><td>Nested <code>AGENTS.override.md</code> / <code>AGENTS.md</code></td><td>Rules for one area of the project.</td><td>Along the path from the project root to your working folder</td><td>No, it is guidance</td></tr>
+      <tr><td><code>SKILL.md</code> in a skill folder</td><td>A reusable workflow for one job. It must include <code>name</code> and <code>description</code>.</td><td>Only the name and description are listed up front; the full text loads when the task matches or you invoke it with <code>/skills</code> or <code>$</code></td><td>No, Codex decides when to use it (unless you call it)</td></tr>
+      <tr><td><code>.rules</code> files</td><td>Which command prefixes may run outside the sandbox: <code>allow</code>, <code>prompt</code> or <code>forbidden</code>. Experimental.</td><td>Scanned at startup from the <code>rules/</code> folder of each active config layer</td><td>Yes, Codex applies them</td></tr>
+      <tr><td><code>config.toml</code></td><td>Saved settings: behaviour, feature flags, instruction-loading options.</td><td>At startup</td><td>Yes, enforced by the tool</td></tr>
+    </table>
+    <p>The most useful distinction is the last column. AGENTS.md and skills <em>ask</em> Codex to behave a certain way. Rules and configuration <em>make</em> it happen. If Codex must never run a command, do not rely on a sentence in AGENTS.md. Use a rule.</p>
+
+    <h3>Skills: a recipe that loads on demand</h3>
+    <p>A skill packages a procedure you would otherwise paste into chat again and again, such as &ldquo;how we write release notes&rdquo;. Codex starts with each skill's name and description (the docs call this progressive disclosure), then loads the full instructions when it decides to use that skill. That is the token saving: long how-to text costs nothing on unrelated tasks. Codex reads repository skills from <code>.agents/skills</code> (it scans every folder from your working folder up to the repository root), and your personal skills from <code>$HOME/.agents/skills</code>.</p>
+    <div class="doc"><div class="doc-bar">.agents/skills/create-release-notes/SKILL.md</div>
+<pre><code>---
+name: create-release-notes
+description: Write release notes from merged changes. Use when asked to
+  prepare or draft release notes for a version.
+---
+
+1. List merged pull requests since the last tag.
+2. Group them: Features, Fixes, Internal.
+3. Write one plain-language line per change; no ticket numbers.</code></pre></div>
+    <p>You can mention a skill in a prompt with <code>$</code> or pick it with <code>/skills</code>. To draft one, the docs say to invoke <code>$skill-creator</code>. Skills are covered properly in Part 6.</p>
+
+    <h3>Rules: enforced command policy</h3>
+    <p>Rules are a different thing from instructions. They control which commands Codex can run outside the sandbox. A rules file lives under a <code>rules/</code> folder next to an active config layer, for example <code>~/.codex/rules/default.rules</code>. Here is the docs' example, which asks for approval before <code>gh pr view</code> runs:</p>
+    <div class="doc"><div class="doc-bar">~/.codex/rules/default.rules</div>
+<pre><code>prefix_rule(
+    pattern = ["gh", "pr", "view"],
+    decision = "prompt",
+    justification = "Viewing PRs is allowed with approval",
+    match = ["gh pr view 7888"],
+    not_match = ["gh pr --repo openai/codex view 7888"],
+)</code></pre></div>
+    <p>If more than one rule matches, the most restrictive decision wins (<code>forbidden</code> beats <code>prompt</code>, which beats <code>allow</code>). Restart Codex after adding a rule, and use <code>codex execpolicy check</code> to test one. Project-local rules under <code>.codex/rules/</code> load only when that project layer is trusted. The docs mark rules as experimental and subject to change, so check the <a href="https://developers.openai.com/codex/rules" target="_blank" rel="noopener">Rules page</a> before relying on the syntax. The approval and sandbox ideas behind this are in Part 1.</p>
+
+    <h3>Custom prompts: deprecated</h3>
+    <p>You may find older guides that tell you to put reusable prompts in <code>~/.codex/prompts/</code> and run them as <code>/prompts:name</code>. The docs now mark custom prompts as deprecated and point to skills instead, because prompts need explicit invocation, live only on your machine, and are not shared through the repository.</p>
+
+    <h3>What goes in git, and what does not</h3>
+    <ul>
+      <li><strong>Commit:</strong> the project <code>AGENTS.md</code> and nested files, and repository skills. The whole team gets the same assistant.</li>
+      <li><strong>Keep personal:</strong> your global <code>~/.codex/AGENTS.md</code>, your <code>config.toml</code>, and generated memory files. Those belong to you.</li>
+      <li><strong>Never store</strong> keys, tokens or customer data in any of these files, committed or not.</li>
+      <li>Review changes to these files in pull requests like code, because a bad instruction affects every future session.</li>
+    </ul>
+    <div class="note"><p>Start small. Begin with one AGENTS.md. Add a nested file only when one area really differs, and add a skill when you paste the same instructions a third time.</p></div>
+
+    <h2 id="edit">10. Keeping it up to date</h2>
+    <p>Three easy ways to change the file:</p>
+    <ol class="steps">
+      <li><strong>Tell Codex in plain words</strong>: &ldquo;Add to AGENTS.md that we always run ktlint before commits.&rdquo; It will edit the file for you, and you review the diff.</li>
+      <li><strong>Edit it like any other file</strong> in your editor and review the change in a pull request.</li>
+      <li><strong>Run a retrospective.</strong> The docs suggest: when Codex makes the same mistake twice, ask it for a retrospective and update <code>AGENTS.md</code>, so the guidance stays based on real friction.</li>
+    </ol>
+    <figure class="shot">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>updating AGENTS.md</span></div>
+<pre><code><span class="t-dim">&gt;</span> <span class="t-b">The debug build needs JAVA_HOME set to JDK 17.
+  Add that to AGENTS.md.</span>
+
+<span class="t-o">&#9679;</span> <span class="t-dim">Edited AGENTS.md</span>
+  <span class="t-g">+ - Needs JDK 17: set JAVA_HOME before running Gradle.</span>
+
+<span class="t-o">&#9679;</span> Added under <span class="t-p">## Commands</span>.</code></pre>
+      </div>
+      <figcaption>Illustrative mockup. When you correct Codex the same way twice, that is a signal to write the rule down.</figcaption>
+    </figure>
+    <p>Make this a habit: <strong>if you correct Codex twice, put the correction in the file.</strong> Equally, when a line stops being true, delete it. A wrong note is worse than none, because Codex will follow it with confidence. After a change, start a new session (or restart Codex) and ask it to summarise the current instructions, as in section 4, to confirm the new text is picked up.</p>
+
+    <h2 id="limits">11. What it cannot do</h2>
+    <ul>
+      <li><strong>It is guidance, not enforcement.</strong> Codex usually follows it, but nothing guarantees it. For commands that must never run without approval, use rules and the approval and sandbox settings from Part 1.</li>
+      <li><strong>It has a size limit.</strong> By default Codex stops adding files at 32 KiB combined, so a bloated file can be cut off. It also sits in the context window, using room that could hold your code or conversation.</li>
+      <li><strong>It is not learning.</strong> Codex does not get smarter from your usage. The model is fixed, and a new session on day 10 starts as blank as on day 1. Only what is written down carries over, so the file is your memory, not Codex's.</li>
+      <li><strong>It is not secret.</strong> It is plain text, and a project file is usually committed to git. Never put credentials in it.</li>
+      <li><strong>It is read when a session starts.</strong> Edits made mid-session are not guaranteed to be in the window until the next run, so restart after big changes.</li>
+      <li><strong>It can go stale.</strong> Nobody updates what nobody owns. Treat it as code: review it, and prune it.</li>
+    </ul>
+    <p>That size point, the cost of space, is where <a href="codex-part-3-tokens-onboarding.html">Part 3</a> begins: how to make the file earn its tokens, and how it helps when you join a new project or start a new feature.</p>
+
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Context window</td><td>The fixed amount of text the model can read at once.</td></tr>
+      <tr><td>AGENTS.md</td><td>A markdown file Codex reads before it does any work.</td></tr>
+      <tr><td>AGENTS.override.md</td><td>A file checked before AGENTS.md in the same folder; it takes priority there.</td></tr>
+      <tr><td>CODEX_HOME</td><td>The Codex home folder. Defaults to <code>~/.codex</code>.</td></tr>
+      <tr><td>/init</td><td>Command that generates an AGENTS.md scaffold.</td></tr>
+      <tr><td>/memories</td><td>Command that controls whether a chat uses or creates memories.</td></tr>
+      <tr><td>project_doc_max_bytes</td><td>Config setting for the size limit on instruction files. 32 KiB by default.</td></tr>
+      <tr><td>Skill</td><td>A reusable recipe whose full text loads only when the task matches.</td></tr>
+      <tr><td>Rule</td><td>A <code>.rules</code> entry that decides whether a command may run outside the sandbox.</td></tr>
+      <tr><td>Standing instruction</td><td>A rule present at the start of every session.</td></tr>
+    </table>
+
+    <h2 id="links">12. Links and official docs</h2>
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages.</p></div>
+    <div class="callout">
+      <strong>Official documentation for this part</strong>
+      <ul>
+        <li><a href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">Custom instructions with AGENTS.md</a>: discovery order, overrides, fallback names and size limit.</li>
+        <li><a href="https://developers.openai.com/codex/memories" target="_blank" rel="noopener">Memories</a>: the local memory feature, <code>/memories</code> and its settings.</li>
+        <li><a href="https://developers.openai.com/codex/skills" target="_blank" rel="noopener">Skills</a>: <code>SKILL.md</code> and how skills load.</li>
+        <li><a href="https://developers.openai.com/codex/rules" target="_blank" rel="noopener">Rules</a>: <code>.rules</code> files and <code>prefix_rule</code>.</li>
+        <li><a href="https://developers.openai.com/codex/config-advanced" target="_blank" rel="noopener">Advanced configuration</a>: project instructions discovery and config locations.</li>
+        <li><a href="https://developers.openai.com/codex/cli/slash-commands" target="_blank" rel="noopener">Slash commands in the CLI</a>: <code>/init</code>, <code>/memories</code>, <code>/resume</code>, <code>/compact</code>.</li>
+        <li><a href="https://developers.openai.com/codex/learn/best-practices" target="_blank" rel="noopener">Best practices</a>: what a good AGENTS.md covers.</li>
+        <li><a href="https://agents.md" target="_blank" rel="noopener">agents.md</a>: the format's own website.</li>
+      </ul>
+      <p>These pages move and grow as Codex changes. If a name or option here does not match your version, the docs are right and this post is out of date.</p>
+    </div>
+
+    <div class="pager">
+      <a class="prev" href="codex-part-1-setup.html"><small>&larr; Previous &middot; Part 1</small>Meet Codex and set it up</a>
+      <a class="next" href="codex-part-3-tokens-onboarding.html"><small>Next &middot; Part 3 &rarr;</small>Fewer tokens, faster onboarding</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

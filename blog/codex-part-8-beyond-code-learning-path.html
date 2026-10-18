@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Beyond code and your learning path: ChatGPT Work, a first-week plan and a cheat sheet — Codex series part 8 (advanced)</title>
+  <meta name="description" content="What Codex and ChatGPT can do beyond code, Codex for non-developers, a day-by-day first-week plan, practice exercises, official resources and a one-page cheat sheet. Part 8 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="8">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Advanced &middot; Part 8 of 8</p>
+    <h1>Beyond code: ChatGPT Work, dots and Sites, a first-week plan, and where to keep learning</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~23 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">ChatGPT Work</span><span class="tag">Non-developers</span><span class="tag">Learning path</span><span class="tag">Cheat sheet</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a class="on" href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">The series so far has been about Codex as a coding agent. But the same ChatGPT account also opens doors that are not about code: a mode called ChatGPT Work for finished documents and research, an always-on helper called a dot, image generation, web search and a site builder. Many people who start with Codex are not writing software at all. This final part does two jobs. First, it maps what surrounds Codex and what the docs say about how mature each piece is. Second, it gives you a learning path: a first-week plan, practice exercises, the official resources, and a one-page cheat sheet of the whole series.</p>
+
+    <div class="callout">
+      <strong>Part 8 in 60 seconds</strong>
+      <ul>
+        <li>In the ChatGPT desktop app you choose between <strong>Chat</strong> (questions), <strong>ChatGPT Work</strong> (delegate a task and get a reviewable result) and <strong>Codex</strong> (developer tools and technical detail). They share usage limits.</li>
+        <li>You do not need to be a programmer. The docs give example Work prompts for a presentation, a comparison spreadsheet and a weekly update.</li>
+        <li>Dots, Sites and some other features are rolling out gradually or are in beta. The docs define five maturity labels, and you should read them before relying on a feature.</li>
+        <li>A week of short daily steps is enough to build a solid foundation. The plan below links every day to a part of this series.</li>
+        <li>OpenAI publishes use cases, videos, a free AI Foundations course, and programs for students and open-source maintainers. This series is a snapshot from October 2026, so trust the official docs when something differs.</li>
+      </ul>
+    </div>
+
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages.</p></div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 8</strong></summary>
+      <ol>
+        <li><a href="#apps">Codex and the products around it</a></li>
+        <li><a href="#help">What each piece does, and what is stable</a></li>
+        <li><a href="#nondev">Codex and ChatGPT Work for people who do not code</a></li>
+        <li><a href="#which">Chat, Work, Codex or a dot?</a></li>
+        <li><a href="#week">Your first week: a day-by-day plan</a></li>
+        <li><a href="#practice">Ten practice exercises</a></li>
+        <li><a href="#courses">Official learning resources</a></li>
+        <li><a href="#current">Staying current</a></li>
+        <li><a href="#cheat">One-page cheat sheet</a></li>
+        <li><a href="#end8">Series wrap-up</a></li>
+        <li><a href="#links">Links and official docs</a></li>
+      </ol>
+    </details>
+
+    <h2 id="apps">1. Codex and the products around it</h2>
+    <p>Back in Part 1 I described Codex as OpenAI's coding agent: it reads your project, edits files and runs commands, and it lives in the ChatGPT desktop app, a terminal (the CLI), an editor extension, the cloud and on mobile. The official docs now describe all of this as one family. The glossary even defines <strong>ChatGPT desktop app</strong> as the app that holds ChatGPT and Codex together, including Chat and Work, projects, file previews, scheduled tasks and developer tools.</p>
+    <p>In the desktop app you pick how you want to work. The &ldquo;Use ChatGPT&rdquo; page puts it in a three-row table:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="The ChatGPT desktop app offers Chat for questions and drafts, ChatGPT Work for defined outcomes with reviewable results, and Codex for developer tools and technical detail.">
+        <rect class="box" x="10" y="14" width="620" height="192" rx="16"/>
+        <text class="b" x="28" y="42">ChatGPT desktop app</text>
+        <rect class="boxb" x="28" y="56" width="188" height="134" rx="12"/><text class="b c" x="122" y="84">Chat</text><text class="sub c" x="122" y="106">Questions, drafts,</text><text class="sub c" x="122" y="124">brainstorming, a</text><text class="sub c" x="122" y="142">back-and-forth.</text>
+        <rect class="boxo" x="226" y="56" width="188" height="134" rx="12"/><text class="b c" x="320" y="84">ChatGPT Work</text><text class="sub c" x="320" y="106">Define an outcome and</text><text class="sub c" x="320" y="124">get a reviewable result:</text><text class="sub c" x="320" y="142">deck, report, analysis.</text>
+        <rect class="boxg" x="424" y="56" width="188" height="134" rx="12"/><text class="b c" x="518" y="84">Codex</text><text class="sub c" x="518" y="106">Developer tools and</text><text class="sub c" x="518" y="124">technical detail: debug,</text><text class="sub c" x="518" y="142">test, review a PR.</text>
+      </svg>
+      <figcaption>Three ways to work in one app. The docs say ChatGPT Work and Codex share usage limits, and that features depend on your plan, platform, region, rollout and workspace settings.</figcaption>
+    </figure>
+    <p>Two more ideas sit next to these. A <strong>dot</strong> is an always-on agent that keeps track of an ongoing responsibility between conversations. <strong>Sites</strong> lets you build, host and share a website by describing it. Both are explained in section 2.</p>
+
+    <h2 id="help">2. What each piece does, and what is stable</h2>
+    <p>These products change faster than the developer tools, so I will describe each in a few plain sentences and point to the official page. The first table is a map. The second one is about trust: how much the docs promise.</p>
+    <table>
+      <tr><th>Piece</th><th>What the docs say it is</th><th>How it relates to Codex</th></tr>
+      <tr><td><strong>ChatGPT Work</strong></td><td>A way to delegate real work. It can plan a task, gather context, use tools and carry it to a result you review, such as a brief, deck, analysis, recurring update or file. See <a href="https://learn.chatgpt.com/docs/get-started-with-work" target="_blank" rel="noopener">Get started with ChatGPT Work</a>.</td><td>The docs say that if you used Codex for non-coding work you can stay in Codex or use Work, which gives the same core capabilities with an experience designed for everyday work.</td></tr>
+      <tr><td><strong>Projects</strong></td><td>A place to keep related chats, files, instructions and sources together. See <a href="https://learn.chatgpt.com/docs/projects" target="_blank" rel="noopener">Projects and chats</a>.</td><td>The Codex CLI treats the directory where you start it as the project. Durable guidance belongs in <code>AGENTS.md</code> (Part 2).</td></tr>
+      <tr><td><strong>Plugins</strong></td><td>Bundles of reusable workflows that can include skills and MCP servers, usable in Chat, Work and Codex. See <a href="https://learn.chatgpt.com/docs/plugins" target="_blank" rel="noopener">Plugins</a>.</td><td>Same idea as Part 6. In the CLI, <code>/plugins</code> opens the plugin browser. The docs say the IDE extension does not support plugins.</td></tr>
+      <tr><td><strong>Image generation</strong></td><td>Create and edit images, such as UI assets, banners and illustrations. See <a href="https://learn.chatgpt.com/docs/image-generation" target="_blank" rel="noopener">Image generation</a>.</td><td>In Codex, describe the image or include <code>$imagegen</code> in the prompt. Attach a reference image with <code>-i</code> or <code>--image</code>. The docs say built-in generation uses <code>gpt-image-2</code> and counts toward your general Codex limits.</td></tr>
+      <tr><td><strong>Web search</strong></td><td>A first-party search tool. The docs say to treat all web results as untrusted input. See <a href="https://learn.chatgpt.com/docs/web-search" target="_blank" rel="noopener">Web search</a>.</td><td>In the CLI, local chats use <code>cached</code> search by default. Pass <code>--search</code> for live results, or set <code>web_search</code> in <code>config.toml</code> to <code>disabled</code>, <code>cached</code>, <code>indexed</code> or <code>live</code>.</td></tr>
+      <tr><td><strong>Sites</strong></td><td>Build, host and share a website, web app or game by describing it in ChatGPT or Codex. See <a href="https://learn.chatgpt.com/docs/sites" target="_blank" rel="noopener">Sites</a>.</td><td>You can start from either product. The docs list unsupported uses, so read that section before you plan a real project.</td></tr>
+      <tr><td><strong>Dots</strong></td><td>An always-on agent with its own cloud computer and browser that follows through between conversations. See <a href="https://learn.chatgpt.com/docs/dots" target="_blank" rel="noopener">Meet dots</a>.</td><td>A dot can start Work or Codex tasks, and continue existing local Codex tasks on a connected computer. Those tasks count toward the usual limits.</td></tr>
+    </table>
+    <div class="analogy">
+      <p><strong>Analogy.</strong> Think of an office. Chat is a colleague you ask a quick question at their desk. Work is a colleague you hand a brief to and review the result later. Codex is the engineer who works inside your code. A dot is more like an assistant who owns an ongoing responsibility and reports back when you need to decide something.</p>
+    </div>
+
+    <h3>How much can you rely on each feature?</h3>
+    <p>The docs have a <a href="https://learn.chatgpt.com/docs/feature-maturity" target="_blank" rel="noopener">Feature Maturity</a> page. It says some ChatGPT and Codex features ship behind a maturity label so you can see how reliable they are and what support to expect. Here are its five labels, in my words:</p>
+    <table>
+      <tr><th>Label</th><th>Meaning</th><th>Official guidance</th></tr>
+      <tr><td><strong>Under development</strong></td><td>Not ready for use.</td><td>Don't use.</td></tr>
+      <tr><td><strong>Experimental</strong></td><td>Unstable. OpenAI may remove or change it.</td><td>Use at your own risk.</td></tr>
+      <tr><td><strong>Beta</strong></td><td>Ready for broad testing, but some aspects may change.</td><td>OK for most evaluation and pilots; expect small changes.</td></tr>
+      <tr><td><strong>Stable</strong></td><td>Fully supported and documented; behaviour stays consistent.</td><td>Safe for production use; removals go through deprecation.</td></tr>
+      <tr><td><strong>Deprecated</strong></td><td>Still available but no longer recommended.</td><td>Avoid new use and plan to migrate.</td></tr>
+    </table>
+    <p>Here is what I found labelled in the pages I read, as of 18 October 2026. Labels move, so run the command shown or open the page to check.</p>
+    <table>
+      <tr><th>Feature</th><th>What the docs say</th></tr>
+      <tr><td>Hooks, goals, subagent collaboration (<code>multi_agent</code>), Fast mode, apps, shell tools</td><td>Listed as <strong>Stable</strong> in the common feature-flag table in Config basics.</td></tr>
+      <tr><td>Memories (<code>memories</code>)</td><td>Listed as <strong>Experimental</strong> and off by default in the same table.</td></tr>
+      <tr><td>Rules</td><td>The Rules page says rules are experimental and may change.</td></tr>
+      <tr><td>Legacy web search flags</td><td>Listed as <strong>Deprecated</strong>. Prefer the top-level <code>web_search</code> setting.</td></tr>
+      <tr><td>Sites</td><td>The pricing FAQ says Sites is included with eligible plans during <strong>public beta</strong>.</td></tr>
+      <tr><td>GitLab merge request reviews, Composer Predictions, device code sign-in</td><td>Described as <strong>beta</strong> on their pages.</td></tr>
+      <tr><td>Dots</td><td>&ldquo;Rolling out gradually&rdquo; to eligible accounts. The docs list plan and region requirements. This is an availability note, not a maturity label.</td></tr>
+      <tr><td>Standalone web search for custom providers</td><td>&ldquo;Under development&rdquo; and off by default.</td></tr>
+    </table>
+    <p>I did not find a maturity label on ChatGPT Work, projects, image generation or plugins in the pages I read. For those, the docs say availability depends on your plan, platform, region, rollout and workspace settings, and that administrators can control access. In the CLI, <code>codex features list</code> shows known feature flags, their maturity stage and their effective state, and <code>/experimental</code> toggles experimental features.</p>
+
+    <h2 id="nondev">3. Codex and ChatGPT Work for people who do not code</h2>
+    <p>This is the part most developers miss when they recommend Codex to a friend. The docs describe Work as a way to get documents, analysis and research done, and say you can keep using Codex for research, documents and presentations if you prefer it. When you use ChatGPT Work in the desktop app, technical details such as Git or shell commands are hidden and the agent prefers nontechnical language and finished outputs. In the Codex view you see diffs and review views instead.</p>
+    <p>The docs give three starter prompts. Fill in the brackets with your own details:</p>
+    <table>
+      <tr><th>Idea</th><th>Example prompt from the docs</th></tr>
+      <tr><td><strong>Create a presentation</strong></td><td><code>Review the attached source materials and create an eight-slide presentation for [audience]. Focus on the main themes, include supporting evidence, and flag anything that needs human review. Return a draft for my review.</code></td></tr>
+      <tr><td><strong>Compare options in a spreadsheet</strong></td><td><code>Create a spreadsheet comparing the options for [decision]. Use the attached notes and source materials. Include the most important criteria, score each option, flag risks or missing information, and add a summary tab with a recommendation and next steps.</code></td></tr>
+      <tr><td><strong>Set up a recurring update</strong></td><td><code>Every Monday morning, review new updates from @Slack and @Google Drive for [project]. Refresh the meeting agenda with decisions, blockers, owners, and open questions. Send me a draft before sharing it.</code></td></tr>
+    </table>
+    <p>Notice the habits built into these prompts: they name the audience and the format, they say what good looks like, and they ask for a <em>draft for review</em>. That is the same discipline as Part 5. Other documented non-coding examples:</p>
+    <ul>
+      <li><strong>Research.</strong> The web search page suggests <em>Research three approaches to reducing food waste in office cafeterias. Compare the evidence, costs, and implementation requirements.</em> using deep research in Work, and says to review the report and its sources.</li>
+      <li><strong>Images.</strong> Ask for a banner or illustration. The docs suggest a prompt of one to three clear sentences that names the purpose, the subject, the setting and style, and anything the image must not contain.</li>
+      <li><strong>Ongoing responsibilities (a dot).</strong> The docs give examples such as keeping a sales proposal current as terms change, or updating a study as new measurements arrive and drafting a findings summary for review.</li>
+      <li><strong>Websites.</strong> Sites says you can get started without writing any code, using documents and data you already have, and ask for changes as you go.</li>
+    </ul>
+    <div class="callout">
+      <strong>A gentle way to start without a terminal</strong>
+      <ol>
+        <li>Install the ChatGPT desktop app (the quickstart lists macOS, Windows and Linux) and sign in with your ChatGPT account.</li>
+        <li>Start with <strong>Chat</strong> to clarify your task. When you want a finished file, switch to <strong>Work</strong>.</li>
+        <li>Give it a clear outcome, the sources to use, constraints, what good looks like, and when to stop for review (this list is the docs' own advice for Work).</li>
+        <li>Open the result and check every section, slide or tab. The docs say to verify important numbers, names, dates and quotes.</li>
+        <li>Ask for focused changes instead of starting over.</li>
+      </ol>
+    </div>
+    <p>Everything in Parts 1 to 3 still applies in spirit: approvals before risky actions, a plan before big tasks, and written instructions so the agent does not start from zero. For a non-developer, those instructions might say who you are, what a project is for, and how you want results formatted. The docs describe project instructions for ChatGPT projects, and <code>AGENTS.md</code> for Codex folders.</p>
+    <div class="note"><p>For legal, financial, medical, security and other high-stakes decisions, the docs say to get expert review. Use the agent to support your judgement, not replace it.</p></div>
+
+    <h2 id="which">4. Chat, Work, Codex or a dot?</h2>
+    <table>
+      <tr><th>You want to&hellip;</th><th>Use</th></tr>
+      <tr><td>Ask a question, brainstorm, or draft a short message</td><td><strong>Chat</strong></td></tr>
+      <tr><td>Hand off research, analysis or a file and review the result</td><td><strong>ChatGPT Work</strong></td></tr>
+      <tr><td>Debug code, run tests, review a pull request or implement a feature</td><td><strong>Codex</strong> (desktop app, CLI, IDE extension)</td></tr>
+      <tr><td>Keep an ongoing responsibility moving and hear back when you must decide</td><td>A <strong>dot</strong></td></tr>
+      <tr><td>Have coding tasks keep running when your laptop is off</td><td><strong>Cloud</strong> environments (Part 6)</td></tr>
+      <tr><td>Run something repeatedly without you</td><td><strong>Scheduled tasks</strong> or <code>codex exec</code> (Part 7)</td></tr>
+    </table>
+    <p>The docs say longer or more complex Work tasks may use more credits, and recommend Chat for quick questions and short rewrites. They also recommend checking plan usage before starting a large task. For plans and limits, see <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">Pricing</a>, and remember that conversations with your dot do not count toward usage limits while tasks it starts in Work or Codex do.</p>
+
+    <h2 id="week">5. Your first week: a day-by-day plan</h2>
+    <p>This plan is my own suggestion, not an official curriculum. It uses short sessions that build on each other, and every day links to the part of the series that explains it. Aim for 20 to 40 minutes a day on a small project you know well. Keep the same project all week.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Seven days: install and ask questions; plan and prompts; AGENTS.md; branch and review; check usage and compact; try one extension; review and write a handoff note.">
+        <rect class="boxb" x="6"   y="18" width="84" height="94" rx="10"/><text class="b c" x="48" y="42">Day 1</text><text class="sub c" x="48" y="64">install,</text><text class="sub c" x="48" y="80">ask 5</text><text class="sub c" x="48" y="96">questions</text>
+        <rect class="boxp" x="96"  y="18" width="84" height="94" rx="10"/><text class="b c" x="138" y="42">Day 2</text><text class="sub c" x="138" y="64">/plan and</text><text class="sub c" x="138" y="80">good</text><text class="sub c" x="138" y="96">prompts</text>
+        <rect class="boxg" x="186" y="18" width="84" height="94" rx="10"/><text class="b c" x="228" y="42">Day 3</text><text class="sub c" x="228" y="64">write your</text><text class="sub c" x="228" y="80">AGENTS.md</text>
+        <rect class="boxo" x="276" y="18" width="84" height="94" rx="10"/><text class="b c" x="318" y="42">Day 4</text><text class="sub c" x="318" y="64">branch,</text><text class="sub c" x="318" y="80">/diff and</text><text class="sub c" x="318" y="96">/review</text>
+        <rect class="boxr" x="366" y="18" width="84" height="94" rx="10"/><text class="b c" x="408" y="42">Day 5</text><text class="sub c" x="408" y="64">check usage,</text><text class="sub c" x="408" y="80">/compact</text>
+        <rect class="boxb" x="456" y="18" width="84" height="94" rx="10"/><text class="b c" x="498" y="42">Day 6</text><text class="sub c" x="498" y="64">try one</text><text class="sub c" x="498" y="80">extension</text>
+        <rect class="boxg" x="546" y="18" width="88" height="94" rx="10"/><text class="b c" x="590" y="42">Day 7</text><text class="sub c" x="590" y="64">review,</text><text class="sub c" x="590" y="80">prune, write</text><text class="sub c" x="590" y="96">a handoff</text>
+        <path class="arrow" d="M8,134 L632,134"/>
+        <text class="sub" x="8" y="156">Each day builds on the one before. Keep the same small project all week.</text>
+        <rect class="ghost" x="6" y="172" width="628" height="68" rx="12"/><text class="b" x="22" y="196">Rule for the whole week</text><text class="sub" x="22" y="216">Work on a git branch, keep approvals on, and finish each day by writing one line in AGENTS.md</text><text class="sub" x="22" y="232">about something that surprised you.</text>
+      </svg>
+      <figcaption>A seven-day on-ramp. Everything is small enough to finish in one sitting.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Day</th><th>Do</th><th>Done when&hellip;</th><th>Read</th></tr>
+      <tr><td><strong>1</strong></td><td>Install Codex (the desktop app or the CLI), sign in, and open a small project. Ask five questions: what it does, how to run it, where the main entry point is, what technologies it uses, how the folders are organised. Run <code>/status</code> to see the model and approval settings.</td><td>You can explain the project to a friend using only Codex's answers, and you know how to quit.</td><td><a href="codex-part-1-setup.html">Part 1</a></td></tr>
+      <tr><td><strong>2</strong></td><td>Type <code>/plan</code> and ask for a plan for a small change. Read the plan, approve it, then ask Codex to run the tests or a check.</td><td>The change works and a test or check proved it.</td><td><a href="codex-part-5-daily-workflow.html">Part 5</a></td></tr>
+      <tr><td><strong>3</strong></td><td>Run <code>/init</code> to generate an <code>AGENTS.md</code> scaffold, then trim it to what Codex would get wrong without it. Start a new chat with <code>/new</code> and check that it follows a rule you wrote.</td><td>AGENTS.md is short and every line is specific, and a fresh chat obeys at least one rule.</td><td><a href="codex-part-2-agents-md.html">Part 2</a></td></tr>
+      <tr><td><strong>4</strong></td><td>On a new Git branch, ask Codex to make a change. Read <code>/diff</code>, then run <code>/review</code> for a second opinion on your working tree.</td><td>You reviewed the diff and the review comments before committing anything.</td><td><a href="codex-part-5-daily-workflow.html">Part 5</a></td></tr>
+      <tr><td><strong>5</strong></td><td>After a long chat run <code>/status</code> and <code>/usage</code>, then <code>/compact</code> or <code>/new</code>, redo a small task and compare. Try the same task with another model via <code>/model</code>.</td><td>You can say roughly what changed the token numbers and which model fit the task.</td><td><a href="codex-part-3-tokens-onboarding.html">Part 3</a> and <a href="codex-part-4-models-api-links.html">Part 4</a></td></tr>
+      <tr><td><strong>6</strong></td><td>Add one extension: a skill for something you repeat (<code>/skills</code>), a plugin you trust (<code>/plugins</code>), or one MCP server (<code>/mcp</code> to list tools).</td><td>You used it once and can say what it saved.</td><td><a href="codex-part-6-extend-and-surfaces.html">Part 6</a></td></tr>
+      <tr><td><strong>7</strong></td><td>Review the week. Delete stale AGENTS.md lines. Run <code>/recap</code>, ask Codex to write a handoff note, then start a fresh chat from that note. Optionally try one non-code task in Work.</td><td>The new chat picks up where you stopped without you retelling the story.</td><td><a href="codex-part-3-tokens-onboarding.html">Part 3</a> and <a href="codex-part-7-automation-and-teams.html">Part 7</a></td></tr>
+    </table>
+    <p><strong>After week one:</strong> add automation only when you have a repeatable job (Part 7), and bring teammates in with shared, committed files rather than telling everyone to copy your setup.</p>
+
+    <h2 id="practice">6. Ten practice exercises</h2>
+    <p>Learning sticks when you do things. These are my own exercises, built from the commands and prompts in the docs. Do them on a throwaway branch or a practice project. Each has a hint or a model answer.</p>
+    <table>
+      <tr><th>#</th><th>Exercise</th><th>Hint or solution</th></tr>
+      <tr><td>1</td><td>Ask for an overview, then trace how one feature works from the screen to storage.</td><td>Ask for the entry point first, then name the feature. Ask for a list of files in the order the data flows.</td></tr>
+      <tr><td>2</td><td>Introduce a small bug on purpose. Describe only the symptom and the likely location, and ask Codex to write a failing test first, then fix it.</td><td>Ask it to show the failing test result before the fix and the passing result after.</td></tr>
+      <tr><td>3</td><td>Pick a function and ask for a refactor that keeps behaviour the same, then have it run the tests.</td><td>If tests do not exist, do exercise 4 first.</td></tr>
+      <tr><td>4</td><td>Ask Codex to find untested functions, add tests, and run them.</td><td>Limit it to one file at a time, so the diff stays reviewable.</td></tr>
+      <tr><td>5</td><td>Turn a vague idea into a short SPEC.md by asking Codex to ask you questions first, then build it in a <em>new</em> chat.</td><td>The docs suggest asking the agent to question you (&ldquo;Ask me questions before you continue&rdquo;). Use <code>/new</code> for the clean start.</td></tr>
+      <tr><td>6</td><td>Give a vague prompt on purpose, correct it twice, then use <code>/new</code> and restate it carefully. Compare.</td><td>Expect the second attempt to be faster and cleaner. The lesson is when to restart.</td></tr>
+      <tr><td>7</td><td>Use <code>/fork</code> to try two approaches to one problem, then compare the results with <code>/diff</code>.</td><td>A fork copies the chat into a new one, so your first transcript stays intact.</td></tr>
+      <tr><td>8</td><td>Run one task on two models and compare quality, time and token use.</td><td>Use <code>/model</code> between runs and <code>/status</code> after each. See Part 4 for the models.</td></tr>
+      <tr><td>9</td><td>Write a three-line AGENTS.md rule for a mistake Codex keeps making, and see whether the mistake stops.</td><td>Make it specific, for example the exact test command to run before finishing.</td></tr>
+      <tr><td>10</td><td>Write a one-line script around <code>codex exec</code> that summarises <code>git log</code>, then ask for JSON events and read them with <code>jq</code>.</td><td>Example: <code>codex exec "Summarise the last 20 commits for a changelog: $(git log --oneline -20)"</code>. Add <code>--json</code> for newline-delimited events, or <code>-o file.txt</code> to save only the final message.</td></tr>
+    </table>
+    <p>For a non-coding practice round, try one of the Work prompts from section 3 on your own notes, and ask the follow-up questions the docs recommend: <em>What sources did you use?</em> and <em>What assumptions did you make?</em></p>
+
+    <h2 id="courses">7. Official learning resources</h2>
+    <h3>Inside the tools</h3>
+    <ul>
+      <li><strong>Slash commands.</strong> Type <code>/</code> in the CLI composer to open the list. <code>codex doctor</code> generates a local diagnostic report if something looks broken.</li>
+      <li><strong>The docs for machines.</strong> The docs publish an index at <a href="https://developers.openai.com/codex/llms.txt" target="_blank" rel="noopener">developers.openai.com/codex/llms.txt</a>, and every page has a Markdown twin when you add <code>.md</code> to its URL.</li>
+    </ul>
+    <h3>Use cases, videos and courses</h3>
+    <table>
+      <tr><th>Resource</th><th>What it is</th></tr>
+      <tr><td><a href="https://learn.chatgpt.com/use-cases" target="_blank" rel="noopener">Use cases</a></td><td>Ready-made workflows for ChatGPT and Codex. When I looked, collections included Web development, Game development, Native development, Production systems, Security, Finance, Sales and Education, plus individual workflows such as creating a slide deck or automating bug triage.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/resources" target="_blank" rel="noopener">Resources</a></td><td>Videos and stories for working with ChatGPT and Codex: product updates, tutorials, and blog posts. It also links the Help Center, the developer forum, OpenAI Academy and a status page.</td></tr>
+      <tr><td><a href="https://academy.openai.com/home/courses/ai-foundations-juzjs" target="_blank" rel="noopener">AI Foundations course</a></td><td>The Use ChatGPT page recommends it for guided practice. Course catalogues change, so browse OpenAI Academy for current options.</td></tr>
+      <tr><td><a href="https://learn.chatgpt.com/docs/prompting" target="_blank" rel="noopener">Prompting</a></td><td>Official guidance on writing prompts for questions, finished work and coding tasks.</td></tr>
+    </table>
+    <h3>Programs</h3>
+    <ul>
+      <li><a href="https://developers.openai.com/community/students" target="_blank" rel="noopener">Codex for Students</a>. When I read the page, it offered verified university students in the United States and Canada $100 in ChatGPT credits to use in Codex, one offer per student, with credits expiring 12 months after the grant. The page lists eligibility rules and a FAQ. Offers change, so read the current terms.</li>
+      <li><a href="https://developers.openai.com/community/codex-for-oss" target="_blank" rel="noopener">Codex for Open Source</a>. For maintainers of widely used open-source projects. The page describes six months of ChatGPT Pro with Codex, conditional access to Codex Security for core maintainers, and API credits through the Codex Open Source Fund. Applications are reviewed, so read who should apply.</li>
+    </ul>
+    <h3>Documentation and community</h3>
+    <ul>
+      <li>The docs home, <a href="https://learn.chatgpt.com/docs/features" target="_blank" rel="noopener">Features</a> and <a href="https://learn.chatgpt.com/docs/glossary" target="_blank" rel="noopener">Glossary</a> pages are the best maps of the whole product family.</li>
+      <li>The <a href="https://learn.chatgpt.com/docs/open-source" target="_blank" rel="noopener">Open Source</a> page lists which parts are open (the CLI, SDK, skills and plugins) and which are not (the IDE extension and Codex cloud). Bugs go to <a href="https://github.com/openai/codex/issues" target="_blank" rel="noopener">openai/codex issues</a> and questions to <a href="https://github.com/openai/codex/discussions" target="_blank" rel="noopener">discussions</a>. The docs say the repository does not accept external pull requests, so read its contribution guidelines first.</li>
+      <li>Part 4 lists the official links in one place.</li>
+    </ul>
+
+    <h2 id="current">8. Staying current</h2>
+    <p>Codex, the models and the docs all change quickly. A few habits keep you from being surprised:</p>
+    <ul>
+      <li><strong>Update the CLI.</strong> <code>codex update</code> checks for and applies an update when your installed release supports self-update, and the docs show the installer commands for macOS, Linux and Windows. Part 1 has the details.</li>
+      <li><strong>Read the weekly digest.</strong> The <a href="https://learn.chatgpt.com/docs/whats-new" target="_blank" rel="noopener">What's new</a> page is a weekly digest of ChatGPT and Codex features. For example, it announced creating a dot in the mobile app on 9 October 2026.</li>
+      <li><strong>Check model notices before you pin one.</strong> The scheduled tasks page, for instance, says GPT-5.5 retired from Codex with ChatGPT sign-in on 14 October 2026 and points to <code>gpt-6.1-sol</code> as the replacement where your plan allows it. Part 4 covers models.</li>
+      <li><strong>Check feature flags.</strong> <code>codex features list</code> shows each flag's maturity and state.</li>
+      <li><strong>Re-audit your setup now and then.</strong> Run <code>codex doctor</code>, prune AGENTS.md, and delete plugins and permissions you no longer use.</li>
+      <li><strong>Remember this series is a dated snapshot.</strong> Everything here was checked against the official pages on 18 October 2026. When your version behaves differently, believe the docs.</li>
+    </ul>
+
+    <h2 id="cheat">9. One-page cheat sheet</h2>
+    <p>Every item below appears in the official docs as of 18 October 2026. Run <code>/</code> in the CLI to see the list your version supports.</p>
+    <h3>Command line</h3>
+    <table>
+      <tr><th>Command</th><th>Does</th></tr>
+      <tr><td><code>codex</code></td><td>Start the interactive terminal UI. Add a prompt to start with a task.</td></tr>
+      <tr><td><code>codex resume</code>, <code>codex resume --last</code></td><td>Continue a saved chat (<code>--last</code> skips the picker; <code>--all</code> looks beyond the current directory).</td></tr>
+      <tr><td><code>codex exec "..."</code> (short form <code>codex e</code>)</td><td>Run once, non-interactively. Useful flags: <code>--json</code>, <code>-o</code> (<code>--output-last-message</code>), <code>--output-schema</code>, <code>-m</code>, <code>-s</code>, <code>-C</code>.</td></tr>
+      <tr><td><code>codex review</code></td><td>Review code non-interactively (<code>--base</code> branch or <code>--commit</code> SHA).</td></tr>
+      <tr><td><code>--search</code></td><td>Switch web search from cached to live for this run.</td></tr>
+      <tr><td><code>-i</code>, <code>--image</code></td><td>Attach images to the first message.</td></tr>
+      <tr><td><code>-m</code>, <code>-a</code>, <code>-s</code>, <code>-C</code>, <code>-c</code></td><td>Model, approval policy (<code>on-request</code> or <code>never</code>), sandbox, working directory, inline config override.</td></tr>
+      <tr><td><code>codex doctor</code>, <code>codex update</code>, <code>codex features list</code></td><td>Diagnose, update, and list feature flags.</td></tr>
+      <tr><td><code>codex login</code>, <code>codex logout</code>, <code>codex mcp</code>, <code>codex plugin</code></td><td>Sign in or out, manage MCP servers and plugins.</td></tr>
+    </table>
+    <h3>Slash commands (CLI)</h3>
+    <table>
+      <tr><th>Command</th><th>Does</th><th>Part</th></tr>
+      <tr><td><code>/init</code></td><td>Generate an <code>AGENTS.md</code> scaffold in the current directory.</td><td>1, 2</td></tr>
+      <tr><td><code>/status</code>, <code>/usage</code></td><td>Show session configuration and token usage; show account token usage.</td><td>1, 3</td></tr>
+      <tr><td><code>/compact</code>, <code>/new</code>, <code>/clear</code>, <code>/recap</code></td><td>Summarise the chat, start a new chat, clear and start fresh, or summarise without compacting.</td><td>1, 3</td></tr>
+      <tr><td><code>/model</code>, <code>/fast</code>, <code>/plan</code>, <code>/goal</code></td><td>Choose the model; toggle a Fast tier; plan mode; set a persistent task goal.</td><td>1, 3, 5</td></tr>
+      <tr><td><code>/permissions</code></td><td>Change what Codex can do without asking first.</td><td>1, 5</td></tr>
+      <tr><td><code>/diff</code>, <code>/review</code></td><td>Show the Git diff; review the working tree.</td><td>5, 7</td></tr>
+      <tr><td><code>/resume</code>, <code>/fork</code>, <code>/side</code></td><td>Resume a chat; branch the chat; start a side chat.</td><td>3, 5</td></tr>
+      <tr><td><code>/worktree</code></td><td>Work in a managed Git worktree.</td><td>5, 6</td></tr>
+      <tr><td><code>/skills</code>, <code>/plugins</code>, <code>/mcp</code>, <code>/hooks</code></td><td>Browse skills, plugins, MCP tools and lifecycle hooks.</td><td>6</td></tr>
+      <tr><td><code>/mention</code></td><td>Attach a file to the chat.</td><td>1, 5</td></tr>
+      <tr><td><code>/export</code>, <code>/copy</code></td><td>Export the chat as Markdown; copy the latest response.</td><td>3, 5</td></tr>
+      <tr><td><code>/experimental</code></td><td>Toggle experimental features.</td><td>8</td></tr>
+    </table>
+    <h3>Files and config keys</h3>
+    <table>
+      <tr><th>Item</th><th>What it is</th></tr>
+      <tr><td><code>AGENTS.md</code>, <code>AGENTS.override.md</code></td><td>Persistent instructions. Codex reads a global file in your Codex home (default <code>~/.codex</code>) and then files from the project root down to your working directory.</td></tr>
+      <tr><td><code>~/.codex/config.toml</code></td><td>User config. <code>-c key=value</code> overrides it for one run.</td></tr>
+      <tr><td><code>model</code>, <code>model_reasoning_effort</code></td><td>Default model and reasoning effort.</td></tr>
+      <tr><td><code>approval_policy</code></td><td><code>on-request</code> or <code>never</code> (or a granular table).</td></tr>
+      <tr><td><code>sandbox_mode</code></td><td><code>read-only</code>, <code>workspace-write</code> or <code>danger-full-access</code>.</td></tr>
+      <tr><td><code>web_search</code></td><td><code>disabled</code>, <code>cached</code>, <code>indexed</code> or <code>live</code>.</td></tr>
+      <tr><td><code>[features]</code> table</td><td>Toggle optional and experimental capabilities.</td></tr>
+    </table>
+    <h3>Ten rules to remember</h3>
+    <ol>
+      <li>The context window is the scarce resource. Keep it clean.</li>
+      <li>The agent does not remember by itself. Your written instructions do.</li>
+      <li>Plan before you implement, unless the change is one sentence.</li>
+      <li>Give Codex a check it can run, and ask for evidence.</li>
+      <li>Work on a branch and read the diff.</li>
+      <li>Start with approvals on and a sandbox that fits the task. Treat <code>--yolo</code> as a last resort inside an isolated runner.</li>
+      <li>Treat web results and untrusted content as untrusted.</li>
+      <li>Correct early; after two failed corrections, start a new chat.</li>
+      <li>Prune AGENTS.md, skills, plugins and permissions regularly.</li>
+      <li>When in doubt, check the official docs.</li>
+    </ol>
+
+    <h2 id="end8">10. Series wrap-up</h2>
+    <table>
+      <tr><th>Level</th><th>Part</th><th>Question it answers</th></tr>
+      <tr><td rowspan="4"><strong>Beginner</strong></td><td><a href="codex-part-1-setup.html">1. Meet Codex and set it up</a></td><td>How do I get started safely?</td></tr>
+      <tr><td><a href="codex-part-2-agents-md.html">2. AGENTS.md: the project memory</a></td><td>How does Codex remember my project?</td></tr>
+      <tr><td><a href="codex-part-3-tokens-onboarding.html">3. Fewer tokens, faster onboarding</a></td><td>How do I spend less and ramp up faster?</td></tr>
+      <tr><td><a href="codex-part-4-models-api-links.html">4. Codex models, the API and official links</a></td><td>What models exist and where are the docs?</td></tr>
+      <tr><td rowspan="4"><strong>Advanced</strong></td><td><a href="codex-part-5-daily-workflow.html">5. Working with Codex day to day</a></td><td>How do I prompt, use git, and fix problems?</td></tr>
+      <tr><td><a href="codex-part-6-extend-and-surfaces.html">6. Extending Codex</a></td><td>How do I connect tools, delegate, and choose a surface?</td></tr>
+      <tr><td><a href="codex-part-7-automation-and-teams.html">7. Automation and teams</a></td><td>How do I run it in scripts and CI, and roll it out?</td></tr>
+      <tr><td>8. Beyond code and your learning path</td><td>What else is there, and what do I do next?</td></tr>
+    </table>
+    <p>If you remember one thing from all eight parts, make it this: the agent forgets by design and the tooling changes constantly, so the durable skills are the ones that do not depend on either. Keep your context small, write down what matters, verify what Codex produces, and read the official docs when something looks different. Thank you for reading.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>ChatGPT desktop app</td><td>The app that holds Chat, ChatGPT Work and Codex, with projects, file previews and scheduled tasks.</td></tr>
+      <tr><td>ChatGPT Work</td><td>The agent for research, analysis and finished documents, presentations and spreadsheets that you review.</td></tr>
+      <tr><td>Dot</td><td>An always-on agent with its own cloud computer that follows through on an ongoing responsibility.</td></tr>
+      <tr><td>Sites</td><td>A way to build, host and share a website by describing it.</td></tr>
+      <tr><td>Project</td><td>A place that keeps related chats, files, instructions and sources together.</td></tr>
+      <tr><td>Feature maturity</td><td>A label (Under development, Experimental, Beta, Stable, Deprecated) that tells you how reliable a feature is.</td></tr>
+      <tr><td><code>$imagegen</code></td><td>Include it in a prompt to invoke the image generation skill explicitly.</td></tr>
+      <tr><td>Codex for Students / Open Source</td><td>OpenAI programs for students and for open-source maintainers; read the current terms on their pages.</td></tr>
+    </table>
+
+    <h2 id="links">Links and official docs</h2>
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages.</p></div>
+    <ul>
+      <li><a href="https://learn.chatgpt.com/docs/use-chatgpt" target="_blank" rel="noopener">Use ChatGPT</a> and <a href="https://learn.chatgpt.com/docs/get-started-with-work" target="_blank" rel="noopener">Get started with ChatGPT Work</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/dots" target="_blank" rel="noopener">Meet dots</a>, <a href="https://learn.chatgpt.com/docs/sites" target="_blank" rel="noopener">Sites</a>, <a href="https://learn.chatgpt.com/docs/projects" target="_blank" rel="noopener">Projects and chats</a>, <a href="https://learn.chatgpt.com/docs/plugins" target="_blank" rel="noopener">Plugins</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/image-generation" target="_blank" rel="noopener">Image generation</a> and <a href="https://learn.chatgpt.com/docs/web-search" target="_blank" rel="noopener">Web search</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/feature-maturity" target="_blank" rel="noopener">Feature Maturity</a>, <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">Pricing</a>, <a href="https://learn.chatgpt.com/docs/whats-new" target="_blank" rel="noopener">What's new</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/developer-commands?surface=cli" target="_blank" rel="noopener">CLI command reference and slash commands</a></li>
+      <li><a href="https://learn.chatgpt.com/use-cases" target="_blank" rel="noopener">Use cases</a>, <a href="https://learn.chatgpt.com/resources" target="_blank" rel="noopener">Resources</a>, <a href="https://developers.openai.com/community/students" target="_blank" rel="noopener">Codex for Students</a>, <a href="https://developers.openai.com/community/codex-for-oss" target="_blank" rel="noopener">Codex for Open Source</a></li>
+    </ul>
+
+    <div class="pager">
+      <a class="prev" href="codex-part-7-automation-and-teams.html"><small>&larr; Previous &middot; Part 7</small>Automation and teams</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>

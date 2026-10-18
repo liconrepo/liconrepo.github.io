@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Working with Codex day to day: prompts, git, review and troubleshooting — Codex series part 5 (advanced)</title>
+  <meta name="description" content="Prompting patterns, the explore-plan-implement-review-commit workflow, git branches and pull requests, worktrees, code review, steering and fixing common problems with Codex. Part 5 of 8 (advanced)." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    kbd { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .82em; background: var(--card); border: 1px solid var(--border-h); border-bottom-width: 2px; padding: 1px 6px; border-radius: 5px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; color: var(--sub); }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .callout li strong:first-child { display: inline; margin: 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+
+    /* ── Terminal "screenshots" (illustrative mockups) ── */
+    .shot { margin: 26px 0; }
+    .term { background: #0f0f12; color: #e4e4e7; border-radius: 12px; border: 1px solid var(--border-h); overflow: hidden; }
+    .term-bar { background: #1d1d22; padding: 9px 14px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #8b8b95; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: #ef4444; }
+    .term-bar i:nth-child(2) { background: #f59e0b; } .term-bar i:nth-child(3) { background: #10b981; }
+    .term-bar span { margin-left: 8px; }
+    .term pre { background: none; border: 0; border-radius: 0; margin: 0; padding: 14px 16px; color: inherit; line-height: 1.55; }
+    .term pre code { color: inherit; font-size: calc(12.5px * var(--fs, 1)); }
+    .t-dim { color: #8b8b95; } .t-g { color: #34d399; } .t-o { color: #fbbf24; } .t-b { color: #60a5fa; } .t-p { color: #c084fc; } .t-r { color: #f87171; }
+    .shot figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+    .doc { background: var(--card); border: 1px solid var(--border-h); border-radius: 12px; overflow: hidden; }
+    .doc-bar { padding: 8px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+    .doc pre { border: 0; border-radius: 0; margin: 0; background: none; }
+    .steps { counter-reset: s; list-style: none; margin-left: 0; }
+    .steps li { counter-increment: s; position: relative; padding-left: 40px; margin: 14px 0; }
+    .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body data-part="5">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Codex &middot; Advanced &middot; Part 5 of 8</p>
+    <h1>Working with Codex day to day: prompts, git, review, and fixing things when they go wrong</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~23 min read</span></div>
+    <div class="tags"><span class="tag">Advanced</span><span class="tag">Prompting</span><span class="tag">Git</span><span class="tag">Code review</span><span class="tag">Troubleshooting</span></div>
+
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="codex-part-1-setup.html"><small>Part 1</small>Meet Codex and set it up</a>
+      <a href="codex-part-2-agents-md.html"><small>Part 2</small>AGENTS.md: the project memory</a>
+      <a href="codex-part-3-tokens-onboarding.html"><small>Part 3</small>Fewer tokens, faster onboarding</a>
+      <a href="codex-part-4-models-api-links.html"><small>Part 4</small>Codex models, the API and official links</a>
+      <a class="on" href="codex-part-5-daily-workflow.html"><small>Part 5 &middot; Advanced</small>Working with Codex day to day</a>
+      <a href="codex-part-6-extend-and-surfaces.html"><small>Part 6 &middot; Advanced</small>Extending Codex</a>
+      <a href="codex-part-7-automation-and-teams.html"><small>Part 7 &middot; Advanced</small>Automation and teams</a>
+      <a href="codex-part-8-beyond-code-learning-path.html"><small>Part 8 &middot; Advanced</small>Beyond code and your learning path</a>
+    </div>
+
+    <p class="lede">Parts 1 to 4 got you installed, safe, and set up with project memory, cost awareness and a feel for the models. This is where the advanced level starts. You can run Codex; now the question is how to get good results from it every day: what to type, how to ship a change with git, how to review it, how to steer when it goes the wrong way, and what to do when something breaks. Everything here follows the official Prompting, Best practices, Worktrees, Code review and Troubleshooting pages, with my own advice marked as such.</p>
+
+    <div class="callout">
+      <strong>Part 5 in 60 seconds</strong>
+      <ul>
+        <li>A good prompt has four parts: goal, context, constraints, and &ldquo;done when&rdquo;.</li>
+        <li>For hard or unclear tasks, plan first: type <code>/plan</code> (or press <kbd>Shift</kbd>+<kbd>Tab</kbd>), then implement.</li>
+        <li>Give Codex a check it can run (tests, lint, a repro), and review the result with <code>/review</code> before you commit.</li>
+        <li>Use a git worktree when two chats would otherwise edit the same files.</li>
+        <li>While Codex works, you can steer it (Enter in the CLI) or queue a follow-up (Tab).</li>
+        <li>Keep one chat per outcome. When a chat is stuck, check for a pending approval, then start fresh with a smaller prompt.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents of Part 5</strong></summary>
+      <ol>
+        <li><a href="#prompt">The four-part prompt</a></li>
+        <li><a href="#phases">Explore, plan, implement, review, commit</a></li>
+        <li><a href="#patterns">Prompting patterns that work</a></li>
+        <li><a href="#recipes">Prompt recipes for everyday tasks</a></li>
+        <li><a href="#verify">Give Codex a way to check its work</a></li>
+        <li><a href="#interview">Big feature? Let Codex interview you</a></li>
+        <li><a href="#git">Git with Codex: branch, commit, pull request</a></li>
+        <li><a href="#worktrees">Worktrees and parallel chats</a></li>
+        <li><a href="#review">Code review: local changes and pull requests</a></li>
+        <li><a href="#steer">Steering, queueing and long-running work</a></li>
+        <li><a href="#chats">Projects, chats and resuming</a></li>
+        <li><a href="#fix">When something goes wrong</a></li>
+        <li><a href="#end5">Wrap-up, glossary and links</a></li>
+      </ol>
+    </details>
+
+    <h2 id="prompt">1. The four-part prompt</h2>
+    <p>Codex is strong enough to be useful even when your prompt is not perfect. The official Best practices page says so directly. But clear prompts make results more reliable, especially in a big codebase or when the stakes are higher. The page recommends a good default: include four things.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="Four boxes: Goal, Context, Constraints and Done when, which together make a prompt that Codex can act on.">
+        <rect class="boxb" x="6"   y="20" width="146" height="110" rx="14"/><text class="b c" x="79"  y="48">Goal</text><text class="sub c" x="79"  y="72">what should change</text><text class="sub c" x="79"  y="90">or be built?</text>
+        <rect class="boxg" x="168" y="20" width="146" height="110" rx="14"/><text class="b c" x="241" y="48">Context</text><text class="sub c" x="241" y="72">files, folders, docs,</text><text class="sub c" x="241" y="90">examples, errors</text>
+        <rect class="boxo" x="330" y="20" width="146" height="110" rx="14"/><text class="b c" x="403" y="48">Constraints</text><text class="sub c" x="403" y="72">standards, safety,</text><text class="sub c" x="403" y="90">conventions</text>
+        <rect class="boxp" x="492" y="20" width="142" height="110" rx="14"/><text class="b c" x="563" y="48">Done when</text><text class="sub c" x="563" y="72">tests pass, bug gone,</text><text class="sub c" x="563" y="90">behavior changed</text>
+        <text class="sub c" x="320" y="162">This keeps Codex scoped, reduces guessing, and makes the work easier for you to review.</text>
+      </svg>
+      <figcaption>The four-part default from the official Best practices page. Use only the parts that help; a one-line prompt is fine for a one-line change.</figcaption>
+    </figure>
+    <p>Here is that shape as one prompt (my example, in the style of the docs):</p>
+<pre><code>Goal: users who log out and log back in lose their saved filters. Fix it.
+Context: start with @src/session/restore.ts and the test in @tests/session.test.ts.
+Constraints: do not change the public API; keep the fix minimal.
+Done when: a new regression test fails before the fix and passes after, and
+the existing session tests still pass.</code></pre>
+    <p>The same page suggests choosing the reasoning effort to fit the job: low for faster, well-scoped tasks, medium or high for complex changes or debugging, and extra high for long, agentic, reasoning-heavy tasks. As of 18 October 2026 it says to use GPT-6.1 Sol when it is available to your account and client, and to start with High for GPT-6 Luna or Light for GPT-6 Astra (<code>low</code> in configuration). Model lineups change, so check Part 4 and the official Models page before you rely on that.</p>
+
+    <h2 id="phases">2. Explore, plan, implement, review, commit</h2>
+    <p>Letting an agent jump straight to code can produce a tidy answer to the wrong question. The official Best practices page says to plan first when the task is complex, ambiguous or hard to describe. Here is the workflow I follow, built from features the docs describe:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="Five phases: explore, plan with plan mode, implement, review with the review command, and commit. A note says to skip planning if you could describe the change in one sentence.">
+        <rect class="boxg" x="6"   y="20" width="116" height="110" rx="14"/><text class="b c" x="64"  y="48">1. Explore</text><text class="sub c" x="64"  y="70">read and ask,</text><text class="sub c" x="64"  y="86">change nothing</text>
+        <rect class="boxb" x="130" y="20" width="116" height="110" rx="14"/><text class="b c" x="188" y="48">2. Plan</text><text class="sub c" x="188" y="70">/plan, answer</text><text class="sub c" x="188" y="86">its questions</text>
+        <rect class="boxo" x="254" y="20" width="116" height="110" rx="14"/><text class="b c" x="312" y="48">3. Implement</text><text class="sub c" x="312" y="70">code, run the</text><text class="sub c" x="312" y="86">checks, fix</text>
+        <rect class="boxp" x="378" y="20" width="116" height="110" rx="14"/><text class="b c" x="436" y="48">4. Review</text><text class="sub c" x="436" y="70">/review and</text><text class="sub c" x="436" y="86">/diff, you read</text>
+        <rect class="boxr" x="502" y="20" width="132" height="110" rx="14"/><text class="b c" x="568" y="48">5. Commit</text><text class="sub c" x="568" y="70">commit, push,</text><text class="sub c" x="568" y="86">open a PR</text>
+        <path class="arrow" d="M123,75 L128,75"/><path class="arrow" d="M247,75 L252,75"/><path class="arrow" d="M371,75 L376,75"/><path class="arrow" d="M495,75 L500,75"/>
+        <rect class="ghost" x="6" y="150" width="628" height="50" rx="12"/><text class="b" x="22" y="172">When to skip steps 1 and 2</text><text class="sub" x="22" y="190">If you could describe the diff in one sentence (a typo, a log line, a rename), just ask for it directly.</text>
+      </svg>
+      <figcaption>Planning has a cost. It pays off when the approach is uncertain, several files change, or the code is unfamiliar.</figcaption>
+    </figure>
+    <p>For planning, the docs name three options:</p>
+    <ul>
+      <li><strong>Plan mode.</strong> The docs call this the easiest and most effective option for most people. Codex gathers context, asks clarifying questions and builds a stronger plan before it implements anything. Toggle it with <code>/plan</code> or <kbd>Shift</kbd>+<kbd>Tab</kbd>. In the CLI you can add the first request inline, for example <code>/plan Propose a migration plan for this service</code>. Note that <code>/plan</code> is temporarily unavailable while Codex is already working.</li>
+      <li><strong>Ask Codex to interview you</strong> (section 6).</li>
+      <li><strong>A <code>PLANS.md</code> template</strong> for longer, multi-step work. The docs point to an execution-plans guide in the OpenAI Cookbook for this.</li>
+    </ul>
+    <p>The steps as prompts (my wording):</p>
+<pre><code># 1. Explore (read-only questions)
+Read @src/auth and explain how sessions and login work.
+Also tell me where secrets are loaded from. Do not change anything.
+
+# 2. Plan
+/plan I want to add Google sign-in. Which files change, and what is the session flow?
+
+# 3. Implement (after you accept the plan)
+Implement the plan. Add tests for the callback handler,
+run the test suite, and fix any failures.
+
+# 4. Review
+/review
+
+# 5. Commit
+Commit this with a descriptive message.</code></pre>
+    <p>A wrong assumption fixed in the plan costs one sentence. The same assumption fixed after twenty edited files costs a lot more.</p>
+
+    <h2 id="patterns">3. Prompting patterns that work</h2>
+    <p>The Prompting page says a useful Codex prompt &ldquo;names the behavior you want, points to the relevant code or reproduction steps, preserves important constraints, and says how to verify the change.&rdquo; Here is how to turn that into habits.</p>
+    <table>
+      <tr><th>Habit</th><th>Weak prompt</th><th>Stronger prompt</th></tr>
+      <tr><td><strong>Describe the result</strong></td><td>look at the settings page</td><td>make the Save button on settings persist the toggle after a page refresh</td></tr>
+      <tr><td><strong>Point at the code</strong></td><td>add a test</td><td>Add a test for the invert_list function in @transform.ts. Cover the happy path plus edge cases. (From the docs.)</td></tr>
+      <tr><td><strong>Give the reproduction</strong></td><td>fix the bug</td><td>A numbered list of repro steps, the expected result, and the actual result. The docs say repro steps and constraints matter more than a high-level description.</td></tr>
+      <tr><td><strong>Set boundaries</strong></td><td>clean this up</td><td>Do not change the API shape. Keep the fix minimal and add a regression test if feasible.</td></tr>
+      <tr><td><strong>Say how to verify</strong></td><td>make it work</td><td>After the fix, run lint plus the smallest relevant test suite. Report the commands and results.</td></tr>
+    </table>
+    <p>The Prompting page also advises starting with the result, not a detailed list of steps. Describe a process only when the process itself matters; otherwise leave Codex room to search and adjust its approach.</p>
+
+    <h3>Give Codex richer context</h3>
+    <ul>
+      <li><strong>Reference files with <code>@</code>.</strong> In the CLI, type <code>@</code> to search for a file in the workspace and add its path to your prompt. <code>/mention src/lib/api.ts</code> attaches a specific file. The IDE extension automatically includes your open files as context; in the CLI you mention paths yourself.</li>
+      <li><strong>Attach images.</strong> In the CLI, drag an image file into the terminal, or start with <code>codex --image path</code> (short form <code>-i</code>). Useful for design mockups and error screenshots. Add the behavior the image cannot show, such as hover states and validation rules.</li>
+      <li><strong>Run a shell command from the prompt.</strong> Prefix a line with <code>!</code> and Codex runs it locally under your current approval and sandbox settings.</li>
+      <li><strong>Connect outside systems with MCP</strong> when the context lives outside the repo (Part 6).</li>
+      <li><strong>Move durable rules out of prompts.</strong> The docs list &ldquo;overloading the prompt with durable rules&rdquo; as a common mistake. Put those in <code>AGENTS.md</code> (Part 2) or a skill (Part 6).</li>
+    </ul>
+    <div class="note"><p>Tip from the docs: when Codex makes the same mistake twice, ask it for a retrospective and update <code>AGENTS.md</code>, so the guidance is based on real friction. In the CLI, <code>/init</code> scaffolds a starter <code>AGENTS.md</code>.</p></div>
+
+    <h2 id="recipes">4. Prompt recipes for everyday tasks</h2>
+    <p>These come from the official Prompting page (its Codex workflows). Adapt the wording to your project.</p>
+    <table>
+      <tr><th>Task</th><th>Prompt to try</th></tr>
+      <tr><td><strong>Understand a codebase</strong></td><td><code>I need to understand the protocol used by this service. Read @foo.ts @schema.ts and explain the schema and request/response flow. Focus on required vs optional fields and backward compatibility rules.</code><br>Ask for something you can verify: <code>Summarize the request flow as a numbered list of steps. Then list the files involved.</code></td></tr>
+      <tr><td><strong>Fix a bug</strong></td><td>Start Codex at the repo root, then give a bug description with numbered repro steps and constraints, and end with: <code>Start by reproducing the bug locally, then propose a patch and run checks.</code></td></tr>
+      <tr><td><strong>Write a test</strong></td><td><code>Add a test for the invert_list function in @transform.ts. Cover the happy path plus edge cases.</code> In the IDE: select the lines, choose &ldquo;Add to Codex Thread&rdquo; from the command palette, then <code>Write a unit test for this function. Follow conventions used in other tests.</code></td></tr>
+    </table>
+    <p>Notice that each recipe is a short conversation, not one giant prompt. You are not expected to get it perfect the first time: ask, read, refine. The docs also note that Codex does not have to be watched step by step; the Best practices page lists &ldquo;treating Codex like something you have to watch step by step&rdquo; as a mistake. Use it in parallel with your own work.</p>
+
+    <h2 id="verify">5. Give Codex a way to check its work</h2>
+    <p>The Best practices page puts it plainly: do not stop at asking Codex to make a change. Ask it to create tests when needed, run the relevant checks, confirm the result and review the work before you accept it. Codex can do this loop for you, but only if it knows what &ldquo;good&rdquo; looks like. That can come from the prompt or from <code>AGENTS.md</code>.</p>
+    <ul>
+      <li><strong>Write or update tests</strong> for the change.</li>
+      <li><strong>Run the right test suites</strong>, plus lint, formatting and type checks.</li>
+      <li><strong>Confirm the final behavior</strong> matches the request, for example by re-running the repro steps.</li>
+      <li><strong>Review the diff</strong> for bugs, regressions and risky patterns (section 9).</li>
+      <li><strong>Ask for evidence, not claims.</strong> &ldquo;Report the commands and results&rdquo; is a good ending for a prompt.</li>
+    </ul>
+    <p>The docs list &ldquo;not letting the agent see its work&rdquo; (no details on how to run build and test commands) as a common mistake. The fix is a few lines in <code>AGENTS.md</code>: your build, test and lint commands, and what &ldquo;done&rdquo; means. If you cannot verify a change, do not ship it. That one is my rule, not the docs'.</p>
+
+    <h2 id="interview">6. Big feature? Let Codex interview you</h2>
+    <p>If you have a rough idea but are not sure how to describe it, the docs suggest asking Codex to question you first, challenge your assumptions and turn the fuzzy idea into something concrete before writing code. A prompt in that spirit (my wording):</p>
+<pre><code>/plan I want to build [brief description]. Interview me first.
+Ask about technical choices, edge cases, concerns and tradeoffs.
+Challenge my assumptions. Don't ask obvious questions.
+When we're done, write a short spec to SPEC.md.</code></pre>
+
+    <h2 id="git">7. Git with Codex: branch, commit, pull request</h2>
+    <p>Codex works inside your git repository, and the desktop app has git actions built in. Here is the flow, and where you stay in charge.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="A git flow: create a branch, change with Codex, verify, review the diff, commit and push, then open a pull request that a person reviews and merges.">
+        <rect class="box" x="6"   y="30" width="96" height="70" rx="12"/><text class="b c" x="54"  y="58">Branch</text><text class="sub c" x="54"  y="78">new branch</text>
+        <rect class="boxb" x="114" y="30" width="96" height="70" rx="12"/><text class="b c" x="162" y="58">Change</text><text class="sub c" x="162" y="78">Codex edits</text>
+        <rect class="boxg" x="222" y="30" width="96" height="70" rx="12"/><text class="b c" x="270" y="58">Verify</text><text class="sub c" x="270" y="78">checks pass</text>
+        <rect class="boxo" x="330" y="30" width="96" height="70" rx="12"/><text class="b c" x="378" y="58">Review</text><text class="sub c" x="378" y="78">/review, /diff</text>
+        <rect class="boxp" x="438" y="30" width="96" height="70" rx="12"/><text class="b c" x="486" y="58">Commit, push</text><text class="sub c" x="486" y="78">open a PR</text>
+        <rect class="boxr" x="546" y="30" width="88" height="70" rx="12"/><text class="b c" x="590" y="58">Merge</text><text class="sub c" x="590" y="78">you decide</text>
+        <path class="arrow" d="M104,65 L112,65"/><path class="arrow" d="M212,65 L220,65"/><path class="arrow" d="M320,65 L328,65"/><path class="arrow" d="M428,65 L436,65"/><path class="arrow" d="M536,65 L544,65"/>
+        <rect class="ghost" x="6" y="124" width="628" height="94" rx="12"/>
+        <text class="b" x="22" y="148">Where you stay in charge</text>
+        <text class="sub" x="22" y="170">&#8226; Read the diff before you commit, and stage only the parts you want.</text>
+        <text class="sub" x="22" y="190">&#8226; Reviewing in a chat does not post comments, approve or merge on its own.</text>
+        <text class="sub" x="22" y="208">&#8226; My advice: use branch protection so nothing reaches your main branch unreviewed.</text>
+      </svg>
+      <figcaption>Codex can do the middle of the flow. The first and last decisions are yours.</figcaption>
+    </figure>
+    <table>
+      <tr><th>You want to&hellip;</th><th>How, according to the docs (or my advice where marked)</th></tr>
+      <tr><td>See what changed</td><td>CLI: <code>/diff</code> shows staged changes, unstaged changes and files Git is not tracking yet. App: open the review pane (section 9).</td></tr>
+      <tr><td>Stage or discard part of the work</td><td>App review pane: stage, unstage or revert the entire diff, a single file, or a single hunk.</td></tr>
+      <tr><td>Start a branch from a worktree chat</td><td>App: select <strong>Create branch here</strong> in the chat header. From there you can commit, push your branch, and open a pull request on GitHub.</td></tr>
+      <tr><td>Commit</td><td>Review the diff first. Then commit from the app's review pane, or ask in plain words (my advice): <code>Commit these changes with a short, descriptive message.</code> Keep your message style in <code>AGENTS.md</code>.</td></tr>
+      <tr><td>Open a pull request</td><td>Push the branch and open the PR on GitHub. Install and sign in to the GitHub CLI (<code>gh auth login</code>), which the docs say powers GitHub-specific features in the desktop app.</td></tr>
+      <tr><td>Fix a failing check on a PR</td><td>In the Code Review plugin, select <strong>Fix</strong> in <strong>Checks</strong> on an open PR. It attaches the failing checks to the chat and prepares a message without sending it. Add your prompt and send. Then inspect the changes and rerun the tests before you push.</td></tr>
+    </table>
+    <p>Tips that make this smoother:</p>
+    <ul>
+      <li><strong>Write your repository etiquette in <code>AGENTS.md</code></strong> (Part 2): branch naming, commit style, PR expectations, build and test commands. The Best practices page lists &ldquo;PR expectations&rdquo; among what a good <code>AGENTS.md</code> covers.</li>
+      <li><strong>Keep approvals tight.</strong> Part 1 covered approvals and the sandbox. The docs advise starting with the default permissions and loosening them only for trusted repos. You can change them mid-session with <code>/permissions</code>.</li>
+    </ul>
+
+    <h2 id="worktrees">8. Worktrees and parallel chats</h2>
+    <p>The Best practices page lists &ldquo;running live tasks on the same files without using Git worktrees&rdquo; as a common mistake. A <strong>git worktree</strong> is a second checkout of your repository. Each worktree has its own copy of every file, but they all share the same <code>.git</code> history, so you can work on several branches at once. Codex worktrees let several chats run in the same project without interfering with each other. They only work in projects that are part of a Git repository.</p>
+    <h3>In the desktop app</h3>
+    <ol class="steps">
+      <li>In a new chat, select <strong>Worktree</strong> under the composer. Optionally pick a local environment to run setup scripts.</li>
+      <li>Choose the starting branch below the composer. It can be <code>main</code>, a feature branch, or your current branch with unstaged changes.</li>
+      <li>Submit your prompt. Codex creates a worktree from that branch. By default it is in a &ldquo;detached HEAD&rdquo; state, so it does not pollute your branches.</li>
+      <li>Choose where to keep working: stay on the worktree and select <strong>Create branch here</strong>, or select <strong>Hand off</strong> to move the chat and code into your Local checkout.</li>
+    </ol>
+    <p>Think of Local as the foreground and Worktree as the background. A few facts worth knowing:</p>
+    <ul>
+      <li><strong>One branch, one place.</strong> Git allows a branch to be checked out in only one place at a time. If a branch is on a worktree, you cannot also check it out locally. If you plan to check it out locally, use Hand off instead of keeping it in both places.</li>
+      <li><strong>Ignored files do not come along.</strong> Worktrees start from files checked into Git. For ignored setup files such as <code>.env</code>, add a <code>.worktreeinclude</code> file at the repository root listing the paths or <code>.gitignore</code>-style patterns to copy. It applies to local managed worktrees made by the app, not ones you create yourself from the command line.</li>
+      <li><strong>Cleanup.</strong> By default Codex keeps your most recent 15 managed worktrees, and you can change that in settings. It will not auto-delete a worktree with a pinned chat, an in-progress chat, or a permanent worktree. Before deleting one, it saves a snapshot and offers to restore it.</li>
+    </ul>
+
+    <h3>In the CLI</h3>
+    <p>The CLI has a <code>--worktree</code> flag (start in a new managed Git worktree; local execution only) and a <code>/worktree</code> slash command, which lets you start a new chat or continue the current one in a new worktree. It is unavailable while a task is running. Parallel chats can also use subagents (Part 6); the rule stays the same: do not let two chats change the same files.</p>
+
+    <h2 id="review">9. Code review: local changes and pull requests</h2>
+    <p>The docs treat review as a first-class part of the loop. There are two different tools, and the Code review page keeps them apart: the built-in <code>/review</code> command reviews changes in your Git checkout, and the Code Review plugin works with pull requests.</p>
+    <h3>Review local changes with /review</h3>
+    <p>Type <code>/review</code> in the CLI, the app composer or the IDE extension. It only appears when the open project is inside a Git repository. Codex starts a dedicated reviewer that reads the diff and reports prioritized, actionable findings <em>without changing your working tree</em>. The CLI presets are:</p>
+    <table>
+      <tr><th>Scope</th><th>What it does</th></tr>
+      <tr><td><strong>Review against a base branch</strong></td><td>Finds the merge base and reviews your branch diff (PR-style).</td></tr>
+      <tr><td><strong>Review uncommitted changes</strong></td><td>Includes staged, unstaged and untracked files.</td></tr>
+      <tr><td><strong>Review a commit</strong></td><td>Reviews the exact change set of a selected commit.</td></tr>
+      <tr><td><strong>Custom review instructions</strong></td><td>Focuses the review on criteria you give, for example <code>/review Focus on edge cases and security issues</code>.</td></tr>
+    </table>
+    <p>Apply fixes, then run <code>/review</code> again to confirm they are resolved. By default the review runs in the current chat; the app has a <strong>Detached</strong> setting under <strong>Settings &gt; General &gt; Code review</strong> to start a separate review chat, and you can set <code>review_model</code> in <code>config.toml</code> to use a different model for reviews. From a script, <code>codex review</code> runs a non-interactive review with <code>--uncommitted</code>, <code>--base BRANCH</code> or <code>--commit SHA</code> (Part 7).</p>
+    <h3>The app's review pane</h3>
+    <p>The review pane reflects the state of your Git repository, not just what Codex edited. By default it shows <strong>Unstaged</strong> changes; switch to <strong>Staged</strong>, <strong>Commit</strong>, <strong>Branch</strong> (diff against your base branch) or <strong>Last turn</strong> (only the most recent assistant turn). To leave line-specific feedback, hover a line, select <strong>+</strong>, write your comment, and then send a message to the chat. The docs advise making your intent explicit, for example &ldquo;Address the inline comments and keep the scope minimal.&rdquo; The pane requires a project inside a Git repository.</p>
+    <h3>Review a pull request</h3>
+    <ul>
+      <li><strong>In the app:</strong> open <strong>Code Review</strong> from the sidebar, connect your source account, and select a pull request or paste its link. <strong>Summary</strong> shows the description, activity, comments and checks. <strong>Changes</strong> shows the diff with comments. Select <strong>Review with Codex</strong> to start a review in a new chat. You can also ask questions such as <code>Walk me through this pull request. Focus on the default filter and what happens when there are no matching issues.</code> and then <code>Show me the code path and tests for the no-matches case.</code></li>
+      <li><strong>Your team's rules:</strong> select the <strong>Review instructions</strong> gear or edit <strong>Settings &gt; Code Review</strong> to give criteria and a reporting format that apply to your reviews.</li>
+      <li><strong>On GitHub itself:</strong> comment <code>@codex review</code> on a pull request. Codex reacts and posts a standard GitHub review that flags only P0 and P1 issues. You can add focus, such as <code>@codex review for security vulnerabilities and security concerns</code>. This needs Codex code review enabled for the repository, and automatic reviews can be turned on in Codex settings. Add a <code>## Code Review Rules</code> section to the closest <code>AGENTS.md</code> to steer what it checks.</li>
+    </ul>
+    <div class="note"><p>Honest caveat from the docs: check every finding against the latest diff, the expected behavior and the tests before you decide it needs a fix. Reviewing a pull request in a chat does not post comments, approve or merge it. Posting in <strong>Summary</strong> or <strong>Changes</strong> sends the comment to GitHub immediately, so keep comments as drafts in the chat until you are ready.</p></div>
+
+    <h2 id="steer">10. Steering, queueing and long-running work</h2>
+    <p>You do not have to wait for Codex to finish before you speak. The Prompting page describes two behaviors for a message you send while Codex is working:</p>
+    <table>
+      <tr><th>Behavior</th><th>What happens</th><th>How</th></tr>
+      <tr><td><strong>Steer</strong></td><td>Adds your message to the current run. Use it to change direction, add a missing detail or share new information.</td><td>CLI: press <kbd>Enter</kbd> while Codex works. App: set the default in <strong>Settings &gt; General &gt; Follow-up behavior</strong>.</td></tr>
+      <tr><td><strong>Queue</strong></td><td>Saves your message for the next run. Use it for a follow-up that should wait.</td><td>CLI: press <kbd>Tab</kbd> while Codex works (this also works for slash commands and shell commands). App: queued messages appear above the composer, where you can edit, reorder, send or delete them.</td></tr>
+    </table>
+    <p>Other keys from the CLI reference worth knowing: press <kbd>Escape</kbd> twice with an empty composer to edit your previous message and fork the chat from that point; <kbd>Up</kbd> and <kbd>Down</kbd> restore draft history; <kbd>Ctrl</kbd>+<kbd>R</kbd> searches prompt history; <kbd>Ctrl</kbd>+<kbd>O</kbd> (or <code>/copy</code>) copies the latest finished output; <kbd>Ctrl</kbd>+<kbd>C</kbd> or <code>/exit</code> closes the session. If background commands are running, <code>/ps</code> lists them and <code>/stop</code> stops them. I did not find a documented shortcut that only interrupts the current turn, so check <code>/keymap</code> and the shortcut list for your version.</p>
+    <h3>Long-running work with /goal</h3>
+    <p>For work that may take many steps, give Codex a clear outcome, constraints and a definition of done, and keep related work in one chat. Type <code>/goal</code> in the CLI, the desktop app or the IDE extension. The goal text becomes both the first prompt and the completion criteria. In the CLI:</p>
+<pre><code>/goal Migrate this codebase from JavaScript to TypeScript. Preserve existing
+behavior, compile in strict mode without explicit `any` types, and make the
+full test suite pass.
+
+/goal            (view the current goal)
+/goal edit       (revise it)
+/goal pause      (pause)   /goal resume   /goal clear</code></pre>
+    <p>The docs say a good goal has three elements: an <strong>outcome</strong> (the result, not just the activity), <strong>constraints</strong> (tools, boundaries, things to avoid) and <strong>verification</strong> (tests, measurements or review criteria that prove it is done). Goal text must be non-empty and at most 4,000 characters; for longer instructions, put them in a file and point the goal at it. Starting a goal does not grant broader access: the same sandbox and approval policy apply, and it pauses when it needs a decision. For local work, turn on <strong>Prevent sleep while running</strong> in settings so your Mac stays awake.</p>
+
+    <h2 id="chats">11. Projects, chats and resuming</h2>
+    <p>The Best practices page says to keep one chat per coherent unit of work, and lists &ldquo;using one chat for an entire project&rdquo; as a mistake because it bloats context. If the work is still the same problem, staying in the same chat preserves the reasoning trail. Fork only when the work truly branches.</p>
+    <ul>
+      <li><strong>Projects in the app.</strong> The Projects view holds local projects that connect to folders on your computer. A project can have several folders; the primary folder is where new chats start, and where Codex finds <code>AGENTS.md</code>, skills and <code>config.toml</code>. Start a separate chat for each distinct outcome. You can pin, rename, search and archive chats.</li>
+      <li><strong>Projects in the CLI.</strong> The directory where you start Codex is the project. Run <code>codex</code> from the folder you want, or pass <code>--cd</code> (<code>-C</code>).</li>
+      <li><strong>Resume a saved chat.</strong> Run <code>codex resume</code> for a picker, <code>codex resume --last</code> for the most recent chat from the current directory (add <code>--all</code> to include other directories), or <code>codex resume SESSION_ID</code>. Inside the CLI, use <code>/resume</code>. If the saved directory differs from yours, Codex asks which to use; <code>tui.resume_cwd</code> can remember the answer.</li>
+      <li><strong>Fork.</strong> <code>/fork</code> (or <code>codex fork</code>) creates a new chat while preserving the original transcript.</li>
+      <li><strong>New chat.</strong> <code>/new</code> starts a fresh chat in the same CLI session; <code>/clear</code> clears the terminal and starts a new chat too.</li>
+      <li><strong>Check state.</strong> <code>/status</code> shows the active model, approval policy, writable roots and token usage.</li>
+    </ul>
+    <p>The chat keeps its transcript and recorded working directory, but Codex reads files from the current working tree. So keep durable guidance in <code>AGENTS.md</code> or checked-in docs, not only in a chat.</p>
+
+    <h2 id="fix">12. When something goes wrong</h2>
+    <p>Install and login problems were covered in Part 1. These are the problems you can hit once Codex is running. They come from the official Troubleshooting page unless I say otherwise. First, the general stuck-chat routine from that page: <strong>(1)</strong> check whether Codex is waiting for an approval, <strong>(2)</strong> open the terminal and run a basic command like <code>git status</code>, <strong>(3)</strong> start a new chat with a smaller, more focused prompt.</p>
+    <table>
+      <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+      <tr><td>Files appear in the review panel that Codex did not edit</td><td>The panel shows your project's Git state, including your own changes.</td><td>Switch the diff pane to the <strong>Last turn</strong> view to see only Codex's last turn.</td></tr>
+      <tr><td>Code does not run in a worktree</td><td>Worktrees are created elsewhere and inherit only files checked into Git, so dependencies and ignored files may be missing.</td><td>Run setup scripts through a local environment, copy ignored files with <code>.worktreeinclude</code>, or check out the changes in your regular project.</td></tr>
+      <tr><td>&ldquo;<code>fatal: '...' is already used by worktree</code>&rdquo; when you check out a branch</td><td>Git allows a branch to be checked out in one place at a time.</td><td>Use Hand off to move the chat to Local, or check out a different branch on the worktree.</td></tr>
+      <tr><td>A chat seems stuck</td><td>Often a pending approval.</td><td>Check for an approval prompt, run <code>git status</code> in the terminal, or start a new chat with a smaller prompt.</td></tr>
+      <tr><td>You started a chat on the wrong target (Local, Worktree or Cloud), or cancelled worktree creation and lost your prompt</td><td>Easy to click the wrong one.</td><td>Cancel the run and press the up arrow in the composer to recover your previous prompt.</td></tr>
+      <tr><td>A feature works in the CLI but not in the desktop app (or the reverse)</td><td>The two can bundle different Codex versions.</td><td>Compare <code>codex --version</code> with the app's bundled copy: <code>/Applications/Codex.app/Contents/Resources/codex --version</code> on macOS.</td></tr>
+      <tr><td>A setting does not seem to apply</td><td>Another config layer or a policy is overriding it.</td><td>Run <code>/debug-config</code> to see config layer order, on/off state and policy sources.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Feedback and logs</strong>
+      <p>Type <code>/</code> in the composer to send feedback; you get a session ID you can share. You can also search or open an issue on the openai/codex GitHub repository. Session transcripts are stored in <code>$CODEX_HOME/sessions</code> (default <code>~/.codex/sessions</code>), and on macOS the app logs are in <code>~/Library/Logs/com.openai.codex/</code>. The docs remind you to review logs for sensitive information before sharing them.</p>
+    </div>
+    <div class="callout">
+      <strong>A general rule for a bad session</strong>
+      <p>If Codex is going in circles, the cause is often the setup, not the model. The Best practices page says many quality issues are really setup issues: the wrong working directory, missing write access, wrong model defaults, or missing tools. Run <code>/status</code>, check the directory and branch, and look at what <code>AGENTS.md</code> tells it. Then start a clean chat with a better first prompt (goal, context, constraints, done when). That almost always beats a long chat full of corrections.</p>
+    </div>
+
+    <h2 id="end5">13. Wrap-up, glossary and links</h2>
+    <ol>
+      <li>Write prompts with a goal, context, constraints and a &ldquo;done when&rdquo;.</li>
+      <li>Plan first (<code>/plan</code>) unless the change is one sentence.</li>
+      <li>Always give Codex a check to run, and review with <code>/review</code> and <code>/diff</code> before you commit.</li>
+      <li>Use worktrees so parallel chats never edit the same files.</li>
+      <li>Steer with Enter, queue with Tab, and use <code>/goal</code> for long work.</li>
+      <li>One chat per outcome; when stuck, check approvals and <code>git status</code>, then start fresh.</li>
+    </ol>
+    <p>Next, <a href="codex-part-6-extend-and-surfaces.html">Part 6</a> extends Codex: connecting outside tools with MCP, skills, plugins and subagents, and choosing between the CLI, IDE extension and desktop app. If you want to revisit models and plans first, that was <a href="codex-part-4-models-api-links.html">Part 4</a>.</p>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Plan mode</td><td>Codex investigates and proposes an approach before it edits anything. Toggle with <code>/plan</code>.</td></tr>
+      <tr><td><code>@</code> reference</td><td>Typing <code>@</code> and a path to add a file to the prompt.</td></tr>
+      <tr><td>Steer / queue</td><td>Send a message into the current run, or save it for the next run.</td></tr>
+      <tr><td>Worktree</td><td>A separate checkout of a git repository, for parallel work.</td></tr>
+      <tr><td>Hand off</td><td>Moving a chat and its code between Local and a worktree.</td></tr>
+      <tr><td><code>/review</code></td><td>A built-in reviewer for your Git changes that reports findings without changing files.</td></tr>
+      <tr><td>Goal mode</td><td><code>/goal</code>: a persistent target for a long task, with completion criteria.</td></tr>
+      <tr><td>Pull request (PR)</td><td>A request to merge your branch, with a description and review.</td></tr>
+    </table>
+
+    <h3>Links and official docs</h3>
+    <div class="note"><p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages.</p></div>
+    <ul>
+      <li><a href="https://developers.openai.com/codex/prompting" target="_blank" rel="noopener">Prompting</a></li>
+      <li><a href="https://developers.openai.com/codex/learn/best-practices" target="_blank" rel="noopener">Best practices</a></li>
+      <li><a href="https://developers.openai.com/codex/cli/slash-commands" target="_blank" rel="noopener">Slash commands in Codex CLI</a></li>
+      <li><a href="https://developers.openai.com/codex/cli/reference" target="_blank" rel="noopener">CLI command reference</a></li>
+      <li><a href="https://developers.openai.com/codex/app/worktrees" target="_blank" rel="noopener">Worktrees</a></li>
+      <li><a href="https://developers.openai.com/codex/code-review" target="_blank" rel="noopener">Code review</a></li>
+      <li><a href="https://developers.openai.com/codex/integrations/github" target="_blank" rel="noopener">Use Codex in GitHub</a></li>
+      <li><a href="https://developers.openai.com/codex/long-running-work" target="_blank" rel="noopener">Long-running work</a></li>
+      <li><a href="https://developers.openai.com/codex/projects" target="_blank" rel="noopener">Projects and chats</a></li>
+      <li><a href="https://developers.openai.com/codex/reference/troubleshooting" target="_blank" rel="noopener">Troubleshooting</a></li>
+    </ul>
+
+    <div class="pager">
+      <a class="prev" href="codex-part-4-models-api-links.html"><small>&larr; Previous &middot; Part 4</small>Codex models, the API and official links</a>
+      <a class="next" href="codex-part-6-extend-and-surfaces.html"><small>Next &middot; Part 6 &rarr;</small>Extending Codex</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+/* Reading analytics: sends events to the Google Analytics tag in <head> */
+(function () {
+  if (typeof gtag !== 'function') return;
+  var part = document.body.dataset.part || '';
+  var ev = function (name, params) { gtag('event', name, Object.assign({ series: 'codex', part: part }, params || {})); };
+
+  var marks = [25, 50, 75, 100], seen = {};
+  function onScroll() {
+    var h = document.documentElement;
+    var pct = Math.round((h.scrollTop + innerHeight) / h.scrollHeight * 100);
+    marks.forEach(function (m) { if (pct >= m && !seen[m]) { seen[m] = 1; ev('scroll_depth', { percent: m }); } });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a');
+    if (a) {
+      if (a.closest('.series, .pager')) ev('series_nav', { target: a.getAttribute('href') });
+      else if (a.closest('.toc')) ev('toc_click', { target: a.getAttribute('href') });
+      else if (a.hostname && a.hostname !== location.hostname) ev('outbound_click', { url: a.href });
+    }
+  });
+  document.addEventListener('copy', function () {
+    var s = String(getSelection()); if (s.length > 3) ev('copy_text', { chars: s.length });
+  });
+
+  var t0 = Date.now();
+  addEventListener('pagehide', function () { ev('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000) }); });
+})();
+</script>
+</body>
+</html>
