@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Building Effective Agents in Practice: Delivering Jira and Crashlytics Fixes as Pull Requests — Khairul Alam</title>
+  <meta name="description" content="Building effective agents in practice: how a Jira ticket, a plain spec or a Firebase Crashlytics crash becomes a tested pull request, using a simple workflow with one agent step. Patterns, tool design, automatic prompts and guardrails, with diagrams." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">AI engineering &middot; Agentic delivery</p>
+    <h1>Building Effective Agents in Practice: Delivering Jira and Crashlytics Fixes as Pull Requests</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~15 min read</span></div>
+    <div class="tags"><span class="tag">AI agents</span><span class="tag">Building effective agents</span><span class="tag">Jira</span><span class="tag">Crashlytics</span><span class="tag">CI/CD</span></div>
+
+    <p class="lede">A change can start as a Jira ticket, a plain spec, or a crash report, and the path to a pull request can be automated. This article uses the framework from Anthropic&rsquo;s <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a> to show how: a simple workflow, with one agent step in the middle, checks around it, and a person at the end.</p>
+
+    <div class="callout">
+      <strong>In brief</strong>
+      <ul>
+        <li><strong>Based on</strong> <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Anthropic&rsquo;s <em>Building effective agents</em></a>: start simple, use <em>workflows</em> where the path is known, and an <em>agent</em> only where the steps cannot be predicted.</li>
+        <li>Three inputs (<strong>Jira, plain spec, Crashlytics</strong>) become one task format, then follow the same pipeline.</li>
+        <li>The pipeline is a <strong>workflow with one agent step</strong>. RAG is a retrieval capability inside it, not an alternative.</li>
+        <li>Prompts are <strong>written by code from templates</strong>. The agent can open a <strong>draft PR</strong>; a person merges.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#idea">The idea behind it</a></li>
+        <li><a href="#cycle">The cycle</a></li>
+        <li><a href="#inputs">Three ways in</a></li>
+        <li><a href="#crash">Crashlytics to fix</a></li>
+        <li><a href="#patterns">The patterns applied</a></li>
+        <li><a href="#llm">Where the LLM is needed</a></li>
+        <li><a href="#rag">LLM, RAG or agent?</a></li>
+        <li><a href="#components">Parts of the augmented LLM</a></li>
+        <li><a href="#prompts">Automatic prompts</a></li>
+        <li><a href="#aci">Tool design for coding agents</a></li>
+        <li><a href="#delivery">Push, review and the one-click button</a></li>
+        <li><a href="#safety">Principles, guardrails and rollout</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="idea">1. The idea behind it</h2>
+    <p>This article applies Anthropic&rsquo;s engineering essay <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener"><strong>Building effective agents</strong></a> (Dec 2024) to one job: delivering a code change. Its advice is to prefer &ldquo;simple, composable patterns&rdquo; over complex frameworks, and it separates two kinds of <em>agentic systems</em>:</p>
+    <ul>
+      <li><strong>Workflows</strong>: LLMs and tools orchestrated through <em>predefined code paths</em>.</li>
+      <li><strong>Agents</strong>: LLMs that <em>dynamically direct their own process</em> and tool use.</li>
+    </ul>
+    <p>The essay describes five workflow patterns and then the agent. Everything in this article is built from these six pieces.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 286" role="img" aria-label="Six patterns from Building effective agents. Prompt chaining, routing, parallelization, orchestrator-workers and evaluator-optimizer are workflows. The agent is a model directing its own loop with tools.">
+        <rect class="rule" x="4"   y="4"   width="204" height="132" rx="12" style="fill:none"/>
+        <text class="b c" x="106" y="22">Prompt chaining</text><text class="sub c" x="106" y="36">workflow</text>
+        <rect class="boxp" x="14"  y="52" width="46" height="30" rx="7"/><text class="c" x="37"  y="72" style="font-size:12px">LLM</text>
+        <rect class="boxo" x="80"  y="52" width="46" height="30" rx="7"/><text class="c" x="103" y="72" style="font-size:12px">gate</text>
+        <rect class="boxp" x="146" y="52" width="46" height="30" rx="7"/><text class="c" x="169" y="72" style="font-size:12px">LLM</text>
+        <path class="arrow" d="M61,67 L78,67"/><path class="arrow" d="M127,67 L144,67"/>
+        <text class="sub c" x="106" y="122">fixed steps, each feeds the next</text>
+
+        <rect class="rule" x="218" y="4"   width="204" height="132" rx="12" style="fill:none"/>
+        <text class="b c" x="320" y="22">Routing</text><text class="sub c" x="320" y="36">workflow</text>
+        <rect class="box"  x="228" y="62" width="40" height="28" rx="7"/><text class="c" x="248" y="81" style="font-size:12px">In</text>
+        <rect class="boxo" x="284" y="62" width="50" height="28" rx="7"/><text class="c" x="309" y="81" style="font-size:12px">Route</text>
+        <rect class="boxp" x="362" y="44" width="48" height="22" rx="6"/><text class="c" x="386" y="60" style="font-size:12px">A</text>
+        <rect class="boxp" x="362" y="65" width="48" height="22" rx="6"/><text class="c" x="386" y="81" style="font-size:12px">B</text>
+        <rect class="boxp" x="362" y="86" width="48" height="22" rx="6"/><text class="c" x="386" y="102" style="font-size:12px">C</text>
+        <path class="arrow" d="M270,76 L282,76"/><path class="arrow" d="M336,70 L360,55"/><path class="arrow" d="M336,76 L360,76"/><path class="arrow" d="M336,82 L360,97"/>
+        <text class="sub c" x="320" y="126">classify, then specialise</text>
+
+        <rect class="rule" x="432" y="4"   width="204" height="132" rx="12" style="fill:none"/>
+        <text class="b c" x="534" y="22">Parallelization</text><text class="sub c" x="534" y="36">workflow</text>
+        <rect class="box"  x="442" y="62" width="40" height="28" rx="7"/><text class="c" x="462" y="81" style="font-size:12px">In</text>
+        <rect class="boxp" x="508" y="44" width="52" height="22" rx="6"/><text class="c" x="534" y="60" style="font-size:12px">LLM</text>
+        <rect class="boxp" x="508" y="65" width="52" height="22" rx="6"/><text class="c" x="534" y="81" style="font-size:12px">LLM</text>
+        <rect class="boxp" x="508" y="86" width="52" height="22" rx="6"/><text class="c" x="534" y="102" style="font-size:12px">LLM</text>
+        <rect class="boxo" x="586" y="62" width="44" height="28" rx="7"/><text class="c" x="608" y="81" style="font-size:12px">Join</text>
+        <path class="arrow" d="M484,70 L506,55"/><path class="arrow" d="M484,76 L506,76"/><path class="arrow" d="M484,82 L506,97"/>
+        <path class="arrow" d="M562,55 L584,70"/><path class="arrow" d="M562,76 L584,76"/><path class="arrow" d="M562,97 L584,82"/>
+        <text class="sub c" x="534" y="126">split or vote, then combine</text>
+
+        <rect class="rule" x="4"   y="148" width="204" height="132" rx="12" style="fill:none"/>
+        <text class="b c" x="106" y="166">Orchestrator-workers</text><text class="sub c" x="106" y="180">workflow</text>
+        <rect class="boxp" x="12"  y="206" width="62" height="34" rx="7"/><text class="c" x="43" y="227" style="font-size:12px">Planner</text>
+        <rect class="boxp" x="104" y="188" width="48" height="22" rx="6"/><text class="c" x="128" y="204" style="font-size:12px">W1</text>
+        <rect class="boxp" x="104" y="209" width="48" height="22" rx="6"/><text class="c" x="128" y="225" style="font-size:12px">W2</text>
+        <rect class="boxp" x="104" y="230" width="48" height="22" rx="6"/><text class="c" x="128" y="246" style="font-size:12px">W3</text>
+        <rect class="boxo" x="170" y="208" width="34" height="30" rx="7"/><text class="c" x="187" y="227" style="font-size:12px">Join</text>
+        <path class="arrow" d="M76,218 L102,200"/><path class="arrow" d="M76,223 L102,220"/><path class="arrow" d="M76,228 L102,241"/>
+        <path class="arrow" d="M154,200 L168,218"/><path class="arrow" d="M154,220 L168,223"/><path class="arrow" d="M154,241 L168,228"/>
+        <text class="sub c" x="106" y="270">subtasks decided at run time</text>
+
+        <rect class="rule" x="218" y="148" width="204" height="132" rx="12" style="fill:none"/>
+        <text class="b c" x="320" y="166">Evaluator-optimizer</text><text class="sub c" x="320" y="180">workflow</text>
+        <rect class="boxg" x="230" y="204" width="76" height="36" rx="8"/><text class="c" x="268" y="227" style="font-size:12px">Generate</text>
+        <rect class="boxo" x="334" y="204" width="76" height="36" rx="8"/><text class="c" x="372" y="227" style="font-size:12px">Evaluate</text>
+        <path class="arrow" d="M308,214 L332,214"/><path class="arrow" d="M332,232 L308,232"/>
+        <text class="sub c" x="320" y="258">feedback</text>
+        <text class="sub c" x="320" y="272">loop until good enough</text>
+
+        <rect class="boxp" x="432" y="148" width="204" height="132" rx="12" style="opacity:.55"/>
+        <text class="b c" x="534" y="166">Agent</text><text class="sub c" x="534" y="180">model directs its own loop</text>
+        <rect class="boxp" x="444" y="204" width="76" height="36" rx="8"/><text class="c" x="482" y="227" style="font-size:12px">LLM</text>
+        <rect class="boxo" x="548" y="204" width="76" height="36" rx="8"/><text class="c" x="586" y="227" style="font-size:12px">Tools</text>
+        <path class="arrow" d="M522,214 L546,214"/><path class="arrow" d="M546,232 L522,232"/>
+        <text class="sub c" x="534" y="258">real results as ground truth</text>
+        <text class="sub c" x="534" y="272">stops on done or a limit</text>
+      </svg>
+      <figcaption>Five workflows and the agent, from <em>Building effective agents</em>. Pick the simplest one that works.</figcaption>
+    </figure>
+    <p>The essay&rsquo;s guidance: find the simplest solution and add complexity only when it clearly improves results. Agents trade latency and cost for flexibility, so use one where the number of steps cannot be predicted. Software delivery is a good fit because tests give the agent objective feedback, while a person still reviews the result.</p>
+
+    <h2 id="cycle">2. The cycle</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 252" role="img" aria-label="Three sources, a Jira ticket, a plain spec and a Crashlytics issue, go into intake, then prompt, agent, checks, and a draft pull request. A person reviews, the change is merged and released, and Crashlytics monitors the fix in production.">
+        <text class="sub b" x="8" y="16">Start: one click, a Jira rule, or a Crashlytics alert</text>
+        <rect class="boxb" x="8" y="28"  width="112" height="42" rx="9"/><text class="b c" x="64" y="46">Jira ticket</text><text class="sub c" x="64" y="62">story or bug</text>
+        <rect class="boxb" x="8" y="80"  width="112" height="42" rx="9"/><text class="b c" x="64" y="98">Plain spec</text><text class="sub c" x="64" y="114">text or Markdown</text>
+        <rect class="boxo" x="8" y="132" width="112" height="42" rx="9"/><text class="b c" x="64" y="150">Crashlytics</text><text class="sub c" x="64" y="166">crash issue</text>
+        <path class="arrow" d="M122,49 L138,98"/><path class="arrow" d="M122,101 L138,104"/><path class="arrow" d="M122,153 L138,112"/>
+        <rect class="box"  x="140" y="78" width="84" height="56" rx="10"/><text class="b c" x="182" y="102">Intake</text><text class="sub c" x="182" y="120">one format</text>
+        <rect class="boxp" x="238" y="78" width="84" height="56" rx="10"/><text class="b c" x="280" y="102">Prompt</text><text class="sub c" x="280" y="120">auto-built</text>
+        <rect class="boxg" x="336" y="78" width="84" height="56" rx="10"/><text class="b c" x="378" y="102">Agent</text><text class="sub c" x="378" y="120">LLM + tools</text>
+        <rect class="box"  x="434" y="78" width="84" height="56" rx="10"/><text class="b c" x="476" y="102">Checks</text><text class="sub c" x="476" y="120">plain code</text>
+        <rect class="boxb" x="532" y="78" width="100" height="56" rx="10"/><text class="b c" x="582" y="102">Push + PR</text><text class="sub c" x="582" y="120">draft only</text>
+        <path class="arrow" d="M226,106 L236,106"/><path class="arrow" d="M324,106 L334,106"/><path class="arrow" d="M422,106 L432,106"/><path class="arrow" d="M520,106 L530,106"/>
+        <path class="rule" d="M140,146 L520,146"/><text class="sub" x="140" y="162">unattended, in a sandbox, no IDE</text>
+        <path class="arrow" d="M582,136 L582,186"/>
+        <rect class="boxr" x="532" y="188" width="100" height="44" rx="10"/><text class="b c" x="582" y="208">Review</text><text class="sub c" x="582" y="224">a person</text>
+        <rect class="box"  x="396" y="188" width="114" height="44" rx="10"/><text class="b c" x="453" y="208">Merge, release</text><text class="sub c" x="453" y="224">your pipeline</text>
+        <rect class="boxo" x="232" y="188" width="142" height="44" rx="10"/><text class="b c" x="303" y="208">Monitor</text><text class="sub c" x="303" y="224">crash-free rate</text>
+        <path class="arrow" d="M530,210 L512,210"/><path class="arrow" d="M394,210 L376,210"/>
+        <path class="arrow" d="M230,210 L64,210 L64,176" style="stroke-dasharray:5 4"/>
+      </svg>
+      <figcaption>The same line serves every input. The dashed arrow closes the loop: production data confirms the fix, or raises the next alert.</figcaption>
+    </figure>
+
+    <h2 id="inputs">3. Three ways in</h2>
+    <table>
+      <tr><th>Input</th><th>What starts it</th><th>What intake fetches</th><th>Watch out for</th></tr>
+      <tr><td><strong>Jira ticket</strong></td><td>A button, or an automation rule on a label such as <code>ai-ok</code></td><td>Summary, description, type, acceptance criteria, links</td><td>Vague tickets. Stop and ask when criteria are missing</td></tr>
+      <tr><td><strong>Plain spec</strong></td><td>A command or a workflow run</td><td>The text itself (optionally cleaned up by a model)</td><td>No fields, so the goal must be extracted</td></tr>
+      <tr><td><strong>Crashlytics issue</strong></td><td>A Firebase alert: new fatal issue, regression, or velocity</td><td>Stack trace, exception, app version, OS and device, user count, logs</td><td>Obfuscated traces and personal data (see next section)</td></tr>
+    </table>
+    <p>Whatever the source, intake produces the same JSON, so every later step is shared:</p>
+<pre><code>{
+  "source": "crashlytics",
+  "id": "a1b2c3",
+  "type": "bug",
+  "goal": "Fix NullPointerException in LoginViewModel.onSubmit",
+  "evidence": {
+    "users": 4210, "version": "3.8.1", "os": "Android 13-14",
+    "top_frame": "LoginViewModel.kt:57"
+  },
+  "acceptance": [
+    "No crash when the email is null",
+    "A unit test reproduces the crash first"
+  ],
+  "scope": ["app/src/main/java/com/example/login/"],
+  "open_questions": []
+}</code></pre>
+
+    <h2 id="crash">4. Crashlytics to fix</h2>
+    <p>A crash is a bug report written by production. The new part of this flow is the middle: the model works out <em>where</em> and <em>why</em>, then the agent decides and applies a fix. See also <a href="firebase-crashlytics-overview.html">Firebase Crashlytics: find and fix crashes faster</a>.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="Crashlytics flow. An alert passes a triage filter, intake fetches the crash data, a model locates the cause and files, the agent writes a failing test and a minimal fix, checks run, a draft PR links the issue, a person reviews, the change is released and the crash-free rate is monitored.">
+        <rect class="box"  x="8"   y="14" width="104" height="62" rx="10"/><text class="b c" x="60"  y="40">Alert</text><text class="sub c" x="60"  y="58">fatal, regression</text>
+        <rect class="box"  x="138" y="14" width="104" height="62" rx="10"/><text class="b c" x="190" y="40">Triage</text><text class="sub c" x="190" y="58">users, own code</text>
+        <rect class="boxb" x="268" y="14" width="104" height="62" rx="10"/><text class="b c" x="320" y="40">Fetch</text><text class="sub c" x="320" y="58">trace, logs</text>
+        <rect class="boxp" x="398" y="14" width="104" height="62" rx="10"/><text class="b c" x="450" y="40">Locate</text><text class="sub c" x="450" y="58">LLM: cause, files</text>
+        <rect class="boxp" x="528" y="14" width="104" height="62" rx="10"/><text class="b c" x="580" y="40">Fix</text><text class="sub c" x="580" y="58">agent: test, fix</text>
+        <path class="arrow" d="M114,45 L136,45"/><path class="arrow" d="M244,45 L266,45"/><path class="arrow" d="M374,45 L396,45"/><path class="arrow" d="M504,45 L526,45"/>
+        <path class="arrow" d="M580,78 L580,102 L60,102 L60,126"/>
+        <rect class="box"  x="8"   y="128" width="104" height="62" rx="10"/><text class="b c" x="60"  y="154">Checks</text><text class="sub c" x="60"  y="172">tests, lint, build</text>
+        <rect class="box"  x="138" y="128" width="104" height="62" rx="10"/><text class="b c" x="190" y="154">Push + PR</text><text class="sub c" x="190" y="172">links the issue</text>
+        <rect class="boxr" x="268" y="128" width="104" height="62" rx="10"/><text class="b c" x="320" y="154">Review</text><text class="sub c" x="320" y="172">a person decides</text>
+        <rect class="box"  x="398" y="128" width="104" height="62" rx="10"/><text class="b c" x="450" y="154">Release</text><text class="sub c" x="450" y="172">your pipeline</text>
+        <rect class="boxb" x="528" y="128" width="104" height="62" rx="10"/><text class="b c" x="580" y="154">Monitor</text><text class="sub c" x="580" y="172">crash-free rate</text>
+        <path class="arrow" d="M114,159 L136,159"/><path class="arrow" d="M244,159 L266,159"/><path class="arrow" d="M374,159 L396,159"/><path class="arrow" d="M504,159 L526,159"/>
+        <text class="sub c" x="320" y="214">Cannot reproduce it with a test, or low confidence? Stop and post the analysis, no PR.</text>
+        <rect class="box"  x="120" y="236" width="14" height="14" rx="3"/><text class="sub" x="140" y="248">plain code</text>
+        <rect class="boxp" x="230" y="236" width="14" height="14" rx="3"/><text class="sub" x="250" y="248">language model</text>
+        <rect class="boxb" x="370" y="236" width="14" height="14" rx="3"/><text class="sub" x="390" y="248">retrieval</text>
+        <rect class="boxr" x="460" y="236" width="14" height="14" rx="3"/><text class="sub" x="480" y="248">a person</text>
+      </svg>
+      <figcaption>The model decides the solution in the middle (Locate, then Fix). Code does everything before and after it.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Triage first.</strong> Only act on fatal issues above a user threshold, in your own code, on a supported app version. Skip SDK-only traces. Deduplicate by issue id.</li>
+      <li><strong>Readable traces.</strong> Upload mapping files (R8 or dSYM) so frames are symbolicated. A model cannot fix <code>a.b.c(Unknown)</code>.</li>
+      <li><strong>Strip personal data</strong> from logs and custom keys before they enter a prompt.</li>
+      <li><strong>Locate.</strong> The model maps frames to source files (code search, <code>git blame</code>), states a root-cause hypothesis and a confidence level.</li>
+      <li><strong>Test first.</strong> The agent must write a failing unit test that reproduces the crash, then a minimal fix. No reproducing test, no PR.</li>
+      <li><strong>Close the loop.</strong> The PR links the Crashlytics issue. After release, a falling crash rate confirms the fix; a regression alert restarts the flow.</li>
+    </ul>
+    <p>How the crash data reaches the pipeline depends on your setup: Firebase alerts through a Cloud Function, a scheduled query on the BigQuery export, or an MCP server that exposes Crashlytics to the agent. Check the current Firebase documentation for what is available.</p>
+
+    <h2 id="patterns">5. The patterns applied</h2>
+    <p>The pipeline is a <strong>workflow with one agent step</strong>. Each pattern from the essay has a natural place in it.</p>
+    <table>
+      <tr><th>Pattern</th><th>Where it appears</th></tr>
+      <tr><td><strong>Prompt chaining</strong></td><td>The backbone: intake, prompt, agent, checks, PR. Gates between steps: completeness (missing criteria stop the run), triage (crash thresholds), diff-size guard</td></tr>
+      <tr><td><strong>Routing</strong></td><td>Classify the input (feature, bug, chore, crash) and pick the matching template. Optionally send routine tickets to a smaller model and hard ones to a stronger model</td></tr>
+      <tr><td><strong>Parallelization</strong></td><td><em>Sectioning:</em> tests, lint and the secret scan run side by side. <em>Voting:</em> several independent review prompts look for risky changes</td></tr>
+      <tr><td><strong>Orchestrator-workers</strong></td><td>For a large ticket touching many files, a planner splits the work at run time and workers handle each part. Use only when one agent run is not enough</td></tr>
+      <tr><td><strong>Evaluator-optimizer</strong></td><td>The checks judge the change and the failure follow-up prompt makes the agent improve it. The optional review pass is the same idea with a second model as evaluator</td></tr>
+      <tr><td><strong>Agent</strong></td><td>The coding step itself: the number of steps is unpredictable, each step gets ground truth from running the tests, and the run is capped by turns, time and cost</td></tr>
+    </table>
+    <div class="callout"><strong>Start with the first row only</strong><p>A chain of four steps plus one agent run already delivers most of the value. Add routing, parallel checks, a reviewer or an orchestrator one at a time, and only if measured results improve.</p></div>
+
+    <h2 id="llm">6. Where the LLM is needed</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 238" role="img" aria-label="Ten pipeline steps coloured by what does the work. Plain code: trigger, fetch input, compile prompt, checks, push and pull request. Retrieval: find context. Language model: normalise (optional), agent loop, review pass (optional). A person does the final review.">
+        <rect class="box"  x="8"   y="10" width="112" height="60" rx="10"/><text class="b c" x="64"  y="34">Trigger</text><text class="sub c" x="64"  y="52">plain code</text>
+        <rect class="box"  x="136" y="10" width="112" height="60" rx="10"/><text class="b c" x="192" y="34">Fetch input</text><text class="sub c" x="192" y="52">plain code</text>
+        <rect class="boxp" x="264" y="10" width="112" height="60" rx="10" stroke-dasharray="5 4"/><text class="b c" x="320" y="34">Normalise</text><text class="sub c" x="320" y="52">LLM, optional</text>
+        <rect class="boxb" x="392" y="10" width="112" height="60" rx="10"/><text class="b c" x="448" y="34">Find context</text><text class="sub c" x="448" y="52">retrieval</text>
+        <rect class="box"  x="520" y="10" width="112" height="60" rx="10"/><text class="b c" x="576" y="34">Build prompt</text><text class="sub c" x="576" y="52">templates</text>
+        <path class="arrow" d="M122,40 L134,40"/><path class="arrow" d="M250,40 L262,40"/><path class="arrow" d="M378,40 L390,40"/><path class="arrow" d="M506,40 L518,40"/>
+        <path class="arrow" d="M576,72 L576,86 L64,86 L64,100"/>
+        <rect class="boxp" x="8"   y="102" width="112" height="60" rx="10"/><text class="b c" x="64"  y="126">Agent loop</text><text class="sub c" x="64"  y="144">LLM + tools</text>
+        <rect class="box"  x="136" y="102" width="112" height="60" rx="10"/><text class="b c" x="192" y="126">Checks</text><text class="sub c" x="192" y="144">plain code</text>
+        <rect class="boxp" x="264" y="102" width="112" height="60" rx="10" stroke-dasharray="5 4"/><text class="b c" x="320" y="126">Review pass</text><text class="sub c" x="320" y="144">LLM, optional</text>
+        <rect class="box"  x="392" y="102" width="112" height="60" rx="10"/><text class="b c" x="448" y="126">Push + PR</text><text class="sub c" x="448" y="144">plain code</text>
+        <rect class="boxr" x="520" y="102" width="112" height="60" rx="10"/><text class="b c" x="576" y="126">Review, merge</text><text class="sub c" x="576" y="144">a person</text>
+        <path class="arrow" d="M122,132 L134,132"/><path class="arrow" d="M250,132 L262,132"/><path class="arrow" d="M378,132 L390,132"/><path class="arrow" d="M506,132 L518,132"/>
+        <rect class="box"  x="40"  y="186" width="14" height="14" rx="3"/><text class="sub" x="60"  y="198">plain code</text>
+        <rect class="boxp" x="150" y="186" width="14" height="14" rx="3"/><text class="sub" x="170" y="198">language model</text>
+        <rect class="boxb" x="290" y="186" width="14" height="14" rx="3"/><text class="sub" x="310" y="198">retrieval</text>
+        <rect class="boxr" x="390" y="186" width="14" height="14" rx="3"/><text class="sub" x="410" y="198">a person</text>
+        <text class="sub c" x="320" y="226">Dashed = optional. The model is required in exactly one place: the agent loop.</text>
+      </svg>
+      <figcaption>Five steps are plain code, one is retrieval, three involve a model, one is a person.</figcaption>
+    </figure>
+    <p><strong>Rule of thumb:</strong> use a model where the input is fuzzy (language, code that needs understanding) and the output needs judgement; use code where the answer is exact (pass or fail, a branch name, an API call). Never let a model grade its own tests.</p>
+
+    <h2 id="rag">7. LLM, RAG or agent?</h2>
+    <p>The essay&rsquo;s building block is the <strong>augmented LLM</strong>: a model with <em>retrieval, tools and memory</em>. RAG is the retrieval part of that block. A workflow adds predefined code paths around it, and an agent lets the model direct its own loop. This pipeline uses the last two: a workflow, with one agent step inside.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="A ladder of four steps: a single LLM call, an augmented LLM with retrieval, tools and memory where RAG lives, a workflow with predefined code paths, and an agent where the model directs its own loop. This pipeline is a workflow with one agent step.">
+        <rect class="box"  x="8"   y="120" width="148" height="86"  rx="10"/><text class="b c" x="82"  y="146">Single LLM call</text><text class="sub c" x="82"  y="168">one prompt in,</text><text class="sub c" x="82"  y="184">one answer out</text>
+        <rect class="boxb" x="168" y="96"  width="148" height="110" rx="10"/><text class="b c" x="242" y="122">Augmented LLM</text><text class="sub c" x="242" y="144">retrieval (RAG)</text><text class="sub c" x="242" y="160">tools, memory</text><text class="sub c" x="242" y="184">reads, can call tools</text>
+        <rect class="boxo" x="328" y="72"  width="148" height="134" rx="10"/><text class="b c" x="402" y="98">Workflow</text><text class="sub c" x="402" y="120">predefined code paths</text><text class="sub c" x="402" y="136">chain, route, parallel,</text><text class="sub c" x="402" y="152">orchestrate, evaluate</text><text class="sub c" x="402" y="184">predictable</text>
+        <rect class="boxp" x="488" y="48"  width="144" height="158" rx="10"/><text class="b c" x="560" y="74">Agent</text><text class="sub c" x="560" y="96">the model decides</text><text class="sub c" x="560" y="112">each next step,</text><text class="sub c" x="560" y="128">using tools in a loop</text><text class="sub c" x="560" y="184">flexible, costs more</text>
+        <path class="arrow" d="M84,40 L560,40" style="stroke-dasharray:4 4"/><text class="sub" x="8" y="30">more autonomy, more cost, more risk</text>
+        <path class="rule" d="M328,222 L632,222"/><text class="b c" x="480" y="244">This pipeline: a workflow with one agent step</text>
+      </svg>
+      <figcaption>Climb only as far as the task needs. RAG is a capability of the second step, not a rival to the fourth.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Default retrieval:</strong> the agent searches the code itself (grep, glob, file reads). No vector database is needed for most repositories.</li>
+      <li><strong>Add a RAG index</strong> only for knowledge code search cannot reach: a huge monorepo, design docs and runbooks, or similar past crashes and their fixes. Offer it to the agent as a search tool.</li>
+    </ul>
+
+    <h2 id="components">8. Parts of the augmented LLM</h2>
+    <p>Whichever tool you use (Claude Code, Codex, or one you build), a coding agent is the essay&rsquo;s augmented LLM running in a loop. Knowing the parts around it shows what to configure, what to restrict, and what to watch.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 338" role="img" aria-label="Components of an AI coding agent around the agent core, a language model in a loop. Inputs: triggers, instructions, context and memory. Actions: tools and outputs. Controls: permissions and sandbox, guardrails and checks, observability.">
+        <rect class="boxb" x="8"   y="8" width="162" height="62" rx="10"/><text class="b c" x="89"  y="32">Triggers</text><text class="sub c" x="89"  y="52">CLI, chat, CI, webhook</text>
+        <rect class="boxb" x="239" y="8" width="162" height="62" rx="10"/><text class="b c" x="320" y="32">Instructions</text><text class="sub c" x="320" y="52">rules, AGENTS.md</text>
+        <rect class="boxb" x="470" y="8" width="162" height="62" rx="10"/><text class="b c" x="551" y="32">Retrieval, memory</text><text class="sub c" x="551" y="52">repo search, notes, history</text>
+        <rect class="boxg" x="8"   y="126" width="162" height="62" rx="10"/><text class="b c" x="89"  y="150">Tools</text><text class="sub c" x="89"  y="170">read, edit, shell, git, MCP</text>
+        <rect class="boxp" x="239" y="116" width="162" height="82" rx="12"/><text class="b c" x="320" y="144">Augmented LLM</text><text class="sub c" x="320" y="164">retrieval, tools, memory</text><text class="sub c" x="320" y="182">in a loop = an agent</text>
+        <rect class="boxo" x="470" y="126" width="162" height="62" rx="10"/><text class="b c" x="551" y="150">Permissions, sandbox</text><text class="sub c" x="551" y="170">allowlist, isolated runner</text>
+        <rect class="boxr" x="8"   y="244" width="162" height="62" rx="10"/><text class="b c" x="89"  y="268">Guardrails, checks</text><text class="sub c" x="89"  y="288">budgets, tests, review</text>
+        <rect class="boxr" x="239" y="244" width="162" height="62" rx="10"/><text class="b c" x="320" y="268">Observability</text><text class="sub c" x="320" y="288">logs, cost, audit trail</text>
+        <rect class="boxg" x="470" y="244" width="162" height="62" rx="10"/><text class="b c" x="551" y="268">Outputs</text><text class="sub c" x="551" y="288">commit, PR, comment</text>
+        <path class="arrow" d="M89,72 L252,114"/><path class="arrow" d="M320,72 L320,114"/><path class="arrow" d="M551,72 L388,114"/>
+        <path class="arrow" d="M172,157 L237,157"/><path class="arrow" d="M237,171 L172,171" style="display:none"/>
+        <path class="rule" d="M468,157 L403,157"/>
+        <path class="rule" d="M89,242 L252,200"/><path class="rule" d="M320,242 L320,200"/><path class="arrow" d="M388,200 L551,242"/>
+        <text class="sub c" x="320" y="328">Inputs (blue) feed the model, it acts through tools (green), and controls (orange, red) bound it.</text>
+      </svg>
+      <figcaption>The essay&rsquo;s building block is the augmented LLM. A delivery pipeline wraps it in triggers, instructions, controls and outputs.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Component</th><th>In this pipeline</th></tr>
+      <tr><td>Instructions</td><td><code>CLAUDE.md</code> or <code>AGENTS.md</code> plus the generated task prompt</td></tr>
+      <tr><td>Tools</td><td>File read and edit, shell with an allowlist, git, an MCP server for Jira or Crashlytics</td></tr>
+      <tr><td>Retrieval and memory</td><td>The agent&rsquo;s own code search, a plan file, the failure log from the last attempt</td></tr>
+      <tr><td>Permissions and sandbox</td><td>A throwaway runner, a narrow token, no production access</td></tr>
+      <tr><td>Guardrails and observability</td><td>Turn, time and cost caps; independent checks; saved prompts, diffs and costs</td></tr>
+    </table>
+    <p>The series <a href="claude-md-part-7-automation-and-teams.html">Claude Code in scripts and CI</a> and <a href="codex-part-7-automation-and-teams.html">Codex in scripts and CI</a> show how to configure these in real tools.</p>
+
+    <h2 id="prompts">9. Automatic prompts</h2>
+    <p>Nobody types a prompt in this cycle. Code writes up to six, from templates versioned in the repo.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="Six automatic prompts on the pipeline: 1 extract the task from a messy spec, 2 the main task prompt, 3 the follow-up when a check fails, 4 the review prompt, 5 the pull request description, 6 questions for the ticket author.">
+        <rect class="box"  x="8"   y="40" width="92" height="56" rx="10"/><text class="b c" x="54"  y="64">Normalise</text><text class="sub c" x="54"  y="82">input to task</text>
+        <rect class="box"  x="114" y="40" width="92" height="56" rx="10"/><text class="b c" x="160" y="64">Compile</text><text class="sub c" x="160" y="82">main prompt</text>
+        <rect class="boxg" x="220" y="40" width="92" height="56" rx="10"/><text class="b c" x="266" y="64">Agent</text><text class="sub c" x="266" y="82">edits code</text>
+        <rect class="box"  x="326" y="40" width="92" height="56" rx="10"/><text class="b c" x="372" y="64">Checks</text><text class="sub c" x="372" y="82">test, lint</text>
+        <rect class="box"  x="432" y="40" width="92" height="56" rx="10"/><text class="b c" x="478" y="64">Review</text><text class="sub c" x="478" y="82">second look</text>
+        <rect class="box"  x="538" y="40" width="92" height="56" rx="10"/><text class="b c" x="584" y="64">PR text</text><text class="sub c" x="584" y="82">description</text>
+        <path class="arrow" d="M102,68 L112,68"/><path class="arrow" d="M208,68 L218,68"/><path class="arrow" d="M314,68 L324,68"/><path class="arrow" d="M420,68 L430,68"/><path class="arrow" d="M526,68 L536,68"/>
+        <path class="arrow" d="M372,98 L372,150 L266,150 L266,100"/>
+        <text class="sub c" x="319" y="172">check fails: an automatic follow-up carries the error log</text>
+        <path class="arrow" d="M54,98 L54,196"/>
+        <rect class="boxr" x="8" y="198" width="236" height="36" rx="10"/><text class="b c" x="126" y="221">Questions to the ticket author</text>
+        <circle class="boxo" cx="92"  cy="40" r="11"/><text class="b c" x="92"  y="45" style="font-size:12px">1</text>
+        <circle class="boxo" cx="198" cy="40" r="11"/><text class="b c" x="198" y="45" style="font-size:12px">2</text>
+        <circle class="boxo" cx="319" cy="150" r="11"/><text class="b c" x="319" y="155" style="font-size:12px">3</text>
+        <circle class="boxo" cx="516" cy="40" r="11"/><text class="b c" x="516" y="45" style="font-size:12px">4</text>
+        <circle class="boxo" cx="622" cy="40" r="11"/><text class="b c" x="622" y="45" style="font-size:12px">5</text>
+        <circle class="boxo" cx="236" cy="198" r="11"/><text class="b c" x="236" y="203" style="font-size:12px">6</text>
+        <text class="sub c" x="440" y="216">Numbered circles = a prompt written by code.</text>
+        <text class="sub c" x="440" y="234">Nobody types any of them during the run.</text>
+      </svg>
+      <figcaption>Number 3 is the one people forget. It makes the loop correct itself.</figcaption>
+    </figure>
+    <table>
+      <tr><th>#</th><th>Prompt</th><th>Fires when</th><th>Template</th></tr>
+      <tr><td>1</td><td>Extract the task (optional)</td><td>Input is free text</td><td><code>extract-task.md</code></td></tr>
+      <tr><td>2</td><td>Main task prompt</td><td>Once per run</td><td><code>task-bug.md</code>, <code>task-feature.md</code></td></tr>
+      <tr><td>3</td><td>Failure follow-up</td><td>A check fails, mid-run</td><td><code>fix-failure.md</code></td></tr>
+      <tr><td>4</td><td>Review the diff (optional)</td><td>All checks pass</td><td><code>review-diff.md</code></td></tr>
+      <tr><td>5</td><td>PR description</td><td>Before the draft PR</td><td><code>pr-description.md</code></td></tr>
+      <tr><td>6</td><td>Questions for the author</td><td>Spec has gaps</td><td><code>clarify.md</code></td></tr>
+    </table>
+    <p>Two examples: the main prompt for a crash, and the automatic follow-up.</p>
+<pre><code># task-bug.md (crash)                        # fix-failure.md (sent by the pipeline)
+Read CLAUDE.md first.                        The checks failed after your change.
+&lt;crash id="{{id}}"&gt;{{evidence}}&lt;/crash&gt;          Step: {{step}}
+1. Name the likely root cause + confidence.  Output: {{log_tail}}
+2. Write a test that FAILS because of it.    Fix the cause. Never weaken tests.
+3. Make the smallest fix. Run all checks.    Attempt {{n}} of {{max}}.
+Max 150 changed lines. Report: cause, files, test, doubts.</code></pre>
+
+    <h2 id="aci">10. Tool design for coding agents</h2>
+    <p>The essay calls the interface between the model and its tools the <strong>agent-computer interface (ACI)</strong> and says it deserves as much care as a human interface. It also notes that tool definitions need as much prompt engineering as the main prompt. Applied here:</p>
+    <table>
+      <tr><th>Advice from the essay</th><th>In a delivery pipeline</th></tr>
+      <tr><td>Write tool descriptions like a docstring for a junior developer: examples, edge cases, boundaries</td><td>Name and describe each tool and script clearly (<code>run_tests</code>, <code>open_pr</code>) and say when not to use it</td></tr>
+      <tr><td>Choose formats close to natural text; avoid formats that need line counting or escaping</td><td>Prefer simple edit tools over asking the model to emit large diffs or JSON-wrapped code</td></tr>
+      <tr><td><strong>Poka-yoke</strong>: change the tool so mistakes are harder</td><td>Require absolute paths (the essay&rsquo;s own fix for path errors), allowlist shell commands, block forbidden paths, give the reviewer read-only tools</td></tr>
+      <tr><td>Test the tools with many example inputs and watch the mistakes</td><td>Replay past tickets and crashes through the pipeline and fix the tool, not only the prompt</td></tr>
+    </table>
+
+    <h2 id="delivery">11. Push, review and the one-click button</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="After checks pass: create a branch, commit with the ticket id, push, and open a draft pull request. Then CI, human review and merge. The agent can push a branch but cannot merge.">
+        <rect class="boxg" x="8"   y="18" width="120" height="52" rx="10"/><text class="b c" x="68"  y="40">Verified</text><text class="sub c" x="68"  y="58">diff</text>
+        <rect class="box"  x="176" y="18" width="120" height="52" rx="10"/><text class="b c" x="236" y="40">Branch</text><text class="sub c" x="236" y="58">ai/PROJ-123-...</text>
+        <rect class="box"  x="344" y="18" width="120" height="52" rx="10"/><text class="b c" x="404" y="40">Commit</text><text class="sub c" x="404" y="58">id in message</text>
+        <rect class="box"  x="512" y="18" width="120" height="52" rx="10"/><text class="b c" x="572" y="40">Push</text><text class="sub c" x="572" y="58">branch only</text>
+        <path class="arrow" d="M130,44 L174,44"/><path class="arrow" d="M298,44 L342,44"/><path class="arrow" d="M466,44 L510,44"/>
+        <path class="arrow" d="M572,72 L572,102"/>
+        <rect class="boxb" x="512" y="104" width="120" height="52" rx="10"/><text class="b c" x="572" y="126">Draft PR</text><text class="sub c" x="572" y="144">summary, links</text>
+        <rect class="boxo" x="344" y="104" width="120" height="52" rx="10"/><text class="b c" x="404" y="126">CI checks</text><text class="sub c" x="404" y="144">must be green</text>
+        <rect class="boxr" x="176" y="104" width="120" height="52" rx="10"/><text class="b c" x="236" y="126">Human review</text><text class="sub c" x="236" y="144">required</text>
+        <rect class="boxg" x="8"   y="104" width="120" height="52" rx="10"/><text class="b c" x="68"  y="126">Merge</text><text class="sub c" x="68"  y="144">by a person</text>
+        <path class="arrow" d="M510,130 L466,130"/><path class="arrow" d="M342,130 L298,130"/><path class="arrow" d="M174,130 L130,130"/>
+        <text class="sub c" x="320" y="190">The agent&rsquo;s token can push a branch and open a draft PR. Branch protection stops it merging.</text>
+      </svg>
+      <figcaption>Git and API calls only, so this part is reliable. Merging stays human.</figcaption>
+    </figure>
+    <figure class="fig">
+      <svg viewBox="0 0 640 232" role="img" aria-label="Three triggers, a Jira button or rule, a chat or command-line command, and a Crashlytics alert through a Cloud Function, all start one workflow on a sandboxed runner. The result is a draft pull request, a Jira or issue comment, and a run log.">
+        <rect class="boxb" x="8" y="18"  width="186" height="54" rx="10"/><text class="b c" x="101" y="40">Jira button or rule</text><text class="sub c" x="101" y="58">PROJ-123</text>
+        <rect class="boxb" x="8" y="88"  width="186" height="54" rx="10"/><text class="b c" x="101" y="110">Chat or command line</text><text class="sub c" x="101" y="128">ship PROJ-123</text>
+        <rect class="boxo" x="8" y="158" width="186" height="54" rx="10"/><text class="b c" x="101" y="180">Crashlytics alert</text><text class="sub c" x="101" y="198">Cloud Function, webhook</text>
+        <rect class="boxp" x="250" y="46" width="170" height="124" rx="12"/><text class="b c" x="335" y="72">One workflow</text>
+        <text class="sub c" x="335" y="96">GitHub Actions</text><text class="sub c" x="335" y="114">sandboxed runner</text><text class="sub c" x="335" y="132">scoped secrets</text><text class="sub c" x="335" y="150">time and cost caps</text>
+        <rect class="boxg" x="476" y="46" width="156" height="124" rx="12"/><text class="b c" x="554" y="72">Result</text>
+        <text class="sub c" x="554" y="98">draft pull request</text><text class="sub c" x="554" y="116">comment on the issue</text><text class="sub c" x="554" y="134">run log and cost</text>
+        <path class="arrow" d="M196,45 L248,90"/><path class="arrow" d="M196,115 L248,108"/><path class="arrow" d="M196,185 L248,128"/><path class="arrow" d="M422,108 L474,108"/>
+      </svg>
+      <figcaption>Different front doors, one workflow. The behaviour is the same no matter who or what triggers it.</figcaption>
+    </figure>
+<pre><code>name: ticket-to-pr
+on:
+  workflow_dispatch:
+    inputs: { source: { description: "PROJ-123 or crashlytics:&lt;issue&gt;", required: true } }
+permissions: { contents: write, pull-requests: write }
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/intake.py "${{ inputs.source }}" &gt; task.json     # Jira, spec or Crashlytics
+      - run: python3 tools/compile_prompt.py task.json &gt; prompt.md          # templates, no model
+      - run: claude -p "$(cat prompt.md)" --allowedTools "Read,Edit,Bash(npm test:*)" --max-turns 30 &gt; result.json
+      - run: ./tools/verify.sh                                               # tests, lint, diff guard, secret scan
+      - run: ./tools/open_pr.sh task.json result.json                        # branch, commit, push, draft PR</code></pre>
+    <p>This is a sketch, not a drop-in file. Check each tool&rsquo;s current documentation for flags and permissions, and give each secret the narrowest scope.</p>
+
+    <h2 id="safety">12. Principles, guardrails and rollout</h2>
+    <p>The essay ends on three principles. Here is what each means for this pipeline.</p>
+    <table>
+      <tr><th>Principle</th><th>Practice</th></tr>
+      <tr><td><strong>Simplicity</strong></td><td>Start with a chain and one agent run. Call the CLI or API directly before adopting a framework, and add patterns only when measured results improve</td></tr>
+      <tr><td><strong>Transparency</strong></td><td>Show the plan (a plan file), keep the prompts, the output, the diff and the cost of every run, linked from the PR</td></tr>
+      <tr><td><strong>A well-built ACI</strong></td><td>Narrow, documented, tested tools (previous section)</td></tr>
+    </table>
+    <p>The essay also warns that agents cost more and errors can compound, and recommends sandbox testing and guardrails, stopping conditions such as a maximum number of iterations, and human checkpoints.</p>
+    <ul>
+      <li><strong>Sandbox and least privilege.</strong> Fresh checkout, no production access, a token that can push <code>ai/*</code> branches and open draft PRs, nothing more. Protect <code>main</code>.</li>
+      <li><strong>Untrusted input.</strong> Ticket text, comments, crash messages and logs can carry hidden instructions. Wrap them as data, restrict the tools, and keep secrets out of the prompt.</li>
+      <li><strong>Limits.</strong> Caps on turns, time, cost and diff size; forbidden paths (CI config, secrets, migrations); a kill switch.</li>
+      <li><strong>Human checkpoints.</strong> A person approves every merge. The essay stresses that human review stays crucial for fit with the wider system.</li>
+      <li><strong>Roll out in steps.</strong> Start with small bugs as draft PRs reviewed line by line. Track acceptance rate, rework, review time and cost, and widen only when the numbers hold.</li>
+    </ul>
+    <div class="note"><p>You do not need an IDE to <em>deliver</em> a routine change, but you still need engineering judgement to <em>approve</em> it. The scarce skills become writing testable specs and reading diffs.</p></div>
+
+    <h2 id="takeaways">13. Takeaways and glossary</h2>
+    <ul>
+      <li>Follow <em>Building effective agents</em>: start simple, and add a pattern only when it clearly improves results.</li>
+      <li>Jira, plain specs and Crashlytics crashes share one pipeline once intake produces a common task format.</li>
+      <li>The pipeline is a <strong>workflow with one agent step</strong>; RAG is a retrieval capability inside it.</li>
+      <li>Prompts are generated from templates, including the mid-run failure follow-up.</li>
+      <li>The agent proposes, checks verify, and a person merges.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Workflow</td><td>LLMs and tools orchestrated through predefined code paths.</td></tr>
+      <tr><td>Agent</td><td>An LLM that directs its own process and tool use in a loop until done or limited.</td></tr>
+      <tr><td>Augmented LLM</td><td>A model with retrieval, tools and memory.</td></tr>
+      <tr><td>RAG</td><td>Retrieve relevant passages first, then have the model answer from them.</td></tr>
+      <tr><td>ACI</td><td>Agent-computer interface: how tools are defined, described and presented to the model.</td></tr>
+      <tr><td>Poka-yoke</td><td>Designing a tool so that mistakes are hard to make.</td></tr>
+      <tr><td>Auto-prompt</td><td>A prompt built by code from a template and the state of the run.</td></tr>
+      <tr><td>MCP</td><td>Model Context Protocol: a standard way to connect an agent to tools such as Jira or GitHub.</td></tr>
+    </table>
+
+    <h2 id="links">Links</h2>
+    <ul>
+      <li><strong>Source:</strong> <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a>, Anthropic engineering (Erik S. and Barry Zhang, Dec 19, 2024). The page notes that the tooling landscape has changed since it was written.</li>
+      <li>In this series: <a href="claude-md-part-7-automation-and-teams.html">Claude Code in scripts and CI</a> &middot; <a href="codex-part-7-automation-and-teams.html">Codex in scripts and CI</a> &middot; <a href="firebase-crashlytics-overview.html">Firebase Crashlytics</a> &middot; <a href="git-quicksheet.html">Git quicksheet</a></li>
+      <li><a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">Claude Code</a> &middot; <a href="https://github.com/anthropics/claude-code-action" target="_blank" rel="noopener">Claude Code GitHub Action</a> &middot; <a href="https://developers.openai.com/codex" target="_blank" rel="noopener">Codex</a> &middot; <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP</a></li>
+      <li><a href="https://firebase.google.com/docs/crashlytics" target="_blank" rel="noopener">Firebase Crashlytics</a> &middot; <a href="https://support.atlassian.com/cloud-automation/" target="_blank" rel="noopener">Jira automation</a> &middot; <a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+</body>
+</html>
