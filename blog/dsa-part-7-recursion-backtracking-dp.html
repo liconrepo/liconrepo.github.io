@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 7: Recursion, Backtracking, Greedy Choices and Dynamic Programming — Khairul Alam</title>
+  <meta name="description" content="A beginner-friendly guide to recursion, the call stack, backtracking, greedy algorithms and dynamic programming in Kotlin, with decision trees, filled tables, runnable programs and exercises with tests." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 7 of 9</p>
+    <h1>Data Structures and Algorithms, Part 7: Recursion, Backtracking, Greedy Choices and Dynamic Programming</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~45 min with exercises</span></div>
+    <div class="tags"><span class="tag">Recursion</span><span class="tag">Backtracking</span><span class="tag">Greedy</span><span class="tag">Dynamic programming</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a class="on" href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Some problems have too many possible answers to check one by one. This part shows four ways of handling them: recursion to break a problem into smaller copies, backtracking to explore choices and undo them, greedy steps when the best local choice is safe, and dynamic programming to stop solving the same subproblem twice.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>Recursion needs a base case (written first) and a recursive case on a smaller input; the call stack stores the waiting calls and can overflow.</li><li>Backtracking is choose, explore, un-choose over a decision tree; pruning cuts dead branches early.</li><li>Greedy takes the best local choice and is only right when you can argue it is safe; one counter-example breaks it.</li><li>Dynamic programming = overlapping subproblems + optimal substructure, solved with: state, recurrence, base cases, order.</li><li>Memoisation is top-down with a cache; tabulation is bottom-up with a table, often shrinkable to a few variables.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#recursion">Recursion: a function that calls itself</a></li><li><a href="#divide">Divide and conquer, a short recap</a></li><li><a href="#backtracking">Backtracking: try, look ahead, undo</a></li><li><a href="#greedy">Greedy: take the best choice now</a></li><li><a href="#dp-intro">Dynamic programming: remember what you solved</a></li><li><a href="#fibonacci">Fibonacci four ways</a></li><li><a href="#dp-1d">Classic one-dimensional problems</a></li><li><a href="#dp-2d">Two-dimensional problems and the filled table</a></li><li><a href="#top-bottom">Top-down or bottom-up?</a></li><li><a href="#choose">Choosing the right tool</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="recursion">1. Recursion: a function that calls itself</h2>
+
+<p>A <strong>recursive</strong> function is a function that calls itself to solve a smaller piece of the same problem. That sounds circular, but it works as long as the pieces keep getting smaller and there is a place to stop.</p>
+<div class="analogy"><p><strong>Russian dolls.</strong> To count the dolls, open the biggest one. If it is empty, the answer is zero. Otherwise the answer is one plus the number of dolls inside. You never need a plan for all dolls at once, only a rule for one doll and a rule for the empty one.</p></div>
+
+<p>Every recursive function has two parts:</p>
+<ul>
+<li>The <strong>base case</strong>: the input so small that the answer is known without any more calls. It is the empty doll. <em>Write it first.</em></li>
+<li>The <strong>recursive case</strong>: solve the problem by calling the same function on a smaller input, then combine the result with a little extra work.</li>
+</ul>
+<p>If you forget the base case, or the input never gets smaller, the function calls itself forever. That is the number one recursion bug.</p>
+<h3>Three small examples</h3>
+<p>The <strong>factorial</strong> of <code>n</code> (written <code>n!</code>) is <code>n * (n-1) * ... * 1</code>. Notice that <code>n! = n * (n-1)!</code>. That is already a recursive rule. The base case is <code>1! = 1</code> (and <code>0! = 1</code>).</p>
+<p>The program below prints a line when each call starts and when it returns, indented by depth, so you can see the dolls opening and closing.</p>
+<div class="try demo"><h3>Run it: watch factorial open and close</h3>
+<p>Read the output from the top down for the calls, then from the bottom up for the returns.</p>
+<pre><code>fun factorial(n: Int, depth: Int = 0): Long {
+    val pad = " ".repeat(depth * 2)
+    println("${pad}factorial($n) called")
+    if (n &lt;= 1) {                       // base case first
+        println("${pad}base case, return 1")
+        return 1
+    }
+    val result = n * factorial(n - 1, depth + 1)   // recursive case
+    println("${pad}factorial($n) returns $result")
+    return result
+}
+
+fun main() {
+    println("answer = ${factorial(4)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-factorial-trace">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-factorial-trace">fun factorial(n: Int, depth: Int = 0): Long {
+    val pad = " ".repeat(depth * 2)
+    println("${pad}factorial($n) called")
+    if (n <= 1) {                       // base case first
+        println("${pad}base case, return 1")
+        return 1
+    }
+    val result = n * factorial(n - 1, depth + 1)   // recursive case
+    println("${pad}factorial($n) returns $result")
+    return result
+}
+
+fun main() {
+    println("answer = ${factorial(4)}")
+}
+</script></div>
+
+<h3>The call stack</h3>
+<p>How does the computer remember where it was in each call? It uses the <strong>call stack</strong>: a pile of &ldquo;frames&rdquo;, one per active call. A frame holds that call&rsquo;s own variables and the place to continue after it finishes. A new call puts a frame on top. A return removes the top frame. (A stack is last in, first out, as Part 3 explains.)</p>
+<figure class="fig"><div class="diagram"><pre> factorial(3) is running.  Time moves down the page.
+
+ call factorial(3)    call factorial(2)    call factorial(1)    returns...
+ +--------------+     +--------------+     +--------------+
+ |              |     |              |     | n=1  base    |  &lt;- top: returns 1
+ |              |     | n=2  waits   |     | n=2  waits   |     then n=2 gets 1,
+ | n=3  waits   |     | n=3  waits   |     | n=3  waits   |     returns 2*1 = 2
+ +--------------+     +--------------+     +--------------+     then n=3 gets 2,
+   bottom of stack                                              returns 3*2 = 6</pre></div><figcaption>Each call adds a frame. The base case is the first one to finish, and the answers flow back down.</figcaption></figure>
+
+<h3>Sum and power</h3>
+<p>The sum of <code>1..n</code> is <code>n</code> plus the sum of <code>1..n-1</code>, with <code>0</code> as the base case. Power is more interesting. Computing <code>b^e</code> as <code>b * b^(e-1)</code> takes <code>e</code> calls. But <code>b^e = (b^(e/2))^2</code> halves the exponent each time, so it takes only about <code>log e</code> calls. Halving is the same trick as binary search.</p>
+<div class="try demo"><h3>Run it: sum, slow power and fast power</h3>
+<pre><code>var slowCalls = 0
+var fastCalls = 0
+
+fun sumTo(n: Int): Int = if (n == 0) 0 else n + sumTo(n - 1)
+
+// b^e as b * b^(e-1): e + 1 calls, O(e)
+fun powerSlow(b: Long, e: Int): Long {
+    slowCalls++
+    return if (e == 0) 1 else b * powerSlow(b, e - 1)
+}
+
+// b^e as (b^(e/2))^2, times b once more if e is odd: O(log e)
+fun powerFast(b: Long, e: Int): Long {
+    fastCalls++
+    if (e == 0) return 1
+    val half = powerFast(b, e / 2)
+    return if (e % 2 == 0) half * half else half * half * b
+}
+
+fun main() {
+    println("sumTo(100) = ${sumTo(100)}")
+    println("slow: ${powerSlow(2, 30)} in $slowCalls calls")
+    println("fast: ${powerFast(2, 30)} in $fastCalls calls")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-sum-power">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-sum-power">var slowCalls = 0
+var fastCalls = 0
+
+fun sumTo(n: Int): Int = if (n == 0) 0 else n + sumTo(n - 1)
+
+// b^e as b * b^(e-1): e + 1 calls, O(e)
+fun powerSlow(b: Long, e: Int): Long {
+    slowCalls++
+    return if (e == 0) 1 else b * powerSlow(b, e - 1)
+}
+
+// b^e as (b^(e/2))^2, times b once more if e is odd: O(log e)
+fun powerFast(b: Long, e: Int): Long {
+    fastCalls++
+    if (e == 0) return 1
+    val half = powerFast(b, e / 2)
+    return if (e % 2 == 0) half * half else half * half * b
+}
+
+fun main() {
+    println("sumTo(100) = ${sumTo(100)}")
+    println("slow: ${powerSlow(2, 30)} in $slowCalls calls")
+    println("fast: ${powerFast(2, 30)} in $fastCalls calls")
+}
+</script></div>
+
+<h3>When the stack runs out</h3>
+<p>The call stack has a limited size. If recursion goes too deep (hundreds of thousands of frames, depending on the machine), the program stops with a <strong>stack overflow</strong>. In Kotlin and Java that is a <code>StackOverflowError</code>. It usually means a missing base case, or an input that is simply too deep for recursion.</p>
+<p>There are two ways out. A <strong>tail call</strong> is a recursive call that is the very last thing a function does, with nothing left to do afterwards. Kotlin can turn those into a loop if you mark the function <code>tailrec</code>. The other way is to write the loop yourself. Any recursion can become a loop, and when the depth is huge, that is the safe choice.</p>
+<div class="try demo"><h3>Run it: stack overflow, tailrec and a loop</h3>
+<p>The plain recursive version breaks at a depth the loop does not even notice.</p>
+<pre><code>fun depth(n: Int): Int = if (n == 0) 0 else 1 + depth(n - 1)   // work left after the call: not a tail call
+
+tailrec fun sumTail(n: Long, acc: Long = 0): Long =           // the call is the last thing: a tail call
+    if (n == 0L) acc else sumTail(n - 1, acc + n)
+
+fun sumLoop(n: Long): Long {                                  // the same thing as a plain loop
+    var total = 0L
+    for (i in 1..n) total += i
+    return total
+}
+
+fun main() {
+    println("depth(1000) = ${depth(1000)}")
+    try {
+        println(depth(10_000_000))
+    } catch (e: StackOverflowError) {
+        println("StackOverflowError: ten million frames do not fit")
+    }
+    println("tailrec = ${sumTail(10_000_000)}")
+    println("loop    = ${sumLoop(10_000_000)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-overflow-loop">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-overflow-loop">fun depth(n: Int): Int = if (n == 0) 0 else 1 + depth(n - 1)   // work left after the call: not a tail call
+
+tailrec fun sumTail(n: Long, acc: Long = 0): Long =           // the call is the last thing: a tail call
+    if (n == 0L) acc else sumTail(n - 1, acc + n)
+
+fun sumLoop(n: Long): Long {                                  // the same thing as a plain loop
+    var total = 0L
+    for (i in 1..n) total += i
+    return total
+}
+
+fun main() {
+    println("depth(1000) = ${depth(1000)}")
+    try {
+        println(depth(10_000_000))
+    } catch (e: StackOverflowError) {
+        println("StackOverflowError: ten million frames do not fit")
+    }
+    println("tailrec = ${sumTail(10_000_000)}")
+    println("loop    = ${sumLoop(10_000_000)}")
+}
+</script></div>
+<table><tr><th></th><th>Time</th><th>Extra space</th></tr><tr><td>Factorial / sum (<code>n</code> calls deep)</td><td><code>O(n)</code></td><td><code>O(n)</code> for the call stack</td></tr><tr><td>Fast power</td><td><code>O(log e)</code></td><td><code>O(log e)</code> for the call stack</td></tr><tr><td>Same job as a loop</td><td>same</td><td><code>O(1)</code></td></tr></table>
+<div class="note"><p><strong>Hidden cost.</strong> Recursion looks free, but the call stack is real memory. A recursive function that goes <code>n</code> deep uses <code>O(n)</code> space even if it declares no arrays.</p></div>
+<h2 id="divide">2. Divide and conquer, a short recap</h2>
+
+<p><strong>Divide and conquer</strong> is a recursion shape you may have met in sorting (Part 6): split the problem into smaller copies, solve each copy, combine the answers. Fast power did it with one half. Binary search does it with one half. Merge sort does it with two halves.</p>
+<p>The key property is that the pieces <em>do not overlap</em>. Each half of the list is a different set of items, so no work is repeated. Remember this, because dynamic programming exists for the case where the pieces <em>do</em> overlap.</p>
+<div class="try demo"><h3>Run it: the maximum by halves</h3>
+<p>This is no faster than a simple loop (<code>O(n)</code> time), but it shows the shape: split, solve, combine. Each item is visited once.</p>
+<pre><code>var calls = 0
+
+fun maxRange(a: IntArray, lo: Int, hi: Int): Int {
+    calls++
+    if (lo == hi) return a[lo]                  // base case: one item
+    val mid = (lo + hi) / 2
+    val left = maxRange(a, lo, mid)             // solve the left half
+    val right = maxRange(a, mid + 1, hi)        // solve the right half
+    return maxOf(left, right)                   // combine
+}
+
+fun main() {
+    val a = intArrayOf(4, 9, 2, 7, 5, 1, 8, 3)
+    println("max = ${maxRange(a, 0, a.size - 1)}")
+    println("calls = $calls  (n = ${a.size}, so about 2n - 1)")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-divide-max">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-divide-max">var calls = 0
+
+fun maxRange(a: IntArray, lo: Int, hi: Int): Int {
+    calls++
+    if (lo == hi) return a[lo]                  // base case: one item
+    val mid = (lo + hi) / 2
+    val left = maxRange(a, lo, mid)             // solve the left half
+    val right = maxRange(a, mid + 1, hi)        // solve the right half
+    return maxOf(left, right)                   // combine
+}
+
+fun main() {
+    val a = intArrayOf(4, 9, 2, 7, 5, 1, 8, 3)
+    println("max = ${maxRange(a, 0, a.size - 1)}")
+    println("calls = $calls  (n = ${a.size}, so about 2n - 1)")
+}
+</script></div>
+
+<p>The cost of a divide-and-conquer algorithm depends on two numbers: how many pieces you make, and how much work the combine step is. Splitting in two and combining in <code>O(n)</code> gives <code>O(n log n)</code>, as in merge sort. Splitting in one half with <code>O(1)</code> combining gives <code>O(log n)</code>, as in binary search.</p>
+<h2 id="backtracking">3. Backtracking: try, look ahead, undo</h2>
+
+<p><strong>Backtracking</strong> is recursion used to search through many possible answers. You build an answer one decision at a time. When a decision leads to a dead end, you undo it and try the next option.</p>
+<div class="analogy"><p><strong>A maze.</strong> At each junction you pick a corridor and walk down it. If it ends at a wall, you walk back to the junction (undo) and try another corridor. You never need to map the whole maze, only remember where the last junction was. The call stack remembers that for you.</p></div>
+
+<p>A few words first. The <strong>state</strong> is whatever describes where you are in the search: the choices made so far. A <strong>decision tree</strong> is the picture of all the choices, where each level is one decision.</p>
+<figure class="fig"><div class="diagram"><pre> Subsets of [1, 2, 3]: at each item decide "take it" or "skip it".
+
+                         []
+               take 1 /      \ skip 1
+                  [1]            []
+         take 2 /   \ skip 2   take 2 /  \ skip 2
+             [1,2]    [1]         [2]     []
+        t3 /  \ s3  t3/ \s3    t3/ \s3  t3/ \s3
+      [1,2,3][1,2] [1,3][1] [2,3][2]  [3]  []
+
+ 8 leaves = 2^3 subsets. The tree has 2^n leaves, so the cost is exponential.</pre></div><figcaption>A decision tree. Backtracking walks this tree depth first, going down and coming back up.</figcaption></figure>
+
+<h3>The template: choose, explore, un-choose</h3>
+<p>Nearly every backtracking solution has the same three steps inside a loop:</p>
+<ol>
+<li><strong>Choose</strong>: add one option to the current state.</li>
+<li><strong>Explore</strong>: recurse to make the next decision.</li>
+<li><strong>Un-choose</strong>: remove that option, so the state is exactly as it was before. This is the &ldquo;back&rdquo; in backtracking.</li>
+</ol>
+<pre><code>fun explore(state) {
+    if (state is a complete answer) { save a COPY of it; return }
+    for (option in options available now) {
+        if (option is not allowed) continue   // pruning
+        choose(option)
+        explore(state)
+        unchoose(option)
+    }
+}</code></pre>
+
+<p>Two details trip people up. First, when you save an answer, save a <em>copy</em> (<code>current.toList()</code>), because the same list keeps changing afterwards. Second, un-choose must exactly reverse choose.</p>
+<h3>Subsets and permutations</h3>
+<p>A <strong>subset</strong> is any selection of items, ignoring order. A <strong>permutation</strong> is an ordering of all the items. For three items there are 8 subsets and 6 permutations. In general, <code>2^n</code> subsets and <code>n!</code> permutations, so these programs only work for small <code>n</code>.</p>
+<div class="try demo"><h3>Run it: all subsets</h3>
+<p>Starting the loop at <code>start</code> means each subset is built in one order only, so there are no repeats.</p>
+<pre><code>fun subsets(nums: List&lt;Int&gt;): List&lt;List&lt;Int&gt;&gt; {
+    val result = mutableListOf&lt;List&lt;Int&gt;&gt;()
+    val current = mutableListOf&lt;Int&gt;()
+
+    fun explore(start: Int) {
+        result.add(current.toList())               // every state on the way is a valid subset
+        for (i in start until nums.size) {
+            current.add(nums[i])                   // choose
+            explore(i + 1)                         // explore: only look at later items
+            current.removeAt(current.size - 1)     // un-choose
+        }
+    }
+
+    explore(0)
+    return result
+}
+
+fun main() {
+    for (s in subsets(listOf(1, 2, 3))) println(s)
+    println("count for 10 items = ${subsets(List(10) { it }).size}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-subsets">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-subsets">fun subsets(nums: List<Int>): List<List<Int>> {
+    val result = mutableListOf<List<Int>>()
+    val current = mutableListOf<Int>()
+
+    fun explore(start: Int) {
+        result.add(current.toList())               // every state on the way is a valid subset
+        for (i in start until nums.size) {
+            current.add(nums[i])                   // choose
+            explore(i + 1)                         // explore: only look at later items
+            current.removeAt(current.size - 1)     // un-choose
+        }
+    }
+
+    explore(0)
+    return result
+}
+
+fun main() {
+    for (s in subsets(listOf(1, 2, 3))) println(s)
+    println("count for 10 items = ${subsets(List(10) { it }).size}")
+}
+</script></div>
+<div class="try demo"><h3>Run it: all permutations</h3>
+<pre><code>fun permutations(nums: List&lt;Int&gt;): List&lt;List&lt;Int&gt;&gt; {
+    val result = mutableListOf&lt;List&lt;Int&gt;&gt;()
+    val current = mutableListOf&lt;Int&gt;()
+    val used = BooleanArray(nums.size)
+
+    fun explore() {
+        if (current.size == nums.size) {           // complete answer
+            result.add(current.toList())
+            return
+        }
+        for (i in nums.indices) {
+            if (used[i]) continue                  // already placed in this answer
+            used[i] = true                         // choose
+            current.add(nums[i])
+            explore()                              // explore
+            current.removeAt(current.size - 1)     // un-choose
+            used[i] = false
+        }
+    }
+
+    explore()
+    return result
+}
+
+fun main() {
+    for (p in permutations(listOf(1, 2, 3))) println(p)
+    println("count for 6 items = ${permutations(List(6) { it }).size}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-permutations">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-permutations">fun permutations(nums: List<Int>): List<List<Int>> {
+    val result = mutableListOf<List<Int>>()
+    val current = mutableListOf<Int>()
+    val used = BooleanArray(nums.size)
+
+    fun explore() {
+        if (current.size == nums.size) {           // complete answer
+            result.add(current.toList())
+            return
+        }
+        for (i in nums.indices) {
+            if (used[i]) continue                  // already placed in this answer
+            used[i] = true                         // choose
+            current.add(nums[i])
+            explore()                              // explore
+            current.removeAt(current.size - 1)     // un-choose
+            used[i] = false
+        }
+    }
+
+    explore()
+    return result
+}
+
+fun main() {
+    for (p in permutations(listOf(1, 2, 3))) println(p)
+    println("count for 6 items = ${permutations(List(6) { it }).size}")
+}
+</script></div>
+
+<h3>Pruning: stop early when a branch cannot work</h3>
+<p><strong>Pruning</strong> means cutting off a branch of the decision tree as soon as you know it cannot lead to a valid answer. It does not change the worst-case Big-O, but it can remove almost all the work in practice. Choosing 2 numbers out of 1..4 (a <strong>combination</strong>, a subset of a fixed size) can stop as soon as the list reaches size 2.</p>
+<p>The classic example is the <strong>n-queens</strong> puzzle: place <code>n</code> queens on an <code>n</code> by <code>n</code> chessboard so that none attacks another. We place one queen per row. For each row we try every column, but skip any square whose column or diagonal is already taken. The skipped squares are the pruning.</p>
+<div class="try demo"><h3>Run it: count the n-queens solutions</h3>
+<p>Without pruning, 8 queens would mean checking 8^8, about 16 million boards. With pruning the search is tiny.</p>
+<pre><code>fun countQueens(n: Int): Int {
+    val cols = BooleanArray(n)
+    val diagDown = BooleanArray(2 * n)       // squares with the same row + col
+    val diagUp = BooleanArray(2 * n)         // squares with the same row - col (shifted)
+    var count = 0
+
+    fun place(row: Int) {
+        if (row == n) { count++; return }    // all rows filled: one solution
+        for (c in 0 until n) {
+            val d1 = row + c
+            val d2 = row - c + n
+            if (cols[c] || diagDown[d1] || diagUp[d2]) continue   // prune: attacked square
+            cols[c] = true; diagDown[d1] = true; diagUp[d2] = true     // choose
+            place(row + 1)                                              // explore
+            cols[c] = false; diagDown[d1] = false; diagUp[d2] = false   // un-choose
+        }
+    }
+
+    place(0)
+    return count
+}
+
+fun main() {
+    for (n in 1..8) println("n = $n -&gt; ${countQueens(n)} solutions")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-n-queens">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-n-queens">fun countQueens(n: Int): Int {
+    val cols = BooleanArray(n)
+    val diagDown = BooleanArray(2 * n)       // squares with the same row + col
+    val diagUp = BooleanArray(2 * n)         // squares with the same row - col (shifted)
+    var count = 0
+
+    fun place(row: Int) {
+        if (row == n) { count++; return }    // all rows filled: one solution
+        for (c in 0 until n) {
+            val d1 = row + c
+            val d2 = row - c + n
+            if (cols[c] || diagDown[d1] || diagUp[d2]) continue   // prune: attacked square
+            cols[c] = true; diagDown[d1] = true; diagUp[d2] = true     // choose
+            place(row + 1)                                              // explore
+            cols[c] = false; diagDown[d1] = false; diagUp[d2] = false   // un-choose
+        }
+    }
+
+    place(0)
+    return count
+}
+
+fun main() {
+    for (n in 1..8) println("n = $n -> ${countQueens(n)} solutions")
+}
+</script></div>
+<table><tr><th>Problem</th><th>Number of answers</th><th>Typical cost</th></tr><tr><td>Subsets of <code>n</code> items</td><td><code>2^n</code></td><td><code>O(n * 2^n)</code></td></tr><tr><td>Permutations of <code>n</code> items</td><td><code>n!</code></td><td><code>O(n * n!)</code></td></tr><tr><td>Combinations, <code>k</code> of <code>n</code></td><td><code>n! / (k! (n-k)!)</code></td><td>about that, times <code>k</code></td></tr><tr><td>N-queens</td><td>depends on <code>n</code></td><td>exponential, but pruning helps a lot</td></tr></table>
+<div class="note"><p><strong>Space.</strong> Apart from the saved answers, backtracking needs only the current state and the call stack, which is as deep as the number of decisions. That is why it fits in memory even when the number of answers does not.</p></div>
+<h2 id="greedy">4. Greedy: take the best choice now</h2>
+
+<p>A <strong>greedy</strong> algorithm makes the choice that looks best right now, never looks back, and never undoes it. There is no search and no recursion, usually just a sort and a loop, so greedy algorithms are fast and short.</p>
+<p>The catch is that &ldquo;best right now&rdquo; is only correct for <em>some</em> problems. For the others, greedy gives a wrong answer without any warning. The skill is knowing which is which.</p>
+<h3>Coin change: greedy works, then it does not</h3>
+<p>Make 63 cents with the fewest coins. Take the biggest coin that fits, again and again. With coins <code>25, 10, 5, 1</code> that gives <code>25+25+10+1+1+1</code>, six coins, and it is the best possible. Coin sets where this always works are called <strong>canonical</strong>. Most real currencies are designed that way.</p>
+<p>Now change the coins to <code>1, 3, 4</code> and ask for 6. Greedy takes <code>4</code>, then <code>1</code>, then <code>1</code>: three coins. But <code>3+3</code> is two coins. The locally best first step (the biggest coin) spoiled the whole answer.</p>
+<div class="try demo"><h3>Run it: greedy coin change and its counter-example</h3>
+<p>In the second line the two numbers disagree. One counter-example is enough to prove that greedy is wrong for a problem.</p>
+<pre><code>// Greedy: biggest coin first. Returns the coin count, or -1 if it gets stuck.
+fun greedyCoins(coins: List&lt;Int&gt;, amount: Int): Int {
+    var left = amount
+    var count = 0
+    for (c in coins.sortedDescending()) {
+        count += left / c
+        left %= c
+    }
+    return if (left == 0) count else -1
+}
+
+// Exact answer by trying every coin for every amount (dynamic programming, explained soon).
+fun bestCoins(coins: List&lt;Int&gt;, amount: Int): Int {
+    val inf = amount + 1
+    val dp = IntArray(amount + 1) { inf }
+    dp[0] = 0
+    for (a in 1..amount) for (c in coins) if (c &lt;= a) dp[a] = minOf(dp[a], dp[a - c] + 1)
+    return if (dp[amount] &gt;= inf) -1 else dp[amount]
+}
+
+fun main() {
+    val us = listOf(25, 10, 5, 1)
+    println("63 with $us: greedy=${greedyCoins(us, 63)} best=${bestCoins(us, 63)}")
+    val odd = listOf(1, 3, 4)
+    println("6 with $odd: greedy=${greedyCoins(odd, 6)} best=${bestCoins(odd, 6)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-coin-greedy">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-coin-greedy">// Greedy: biggest coin first. Returns the coin count, or -1 if it gets stuck.
+fun greedyCoins(coins: List<Int>, amount: Int): Int {
+    var left = amount
+    var count = 0
+    for (c in coins.sortedDescending()) {
+        count += left / c
+        left %= c
+    }
+    return if (left == 0) count else -1
+}
+
+// Exact answer by trying every coin for every amount (dynamic programming, explained soon).
+fun bestCoins(coins: List<Int>, amount: Int): Int {
+    val inf = amount + 1
+    val dp = IntArray(amount + 1) { inf }
+    dp[0] = 0
+    for (a in 1..amount) for (c in coins) if (c <= a) dp[a] = minOf(dp[a], dp[a - c] + 1)
+    return if (dp[amount] >= inf) -1 else dp[amount]
+}
+
+fun main() {
+    val us = listOf(25, 10, 5, 1)
+    println("63 with $us: greedy=${greedyCoins(us, 63)} best=${bestCoins(us, 63)}")
+    val odd = listOf(1, 3, 4)
+    println("6 with $odd: greedy=${greedyCoins(odd, 6)} best=${bestCoins(odd, 6)}")
+}
+</script></div>
+
+<h3>Interval scheduling</h3>
+<p>You have a list of activities, each with a start and end time, and one room. Pick as many as possible so that none overlap. A tempting rule is &ldquo;earliest start&rdquo; or &ldquo;shortest&rdquo;, but both have counter-examples. The rule that is provably right: <strong>always pick the activity that ends earliest</strong>, because it leaves the most room for the rest. Sort by end time, then take each activity that starts after the last chosen one ends.</p>
+<div class="try demo"><h3>Run it: activity selection</h3>
+<p>Time <code>O(n log n)</code> for the sort, then one pass.</p>
+<pre><code>fun selectActivities(acts: List&lt;Pair&lt;Int, Int&gt;&gt;): List&lt;Pair&lt;Int, Int&gt;&gt; {
+    val chosen = mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;()
+    var lastEnd = Int.MIN_VALUE
+    for (a in acts.sortedBy { it.second }) {      // earliest end first
+        if (a.first &gt;= lastEnd) {                 // starts after the last pick ended
+            chosen.add(a)
+            lastEnd = a.second
+        }
+    }
+    return chosen
+}
+
+fun main() {
+    val acts = listOf(1 to 4, 3 to 5, 0 to 6, 5 to 7, 3 to 9, 5 to 9, 6 to 10, 8 to 11)
+    val picked = selectActivities(acts)
+    println("picked ${picked.size}: $picked")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-activities">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-activities">fun selectActivities(acts: List<Pair<Int, Int>>): List<Pair<Int, Int>> {
+    val chosen = mutableListOf<Pair<Int, Int>>()
+    var lastEnd = Int.MIN_VALUE
+    for (a in acts.sortedBy { it.second }) {      // earliest end first
+        if (a.first >= lastEnd) {                 // starts after the last pick ended
+            chosen.add(a)
+            lastEnd = a.second
+        }
+    }
+    return chosen
+}
+
+fun main() {
+    val acts = listOf(1 to 4, 3 to 5, 0 to 6, 5 to 7, 3 to 9, 5 to 9, 6 to 10, 8 to 11)
+    val picked = selectActivities(acts)
+    println("picked ${picked.size}: $picked")
+}
+</script></div>
+
+<h3>Jump game</h3>
+<p>You stand at the start of an array. Each number says the longest jump you can make from that square. Can you reach the last square? Greedy view: walk left to right and track the <strong>farthest</strong> square reachable so far. If you ever stand on a square beyond that, you are stuck.</p>
+<div class="try demo"><h3>Run it: can you reach the end?</h3>
+<p>One pass, <code>O(n)</code> time, <code>O(1)</code> space. A brute-force search would try every jump length from every square.</p>
+<pre><code>fun canJump(nums: IntArray): Boolean {
+    var farthest = 0
+    for (i in nums.indices) {
+        if (i &gt; farthest) return false            // this square is out of reach
+        farthest = maxOf(farthest, i + nums[i])   // best landing spot seen so far
+    }
+    return true
+}
+
+fun main() {
+    println(canJump(intArrayOf(2, 3, 1, 1, 4)))   // true
+    println(canJump(intArrayOf(3, 2, 1, 0, 4)))   // false: every path ends on the 0
+    println(canJump(intArrayOf(0)))               // true: already at the end
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-jump-game">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-jump-game">fun canJump(nums: IntArray): Boolean {
+    var farthest = 0
+    for (i in nums.indices) {
+        if (i > farthest) return false            // this square is out of reach
+        farthest = maxOf(farthest, i + nums[i])   // best landing spot seen so far
+    }
+    return true
+}
+
+fun main() {
+    println(canJump(intArrayOf(2, 3, 1, 1, 4)))   // true
+    println(canJump(intArrayOf(3, 2, 1, 0, 4)))   // false: every path ends on the 0
+    println(canJump(intArrayOf(0)))               // true: already at the end
+}
+</script></div>
+<div class="callout"><strong>How to tell greedy from dynamic programming</strong><ul>
+<li>Ask: <em>if I take the best option now, can it ever block a better total later?</em> If you can argue &ldquo;no&rdquo; (the usual proof says any better answer can be changed to start with your greedy choice), use greedy.</li>
+<li>If you can find even one small counter-example by hand, like coins <code>1, 3, 4</code>, greedy is out. Reach for dynamic programming or backtracking.</li>
+<li>Always test a greedy idea against a slow, correct solution on small inputs before you trust it.</li>
+</ul></div>
+<h2 id="dp-intro">5. Dynamic programming: remember what you solved</h2>
+
+<p>Dynamic programming (DP) sounds mysterious, but the idea is plain: <strong>do not solve the same small problem twice</strong>. Solve it once, write the answer down, and look it up next time.</p>
+<div class="analogy"><p><strong>Homework you already did.</strong> If a teacher asks 12 x 12 ten times, you do not redo the sum each time. You remember 144. DP is a notebook of answers to small questions, used to answer bigger ones.</p></div>
+
+<p>Two properties tell you DP can work:</p>
+<ul>
+<li><strong>Overlapping subproblems.</strong> A <strong>subproblem</strong> is a smaller version of the same question. They <em>overlap</em> when the same subproblem is needed again and again by different bigger ones. (In divide and conquer they do not overlap.)</li>
+<li><strong>Optimal substructure.</strong> The best answer to the big problem is built from the best answers to its subproblems.</li>
+</ul>
+<h3>The four steps</h3>
+<ol>
+<li><strong>Define the state.</strong> Say in one sentence what <code>dp[i]</code> (or <code>dp[i][j]</code>) means. For example, &ldquo;the fewest coins that make amount <code>i</code>&rdquo;. This sentence is the most important line you write.</li>
+<li><strong>Write the recurrence.</strong> A <strong>recurrence</strong> is a formula that gets one state from smaller states, for example <code>dp[i] = min(dp[i - coin] + 1)</code> over all coins.</li>
+<li><strong>Set the base cases.</strong> The smallest states, whose answers you simply know: <code>dp[0] = 0</code>.</li>
+<li><strong>Choose the order.</strong> Fill states so that everything a state depends on is already filled. Usually that means smaller indexes first. The answer is the state for the full problem.</li>
+</ol>
+<p>There are two ways to carry out the plan. <strong>Memoisation</strong> (top-down) keeps the recursive function and adds a notebook: before computing, check it; after computing, save it. <strong>Tabulation</strong> (bottom-up) drops the recursion and fills a table from the smallest state to the largest with loops.</p>
+<h2 id="fibonacci">6. Fibonacci four ways</h2>
+
+<p>The Fibonacci numbers start <code>0, 1, 1, 2, 3, 5, 8, ...</code> and each is the sum of the two before. The state is <code>fib(n)</code>, the recurrence is <code>fib(n) = fib(n-1) + fib(n-2)</code>, and the base cases are <code>fib(0) = 0</code>, <code>fib(1) = 1</code>. Here is what the naive recursion does for <code>fib(5)</code>:</p>
+<figure class="fig"><div class="diagram"><pre>                         fib(5)
+                    /              \
+              fib(4)                fib(3)
+             /      \              /     \
+        fib(3)      fib(2)      fib(2)    fib(1)
+        /    \      /   \       /   \
+    fib(2) fib(1) fib(1) fib(0) fib(1) fib(0)
+    /   \
+ fib(1) fib(0)
+
+ fib(3) is computed twice, fib(2) three times. That is the overlap.</pre></div><figcaption>The call tree of naive Fibonacci. The same subproblems appear again and again.</figcaption></figure>
+
+<p>The number of calls roughly multiplies by 1.6 for every step of <code>n</code>, so naive Fibonacci is exponential. The program below runs four versions and counts the calls.</p>
+<div class="try demo"><h3>Run it: naive, memoised, tabulated, two variables</h3>
+<p>Compare the two call counts. The answer is the same, but the notebook turns millions of calls into about sixty.</p>
+<pre><code>var naiveCalls = 0L
+var memoCalls = 0L
+val memo = HashMap&lt;Int, Long&gt;()
+
+// 1. Naive recursion: exponential time.
+fun fibNaive(n: Int): Long {
+    naiveCalls++
+    return if (n &lt; 2) n.toLong() else fibNaive(n - 1) + fibNaive(n - 2)
+}
+
+// 2. Top-down with a notebook (memoisation): O(n) time, O(n) space.
+fun fibMemo(n: Int): Long {
+    memoCalls++
+    if (n &lt; 2) return n.toLong()
+    memo[n]?.let { return it }             // already solved: look it up
+    val answer = fibMemo(n - 1) + fibMemo(n - 2)
+    memo[n] = answer                       // write it in the notebook
+    return answer
+}
+
+// 3. Bottom-up table (tabulation): O(n) time, O(n) space.
+fun fibTable(n: Int): Long {
+    if (n &lt; 2) return n.toLong()
+    val dp = LongArray(n + 1)
+    dp[1] = 1
+    for (i in 2..n) dp[i] = dp[i - 1] + dp[i - 2]
+    return dp[n]
+}
+
+// 4. Keep only the last two values: O(n) time, O(1) space.
+fun fibTwoVars(n: Int): Long {
+    var a = 0L
+    var b = 1L
+    repeat(n) { val next = a + b; a = b; b = next }
+    return a
+}
+
+fun main() {
+    val n = 30
+    println("naive : ${fibNaive(n)}  calls = $naiveCalls")
+    println("memo  : ${fibMemo(n)}  calls = $memoCalls")
+    println("table : ${fibTable(n)}")
+    println("2 vars: ${fibTwoVars(n)}")
+    println("fib(90) = ${fibTwoVars(90)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-fib-four">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-fib-four">var naiveCalls = 0L
+var memoCalls = 0L
+val memo = HashMap<Int, Long>()
+
+// 1. Naive recursion: exponential time.
+fun fibNaive(n: Int): Long {
+    naiveCalls++
+    return if (n < 2) n.toLong() else fibNaive(n - 1) + fibNaive(n - 2)
+}
+
+// 2. Top-down with a notebook (memoisation): O(n) time, O(n) space.
+fun fibMemo(n: Int): Long {
+    memoCalls++
+    if (n < 2) return n.toLong()
+    memo[n]?.let { return it }             // already solved: look it up
+    val answer = fibMemo(n - 1) + fibMemo(n - 2)
+    memo[n] = answer                       // write it in the notebook
+    return answer
+}
+
+// 3. Bottom-up table (tabulation): O(n) time, O(n) space.
+fun fibTable(n: Int): Long {
+    if (n < 2) return n.toLong()
+    val dp = LongArray(n + 1)
+    dp[1] = 1
+    for (i in 2..n) dp[i] = dp[i - 1] + dp[i - 2]
+    return dp[n]
+}
+
+// 4. Keep only the last two values: O(n) time, O(1) space.
+fun fibTwoVars(n: Int): Long {
+    var a = 0L
+    var b = 1L
+    repeat(n) { val next = a + b; a = b; b = next }
+    return a
+}
+
+fun main() {
+    val n = 30
+    println("naive : ${fibNaive(n)}  calls = $naiveCalls")
+    println("memo  : ${fibMemo(n)}  calls = $memoCalls")
+    println("table : ${fibTable(n)}")
+    println("2 vars: ${fibTwoVars(n)}")
+    println("fib(90) = ${fibTwoVars(90)}")
+}
+</script></div>
+<table><tr><th>Version</th><th>Time</th><th>Space</th></tr><tr><td>Naive recursion</td><td>exponential, about <code>O(1.6^n)</code></td><td><code>O(n)</code> call stack</td></tr><tr><td>Memoised</td><td><code>O(n)</code></td><td><code>O(n)</code></td></tr><tr><td>Tabulated</td><td><code>O(n)</code></td><td><code>O(n)</code></td></tr><tr><td>Two variables</td><td><code>O(n)</code></td><td><code>O(1)</code></td></tr></table>
+
+<p>The last step is a habit worth learning: when <code>dp[i]</code> only needs the previous one or two entries, you do not have to keep the whole table. Keep a few variables.</p>
+<h2 id="dp-1d">7. Classic one-dimensional problems</h2>
+
+<p>A one-dimensional DP has a single index in its state. We will do three, each following the four steps.</p>
+<h3>Climbing stairs</h3>
+<p>You can climb 1 or 2 steps at a time. How many different ways reach step <code>n</code>?</p>
+<ol>
+<li><strong>State:</strong> <code>ways[i]</code> = the number of ways to reach step <code>i</code>.</li>
+<li><strong>Recurrence:</strong> the last move was a 1-step from <code>i-1</code> or a 2-step from <code>i-2</code>, so <code>ways[i] = ways[i-1] + ways[i-2]</code>.</li>
+<li><strong>Base:</strong> <code>ways[0] = 1</code> (do nothing), <code>ways[1] = 1</code>.</li>
+<li><strong>Order:</strong> <code>i</code> from 2 up to <code>n</code>.</li>
+</ol>
+<p>It is Fibonacci in disguise. Spotting a familiar recurrence is a big part of the skill.</p>
+<h3>House robber</h3>
+<p>A row of houses holds some money each. You may not take from two neighbouring houses. What is the most you can take?</p>
+<ol>
+<li><strong>State:</strong> <code>best[i]</code> = the most money from the first <code>i</code> houses.</li>
+<li><strong>Recurrence:</strong> for house <code>i</code>, either skip it (<code>best[i-1]</code>) or take it and skip its neighbour (<code>best[i-2] + money[i]</code>). Choose the larger.</li>
+<li><strong>Base:</strong> no houses gives 0; one house gives its money.</li>
+<li><strong>Order:</strong> left to right. Only the last two values matter, so two variables are enough.</li>
+</ol>
+<h3>Coin change, fewest coins</h3>
+<p>The same coin problem greedy got wrong, now solved properly. <strong>State:</strong> <code>fewest[a]</code> = the fewest coins to make amount <code>a</code>. <strong>Recurrence:</strong> try each coin <code>c</code> as the last coin: <code>fewest[a] = 1 + min(fewest[a - c])</code>. <strong>Base:</strong> <code>fewest[0] = 0</code>. <strong>Order:</strong> amounts from 1 up to the target. Amounts that no coin combination can make stay at &ldquo;infinity&rdquo; and we report <code>-1</code>.</p>
+<div class="try demo"><h3>Run it: stairs, robber and coin change</h3>
+<p>Change the numbers, and try writing the state sentence for each function before reading the code.</p>
+<pre><code>// Climbing stairs: ways[i] = ways[i-1] + ways[i-2]
+fun climbStairs(n: Int): Long {
+    var prev = 1L      // ways[0]
+    var cur = 1L       // ways[1]
+    for (i in 2..n) { val next = prev + cur; prev = cur; cur = next }
+    return cur
+}
+
+// House robber: best[i] = max(best[i-1], best[i-2] + money[i])
+fun rob(money: IntArray): Int {
+    var twoBack = 0    // best for the houses up to i-2
+    var oneBack = 0    // best for the houses up to i-1
+    for (m in money) {
+        val best = maxOf(oneBack, twoBack + m)
+        twoBack = oneBack
+        oneBack = best
+    }
+    return oneBack
+}
+
+// Coin change: fewest[a] = 1 + min over coins of fewest[a - coin]
+fun coinChange(coins: IntArray, amount: Int): Int {
+    if (amount &lt; 0) return -1
+    val inf = amount + 1                       // bigger than any real answer
+    val fewest = IntArray(amount + 1) { inf }
+    fewest[0] = 0
+    for (a in 1..amount) {
+        for (c in coins) {
+            if (c &lt;= a &amp;&amp; fewest[a - c] + 1 &lt; fewest[a]) fewest[a] = fewest[a - c] + 1
+        }
+    }
+    return if (fewest[amount] &gt;= inf) -1 else fewest[amount]
+}
+
+fun main() {
+    println("stairs(5) = ${climbStairs(5)}, stairs(50) = ${climbStairs(50)}")
+    println("rob = ${rob(intArrayOf(2, 7, 9, 3, 1))}")          // 2 + 9 + 1 = 12
+    println("coins 1,3,4 for 6 = ${coinChange(intArrayOf(1, 3, 4), 6)}")   // 2
+    println("coins 2 for 3     = ${coinChange(intArrayOf(2), 3)}")           // -1, impossible
+    println("coins 5 for 0     = ${coinChange(intArrayOf(5), 0)}")           // 0
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-dp-1d">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-dp-1d">// Climbing stairs: ways[i] = ways[i-1] + ways[i-2]
+fun climbStairs(n: Int): Long {
+    var prev = 1L      // ways[0]
+    var cur = 1L       // ways[1]
+    for (i in 2..n) { val next = prev + cur; prev = cur; cur = next }
+    return cur
+}
+
+// House robber: best[i] = max(best[i-1], best[i-2] + money[i])
+fun rob(money: IntArray): Int {
+    var twoBack = 0    // best for the houses up to i-2
+    var oneBack = 0    // best for the houses up to i-1
+    for (m in money) {
+        val best = maxOf(oneBack, twoBack + m)
+        twoBack = oneBack
+        oneBack = best
+    }
+    return oneBack
+}
+
+// Coin change: fewest[a] = 1 + min over coins of fewest[a - coin]
+fun coinChange(coins: IntArray, amount: Int): Int {
+    if (amount < 0) return -1
+    val inf = amount + 1                       // bigger than any real answer
+    val fewest = IntArray(amount + 1) { inf }
+    fewest[0] = 0
+    for (a in 1..amount) {
+        for (c in coins) {
+            if (c <= a && fewest[a - c] + 1 < fewest[a]) fewest[a] = fewest[a - c] + 1
+        }
+    }
+    return if (fewest[amount] >= inf) -1 else fewest[amount]
+}
+
+fun main() {
+    println("stairs(5) = ${climbStairs(5)}, stairs(50) = ${climbStairs(50)}")
+    println("rob = ${rob(intArrayOf(2, 7, 9, 3, 1))}")          // 2 + 9 + 1 = 12
+    println("coins 1,3,4 for 6 = ${coinChange(intArrayOf(1, 3, 4), 6)}")   // 2
+    println("coins 2 for 3     = ${coinChange(intArrayOf(2), 3)}")           // -1, impossible
+    println("coins 5 for 0     = ${coinChange(intArrayOf(5), 0)}")           // 0
+}
+</script></div>
+<table><tr><th>Problem</th><th>Time</th><th>Space</th></tr><tr><td>Climbing stairs</td><td><code>O(n)</code></td><td><code>O(1)</code></td></tr><tr><td>House robber</td><td><code>O(n)</code></td><td><code>O(1)</code></td></tr><tr><td>Coin change</td><td><code>O(amount * coins)</code></td><td><code>O(amount)</code></td></tr></table>
+<h2 id="dp-2d">8. Two-dimensional problems and the filled table</h2>
+
+<p>When the state needs two numbers, the table has two dimensions. A common case is two sequences, where <code>i</code> is how much of the first you have used and <code>j</code> how much of the second.</p>
+<h3>Grid paths</h3>
+<p>A robot starts at the top-left of a grid and can only move right or down. How many routes reach the bottom-right? <strong>State:</strong> <code>paths[r][c]</code> = routes to square <code>(r, c)</code>. <strong>Recurrence:</strong> you arrived from above or from the left, so <code>paths[r][c] = paths[r-1][c] + paths[r][c-1]</code>. <strong>Base:</strong> the first row and first column are all 1. <strong>Order:</strong> row by row.</p>
+<figure class="fig"><div class="diagram"><pre> 3 rows x 4 columns.  Each cell = cell above + cell to the left.
+
+        col0 col1 col2 col3
+ row0 [   1    1    1    1 ]
+ row1 [   1    2    3    4 ]
+ row2 [   1    3    6   10 ]   &lt;- answer: 10 routes</pre></div><figcaption>The filled table for grid paths. Every number comes from its two neighbours.</figcaption></figure>
+
+<h3>Longest common subsequence</h3>
+<p>A <strong>subsequence</strong> keeps letters in order but may skip some, like <code>ACD</code> from <code>ABCD</code>. The <strong>longest common subsequence</strong> (LCS) of two strings is the longest one that appears in both. It is the idea behind file-comparison tools.</p>
+<ol>
+<li><strong>State:</strong> <code>dp[i][j]</code> = the LCS length of the first <code>i</code> letters of <code>s</code> and the first <code>j</code> letters of <code>t</code>.</li>
+<li><strong>Recurrence:</strong> if the letters <code>s[i-1]</code> and <code>t[j-1]</code> match, extend the diagonal: <code>dp[i-1][j-1] + 1</code>. Otherwise take the better of dropping a letter from either string: <code>max(dp[i-1][j], dp[i][j-1])</code>.</li>
+<li><strong>Base:</strong> with an empty string the answer is 0, so row 0 and column 0 are zeros.</li>
+<li><strong>Order:</strong> rows top to bottom, columns left to right.</li>
+</ol>
+<figure class="fig"><div class="diagram"><pre> s = "ABCD" (down), t = "ACBD" (across)
+
+           ""   A   C   B   D
+      ""    0   0   0   0   0
+      A     0   1   1   1   1
+      B     0   1   1   2   2
+      C     0   1   2   2   2
+      D     0   1   2   2   3   &lt;- bottom-right: LCS length 3 ("ACD" or "ABD")
+
+ The cell for (C, C) = diagonal 1 + 1 = 2, because the letters match.
+ The cell for (B, C) = max(above 1, left 1) = 1, because they do not.</pre></div><figcaption>A filled LCS table. The answer is the bottom-right corner.</figcaption></figure>
+<div class="try demo"><h3>Run it: grid paths and longest common subsequence</h3>
+<p>The printed table matches the diagram above. Time and space are both <code>O(rows * cols)</code>.</p>
+<pre><code>fun gridPaths(rows: Int, cols: Int): Long {
+    val paths = Array(rows) { LongArray(cols) }
+    for (r in 0 until rows) for (c in 0 until cols) {
+        paths[r][c] = if (r == 0 || c == 0) 1 else paths[r - 1][c] + paths[r][c - 1]
+    }
+    return paths[rows - 1][cols - 1]
+}
+
+fun lcsTable(s: String, t: String): Array&lt;IntArray&gt; {
+    val dp = Array(s.length + 1) { IntArray(t.length + 1) }     // row 0 and column 0 stay 0
+    for (i in 1..s.length) for (j in 1..t.length) {
+        dp[i][j] = if (s[i - 1] == t[j - 1]) dp[i - 1][j - 1] + 1
+                   else maxOf(dp[i - 1][j], dp[i][j - 1])
+    }
+    return dp
+}
+
+fun main() {
+    println("grid 3x4 -&gt; ${gridPaths(3, 4)}")
+    println("grid 18x18 -&gt; ${gridPaths(18, 18)}")
+    val s = "ABCD"
+    val t = "ACBD"
+    val dp = lcsTable(s, t)
+    for (row in dp) println(row.joinToString(" "))
+    println("LCS length = ${dp[s.length][t.length]}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-grid-lcs">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-grid-lcs">fun gridPaths(rows: Int, cols: Int): Long {
+    val paths = Array(rows) { LongArray(cols) }
+    for (r in 0 until rows) for (c in 0 until cols) {
+        paths[r][c] = if (r == 0 || c == 0) 1 else paths[r - 1][c] + paths[r][c - 1]
+    }
+    return paths[rows - 1][cols - 1]
+}
+
+fun lcsTable(s: String, t: String): Array<IntArray> {
+    val dp = Array(s.length + 1) { IntArray(t.length + 1) }     // row 0 and column 0 stay 0
+    for (i in 1..s.length) for (j in 1..t.length) {
+        dp[i][j] = if (s[i - 1] == t[j - 1]) dp[i - 1][j - 1] + 1
+                   else maxOf(dp[i - 1][j], dp[i][j - 1])
+    }
+    return dp
+}
+
+fun main() {
+    println("grid 3x4 -> ${gridPaths(3, 4)}")
+    println("grid 18x18 -> ${gridPaths(18, 18)}")
+    val s = "ABCD"
+    val t = "ACBD"
+    val dp = lcsTable(s, t)
+    for (row in dp) println(row.joinToString(" "))
+    println("LCS length = ${dp[s.length][t.length]}")
+}
+</script></div>
+
+<h3>Edit distance</h3>
+<p>The <strong>edit distance</strong> between two words is the fewest single-letter edits (insert, delete or replace) that turn one into the other. Spell checkers use it to suggest corrections. The shape is the same as LCS. <strong>State:</strong> <code>dp[i][j]</code> = the edits to turn the first <code>i</code> letters of <code>a</code> into the first <code>j</code> of <code>b</code>. <strong>Base:</strong> turning a word into an empty one costs its length (delete everything), and the reverse costs the other length (insert everything). <strong>Recurrence:</strong> if the letters match, copy the diagonal for free. Otherwise it is one edit plus the cheapest of three neighbours: diagonal (replace), above (delete), left (insert).</p>
+<div class="try demo"><h3>Run it: how far apart are two words?</h3>
+<pre><code>fun editDistance(a: String, b: String): Int {
+    val dp = Array(a.length + 1) { IntArray(b.length + 1) }
+    for (i in 0..a.length) dp[i][0] = i          // delete i letters
+    for (j in 0..b.length) dp[0][j] = j          // insert j letters
+    for (i in 1..a.length) for (j in 1..b.length) {
+        dp[i][j] = if (a[i - 1] == b[j - 1]) {
+            dp[i - 1][j - 1]                                             // match: free
+        } else {
+            1 + minOf(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])      // replace, delete, insert
+        }
+    }
+    return dp[a.length][b.length]
+}
+
+fun main() {
+    println(editDistance("kitten", "sitting"))   // 3
+    println(editDistance("", "abc"))             // 3
+    println(editDistance("same", "same"))        // 0
+    println(editDistance("horse", "ros"))        // 3
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-edit-distance">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-edit-distance">fun editDistance(a: String, b: String): Int {
+    val dp = Array(a.length + 1) { IntArray(b.length + 1) }
+    for (i in 0..a.length) dp[i][0] = i          // delete i letters
+    for (j in 0..b.length) dp[0][j] = j          // insert j letters
+    for (i in 1..a.length) for (j in 1..b.length) {
+        dp[i][j] = if (a[i - 1] == b[j - 1]) {
+            dp[i - 1][j - 1]                                             // match: free
+        } else {
+            1 + minOf(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])      // replace, delete, insert
+        }
+    }
+    return dp[a.length][b.length]
+}
+
+fun main() {
+    println(editDistance("kitten", "sitting"))   // 3
+    println(editDistance("", "abc"))             // 3
+    println(editDistance("same", "same"))        // 0
+    println(editDistance("horse", "ros"))        // 3
+}
+</script></div>
+<div class="note"><p><strong>Saving space.</strong> Row <code>i</code> of these tables only reads row <code>i-1</code>, so you can keep just two rows and use <code>O(columns)</code> space. You give up the ability to rebuild <em>which</em> letters were chosen, so keep the whole table if you need that.</p></div>
+<h2 id="top-bottom">9. Top-down or bottom-up?</h2>
+
+<p>Both styles give the same answers and the same Big-O in most problems. They differ in how you write them and what they cost in practice.</p>
+<table><tr><th></th><th>Top-down (memoisation)</th><th>Bottom-up (tabulation)</th></tr><tr><td>Shape</td><td>A recursive function plus a cache</td><td>Loops filling an array</td></tr><tr><td>Order</td><td>The computer works it out from the calls</td><td>You must choose it yourself</td></tr><tr><td>Work done</td><td>Only the states that are really needed</td><td>Usually every state in the table</td></tr><tr><td>Risk</td><td>Deep recursion can overflow the stack</td><td>None, but you must get the loop order right</td></tr><tr><td>Space saving</td><td>Hard</td><td>Easy: keep only the last row or two values</td></tr><tr><td>Easiest to</td><td>Write first, straight from the recurrence</td><td>Make fast and small afterwards</td></tr></table>
+
+<p>A practical path: write the recurrence as plain recursion, add a cache to see it work (top-down), then convert to loops and shrink the memory (bottom-up). You do not have to pick one for life.</p>
+<div class="try demo"><h3>Run it: the same problem, both ways</h3>
+<p>Both print the same numbers. Only the way of getting there differs.</p>
+<pre><code>// Count the ways to climb n stairs taking 1, 2 or 3 steps at a time.
+
+// Top-down: recursion plus a cache.
+fun waysTopDown(n: Int, cache: HashMap&lt;Int, Long&gt; = HashMap()): Long {
+    if (n &lt; 0) return 0
+    if (n == 0) return 1
+    cache[n]?.let { return it }
+    val result = waysTopDown(n - 1, cache) + waysTopDown(n - 2, cache) + waysTopDown(n - 3, cache)
+    cache[n] = result
+    return result
+}
+
+// Bottom-up: a table filled from the smallest case.
+fun waysBottomUp(n: Int): Long {
+    val ways = LongArray(n + 1)
+    ways[0] = 1
+    for (i in 1..n) {
+        for (step in 1..3) if (i - step &gt;= 0) ways[i] += ways[i - step]
+    }
+    return ways[n]
+}
+
+fun main() {
+    for (n in listOf(0, 1, 3, 10, 30)) {
+        println("n=$n  top-down=${waysTopDown(n)}  bottom-up=${waysBottomUp(n)}")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-top-down-vs-bottom-up">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-top-down-vs-bottom-up">// Count the ways to climb n stairs taking 1, 2 or 3 steps at a time.
+
+// Top-down: recursion plus a cache.
+fun waysTopDown(n: Int, cache: HashMap<Int, Long> = HashMap()): Long {
+    if (n < 0) return 0
+    if (n == 0) return 1
+    cache[n]?.let { return it }
+    val result = waysTopDown(n - 1, cache) + waysTopDown(n - 2, cache) + waysTopDown(n - 3, cache)
+    cache[n] = result
+    return result
+}
+
+// Bottom-up: a table filled from the smallest case.
+fun waysBottomUp(n: Int): Long {
+    val ways = LongArray(n + 1)
+    ways[0] = 1
+    for (i in 1..n) {
+        for (step in 1..3) if (i - step >= 0) ways[i] += ways[i - step]
+    }
+    return ways[n]
+}
+
+fun main() {
+    for (n in listOf(0, 1, 3, 10, 30)) {
+        println("n=$n  top-down=${waysTopDown(n)}  bottom-up=${waysBottomUp(n)}")
+    }
+}
+</script></div>
+<h2 id="choose">10. Choosing the right tool</h2>
+
+<p>You now have four ways of attacking a problem that has many possible answers. Use this table to decide, and then confirm on a small example.</p>
+<table><tr><th>Approach</th><th>Use it when</th><th>Signs in the problem</th><th>Typical cost</th></tr><tr><td>Brute force</td><td>The input is tiny, or you need a trusted answer to test against</td><td>&ldquo;try every&hellip;&rdquo; with small <code>n</code></td><td>Often exponential</td></tr><tr><td>Backtracking</td><td>You must list or find answers built from a series of choices, and some choices can be ruled out early</td><td>&ldquo;all subsets / arrangements / placements&rdquo;, constraints such as &ldquo;no two attack&rdquo;</td><td>Exponential, shrunk by pruning</td></tr><tr><td>Greedy</td><td>A locally best step is provably safe</td><td>Sorting then one pass; &ldquo;earliest end&rdquo;, &ldquo;farthest reach&rdquo;; you cannot find a counter-example</td><td>Usually <code>O(n log n)</code> or <code>O(n)</code></td></tr><tr><td>Dynamic programming</td><td>The best answer is built from smaller best answers, and the same subproblems repeat</td><td>&ldquo;fewest / most / how many ways&rdquo;; recursion that recomputes the same inputs; two sequences</td><td>Number of states times work per state</td></tr></table>
+
+<p>A short routine for a new problem:</p>
+<ol>
+<li>Write the brute-force recursion. Is it correct on small inputs?</li>
+<li>Draw its call tree. Do the same arguments appear more than once? If so, add a cache (DP).</li>
+<li>If you need the actual list of answers rather than a count or a best value, you are probably doing backtracking, and the answers themselves set the cost.</li>
+<li>If sorting the input makes one simple rule work, test it against the brute force. If it never disagrees on many small cases, greedy may be right.</li>
+</ol>
+<div class="note"><p><strong>Counting versus listing.</strong> &ldquo;How many subsets add up to 10?&rdquo; can be answered by DP in polynomial time. &ldquo;List all subsets that add up to 10&rdquo; must produce each one, so it is backtracking. The words &ldquo;how many&rdquo; and &ldquo;list&rdquo; point to different tools.</p></div>
+<h2 id="practice">11. Practice</h2>
+<p>Six exercises, one for each idea in this part. Start with the state sentence on paper for the DP ones, and test small cases by hand first.</p>
+<div class="try"><h3>Try it: fast power</h3>
+<p>Write <code>power(base, exp)</code> with recursion that halves the exponent, so it needs only about <code>log exp</code> calls. Assume <code>exp &gt;= 0</code>. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun power(base: Long, exp: Int): Long {
+    TODO("base case first, then use the half")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-fast-power">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-fast-power">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun power(base: Long, exp: Int): Long {
+    TODO("base case first, then use the half")
+}
+
+fun main() {
+    test("exponent zero") { eq(power(2, 0), 1L) }
+    test("zero to the zero") { eq(power(0, 0), 1L) }
+    test("2 to the 10") { eq(power(2, 10), 1024L) }
+    test("odd exponent") { eq(power(3, 5), 243L) }
+    test("big exponent") { eq(power(2, 62), 4611686018427387904L) }
+    test("negative base") { eq(power(-2, 3), -8L) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Compute <code>half = power(base, exp / 2)</code> once, not twice. Square it, and multiply by <code>base</code> once more when <code>exp</code> is odd.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun power(base: Long, exp: Int): Long {
+    if (exp == 0) return 1
+    val half = power(base, exp / 2)
+    return if (exp % 2 == 0) half * half else half * half * base
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: combinations by backtracking</h3>
+<p>Write <code>combinations(n, k)</code>: every way to choose <code>k</code> numbers from <code>1..n</code>, each combination in increasing order, and the list in dictionary order. Use choose, explore, un-choose. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun combinations(n: Int, k: Int): List&lt;List&lt;Int&gt;&gt; {
+    TODO("backtrack with a current list and a start number")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-combinations">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-combinations">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun combinations(n: Int, k: Int): List<List<Int>> {
+    TODO("backtrack with a current list and a start number")
+}
+
+fun main() {
+    test("4 choose 2") { eq(combinations(4, 2), listOf(listOf(1, 2), listOf(1, 3), listOf(1, 4), listOf(2, 3), listOf(2, 4), listOf(3, 4))) }
+    test("choose none") { eq(combinations(3, 0), listOf(emptyList<Int>())) }
+    test("choose all") { eq(combinations(3, 3), listOf(listOf(1, 2, 3))) }
+    test("k bigger than n") { eq(combinations(3, 4), emptyList<List<Int>>()) }
+    test("count of 10 choose 5") { eq(combinations(10, 5).size, 252) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Stop when <code>current.size == k</code> and save a copy. In the loop, go from <code>start</code> to <code>n</code> and recurse with <code>i + 1</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun combinations(n: Int, k: Int): List&lt;List&lt;Int&gt;&gt; {
+    val result = mutableListOf&lt;List&lt;Int&gt;&gt;()
+    val current = mutableListOf&lt;Int&gt;()
+    fun explore(start: Int) {
+        if (current.size == k) {
+            result.add(current.toList())
+            return
+        }
+        for (i in start..n) {
+            current.add(i)
+            explore(i + 1)
+            current.removeAt(current.size - 1)
+        }
+    }
+    explore(1)
+    return result
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: jump game (greedy)</h3>
+<p>Each number in <code>nums</code> is the longest jump from that square. Write <code>canJump</code> that says whether you can reach the last square starting from the first. Track the farthest reachable square in one pass. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun canJump(nums: IntArray): Boolean {
+    TODO("walk left to right, track the farthest square")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-can-jump">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-can-jump">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun canJump(nums: IntArray): Boolean {
+    TODO("walk left to right, track the farthest square")
+}
+
+fun main() {
+    test("reachable") { eq(canJump(intArrayOf(2, 3, 1, 1, 4)), true) }
+    test("blocked by zero") { eq(canJump(intArrayOf(3, 2, 1, 0, 4)), false) }
+    test("single square") { eq(canJump(intArrayOf(0)), true) }
+    test("stuck at start") { eq(canJump(intArrayOf(0, 1)), false) }
+    test("long input") { eq(canJump(IntArray(100_000) { 1 }), true) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> If the current index is greater than <code>farthest</code>, return <code>false</code>. Otherwise update <code>farthest</code> with <code>i + nums[i]</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun canJump(nums: IntArray): Boolean {
+    var farthest = 0
+    for (i in nums.indices) {
+        if (i &gt; farthest) return false
+        farthest = maxOf(farthest, i + nums[i])
+    }
+    return true
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: house robber (1D DP)</h3>
+<p>Write <code>rob(money)</code>: the largest total you can take from a row of houses without taking from two neighbours. Remember the empty row. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun rob(money: IntArray): Int {
+    TODO("best so far = max(skip this house, take it plus best two back)")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-house-robber">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-house-robber">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun rob(money: IntArray): Int {
+    TODO("best so far = max(skip this house, take it plus best two back)")
+}
+
+fun main() {
+    test("no houses") { eq(rob(intArrayOf()), 0) }
+    test("one house") { eq(rob(intArrayOf(5)), 5) }
+    test("take alternate") { eq(rob(intArrayOf(2, 7, 9, 3, 1)), 12) }
+    test("small") { eq(rob(intArrayOf(1, 2, 3, 1)), 4) }
+    test("two houses, take the bigger") { eq(rob(intArrayOf(3, 10)), 10) }
+    test("long row") { eq(rob(IntArray(100_000) { 1 }), 50_000) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Keep two variables: the best total up to the previous house, and up to the one before that. For each house the new best is <code>maxOf(oneBack, twoBack + m)</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun rob(money: IntArray): Int {
+    var twoBack = 0
+    var oneBack = 0
+    for (m in money) {
+        val best = maxOf(oneBack, twoBack + m)
+        twoBack = oneBack
+        oneBack = best
+    }
+    return oneBack
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: fewest coins (1D DP)</h3>
+<p>Write <code>minCoins(coins, amount)</code>: the fewest coins that add up to <code>amount</code>, or <code>-1</code> if it is impossible. A negative amount is impossible, and zero needs no coins. Greedy fails for some coin sets, so use a table. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun minCoins(coins: IntArray, amount: Int): Int {
+    TODO("fewest[a] = 1 + min(fewest[a - coin])")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-min-coins">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-min-coins">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun minCoins(coins: IntArray, amount: Int): Int {
+    TODO("fewest[a] = 1 + min(fewest[a - coin])")
+}
+
+fun main() {
+    test("zero amount") { eq(minCoins(intArrayOf(1, 2, 5), 0), 0) }
+    test("negative amount") { eq(minCoins(intArrayOf(1, 2, 5), -3), -1) }
+    test("typical") { eq(minCoins(intArrayOf(1, 2, 5), 11), 3) }
+    test("greedy would fail") { eq(minCoins(intArrayOf(1, 3, 4), 6), 2) }
+    test("impossible") { eq(minCoins(intArrayOf(2), 3), -1) }
+    test("no coins") { eq(minCoins(intArrayOf(), 5), -1) }
+    test("large amount") { eq(minCoins(intArrayOf(1, 5, 10, 25), 10_000), 400) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Fill the table with a value bigger than any answer (like <code>amount + 1</code>), set <code>fewest[0] = 0</code>, then check at the end whether the target is still that big value.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun minCoins(coins: IntArray, amount: Int): Int {
+    if (amount &lt; 0) return -1
+    val inf = amount + 1
+    val fewest = IntArray(amount + 1) { inf }
+    fewest[0] = 0
+    for (a in 1..amount) {
+        for (c in coins) {
+            if (c &lt;= a &amp;&amp; fewest[a - c] + 1 &lt; fewest[a]) fewest[a] = fewest[a - c] + 1
+        }
+    }
+    return if (fewest[amount] &gt;= inf) -1 else fewest[amount]
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: longest common subsequence (2D DP)</h3>
+<p>Write <code>lcsLength(s, t)</code>: the length of the longest subsequence that appears in both strings. Build the two-dimensional table from the diagram. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun lcsLength(s: String, t: String): Int {
+    TODO("dp[i][j] for the first i letters of s and first j of t")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p7-lcs-length">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p7-lcs-length">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun lcsLength(s: String, t: String): Int {
+    TODO("dp[i][j] for the first i letters of s and first j of t")
+}
+
+fun main() {
+    test("both empty") { eq(lcsLength("", ""), 0) }
+    test("one empty") { eq(lcsLength("abc", ""), 0) }
+    test("the diagram example") { eq(lcsLength("ABCD", "ACBD"), 3) }
+    test("identical") { eq(lcsLength("kotlin", "kotlin"), 6) }
+    test("nothing in common") { eq(lcsLength("abc", "xyz"), 0) }
+    test("classic") { eq(lcsLength("AGGTAB", "GXTXAYB"), 4) }
+    test("long strings") { eq(lcsLength("ab".repeat(500), "ba".repeat(500)), 999) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Row 0 and column 0 stay zero. On a match use <code>dp[i-1][j-1] + 1</code>, otherwise the larger of the cell above and the cell to the left.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun lcsLength(s: String, t: String): Int {
+    val dp = Array(s.length + 1) { IntArray(t.length + 1) }
+    for (i in 1..s.length) for (j in 1..t.length) {
+        dp[i][j] = if (s[i - 1] == t[j - 1]) dp[i - 1][j - 1] + 1
+                   else maxOf(dp[i - 1][j], dp[i][j - 1])
+    }
+    return dp[s.length][t.length]
+}</code></pre>
+</details></div>
+<div class="note"><p><strong>A good habit.</strong> After each DP solution, change the numbers in the tests and predict the output before you run it. If your prediction is wrong, that is exactly where the learning is.</p></div>
+
+    <h2 id="takeaways">12. Takeaways</h2>
+    <ul><li>Write the base case first, and make sure each call moves toward it.</li><li>Recursion uses call stack space; very deep recursion should become a loop.</li><li>Backtracking: choose, explore, un-choose, and save a copy of each answer.</li><li>Greedy is fast but must be justified; test it against a slow, correct solution.</li><li>For DP, write the meaning of the state in one sentence before any code.</li><li>If a recursion repeats the same arguments, add a cache. If only the last row or two values are needed, drop the full table.</li><li>Next up: Part 8 collects the reusable programming patterns, such as two pointers and sliding windows.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Recursion</td><td>A function that solves a problem by calling itself on a smaller piece of it.</td></tr><tr><td>Base case</td><td>The input so small that the answer is known without another call.</td></tr><tr><td>Recursive case</td><td>The part that calls the function again on a smaller input and combines the result.</td></tr><tr><td>Call stack</td><td>The pile of frames, one per active function call, that remembers where to continue.</td></tr><tr><td>Stack overflow</td><td>The error when recursion goes deeper than the call stack can hold.</td></tr><tr><td>Tail call</td><td>A recursive call that is the last thing a function does.</td></tr><tr><td>Divide and conquer</td><td>Split into non-overlapping pieces, solve each, combine the answers.</td></tr><tr><td>Backtracking</td><td>Building an answer step by step and undoing a step when it leads nowhere.</td></tr><tr><td>State</td><td>The information that describes where you are in a search or a table.</td></tr><tr><td>Pruning</td><td>Skipping a branch of the search as soon as it cannot give a valid answer.</td></tr><tr><td>Greedy algorithm</td><td>An algorithm that always takes the best-looking choice now and never undoes it.</td></tr><tr><td>Subproblem</td><td>A smaller version of the same problem.</td></tr><tr><td>Overlapping subproblems</td><td>The same subproblem is needed many times by different bigger problems.</td></tr><tr><td>Optimal substructure</td><td>The best answer to the whole is made of the best answers to its parts.</td></tr><tr><td>Memoisation</td><td>Top-down DP: keep the recursion and cache each result.</td></tr><tr><td>Tabulation</td><td>Bottom-up DP: fill a table with loops from the smallest case upward.</td></tr><tr><td>Recurrence</td><td>A formula that gives one state from smaller states.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-6-sorting-and-searching.html"><small>&larr; Previous &middot; Part 6</small>Sorting and searching</a><a class="next" href="dsa-part-8-problem-solving-patterns.html"><small>Next &middot; Part 8 &rarr;</small>Programming patterns for solving problems</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

@@ -558,6 +558,8 @@
     .series-card .series-title { font-size: calc(17px * var(--fs, 1)); }
     .series-level { grid-column: 1 / -1; font-size: calc(11px * var(--fs, 1)); font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text); margin-top: 6px; }
     .series-level span { font-weight: 400; letter-spacing: .6px; color: var(--muted); text-transform: none; margin-left: 6px; }
+    .series-sub { grid-column: 1 / -1; font-size: calc(13px * var(--fs, 1)); font-weight: 600; color: var(--text); margin-top: 2px; padding-left: 10px; border-left: 3px solid #3b82f6; }
+    .series-sub span { font-weight: 400; color: var(--muted); margin-left: 6px; }
     .series-parts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
     .series-parts[hidden] { display: none; }
     .archive-btn.series-toggle {
@@ -577,7 +579,7 @@
     }
     .series-part:hover { background: var(--card-h); border-color: var(--border-h); transform: translateY(-2px); }
     .sp-num {
-      flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; background: #3b82f6; color: #fff;
+      flex: 0 0 auto; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #3b82f6; color: #fff;
       font-size: calc(12px * var(--fs, 1)); font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px;
     }
     .sp-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -1053,22 +1055,8 @@
   <div class="container">
     <p class="section-label">Technical Writing</p>
 
-    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">6 posts</span></p>
+    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">3 posts</span></p>
     <div class="blog-grid new-grid">
-      <a href="blog/clean-architecture-summary.html" class="blog-card featured reveal">
-        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Clean Architecture, Chapter by Chapter: A Kotlin Companion to Uncle Bob&rsquo;s Guide</div>
-        <div class="blog-summary">All chapters of <em>Clean Architecture</em> plus the 2012 article, with diagrams and Kotlin examples for the Dependency Rule, boundaries, components and details.</div>
-        <div class="blog-tags"><span class="blog-tag">Clean Architecture</span><span class="blog-tag">Book summary</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Software design</span></div>
-        <div class="blog-footer"><span class="views-badge">~45 min read</span><span class="blog-date">Oct 2026</span></div>
-      </a>
-      <a href="blog/clean-code-summary.html" class="blog-card featured reveal">
-        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Clean Code, Distilled: What I Learned from Robert C. Martin&rsquo;s Classic</div>
-        <div class="blog-summary">My summary of all 17 chapters of <em>Clean Code</em>, from names and functions to error handling, classes, concurrency and smells, each with a bad and a clean Kotlin example, plus where to get the book.</div>
-        <div class="blog-tags"><span class="blog-tag">Clean Code</span><span class="blog-tag">Book summary</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Refactoring</span></div>
-        <div class="blog-footer"><span class="views-badge">~40 min read</span><span class="blog-date">Oct 2026</span></div>
-      </a>
       <a href="blog/design-docs-guide.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
         <div class="blog-title">Write It Before You Build It: A Practical Guide to Design Docs</div>
@@ -1076,19 +1064,12 @@
         <div class="blog-tags"><span class="blog-tag">Design docs</span><span class="blog-tag">Software design</span><span class="blog-tag">Teamwork</span><span class="blog-tag">Templates</span></div>
         <div class="blog-footer"><span class="views-badge">~15 min read</span><span class="blog-date">Oct 2026</span></div>
       </a>
-      <a href="blog/solid-principles-explained.html" class="blog-card featured reveal">
-        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Designing for Change: The SOLID Principles, Explained and Practised</div>
-        <div class="blog-summary">The five SOLID design principles in plain words: one diagram and one small Kotlin example each, plus exercises with tests that you open in the Kotlin Playground and fix yourself.</div>
-        <div class="blog-tags"><span class="blog-tag">SOLID</span><span class="blog-tag">Design principles</span><span class="blog-tag">Kotlin</span><span class="blog-tag">Clean code</span></div>
-        <div class="blog-footer"><span class="views-badge">~30 min with exercises</span><span class="blog-date">Oct 2026</span></div>
-      </a>
-      <a href="blog/design-patterns-kotlin.html" class="blog-card featured reveal">
-        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
-        <div class="blog-title">Design Patterns in Kotlin: 50+ Patterns With Diagrams and Playground Exercises</div>
-        <div class="blog-summary">53 patterns from Wikipedia&rsquo;s catalogue in plain words: Creational, Structural, Behavioral and Concurrency. Each has a diagram, a Kotlin example and its SOLID links; the most popular are starred, and 15 come with tests you run in the Kotlin Playground.</div>
-        <div class="blog-tags"><span class="blog-tag">Design patterns</span><span class="blog-tag">Kotlin</span><span class="blog-tag">SOLID</span><span class="blog-tag">Concurrency</span><span class="blog-tag">Android</span></div>
-        <div class="blog-footer"><span class="views-badge">~2 hours with exercises</span><span class="blog-date">Oct 2026</span></div>
+      <a href="blog/patterns-cheat-sheet.html" class="blog-card featured reveal">
+        <div class="blog-idx">Cheat sheet<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Patterns Cheat Sheet: Architecture, Design Patterns and DSA on One Page</div>
+        <div class="blog-summary">127 patterns in one searchable list: Android architecture, design principles, 53 software design patterns and 49 DSA patterns, each with a short description, a popular mark and a link to learn more.</div>
+        <div class="blog-tags"><span class="blog-tag">Cheat sheet</span><span class="blog-tag">Architecture</span><span class="blog-tag">Design patterns</span><span class="blog-tag">DSA</span></div>
+        <div class="blog-footer"><span class="views-badge">~10 min skim</span><span class="blog-date">Oct 2026</span></div>
       </a>
       <a href="blog/private-ai-chat-android.html" class="blog-card featured reveal">
         <div class="blog-idx">Article</div>
@@ -1099,8 +1080,141 @@
       </a>
     </div>
 
-    <p class="blog-cat"><span class="bc-title">Series</span><span class="bc-sub">4 series, 27 parts</span></p>
+    <p class="blog-cat"><span class="bc-title">Series</span><span class="bc-sub">5 series, 40 parts</span></p>
     <div class="blog-grid new-grid">
+      <div class="series-card reveal">
+        <div class="blog-idx">Series &middot; 13 parts<span class="blog-new">NEW</span></div>
+        <div class="blog-title series-title">Coding style: Clean Code, SOLID, Software Design Patterns, Clean Architecture, MVP, MVVM and Redux</div>
+        <div class="blog-summary">One path through how good code is written and organised, from naming a variable to choosing an app architecture. It starts with Clean Code, SOLID and design patterns, then moves up to Clean Architecture and the MVP, MVVM and VIPER presentation patterns, all with Kotlin examples.</div>
+        <button type="button" class="archive-btn series-toggle" aria-expanded="false" aria-controls="series-style" data-count="13"><span class="st-label">Show all 13 parts</span><span class="chev">&#9662;</span></button>
+        <div class="series-parts" id="series-style" hidden>
+          <div class="series-level">Code level <span>Parts 1 to 3 &middot; how to write each line and class</span></div>
+          <a class="series-part" href="blog/clean-code-summary.html">
+            <span class="sp-num">1</span>
+            <span class="sp-body"><span class="sp-title">Clean Code</span><span class="sp-desc">All 17 chapters: names, functions, error handling, classes and smells, with bad and clean Kotlin.</span></span>
+            <span class="sp-meta">~40 min</span>
+          </a>
+          <a class="series-part" href="blog/solid-principles-explained.html">
+            <span class="sp-num">2</span>
+            <span class="sp-body"><span class="sp-title">SOLID principles</span><span class="sp-desc">The five principles with a diagram, a small Kotlin example and playground exercises each.</span></span>
+            <span class="sp-meta">~30 min</span>
+          </a>
+          <a class="series-part" href="blog/design-patterns-kotlin.html">
+            <span class="sp-num">3</span>
+            <span class="sp-body"><span class="sp-title">Software Design Patterns</span><span class="sp-desc">53 patterns with diagrams and Kotlin examples; the popular ones are starred.</span></span>
+            <span class="sp-meta">~2 hours</span>
+          </a>
+          <div class="series-level">Architecture level <span>Part 4 &middot; how to arrange the pieces</span></div>
+          <div class="series-sub">Android Architecture series: MVC, MVP, MVVM, Redux, VIPER and Clean Architecture <span>Part 4 &middot; 10 sub-parts</span></div>
+          <a class="series-part" href="blog/android-arch-part-1-why-architecture.html">
+            <span class="sp-num">4.1</span>
+            <span class="sp-body"><span class="sp-title">Why architecture</span><span class="sp-desc">The goals, the View, Logic, Data template, and a map of MVC, MVP, MVVM, VIPER and Redux.</span></span>
+            <span class="sp-meta">~8 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-2-principles-and-patterns.html">
+            <span class="sp-num">4.2</span>
+            <span class="sp-body"><span class="sp-title">Principles</span><span class="sp-desc">SOLID, KISS, DRY, plus the Proxy, Scheduler and Repository patterns.</span></span>
+            <span class="sp-meta">~10 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-3-mvc-and-mvp.html">
+            <span class="sp-num">4.3</span>
+            <span class="sp-body"><span class="sp-title">MVC and MVP</span><span class="sp-desc">Why the Activity becomes a Massive View Controller, and how a Presenter fixes it.</span></span>
+            <span class="sp-meta">~10 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-4-mvvm-and-redux.html">
+            <span class="sp-num">4.4</span>
+            <span class="sp-body"><span class="sp-title">MVVM and Redux</span><span class="sp-desc">State flows to the view: ViewModel, StateFlow, reducers and one-way data flow.</span></span>
+            <span class="sp-meta">~11 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-5-viper-and-modules.html">
+            <span class="sp-num">4.5</span>
+            <span class="sp-body"><span class="sp-title">VIPER</span><span class="sp-desc">Five single-purpose roles, plus Gradle modules for big teams and big apps.</span></span>
+            <span class="sp-meta">~10 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-6-di-async-errors.html">
+            <span class="sp-num">4.6</span>
+            <span class="sp-body"><span class="sp-title">DI and async</span><span class="sp-desc">Hilt and Koin, coroutines vs Rx vs AsyncTask, lifecycle and error handling.</span></span>
+            <span class="sp-meta">~12 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-7-data-and-config-changes.html">
+            <span class="sp-num">4.7</span>
+            <span class="sp-body"><span class="sp-title">Data and config</span><span class="sp-desc">Room, Retrofit, gRPC, microservices, and surviving rotation, language, font and size changes.</span></span>
+            <span class="sp-meta">~13 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-8-testing-and-proof.html">
+            <span class="sp-num">4.8</span>
+            <span class="sp-body"><span class="sp-title">Testing and proof</span><span class="sp-desc">TDD, and a code proof that every architecture is the same three boxes.</span></span>
+            <span class="sp-meta">~12 min</span>
+          </a>
+          <a class="series-part" href="blog/android-arch-part-9-converting-architectures.html">
+            <span class="sp-num">4.9</span>
+            <span class="sp-body"><span class="sp-title">Converting</span><span class="sp-desc">Before/after code, mapping diagrams and a bridge adapter for moving between architectures.</span></span>
+            <span class="sp-meta">~14 min</span>
+          </a>
+          <a class="series-part" href="blog/clean-architecture-summary.html">
+            <span class="sp-num">4.10</span>
+            <span class="sp-body"><span class="sp-title">Clean Architecture</span><span class="sp-desc">The Dependency Rule, boundaries, components and details, chapter by chapter.</span></span>
+            <span class="sp-meta">~45 min</span>
+          </a>
+        </div>
+        <div class="blog-tags"><span class="blog-tag">Clean Code</span><span class="blog-tag">SOLID</span><span class="blog-tag">Software design patterns</span><span class="blog-tag">Clean Architecture</span><span class="blog-tag">MVP</span><span class="blog-tag">MVVM</span><span class="blog-tag">VIPER</span></div>
+        <div class="blog-footer"><span class="views-badge">~5 hours of reading</span><span class="blog-date">Oct 2026</span></div>
+      </div>
+      <div class="series-card reveal">
+        <div class="blog-idx">Series &middot; 9 parts<span class="blog-new">NEW</span></div>
+        <div class="blog-title series-title">Data structures, algorithms and programming patterns, with Kotlin Playground exercises</div>
+        <div class="blog-summary">A hands-on starter guide for computer science students. It covers Big-O, arrays and hashing, stacks, queues and linked lists, trees, heaps, graphs, sorting, recursion and dynamic programming, and the reusable patterns for solving problems. Every part has diagrams, runnable Kotlin and tested exercises.</div>
+        <button type="button" class="archive-btn series-toggle" aria-expanded="false" aria-controls="series-dsa" data-count="9"><span class="st-label">Show all 9 parts</span><span class="chev">&#9662;</span></button>
+        <div class="series-parts" id="series-dsa" hidden>
+          <a class="series-part" href="blog/dsa-part-1-start-here.html">
+            <span class="sp-num">1</span>
+            <span class="sp-body"><span class="sp-title">Thinking in cost</span><span class="sp-desc">Big-O, time versus space and a six-step problem-solving method.</span></span>
+            <span class="sp-meta">~25 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-2-arrays-strings-hashing.html">
+            <span class="sp-num">2</span>
+            <span class="sp-body"><span class="sp-title">Arrays, strings, hash maps and sets</span><span class="sp-desc">Arrays, strings, hash maps and sets, and how hashing finds things fast.</span></span>
+            <span class="sp-meta">~35 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-3-stacks-queues-linked-lists.html">
+            <span class="sp-num">3</span>
+            <span class="sp-body"><span class="sp-title">Stacks, queues and linked lists</span><span class="sp-desc">Linked lists, stacks, queues and deques, built by hand in Kotlin.</span></span>
+            <span class="sp-meta">~35 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-4-trees-heaps-tries.html">
+            <span class="sp-num">4</span>
+            <span class="sp-body"><span class="sp-title">Trees, heaps and tries</span><span class="sp-desc">Binary trees, search trees, heaps, priority queues and tries.</span></span>
+            <span class="sp-meta">~40 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-5-graphs.html">
+            <span class="sp-num">5</span>
+            <span class="sp-body"><span class="sp-title">Graphs and how to walk them</span><span class="sp-desc">BFS, DFS, topological sort, Dijkstra and union-find.</span></span>
+            <span class="sp-meta">~40 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-6-sorting-and-searching.html">
+            <span class="sp-num">6</span>
+            <span class="sp-body"><span class="sp-title">Sorting and searching</span><span class="sp-desc">Binary search, the classic sorts and what Kotlin gives you.</span></span>
+            <span class="sp-meta">~35 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-7-recursion-backtracking-dp.html">
+            <span class="sp-num">7</span>
+            <span class="sp-body"><span class="sp-title">Recursion, backtracking, greedy and dynamic programming</span><span class="sp-desc">Recursion, backtracking, greedy choices and dynamic programming.</span></span>
+            <span class="sp-meta">~45 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-8-problem-solving-patterns.html">
+            <span class="sp-num">8</span>
+            <span class="sp-body"><span class="sp-title">Programming patterns for solving problems</span><span class="sp-desc">Two pointers, sliding window, prefix sums, monotonic stack and more.</span></span>
+            <span class="sp-meta">~50 min</span>
+          </a>
+          <a class="series-part" href="blog/dsa-part-9-study-path-cheat-sheet.html">
+            <span class="sp-num">9</span>
+            <span class="sp-body"><span class="sp-title">Study path and cheat sheet</span><span class="sp-desc">Big-O, Theta and Omega explained, full time and space cheat sheets, a study routine and mini-projects.</span></span>
+            <span class="sp-meta">~40 min</span>
+          </a>
+        </div>
+        <div class="blog-tags"><span class="blog-tag">Data structures</span><span class="blog-tag">Algorithms</span><span class="blog-tag">Big-O</span><span class="blog-tag">Kotlin</span><span class="blog-tag">For beginners</span></div>
+        <div class="blog-footer"><span class="views-badge">~5.75 hours with exercises</span><span class="blog-date">Oct 2026</span></div>
+      </div>
       <div class="series-card reveal">
         <div class="blog-idx">Series &middot; 6 parts<span class="blog-new">NEW</span></div>
         <div class="blog-title series-title">Building a design system for Android Views, with working code</div>
@@ -1225,63 +1339,6 @@
         </div>
         <div class="blog-tags"><span class="blog-tag">Firebase</span><span class="blog-tag">Remote Config</span><span class="blog-tag">Analytics</span><span class="blog-tag">App Distribution</span><span class="blog-tag">Crashlytics</span></div>
         <div class="blog-footer"><span class="views-badge">~30 min of reading</span><span class="blog-date">Oct 2026</span></div>
-      </div>
-      <div class="series-card reveal">
-        <div class="blog-idx">Series &middot; 9 parts<span class="blog-new">NEW</span></div>
-        <div class="blog-title series-title">Android architecture for first-timers: MVC, MVP, MVVM, VIPER and Redux</div>
-        <div class="blog-summary">A beginner-friendly tour of Android architectures that shows they are all the same three boxes (View, Logic, Data). Covers the goals, SOLID and design patterns, each architecture with Kotlin code, DI, coroutines and Rx, Room, Retrofit, gRPC, configuration changes and TDD, a proof that the variants are alike, and recipes for converting between them.</div>
-        <button type="button" class="archive-btn series-toggle" aria-expanded="false" aria-controls="series-arch" data-count="9"><span class="st-label">Show all 9 parts</span><span class="chev">&#9662;</span></button>
-        <div class="series-parts" id="series-arch" hidden>
-          <div class="series-level">Foundations <span>Parts 1 to 4 &middot; start here</span></div>
-          <a class="series-part" href="blog/android-arch-part-1-why-architecture.html">
-            <span class="sp-num">1</span>
-            <span class="sp-body"><span class="sp-title">Why architecture matters</span><span class="sp-desc">The goals, the View, Logic, Data template, and a map of MVC, MVP, MVVM, VIPER and Redux.</span></span>
-            <span class="sp-meta">~8 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-2-principles-and-patterns.html">
-            <span class="sp-num">2</span>
-            <span class="sp-body"><span class="sp-title">Principles and patterns</span><span class="sp-desc">SOLID, KISS, DRY, plus the Proxy (ViewProxy, GlideProxy), Scheduler and Repository patterns.</span></span>
-            <span class="sp-meta">~10 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-3-mvc-and-mvp.html">
-            <span class="sp-num">3</span>
-            <span class="sp-body"><span class="sp-title">MVC and MVP</span><span class="sp-desc">Why the Activity becomes a Massive View Controller, and how a Presenter fixes it.</span></span>
-            <span class="sp-meta">~10 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-4-mvvm-and-redux.html">
-            <span class="sp-num">4</span>
-            <span class="sp-body"><span class="sp-title">MVVM and Redux (MVI)</span><span class="sp-desc">State flows to the view: ViewModel, StateFlow, reducers and one-way data flow.</span></span>
-            <span class="sp-meta">~11 min</span>
-          </a>
-          <div class="series-level">Going deeper <span>Parts 5 to 9 &middot; scale, prove it, migrate</span></div>
-          <a class="series-part" href="blog/android-arch-part-5-viper-and-modules.html">
-            <span class="sp-num">5</span>
-            <span class="sp-body"><span class="sp-title">VIPER and modules</span><span class="sp-desc">Five single-purpose roles, plus Gradle modules for big teams and big apps.</span></span>
-            <span class="sp-meta">~10 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-6-di-async-errors.html">
-            <span class="sp-num">6</span>
-            <span class="sp-body"><span class="sp-title">DI, async and errors</span><span class="sp-desc">Hilt and Koin, coroutines vs Rx vs AsyncTask, lifecycle and error handling.</span></span>
-            <span class="sp-meta">~12 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-7-data-and-config-changes.html">
-            <span class="sp-num">7</span>
-            <span class="sp-body"><span class="sp-title">Data, network and config changes</span><span class="sp-desc">Room, Retrofit, gRPC, microservices, and surviving rotation, language, font and size changes.</span></span>
-            <span class="sp-meta">~13 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-8-testing-and-proof.html">
-            <span class="sp-num">8</span>
-            <span class="sp-body"><span class="sp-title">Testing and the proof</span><span class="sp-desc">TDD, and a code proof that every architecture is the same three boxes.</span></span>
-            <span class="sp-meta">~12 min</span>
-          </a>
-          <a class="series-part" href="blog/android-arch-part-9-converting-architectures.html">
-            <span class="sp-num">9</span>
-            <span class="sp-body"><span class="sp-title">Converting between architectures</span><span class="sp-desc">Before/after code, mapping diagrams and a bridge adapter for moving between MVC, MVP, MVVM, Redux and VIPER.</span></span>
-            <span class="sp-meta">~14 min</span>
-          </a>
-        </div>
-        <div class="blog-tags"><span class="blog-tag">Android</span><span class="blog-tag">MVP</span><span class="blog-tag">MVVM</span><span class="blog-tag">VIPER</span><span class="blog-tag">Redux</span><span class="blog-tag">Kotlin</span></div>
-        <div class="blog-footer"><span class="views-badge">~100 min of reading</span><span class="blog-date">Oct 2026</span></div>
       </div>
     </div>
 

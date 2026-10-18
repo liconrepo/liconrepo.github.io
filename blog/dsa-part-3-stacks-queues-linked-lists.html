@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 3: Stacks, Queues, Deques and Linked Lists — Khairul Alam</title>
+  <meta name="description" content="Learn linked lists, stacks, queues and deques in Kotlin with pictures, Big-O costs, classic problems (reverse a list, balanced brackets, postfix) and runnable Kotlin Playground exercises." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 3 of 9</p>
+    <h1>Data Structures and Algorithms, Part 3: Stacks, Queues, Deques and Linked Lists</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~35 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Linked list</span><span class="tag">Stack</span><span class="tag">Queue</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a class="on" href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Some data structures are defined less by how they store things and more by the rules they enforce. This part covers linked lists, which are built from nodes and pointers, and then stacks, queues and deques, which control the order in which things come out. You will build each one, see its cost, and solve classic problems with them.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>A linked list is a chain of nodes; adding at the head is <code>O(1)</code>, searching is <code>O(n)</code>.</li><li>Reversing, finding the middle and detecting a cycle all come down to careful pointer moves, often with a slow and a fast pointer.</li><li>A stack is LIFO (push, pop, peek); a queue is FIFO (enqueue, dequeue); a deque works at both ends. Kotlin&rsquo;s <code>ArrayDeque</code> covers all three.</li><li>Arrays usually beat linked lists in practice because of cache and memory, but linked nodes are the base of trees and graphs.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#linked-idea">Linked lists: the idea</a></li><li><a href="#singly">Build a singly linked list in Kotlin</a></li><li><a href="#classic">Three classic list tricks: reverse, middle, cycle</a></li><li><a href="#doubly">Doubly linked lists, and lists versus arrays</a></li><li><a href="#stack">Stacks: last in, first out</a></li><li><a href="#queue">Queues: first in, first out</a></li><li><a href="#deque">Deques: both ends</a></li><li><a href="#puzzle">A classic puzzle: a queue from two stacks</a></li><li><a href="#costs">Comparing the costs</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="linked-idea">1. Linked lists: the idea</h2>
+
+<p>In Part 2 you met the array: items stored side by side in one block of memory. That layout makes reading <code>arr[5]</code> instant, but it makes inserting at the front slow, because every other item has to shuffle along.</p>
+<p>A <strong>linked list</strong> takes the opposite deal. Items are not side by side. Each item lives in its own small box called a <strong>node</strong>, and each node holds two things: the <strong>value</strong>, and a <strong>pointer</strong> (also called a <strong>reference</strong>) to the next node. A pointer is just the address of another object. The last node points to nothing, which we write as <code>null</code>.</p>
+<div class="analogy"><p><strong>Think of a treasure hunt.</strong> Each clue tells you what is here and where the next clue is hidden. You cannot jump to clue number 5. You must follow clues 1, 2, 3 and 4 first. But adding a new clue in the middle is easy: change one note to point to the new clue, and let the new clue point onward.</p></div>
+<figure class="fig"><div class="diagram"><pre>  head
+   |
+   v
+ +-----+---+     +-----+---+     +-----+---+
+ |  7  | * |----&gt;|  3  | * |----&gt;|  9  | * |----&gt; null
+ +-----+---+     +-----+---+     +-----+---+
+  value next      value next      value next</pre></div><figcaption>A singly linked list holding 7, 3, 9. The only thing we keep is <code>head</code>, a pointer to the first node.</figcaption></figure>
+
+<p>Because we only hold <code>head</code>, every other node is reachable only by walking. That one fact explains the whole cost table later in this part.</p>
+<h3>Inserting at the front</h3>
+<p>To add a new first item, make a node, point it at the old head, then move <code>head</code> to the new node. Two pointer changes, no shuffling, so it is <code>O(1)</code>.</p>
+<figure class="fig"><div class="diagram"><pre> Before:   head --&gt; [7] --&gt; [3] --&gt; [9] --&gt; null
+
+ Step 1:   new node [5] points at the old head
+           [5] --&gt; [7] --&gt; [3] --&gt; [9] --&gt; null
+
+ Step 2:   head moves to the new node
+ After:    head --&gt; [5] --&gt; [7] --&gt; [3] --&gt; [9] --&gt; null</pre></div><figcaption>Add-first changes two pointers, whatever the length of the list.</figcaption></figure>
+<h2 id="singly">2. Build a singly linked list in Kotlin</h2>
+
+<p>We need just one small class. A node has a value and a nullable <code>next</code>. In Kotlin, <code>Node?</code> means &ldquo;a Node or null&rdquo;, which is exactly what a pointer that might point to nothing needs.</p>
+<pre><code>class Node(var value: Int, var next: Node? = null)</code></pre>
+
+<p>Then a list class that remembers <code>head</code> and the size. Read the comments: each method says what it costs.</p>
+<div class="try demo"><h3>Run it: your own linked list</h3>
+<p>Run it, then try removing the last item, and removing from an empty list. Those edge cases are where linked-list bugs hide.</p>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+class MyLinkedList {
+    var head: Node? = null
+    var size = 0
+        private set
+
+    // O(1): the new node becomes the head.
+    fun addFirst(value: Int) {
+        head = Node(value, head)
+        size++
+    }
+
+    // O(n): we must walk to the end, because we only hold the head.
+    fun addLast(value: Int) {
+        val node = Node(value)
+        val first = head
+        if (first == null) {
+            head = node
+        } else {
+            var cur: Node = first
+            while (cur.next != null) cur = cur.next!!
+            cur.next = node
+        }
+        size++
+    }
+
+    // O(n): walk until we find it (worst case, it is last or missing).
+    fun contains(value: Int): Boolean {
+        var cur = head
+        while (cur != null) {
+            if (cur.value == value) return true
+            cur = cur.next
+        }
+        return false
+    }
+
+    // O(n) to find it, O(1) to unlink it.
+    fun remove(value: Int): Boolean {
+        val first = head ?: return false
+        if (first.value == value) {          // removing the head is a special case
+            head = first.next
+            size--
+            return true
+        }
+        var prev: Node = first
+        while (true) {
+            val cur = prev.next ?: return false
+            if (cur.value == value) {
+                prev.next = cur.next          // skip over it: one pointer change
+                size--
+                return true
+            }
+            prev = cur
+        }
+    }
+
+    override fun toString(): String {
+        val parts = ArrayList&lt;String&gt;()
+        var cur = head
+        while (cur != null) { parts.add(cur.value.toString()); cur = cur.next }
+        return parts.joinToString(" -&gt; ", postfix = " -&gt; null")
+    }
+}
+
+fun main() {
+    val list = MyLinkedList()
+    list.addFirst(3)
+    list.addFirst(7)      // 7 -&gt; 3
+    list.addLast(9)       // 7 -&gt; 3 -&gt; 9
+    println(list)
+    println("contains 3? ${list.contains(3)}   contains 4? ${list.contains(4)}")
+    println("remove 3: ${list.remove(3)}  -&gt; $list")
+    println("remove 7: ${list.remove(7)}  -&gt; $list   (that was the head)")
+    println("remove 42: ${list.remove(42)}  size=${list.size}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-linked-list">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-linked-list">class Node(var value: Int, var next: Node? = null)
+
+class MyLinkedList {
+    var head: Node? = null
+    var size = 0
+        private set
+
+    // O(1): the new node becomes the head.
+    fun addFirst(value: Int) {
+        head = Node(value, head)
+        size++
+    }
+
+    // O(n): we must walk to the end, because we only hold the head.
+    fun addLast(value: Int) {
+        val node = Node(value)
+        val first = head
+        if (first == null) {
+            head = node
+        } else {
+            var cur: Node = first
+            while (cur.next != null) cur = cur.next!!
+            cur.next = node
+        }
+        size++
+    }
+
+    // O(n): walk until we find it (worst case, it is last or missing).
+    fun contains(value: Int): Boolean {
+        var cur = head
+        while (cur != null) {
+            if (cur.value == value) return true
+            cur = cur.next
+        }
+        return false
+    }
+
+    // O(n) to find it, O(1) to unlink it.
+    fun remove(value: Int): Boolean {
+        val first = head ?: return false
+        if (first.value == value) {          // removing the head is a special case
+            head = first.next
+            size--
+            return true
+        }
+        var prev: Node = first
+        while (true) {
+            val cur = prev.next ?: return false
+            if (cur.value == value) {
+                prev.next = cur.next          // skip over it: one pointer change
+                size--
+                return true
+            }
+            prev = cur
+        }
+    }
+
+    override fun toString(): String {
+        val parts = ArrayList<String>()
+        var cur = head
+        while (cur != null) { parts.add(cur.value.toString()); cur = cur.next }
+        return parts.joinToString(" -> ", postfix = " -> null")
+    }
+}
+
+fun main() {
+    val list = MyLinkedList()
+    list.addFirst(3)
+    list.addFirst(7)      // 7 -> 3
+    list.addLast(9)       // 7 -> 3 -> 9
+    println(list)
+    println("contains 3? ${list.contains(3)}   contains 4? ${list.contains(4)}")
+    println("remove 3: ${list.remove(3)}  -> $list")
+    println("remove 7: ${list.remove(7)}  -> $list   (that was the head)")
+    println("remove 42: ${list.remove(42)}  size=${list.size}")
+}
+</script></div>
+
+<p>Notice how <code>remove</code> works. To delete a node we need the node <em>before</em> it, so that we can make that earlier node point past the victim. That is why the loop tracks <code>prev</code>.</p>
+<figure class="fig"><div class="diagram"><pre> remove 3 from  head --&gt; [7] --&gt; [3] --&gt; [9] --&gt; null
+
+   prev = [7], cur = [3]
+   prev.next = cur.next
+
+ head --&gt; [7] ----------&gt; [9] --&gt; null        [3] is no longer reachable
+                    (the garbage collector frees it)</pre></div><figcaption>Unlinking a node: one pointer is redirected.</figcaption></figure>
+<table><tr><th>Operation</th><th>Cost</th><th>Why</th></tr><tr><td>Add at head</td><td><code>O(1)</code></td><td>Two pointer changes.</td></tr><tr><td>Add at tail (only head kept)</td><td><code>O(n)</code></td><td>Walk to the end first.</td></tr><tr><td>Find a value</td><td><code>O(n)</code></td><td>Follow pointers one by one.</td></tr><tr><td>Get the i-th item</td><td><code>O(n)</code></td><td>No jumping; walk i steps.</td></tr><tr><td>Remove the head</td><td><code>O(1)</code></td><td>Move <code>head</code> forward.</td></tr><tr><td>Remove a value</td><td><code>O(n)</code></td><td>Find it, then unlink in <code>O(1)</code>.</td></tr></table>
+<div class="note"><p><strong>Tail pointer.</strong> If the list also keeps a pointer to the last node, adding at the tail becomes <code>O(1)</code>. Removing the tail is still <code>O(n)</code> in a singly linked list, because you need the node before it.</p></div>
+<h2 id="classic">3. Three classic list tricks: reverse, middle, cycle</h2>
+
+<p>These three small problems appear in almost every course, because they teach you to think in pointers. Draw them on paper before you code them.</p>
+<h3>Reversing a list</h3>
+<p>Walk down the list and flip each pointer to face backwards. You need three variables: <code>prev</code> (the already-reversed part), <code>cur</code> (the node you are fixing) and <code>next</code> (saved first, so you do not lose the rest of the list).</p>
+<figure class="fig"><div class="diagram"><pre> Start:   prev = null     cur = [1] --&gt; [2] --&gt; [3] --&gt; null
+
+ Step 1:  save next = [2]; point [1] back at prev
+          null &lt;-- [1]     cur = [2] --&gt; [3] --&gt; null
+ Step 2:  save next = [3]; point [2] back at [1]
+          null &lt;-- [1] &lt;-- [2]     cur = [3]
+ Step 3:  point [3] back at [2]; cur becomes null
+          null &lt;-- [1] &lt;-- [2] &lt;-- [3]      prev is the new head</pre></div><figcaption>Reversal in place. It visits each node once: O(n) time, O(1) extra space.</figcaption></figure>
+
+<h3>Finding the middle</h3>
+<p>Use two pointers that start together. The <strong>fast</strong> pointer moves two nodes per step, the <strong>slow</strong> pointer moves one. When fast reaches the end, slow is halfway. One pass, no need to know the length.</p>
+<div class="try demo"><h3>Run it: reverse a list and find its middle</h3>
+<p>For an even number of nodes there are two middles; this version returns the second one.</p>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+fun fromList(items: List&lt;Int&gt;): Node? {
+    var head: Node? = null
+    for (x in items.reversed()) head = Node(x, head)
+    return head
+}
+
+fun toList(head: Node?): List&lt;Int&gt; {
+    val out = ArrayList&lt;Int&gt;()
+    var cur = head
+    while (cur != null) { out.add(cur.value); cur = cur.next }
+    return out
+}
+
+fun reverse(head: Node?): Node? {
+    var prev: Node? = null
+    var cur = head
+    while (cur != null) {
+        val next = cur.next     // 1. remember the rest
+        cur.next = prev         // 2. flip the pointer
+        prev = cur              // 3. move both forward
+        cur = next
+    }
+    return prev                 // prev ends on the old last node: the new head
+}
+
+fun middle(head: Node?): Node? {
+    var slow = head
+    var fast = head
+    while (fast?.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+    }
+    return slow
+}
+
+fun main() {
+    val list = fromList(listOf(1, 2, 3, 4, 5))
+    println("middle of 1..5 = ${middle(list)?.value}")                       // 3
+    println("middle of 1..4 = ${middle(fromList(listOf(1, 2, 3, 4)))?.value}") // 3 (second of two)
+    println("reversed: ${toList(reverse(list))}")
+    println("reverse empty: ${toList(reverse(null))}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-reverse-middle">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-reverse-middle">class Node(var value: Int, var next: Node? = null)
+
+fun fromList(items: List<Int>): Node? {
+    var head: Node? = null
+    for (x in items.reversed()) head = Node(x, head)
+    return head
+}
+
+fun toList(head: Node?): List<Int> {
+    val out = ArrayList<Int>()
+    var cur = head
+    while (cur != null) { out.add(cur.value); cur = cur.next }
+    return out
+}
+
+fun reverse(head: Node?): Node? {
+    var prev: Node? = null
+    var cur = head
+    while (cur != null) {
+        val next = cur.next     // 1. remember the rest
+        cur.next = prev         // 2. flip the pointer
+        prev = cur              // 3. move both forward
+        cur = next
+    }
+    return prev                 // prev ends on the old last node: the new head
+}
+
+fun middle(head: Node?): Node? {
+    var slow = head
+    var fast = head
+    while (fast?.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+    }
+    return slow
+}
+
+fun main() {
+    val list = fromList(listOf(1, 2, 3, 4, 5))
+    println("middle of 1..5 = ${middle(list)?.value}")                       // 3
+    println("middle of 1..4 = ${middle(fromList(listOf(1, 2, 3, 4)))?.value}") // 3 (second of two)
+    println("reversed: ${toList(reverse(list))}")
+    println("reverse empty: ${toList(reverse(null))}")
+}
+</script></div>
+
+<h3>Detecting a cycle</h3>
+<p>Normally the last node points to <code>null</code>. If a bug makes some node point back to an earlier one, the list becomes a loop, and walking it would never end. How can you tell without walking forever?</p>
+<p>The two-speed trick again, known as <strong>Floyd&rsquo;s tortoise and hare</strong>. Slow moves one step, fast moves two. If there is no cycle, fast falls off the end. If there is a cycle, both run round it, and the fast one gains one step per lap on the slow one until they stand on the same node.</p>
+<div class="analogy"><p><strong>Two runners on a circular track.</strong> The faster runner eventually laps the slower one, so they must meet. On a straight road with an end, the fast runner just finishes first.</p></div>
+<figure class="fig"><div class="diagram"><pre> [1] --&gt; [2] --&gt; [3] --&gt; [4]
+                  ^       |
+                  |       v
+                 [6] &lt;-- [5]
+
+ slow: 1 2 3 4 5 6 3 ...
+ fast: 1 3 5 3 5 3 ...        they meet inside the loop</pre></div><figcaption>A list whose last node points back to node 3. Time O(n), extra space O(1).</figcaption></figure>
+<div class="try demo"><h3>Run it: tortoise and hare</h3>
+<p>Note <code>===</code>. We care whether two references are the <em>same node</em>, not whether two nodes hold equal values.</p>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+fun hasCycle(head: Node?): Boolean {
+    var slow = head
+    var fast = head
+    while (fast?.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+        if (slow === fast) return true      // === compares identity: the very same node
+    }
+    return false
+}
+
+fun main() {
+    val a = Node(1); val b = Node(2); val c = Node(3); val d = Node(4)
+    a.next = b; b.next = c; c.next = d
+    println("straight list: ${hasCycle(a)}")   // false
+    d.next = b                                  // close a loop: 4 points back to 2
+    println("with a loop:   ${hasCycle(a)}")   // true
+    println("empty list:    ${hasCycle(null)}") // false
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-cycle">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-cycle">class Node(var value: Int, var next: Node? = null)
+
+fun hasCycle(head: Node?): Boolean {
+    var slow = head
+    var fast = head
+    while (fast?.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+        if (slow === fast) return true      // === compares identity: the very same node
+    }
+    return false
+}
+
+fun main() {
+    val a = Node(1); val b = Node(2); val c = Node(3); val d = Node(4)
+    a.next = b; b.next = c; c.next = d
+    println("straight list: ${hasCycle(a)}")   // false
+    d.next = b                                  // close a loop: 4 points back to 2
+    println("with a loop:   ${hasCycle(a)}")   // true
+    println("empty list:    ${hasCycle(null)}") // false
+}
+</script></div>
+<div class="note"><p><strong>Why not just remember visited nodes?</strong> A hash set of visited nodes also works, in <code>O(n)</code> time, but it costs <code>O(n)</code> memory. Two pointers need only <code>O(1)</code>. Another example of trading space for time, in reverse.</p></div>
+<h2 id="doubly">4. Doubly linked lists, and lists versus arrays</h2>
+
+<p>A <strong>doubly linked list</strong> gives each node two pointers: <code>next</code> and <code>prev</code>. You can walk both ways, and if you already hold a node, you can remove it in <code>O(1)</code> without hunting for its predecessor.</p>
+<figure class="fig"><div class="diagram"><pre> null &lt;-- [ 7 ] &lt;--&gt; [ 3 ] &lt;--&gt; [ 9 ] --&gt; null
+          ^                       ^
+         head                    tail</pre></div><figcaption>Doubly linked: every link goes both ways. Keeping both head and tail makes both ends O(1).</figcaption></figure>
+
+<p>The price is one extra pointer per node, and a bit more care when changing links (four pointer updates instead of two). Java&rsquo;s <code>LinkedList</code> is a doubly linked list. Real uses include an editor&rsquo;s list of lines, a browser&rsquo;s back and forward history, and the least-recently-used cache.</p>
+<pre><code>class DNode(var value: Int) {
+    var prev: DNode? = null
+    var next: DNode? = null
+}
+
+// Insert `node` right after `at`: four pointer updates.
+fun insertAfter(at: DNode, node: DNode) {
+    node.prev = at
+    node.next = at.next
+    at.next?.prev = node
+    at.next = node
+}
+
+// Unlink a node we already hold: O(1).
+fun unlink(node: DNode) {
+    node.prev?.next = node.next
+    node.next?.prev = node.prev
+}</code></pre>
+
+<h3>So, lists or arrays?</h3>
+<p>On paper, linked lists win at inserting and deleting in the middle (once you hold the spot). Arrays win at reading by position. In practice, arrays usually win overall, for two reasons:</p>
+<ul>
+<li><strong>Cache.</strong> A computer loads memory in chunks. Array items sit side by side, so one load brings in many neighbours for free. Linked nodes are scattered, so each step may need a fresh, slow trip to memory.</li>
+<li><strong>Memory.</strong> Every node carries a pointer, and often an object header too. A list of numbers can take several times the memory of an array of the same numbers.</li>
+</ul>
+<table><tr><th>Use a&hellip;</th><th>when&hellip;</th></tr><tr><td>Array / <code>ArrayList</code></td><td>You read by position, loop often, or just want a sensible default.</td></tr><tr><td>Linked list</td><td>You add and remove at the ends or at spots you already hold, you never need position lookup, and you want no big resize copies.</td></tr></table>
+<div class="note"><p><strong>Be honest about the default.</strong> In most real Kotlin code you will reach for <code>ArrayList</code> or <code>ArrayDeque</code>, not a linked list. We build linked lists to learn pointers, which trees (Part 4) and graphs (Part 5) are made of.</p></div>
+<h2 id="stack">5. Stacks: last in, first out</h2>
+
+<p>A <strong>stack</strong> allows work at one end only, called the <strong>top</strong>. The last item you put in is the first one to come out. This rule is called <strong>LIFO</strong>: last in, first out.</p>
+<div class="analogy"><p><strong>A pile of plates.</strong> You put a clean plate on top and you take a plate from the top. Nobody pulls one from the bottom.</p></div>
+
+<p>A stack has three core operations:</p>
+<ul>
+<li><code>push(x)</code>: put <code>x</code> on top.</li>
+<li><code>pop()</code>: remove and return the top item.</li>
+<li><code>peek()</code>: look at the top item without removing it.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre> push(1)   push(2)   push(3)    pop() -&gt; 3   pop() -&gt; 2
+
+            |   |     | 3 | &lt;- top   |   |      |   |
+            |   |     | 2 |          | 2 | &lt;-top|   |
+  | 1 |     | 2 |     | 1 |          | 1 |      | 1 | &lt;- top
+  +---+     +---+     +---+          +---+      +---+</pre></div><figcaption>Items enter and leave at the top. Every operation is O(1).</figcaption></figure>
+
+<h3>Implementing a stack</h3>
+<p>You do not need to write a node class. Kotlin&rsquo;s <code>ArrayDeque</code> is a resizable array that is fast at both ends, so a stack is just <code>addLast</code> to push and <code>removeLast</code> to pop. Wrapping it in a small class makes the intent obvious.</p>
+<div class="try demo"><h3>Run it: a stack, and an undo button</h3>
+<p>Undo works because the most recent change is the first one you want to reverse. That is exactly LIFO.</p>
+<pre><code>class Stack&lt;T&gt; {
+    private val items = ArrayDeque&lt;T&gt;()
+    fun push(x: T) = items.addLast(x)                 // O(1) on average
+    fun pop(): T = items.removeLast()                 // O(1); throws if empty
+    fun peek(): T? = items.lastOrNull()               // O(1); null if empty
+    fun isEmpty() = items.isEmpty()
+    val size get() = items.size
+}
+
+fun main() {
+    val s = Stack&lt;Int&gt;()
+    s.push(1); s.push(2); s.push(3)
+    println("peek=${s.peek()} size=${s.size}")
+    println("pop=${s.pop()} pop=${s.pop()} left=${s.size}")
+
+    // Undo: remember each edit on a stack, undo by popping the latest.
+    var text = ""
+    val history = Stack&lt;String&gt;()
+    for (word in listOf("Hello", " there", " world")) {
+        history.push(text)       // save the state BEFORE the change
+        text += word
+        println("typed -&gt; \"$text\"")
+    }
+    while (!history.isEmpty()) {
+        text = history.pop()
+        println("undo  -&gt; \"$text\"")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-stack-undo">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-stack-undo">class Stack<T> {
+    private val items = ArrayDeque<T>()
+    fun push(x: T) = items.addLast(x)                 // O(1) on average
+    fun pop(): T = items.removeLast()                 // O(1); throws if empty
+    fun peek(): T? = items.lastOrNull()               // O(1); null if empty
+    fun isEmpty() = items.isEmpty()
+    val size get() = items.size
+}
+
+fun main() {
+    val s = Stack<Int>()
+    s.push(1); s.push(2); s.push(3)
+    println("peek=${s.peek()} size=${s.size}")
+    println("pop=${s.pop()} pop=${s.pop()} left=${s.size}")
+
+    // Undo: remember each edit on a stack, undo by popping the latest.
+    var text = ""
+    val history = Stack<String>()
+    for (word in listOf("Hello", " there", " world")) {
+        history.push(text)       // save the state BEFORE the change
+        text += word
+        println("typed -> \"$text\"")
+    }
+    while (!history.isEmpty()) {
+        text = history.pop()
+        println("undo  -> \"$text\"")
+    }
+}
+</script></div>
+
+<h3>Where stacks show up</h3>
+<ul>
+<li><strong>Undo and redo</strong> in editors, as in the demo.</li>
+<li><strong>The call stack.</strong> When function <code>a</code> calls <code>b</code>, which calls <code>c</code>, the computer pushes a frame for each call. When <code>c</code> returns, its frame is popped and <code>b</code> continues. This is why too-deep recursion ends in a <em>stack overflow</em>: the stack ran out of room.</li>
+<li><strong>Matching brackets</strong> and parsing, below.</li>
+<li><strong>Depth-first search</strong>, which you will see in Part 5.</li>
+</ul>
+<h3>Balanced brackets</h3>
+<p>Is <code>{[()]}</code> well formed? Is <code>([)]</code>? Scan left to right. Push every opening bracket. On a closing bracket, the top of the stack must be its matching opener; pop it. At the end the stack must be empty. The most recent unclosed opener is always the one that must close first, which is LIFO again.</p>
+<div class="try demo"><h3>Run it: balanced brackets</h3>
+<p>Time <code>O(n)</code>, one pass. Space <code>O(n)</code> in the worst case, when everything is an opener.</p>
+<pre><code>fun isBalanced(s: String): Boolean {
+    val pairs = mapOf(')' to '(', ']' to '[', '}' to '{')
+    val stack = ArrayDeque&lt;Char&gt;()
+    for (c in s) {
+        when {
+            c in pairs.values -&gt; stack.addLast(c)                       // opener: push
+            c in pairs.keys -&gt; {                                         // closer: must match top
+                if (stack.isEmpty() || stack.removeLast() != pairs[c]) return false
+            }
+            // any other character is ignored
+        }
+    }
+    return stack.isEmpty()      // leftover openers mean it is not balanced
+}
+
+fun main() {
+    for (s in listOf("{[()]}", "([)]", "((", "", "a(b)c")) {
+        println("%-8s -&gt; %s".format("\"$s\"", isBalanced(s)))
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-brackets">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-brackets">fun isBalanced(s: String): Boolean {
+    val pairs = mapOf(')' to '(', ']' to '[', '}' to '{')
+    val stack = ArrayDeque<Char>()
+    for (c in s) {
+        when {
+            c in pairs.values -> stack.addLast(c)                       // opener: push
+            c in pairs.keys -> {                                         // closer: must match top
+                if (stack.isEmpty() || stack.removeLast() != pairs[c]) return false
+            }
+            // any other character is ignored
+        }
+    }
+    return stack.isEmpty()      // leftover openers mean it is not balanced
+}
+
+fun main() {
+    for (s in listOf("{[()]}", "([)]", "((", "", "a(b)c")) {
+        println("%-8s -> %s".format("\"$s\"", isBalanced(s)))
+    }
+}
+</script></div>
+
+<h3>Evaluating postfix</h3>
+<p>We usually write maths <em>infix</em>: <code>(3 + 4) * 2</code>. <strong>Postfix</strong> (also called reverse Polish notation) puts the operator after its operands: <code>3 4 + 2 *</code>. It needs no brackets and no precedence rules, and a stack evaluates it in one pass: push numbers; on an operator, pop two numbers, apply it, push the result.</p>
+<figure class="fig"><div class="diagram"><pre> tokens:  3   4   +   2   *
+
+ 3 : push            [3]
+ 4 : push            [3, 4]
+ + : pop 4, pop 3    3+4 = 7, push      [7]
+ 2 : push            [7, 2]
+ * : pop 2, pop 7    7*2 = 14, push     [14]
+
+ answer = the one item left: 14</pre></div><figcaption>Watch the order: the first number popped is the right-hand operand.</figcaption></figure>
+<div class="try demo"><h3>Run it: evaluate postfix</h3>
+<p>Try <code>"2 3 4 * +"</code> and check it by hand.</p>
+<pre><code>fun evalPostfix(tokens: List&lt;String&gt;): Int {
+    val stack = ArrayDeque&lt;Int&gt;()
+    for (t in tokens) {
+        when (t) {
+            "+", "-", "*", "/" -&gt; {
+                val right = stack.removeLast()     // popped first: the RIGHT operand
+                val left = stack.removeLast()
+                stack.addLast(when (t) {
+                    "+" -&gt; left + right
+                    "-" -&gt; left - right
+                    "*" -&gt; left * right
+                    else -&gt; left / right
+                })
+            }
+            else -&gt; stack.addLast(t.toInt())
+        }
+    }
+    return stack.removeLast()
+}
+
+fun main() {
+    println(evalPostfix("3 4 + 2 *".split(" ")))        // (3 + 4) * 2 = 14
+    println(evalPostfix("5 1 2 + 4 * + 3 -".split(" ")))  // 5 + (1+2)*4 - 3 = 14
+    println(evalPostfix("10 2 -".split(" ")))             // 8, not -8: order matters
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-postfix">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-postfix">fun evalPostfix(tokens: List<String>): Int {
+    val stack = ArrayDeque<Int>()
+    for (t in tokens) {
+        when (t) {
+            "+", "-", "*", "/" -> {
+                val right = stack.removeLast()     // popped first: the RIGHT operand
+                val left = stack.removeLast()
+                stack.addLast(when (t) {
+                    "+" -> left + right
+                    "-" -> left - right
+                    "*" -> left * right
+                    else -> left / right
+                })
+            }
+            else -> stack.addLast(t.toInt())
+        }
+    }
+    return stack.removeLast()
+}
+
+fun main() {
+    println(evalPostfix("3 4 + 2 *".split(" ")))        // (3 + 4) * 2 = 14
+    println(evalPostfix("5 1 2 + 4 * + 3 -".split(" ")))  // 5 + (1+2)*4 - 3 = 14
+    println(evalPostfix("10 2 -".split(" ")))             // 8, not -8: order matters
+}
+</script></div>
+<h2 id="queue">6. Queues: first in, first out</h2>
+
+<p>A <strong>queue</strong> is the fair line at a shop. Items join at the <strong>back</strong> and leave from the <strong>front</strong>. The first one to arrive is the first one served: <strong>FIFO</strong>, first in, first out.</p>
+<ul>
+<li><code>enqueue(x)</code>: join the back of the line.</li>
+<li><code>dequeue()</code>: remove and return the front item.</li>
+<li><code>peek()</code>: look at the front item.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre>            front                         back
+              |                             |
+ dequeue &lt;--  [ A ] [ B ] [ C ] [ D ]  &lt;--  enqueue
+              leaves first            joins last</pre></div><figcaption>A queue. Items join at one end and leave from the other.</figcaption></figure>
+
+<p>With <code>ArrayDeque</code> a queue is <code>addLast</code> to enqueue and <code>removeFirst</code> to dequeue. Both are <code>O(1)</code> on average.</p>
+<p><strong>Warning:</strong> do not build a queue on a plain <code>ArrayList</code> by calling <code>removeAt(0)</code>. Removing the first item shifts all the others, so each dequeue costs <code>O(n)</code>.</p>
+<h3>A tiny circular buffer</h3>
+<p>How can an array give a fast queue? Keep a <code>head</code> index (where the front is) and a count. When an index runs off the end, <strong>wrap around</strong> to 0 using the remainder operator <code>%</code>. No shuffling is ever needed, so the array behaves like a ring. This is what <code>ArrayDeque</code> does inside, with extra code to grow when it is full.</p>
+<figure class="fig"><div class="diagram"><pre> capacity 5, head = 2, size = 3 (items C D E), slots 0 and 1 are free
+
+   index:   0     1     2     3     4
+          +-----+-----+-----+-----+-----+
+          |     |     |  C  |  D  |  E  |
+          +-----+-----+-----+-----+-----+
+                         ^head       ^ last item at (head+size-1) % 5 = 4
+
+ enqueue F goes to (head+size) % 5 = 0  -&gt; wraps to the start</pre></div><figcaption>A circular buffer. The array is fixed, but the queue slides around it.</figcaption></figure>
+<div class="try demo"><h3>Run it: a fixed-size circular queue</h3>
+<p>Every operation is <code>O(1)</code>. The cost is a fixed capacity; a growable version copies into a bigger array when full.</p>
+<pre><code>class RingQueue(private val capacity: Int) {
+    private val data = IntArray(capacity)
+    private var head = 0          // index of the front item
+    var size = 0
+        private set
+
+    fun enqueue(x: Int): Boolean {
+        if (size == capacity) return false          // full
+        data[(head + size) % capacity] = x          // wrap around with %
+        size++
+        return true
+    }
+
+    fun dequeue(): Int? {
+        if (size == 0) return null                  // empty
+        val x = data[head]
+        head = (head + 1) % capacity
+        size--
+        return x
+    }
+}
+
+fun main() {
+    val q = RingQueue(3)
+    println(listOf(q.enqueue(1), q.enqueue(2), q.enqueue(3), q.enqueue(4)))  // last is false: full
+    println("dequeue -&gt; ${q.dequeue()}")      // 1
+    println("enqueue 5 -&gt; ${q.enqueue(5)}")    // true: it reuses the freed slot
+    val out = ArrayList&lt;Int?&gt;()
+    repeat(4) { out.add(q.dequeue()) }
+    println(out)                               // [2, 3, 5, null]
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-ring-queue">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-ring-queue">class RingQueue(private val capacity: Int) {
+    private val data = IntArray(capacity)
+    private var head = 0          // index of the front item
+    var size = 0
+        private set
+
+    fun enqueue(x: Int): Boolean {
+        if (size == capacity) return false          // full
+        data[(head + size) % capacity] = x          // wrap around with %
+        size++
+        return true
+    }
+
+    fun dequeue(): Int? {
+        if (size == 0) return null                  // empty
+        val x = data[head]
+        head = (head + 1) % capacity
+        size--
+        return x
+    }
+}
+
+fun main() {
+    val q = RingQueue(3)
+    println(listOf(q.enqueue(1), q.enqueue(2), q.enqueue(3), q.enqueue(4)))  // last is false: full
+    println("dequeue -> ${q.dequeue()}")      // 1
+    println("enqueue 5 -> ${q.enqueue(5)}")    // true: it reuses the freed slot
+    val out = ArrayList<Int?>()
+    repeat(4) { out.add(q.dequeue()) }
+    println(out)                               // [2, 3, 5, null]
+}
+</script></div>
+
+<h3>Where queues show up</h3>
+<ul>
+<li><strong>Task scheduling:</strong> print jobs, web requests waiting for a server, messages waiting to be handled. Fairness is the whole point.</li>
+<li><strong>Buffers:</strong> keyboard input and network data wait their turn.</li>
+<li><strong>Breadth-first search (BFS):</strong> visiting things in rings, nearest first. A preview follows; Part 5 explains it fully.</li>
+</ul>
+<div class="try demo"><h3>Run it: a preview of breadth-first search</h3>
+<p>Because the queue is FIFO, everything one step from A is processed before anything two steps away.</p>
+<pre><code>fun main() {
+    // Who is connected to whom. Start at A and visit nearest first.
+    val friends = mapOf(
+        "A" to listOf("B", "C"),
+        "B" to listOf("D"),
+        "C" to listOf("D", "E"),
+        "D" to listOf("F"),
+        "E" to listOf("F"),
+        "F" to emptyList()
+    )
+    val queue = ArrayDeque&lt;String&gt;()
+    val seen = HashSet&lt;String&gt;()
+    queue.addLast("A"); seen.add("A")
+    val order = ArrayList&lt;String&gt;()
+    while (queue.isNotEmpty()) {
+        val node = queue.removeFirst()           // the one that has waited longest
+        order.add(node)
+        for (next in friends.getValue(node)) {
+            if (seen.add(next)) queue.addLast(next)   // join the back, once only
+        }
+    }
+    println(order)     // [A, B, C, D, E, F]: A, then its neighbours, then theirs
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-bfs-preview">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-bfs-preview">fun main() {
+    // Who is connected to whom. Start at A and visit nearest first.
+    val friends = mapOf(
+        "A" to listOf("B", "C"),
+        "B" to listOf("D"),
+        "C" to listOf("D", "E"),
+        "D" to listOf("F"),
+        "E" to listOf("F"),
+        "F" to emptyList()
+    )
+    val queue = ArrayDeque<String>()
+    val seen = HashSet<String>()
+    queue.addLast("A"); seen.add("A")
+    val order = ArrayList<String>()
+    while (queue.isNotEmpty()) {
+        val node = queue.removeFirst()           // the one that has waited longest
+        order.add(node)
+        for (next in friends.getValue(node)) {
+            if (seen.add(next)) queue.addLast(next)   // join the back, once only
+        }
+    }
+    println(order)     // [A, B, C, D, E, F]: A, then its neighbours, then theirs
+}
+</script></div>
+<h2 id="deque">7. Deques: both ends</h2>
+
+<p>A <strong>deque</strong> (say &ldquo;deck&rdquo;, short for double-ended queue) lets you add and remove at <em>both</em> ends in <code>O(1)</code>. It is more general than a stack or a queue, which is why Kotlin&rsquo;s one <code>ArrayDeque</code> class can act as either.</p>
+<figure class="fig"><div class="diagram"><pre>  addFirst --&gt;  [ A ] [ B ] [ C ] [ D ]  &lt;-- addLast
+  removeFirst &lt;-- front              back --&gt; removeLast</pre></div><figcaption>Four O(1) operations: addFirst, addLast, removeFirst, removeLast.</figcaption></figure>
+<table><tr><th>You want a&hellip;</th><th>Use these calls</th></tr><tr><td>Stack</td><td><code>addLast</code> and <code>removeLast</code></td></tr><tr><td>Queue</td><td><code>addLast</code> and <code>removeFirst</code></td></tr><tr><td>Deque</td><td>all four</td></tr></table>
+<div class="try demo"><h3>Run it: a deque as a palindrome checker</h3>
+<p>Compare the front and the back, then shrink inwards. Only a structure with cheap access at both ends makes this natural.</p>
+<pre><code>fun isPalindrome(text: String): Boolean {
+    val dq = ArrayDeque&lt;Char&gt;()
+    for (c in text) if (c.isLetterOrDigit()) dq.addLast(c.lowercaseChar())
+    while (dq.size &gt; 1) {
+        if (dq.removeFirst() != dq.removeLast()) return false   // compare the two ends
+    }
+    return true
+}
+
+fun main() {
+    println(isPalindrome("A man, a plan, a canal: Panama"))   // true
+    println(isPalindrome("kotlin"))                            // false
+    println(isPalindrome(""))                                  // true
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-deque-palindrome">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-deque-palindrome">fun isPalindrome(text: String): Boolean {
+    val dq = ArrayDeque<Char>()
+    for (c in text) if (c.isLetterOrDigit()) dq.addLast(c.lowercaseChar())
+    while (dq.size > 1) {
+        if (dq.removeFirst() != dq.removeLast()) return false   // compare the two ends
+    }
+    return true
+}
+
+fun main() {
+    println(isPalindrome("A man, a plan, a canal: Panama"))   // true
+    println(isPalindrome("kotlin"))                            // false
+    println(isPalindrome(""))                                  // true
+}
+</script></div>
+
+<p>Deques also power a few clever tricks, such as sliding-window maximum, which Part 8 covers. For now, remember: if you need both ends, reach for <code>ArrayDeque</code>.</p>
+<h2 id="puzzle">8. A classic puzzle: a queue from two stacks</h2>
+
+<p>Can you build a FIFO queue when the only tool you have is two LIFO stacks? Yes, and it teaches something deep: reversing the order twice gives back the original order.</p>
+<p>Keep an <strong>in</strong> stack and an <strong>out</strong> stack.</p>
+<ul>
+<li><code>enqueue(x)</code>: push onto <em>in</em>.</li>
+<li><code>dequeue()</code>: if <em>out</em> is empty, pour everything from <em>in</em> into <em>out</em> (this reverses it, so the oldest item lands on top). Then pop <em>out</em>.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre> enqueue 1, 2, 3          dequeue (out is empty: pour in -&gt; out)
+
+   in        out             in        out
+ | 3 |     |   |           |   |     | 1 | &lt;- pop gives 1: the oldest
+ | 2 |     |   |    ==&gt;    |   |     | 2 |
+ | 1 |     |   |           |   |     | 3 |
+ +---+     +---+           +---+     +---+</pre></div><figcaption>Pouring one stack into another reverses it.</figcaption></figure>
+
+<p>Pouring costs <code>O(n)</code> once, but each item is poured exactly once in its life. So over many operations the average cost per call is <code>O(1)</code>. We call that <strong>amortised</strong> <code>O(1)</code>: expensive occasionally, cheap on average.</p>
+<div class="try demo"><h3>Run it: queue built from two stacks</h3>
+<p>Interleaving enqueues and dequeues is the tricky case: never pour while <code>outbox</code> still has items, or you will break the order.</p>
+<pre><code>class QueueFromStacks {
+    private val inbox = ArrayDeque&lt;Int&gt;()    // used only as a stack
+    private val outbox = ArrayDeque&lt;Int&gt;()   // used only as a stack
+
+    fun enqueue(x: Int) { inbox.addLast(x) }
+
+    fun dequeue(): Int {
+        if (outbox.isEmpty()) {
+            while (inbox.isNotEmpty()) outbox.addLast(inbox.removeLast())   // pour: reverses order
+        }
+        return outbox.removeLast()
+    }
+
+    fun isEmpty() = inbox.isEmpty() &amp;&amp; outbox.isEmpty()
+}
+
+fun main() {
+    val q = QueueFromStacks()
+    q.enqueue(1); q.enqueue(2); q.enqueue(3)
+    println(q.dequeue())      // 1
+    q.enqueue(4)
+    println(q.dequeue())      // 2  (still in the outbox from the earlier pour)
+    println(q.dequeue())      // 3
+    println(q.dequeue())      // 4
+    println(q.isEmpty())      // true
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-queue-two-stacks">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-queue-two-stacks">class QueueFromStacks {
+    private val inbox = ArrayDeque<Int>()    // used only as a stack
+    private val outbox = ArrayDeque<Int>()   // used only as a stack
+
+    fun enqueue(x: Int) { inbox.addLast(x) }
+
+    fun dequeue(): Int {
+        if (outbox.isEmpty()) {
+            while (inbox.isNotEmpty()) outbox.addLast(inbox.removeLast())   // pour: reverses order
+        }
+        return outbox.removeLast()
+    }
+
+    fun isEmpty() = inbox.isEmpty() && outbox.isEmpty()
+}
+
+fun main() {
+    val q = QueueFromStacks()
+    q.enqueue(1); q.enqueue(2); q.enqueue(3)
+    println(q.dequeue())      // 1
+    q.enqueue(4)
+    println(q.dequeue())      // 2  (still in the outbox from the earlier pour)
+    println(q.dequeue())      // 3
+    println(q.dequeue())      // 4
+    println(q.isEmpty())      // true
+}
+</script></div>
+
+<p>The reverse puzzle, a stack from queues, also works: after each push, rotate the queue so the new item comes to the front. It makes <code>push</code> cost <code>O(n)</code>. Try it on paper; it is a good check of your understanding of FIFO.</p>
+<h2 id="costs">9. Comparing the costs</h2>
+
+<p>Here is everything side by side. &ldquo;Avg&rdquo; for the array&rsquo;s append means amortised: the occasional resize is spread over many appends.</p>
+<table><tr><th>Operation</th><th>Array / ArrayList</th><th>Singly linked list</th><th>Stack</th><th>Queue (ArrayDeque)</th></tr><tr><td>Read by position</td><td><code>O(1)</code></td><td><code>O(n)</code></td><td>not offered</td><td>not offered</td></tr><tr><td>Search for a value</td><td><code>O(n)</code></td><td><code>O(n)</code></td><td><code>O(n)</code></td><td><code>O(n)</code></td></tr><tr><td>Add at the front</td><td><code>O(n)</code></td><td><code>O(1)</code></td><td>n/a</td><td><code>O(1)</code> (deque)</td></tr><tr><td>Add at the back</td><td><code>O(1)</code> avg</td><td><code>O(n)</code>, or <code>O(1)</code> with a tail</td><td><code>push</code>: <code>O(1)</code></td><td><code>enqueue</code>: <code>O(1)</code> avg</td></tr><tr><td>Remove from the front</td><td><code>O(n)</code></td><td><code>O(1)</code></td><td>n/a</td><td><code>dequeue</code>: <code>O(1)</code></td></tr><tr><td>Remove from the back</td><td><code>O(1)</code></td><td><code>O(n)</code></td><td><code>pop</code>: <code>O(1)</code></td><td>n/a (deque: <code>O(1)</code>)</td></tr><tr><td>Insert in the middle</td><td><code>O(n)</code></td><td><code>O(1)</code> once you hold the spot, <code>O(n)</code> to find it</td><td>not offered</td><td>not offered</td></tr></table>
+
+<p>The pattern to take away: a stack or queue gives you <em>fewer</em> operations on purpose. That restriction is a feature. When code uses a stack, the reader instantly knows the order is LIFO, and the structure guarantees nothing else can reach the middle.</p>
+<div class="callout"><strong>Choosing quickly</strong><ul>
+<li>Need to undo, backtrack, match nested things, or follow a call chain? <strong>Stack.</strong></li>
+<li>Need fairness or nearest-first order? <strong>Queue.</strong></li>
+<li>Need both ends? <strong>Deque.</strong></li>
+<li>Need position lookup? <strong>Array.</strong></li>
+<li>Learning pointers, or building trees and graphs? <strong>Linked nodes.</strong></li>
+</ul></div>
+<h2 id="practice">10. Practice</h2>
+<p>Five exercises, from pointer wiring to stack tricks. Draw the picture on paper first, then write the code. The edge cases (empty, one item) are in the tests on purpose.</p>
+<div class="try"><h3>Try it: reverse a linked list</h3>
+<p>The <code>Node</code> class and two helpers are done for you. Fill in <code>reverse</code> so it flips the pointers in place and returns the new head. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+fun fromList(items: List&lt;Int&gt;): Node? {
+    var head: Node? = null
+    for (x in items.reversed()) head = Node(x, head)
+    return head
+}
+
+fun toList(head: Node?): List&lt;Int&gt; {
+    val out = ArrayList&lt;Int&gt;()
+    var cur = head
+    while (cur != null) { out.add(cur.value); cur = cur.next }
+    return out
+}
+
+fun reverse(head: Node?): Node? {
+    TODO("flip each next pointer; keep prev, cur and a saved next")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-reverse-list">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-reverse-list">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class Node(var value: Int, var next: Node? = null)
+
+fun fromList(items: List<Int>): Node? {
+    var head: Node? = null
+    for (x in items.reversed()) head = Node(x, head)
+    return head
+}
+
+fun toList(head: Node?): List<Int> {
+    val out = ArrayList<Int>()
+    var cur = head
+    while (cur != null) { out.add(cur.value); cur = cur.next }
+    return out
+}
+
+fun reverse(head: Node?): Node? {
+    TODO("flip each next pointer; keep prev, cur and a saved next")
+}
+
+fun main() {
+    test("empty list") { eq(toList(reverse(null)), emptyList()) }
+    test("single node") { eq(toList(reverse(fromList(listOf(1)))), listOf(1)) }
+    test("two nodes") { eq(toList(reverse(fromList(listOf(1, 2)))), listOf(2, 1)) }
+    test("five nodes") { eq(toList(reverse(fromList(listOf(1, 2, 3, 4, 5)))), listOf(5, 4, 3, 2, 1)) }
+    test("long list") { eq(toList(reverse(fromList((1..10_000).toList()))), (10_000 downTo 1).toList()) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Save <code>cur.next</code> in a variable before you overwrite it. Return <code>prev</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+fun fromList(items: List&lt;Int&gt;): Node? {
+    var head: Node? = null
+    for (x in items.reversed()) head = Node(x, head)
+    return head
+}
+
+fun toList(head: Node?): List&lt;Int&gt; {
+    val out = ArrayList&lt;Int&gt;()
+    var cur = head
+    while (cur != null) { out.add(cur.value); cur = cur.next }
+    return out
+}
+
+fun reverse(head: Node?): Node? {
+    var prev: Node? = null
+    var cur = head
+    while (cur != null) {
+        val next = cur.next
+        cur.next = prev
+        prev = cur
+        cur = next
+    }
+    return prev
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: detect a cycle</h3>
+<p>Write <code>hasCycle</code> using two pointers, so it uses <code>O(1)</code> extra memory. The tests build loops by hand. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+fun hasCycle(head: Node?): Boolean {
+    TODO("slow moves 1, fast moves 2; do they ever meet?")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-has-cycle">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-has-cycle">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class Node(var value: Int, var next: Node? = null)
+
+fun hasCycle(head: Node?): Boolean {
+    TODO("slow moves 1, fast moves 2; do they ever meet?")
+}
+
+fun main() {
+    fun chain(n: Int): List<Node> {
+        val nodes = List(n) { Node(it) }
+        for (i in 0 until n - 1) nodes[i].next = nodes[i + 1]
+        return nodes
+    }
+    test("empty") { eq(hasCycle(null), false) }
+    test("single node, no loop") { eq(hasCycle(Node(1)), false) }
+    test("straight chain") { eq(hasCycle(chain(6)[0]), false) }
+    test("single node pointing at itself") {
+        val a = Node(1); a.next = a
+        eq(hasCycle(a), true)
+    }
+    test("loop back to the head") {
+        val n = chain(4); n[3].next = n[0]
+        eq(hasCycle(n[0]), true)
+    }
+    test("loop back into the middle") {
+        val n = chain(7); n[6].next = n[2]
+        eq(hasCycle(n[0]), true)
+    }
+    test("equal values but no loop") {
+        val a = Node(5, Node(5, Node(5)))
+        eq(hasCycle(a), false)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Loop while <code>fast</code> and <code>fast.next</code> are not null. Compare nodes with <code>===</code>, not by value.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class Node(var value: Int, var next: Node? = null)
+
+fun hasCycle(head: Node?): Boolean {
+    var slow = head
+    var fast = head
+    while (fast?.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+        if (slow === fast) return true
+    }
+    return false
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: balanced brackets, with a twist</h3>
+<p>Write <code>isBalanced</code> for the three kinds <code>()</code>, <code>[]</code> and <code>{}</code>. Ignore all other characters. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun isBalanced(s: String): Boolean {
+    TODO("push openers, match closers against the top")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-balanced">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-balanced">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun isBalanced(s: String): Boolean {
+    TODO("push openers, match closers against the top")
+}
+
+fun main() {
+    test("empty string") { eq(isBalanced(""), true) }
+    test("simple pair") { eq(isBalanced("()"), true) }
+    test("nested") { eq(isBalanced("{[()]}"), true) }
+    test("wrong order") { eq(isBalanced("([)]"), false) }
+    test("only a closer") { eq(isBalanced(")"), false) }
+    test("only an opener") { eq(isBalanced("("), false) }
+    test("text around brackets") { eq(isBalanced("fun f(a: List<Int>) { return a[0] }"), true) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Check <code>stack.isEmpty()</code> before popping when you see a closer, and check it again at the very end.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun isBalanced(s: String): Boolean {
+    val pairs = mapOf(')' to '(', ']' to '[', '}' to '{')
+    val stack = ArrayDeque&lt;Char&gt;()
+    for (c in s) {
+        if (c in pairs.values) stack.addLast(c)
+        else if (c in pairs.keys) {
+            if (stack.isEmpty() || stack.removeLast() != pairs[c]) return false
+        }
+    }
+    return stack.isEmpty()
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: evaluate postfix</h3>
+<p>Write <code>evalPostfix</code> for <code>+ - * /</code> over whole numbers. Remember that the first value you pop is the <em>right</em> operand. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun evalPostfix(tokens: List&lt;String&gt;): Int {
+    TODO("push numbers; on an operator pop right, pop left, push the result")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-postfix-ex">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-postfix-ex">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun evalPostfix(tokens: List<String>): Int {
+    TODO("push numbers; on an operator pop right, pop left, push the result")
+}
+
+fun main() {
+    test("single number") { eq(evalPostfix(listOf("42")), 42) }
+    test("addition") { eq(evalPostfix(listOf("3", "4", "+")), 7) }
+    test("order matters for minus") { eq(evalPostfix(listOf("10", "2", "-")), 8) }
+    test("order matters for divide") { eq(evalPostfix(listOf("20", "4", "/")), 5) }
+    test("mixed") { eq(evalPostfix("3 4 + 2 *".split(" ")), 14) }
+    test("longer") { eq(evalPostfix("5 1 2 + 4 * + 3 -".split(" ")), 14) }
+    test("negative number token") { eq(evalPostfix("-3 4 *".split(" ")), -12) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> A token like <code>"-3"</code> is a number, not the minus operator, so test for the four exact operator strings only.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun evalPostfix(tokens: List&lt;String&gt;): Int {
+    val stack = ArrayDeque&lt;Int&gt;()
+    for (t in tokens) {
+        when (t) {
+            "+", "-", "*", "/" -&gt; {
+                val right = stack.removeLast()
+                val left = stack.removeLast()
+                stack.addLast(when (t) {
+                    "+" -&gt; left + right
+                    "-" -&gt; left - right
+                    "*" -&gt; left * right
+                    else -&gt; left / right
+                })
+            }
+            else -&gt; stack.addLast(t.toInt())
+        }
+    }
+    return stack.removeLast()
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: a queue from two stacks</h3>
+<p>Complete <code>MyQueue</code> using only the two stacks provided (use <code>addLast</code> and <code>removeLast</code> on them, nothing else). <code>dequeue</code> and <code>peek</code> return <code>null</code> when empty. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class MyQueue {
+    private val inbox = ArrayDeque&lt;Int&gt;()
+    private val outbox = ArrayDeque&lt;Int&gt;()
+
+    fun enqueue(x: Int) {
+        TODO("push onto inbox")
+    }
+
+    private fun refill() {
+        TODO("if outbox is empty, pour all of inbox into it")
+    }
+
+    fun dequeue(): Int? {
+        TODO("refill, then pop from outbox")
+    }
+
+    fun peek(): Int? {
+        TODO("refill, then look at the top of outbox")
+    }
+
+    fun isEmpty(): Boolean {
+        TODO("both stacks empty")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p3-two-stack-queue">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p3-two-stack-queue">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class MyQueue {
+    private val inbox = ArrayDeque<Int>()
+    private val outbox = ArrayDeque<Int>()
+
+    fun enqueue(x: Int) {
+        TODO("push onto inbox")
+    }
+
+    private fun refill() {
+        TODO("if outbox is empty, pour all of inbox into it")
+    }
+
+    fun dequeue(): Int? {
+        TODO("refill, then pop from outbox")
+    }
+
+    fun peek(): Int? {
+        TODO("refill, then look at the top of outbox")
+    }
+
+    fun isEmpty(): Boolean {
+        TODO("both stacks empty")
+    }
+}
+
+fun main() {
+    test("empty queue") {
+        val q = MyQueue()
+        eq(q.isEmpty(), true); eq(q.dequeue(), null); eq(q.peek(), null)
+    }
+    test("first in, first out") {
+        val q = MyQueue()
+        q.enqueue(1); q.enqueue(2); q.enqueue(3)
+        eq(q.dequeue(), 1); eq(q.dequeue(), 2); eq(q.dequeue(), 3)
+    }
+    test("interleaved") {
+        val q = MyQueue()
+        q.enqueue(1); q.enqueue(2)
+        eq(q.dequeue(), 1)
+        q.enqueue(3)
+        eq(q.dequeue(), 2); eq(q.dequeue(), 3); eq(q.dequeue(), null)
+    }
+    test("peek does not remove") {
+        val q = MyQueue()
+        q.enqueue(9); q.enqueue(8)
+        eq(q.peek(), 9); eq(q.peek(), 9); eq(q.dequeue(), 9); eq(q.peek(), 8)
+    }
+    test("isEmpty tracks both stacks") {
+        val q = MyQueue()
+        q.enqueue(1); q.enqueue(2); q.dequeue()
+        eq(q.isEmpty(), false)
+        q.dequeue()
+        eq(q.isEmpty(), true)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Only pour when <code>outbox</code> is empty. Pouring earlier mixes old and new items and breaks the order.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class MyQueue {
+    private val inbox = ArrayDeque&lt;Int&gt;()
+    private val outbox = ArrayDeque&lt;Int&gt;()
+
+    fun enqueue(x: Int) {
+        inbox.addLast(x)
+    }
+
+    private fun refill() {
+        if (outbox.isEmpty()) {
+            while (inbox.isNotEmpty()) outbox.addLast(inbox.removeLast())
+        }
+    }
+
+    fun dequeue(): Int? {
+        refill()
+        return outbox.removeLastOrNull()
+    }
+
+    fun peek(): Int? {
+        refill()
+        return outbox.lastOrNull()
+    }
+
+    fun isEmpty(): Boolean = inbox.isEmpty() &amp;&amp; outbox.isEmpty()
+}</code></pre>
+</details></div>
+<div class="note"><p><strong>Going further.</strong> Try adding <code>removeLast</code> to the linked list, writing a doubly linked list with a tail pointer, or building a stack on top of the linked list so that <code>push</code> and <code>pop</code> work at the head. All three are <code>O(1)</code> at the head.</p></div>
+
+    <h2 id="takeaways">11. Takeaways</h2>
+    <ul><li>A node holds a value and a pointer; a linked list is only as good as its pointer handling, so draw it first.</li><li>Linked lists give <code>O(1)</code> insert and delete at a spot you hold, but <code>O(n)</code> access by position.</li><li>Stacks are for undo, nesting, matching and call chains; queues are for fairness and nearest-first order.</li><li>Use <code>ArrayDeque</code> for a stack, a queue or a deque, and never <code>removeAt(0)</code> on a list as a queue.</li><li>Two pointers at different speeds solve middle and cycle problems in <code>O(1)</code> space.</li><li>Next up: trees, heaps and tries, where each node has more than one next.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Node</td><td>A small object holding a value and one or more pointers to other nodes.</td></tr><tr><td>Pointer / reference</td><td>The address of another object, or <code>null</code> for nothing.</td></tr><tr><td>Head / tail</td><td>The first / last node of a list.</td></tr><tr><td>Singly / doubly linked</td><td>Nodes have a pointer to the next only / to both next and previous.</td></tr><tr><td>LIFO</td><td>Last in, first out: the stack rule.</td></tr><tr><td>FIFO</td><td>First in, first out: the queue rule.</td></tr><tr><td>Push / pop / peek</td><td>Add to the top / remove from the top / look at the top of a stack.</td></tr><tr><td>Enqueue / dequeue</td><td>Add at the back / remove from the front of a queue.</td></tr><tr><td>Deque</td><td>A double-ended queue: add and remove at both ends.</td></tr><tr><td>Circular buffer</td><td>A fixed array used as a ring by wrapping indexes with <code>%</code>.</td></tr><tr><td>Call stack</td><td>The stack of active function calls the computer keeps while a program runs.</td></tr><tr><td>Amortised</td><td>Averaged over many operations, so an occasional expensive step is spread out.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-2-arrays-strings-hashing.html"><small>&larr; Previous &middot; Part 2</small>Arrays, strings, hash maps and sets</a><a class="next" href="dsa-part-4-trees-heaps-tries.html"><small>Next &middot; Part 4 &rarr;</small>Trees, heaps and tries</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 2: Arrays, Strings, Hash Maps and Sets — Khairul Alam</title>
+  <meta name="description" content="Learn arrays, growable lists, strings, hash maps and hash sets in Kotlin with pictures, Big-O costs, runnable Kotlin Playground programs and exercises with tests." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 2 of 9</p>
+    <h1>Data Structures and Algorithms, Part 2: Arrays, Strings, Hash Maps and Sets</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~35 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Arrays</span><span class="tag">Strings</span><span class="tag">Hash maps</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a class="on" href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Arrays, strings, hash maps and hash sets cover most of what everyday programs store. This part shows how each one works inside, what every operation costs, and how a hash map can turn a slow search into a single step.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>An array gives <code>O(1)</code> access by index, but inserting or removing in the middle shifts items: <code>O(n)</code>.</li><li>A growable list doubles its array when full, so adding at the end is amortised <code>O(1)</code>.</li><li>Strings are immutable; build big ones with <code>StringBuilder</code>. Count letters with an array of 26.</li><li>A hash table finds a key by computing a bucket, so lookup is average <code>O(1)</code> but keys lose their order.</li><li><code>LinkedHashMap</code> keeps insertion order, <code>TreeMap</code> keeps sorted order at <code>O(log n)</code>; <code>data class</code> gives you <code>equals</code> and <code>hashCode</code>.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#arrays">Arrays: numbered boxes in a row</a></li><li><a href="#lists">Growable lists and the idea of amortised cost</a></li><li><a href="#strings">Strings: arrays of characters with rules</a></li><li><a href="#hashing">Hashing: finding things without searching</a></li><li><a href="#maps">HashMap, HashSet and their relatives</a></li><li><a href="#counting">Counting and grouping with maps</a></li><li><a href="#worked">Worked problems: from slow to fast</a></li><li><a href="#matrices">Two-dimensional arrays and grids</a></li><li><a href="#costs">The cost table</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="arrays">1. Arrays: numbered boxes in a row</h2>
+
+<p>An <strong>array</strong> is a row of boxes of the same size, sitting side by side in memory, each holding one value. Every box has a number called its <strong>index</strong>, and counting starts at 0.</p>
+<div class="analogy"><p><strong>Think of a row of lockers.</strong> Each locker has a number. If you know the number, you walk straight to it. You never open lockers one by one to find locker 7, because the position tells you exactly where it is.</p></div>
+
+<figure class="fig"><div class="diagram"><pre> index:     0      1      2      3      4
+          +------+------+------+------+------+
+ value:   |  10  |  20  |  30  |  40  |  50  |
+          +------+------+------+------+------+
+ address: 1000   1004   1008   1012   1016      (each Int takes 4 bytes)
+
+ address of box i = start + i * box size</pre></div><figcaption>Boxes are packed together. To find box i the computer does one multiplication and one addition.</figcaption></figure>
+
+<p>That formula is the reason for the array&#39;s best trick: <strong>reading or writing <code>arr[i]</code> costs <code>O(1)</code></strong>. It does not matter whether the array has ten boxes or ten million.</p>
+<p>The price is that the boxes are packed tightly. To put a new value in the middle, every value after it has to shuffle one box to the right to make room. To remove one, they shuffle left to close the gap.</p>
+<figure class="fig"><div class="diagram"><pre> insert 15 at index 1:
+
+ before:  [10][20][30][40][  ]
+               |   |   |
+ shift:        v   v   v        (the three values move right, last one first)
+ after:   [10][15][20][30][40]</pre></div><figcaption>Inserting near the front moves almost every item: O(n). Inserting at the end moves nothing.</figcaption></figure>
+<div class="try demo"><h3>Run it: index access and shifting</h3>
+<p>Run it and count the moves. Inserting at index 1 moved three values, inserting at the end moved none.</p>
+<pre><code>fun insertAt(arr: IntArray, size: Int, index: Int, value: Int): Int {
+    var moves = 0
+    for (i in size downTo index + 1) {   // walk from the back so we do not overwrite anything
+        arr[i] = arr[i - 1]
+        moves++
+    }
+    arr[index] = value
+    return moves
+}
+
+fun main() {
+    val a = IntArray(6)
+    a[0] = 10; a[1] = 20; a[2] = 30; a[3] = 40   // size 4, two spare boxes
+    println("a[2] = ${a[2]}")                      // O(1): jump straight to box 2
+
+    val moves = insertAt(a, 4, 1, 15)
+    println(a.joinToString() + "   moves=$moves")  // three values had to shift
+
+    val appendMoves = insertAt(a, 5, 5, 99)        // at the end
+    println(a.joinToString() + "   moves=$appendMoves")
+
+    // The same effect with a MutableList: add(index, value) shifts for you.
+    val big = MutableList(1000) { it }
+    big.add(0, -1)                                 // every one of the 1000 items moves
+    println("first=${big[0]} second=${big[1]} size=${big.size}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-array-basics">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-array-basics">fun insertAt(arr: IntArray, size: Int, index: Int, value: Int): Int {
+    var moves = 0
+    for (i in size downTo index + 1) {   // walk from the back so we do not overwrite anything
+        arr[i] = arr[i - 1]
+        moves++
+    }
+    arr[index] = value
+    return moves
+}
+
+fun main() {
+    val a = IntArray(6)
+    a[0] = 10; a[1] = 20; a[2] = 30; a[3] = 40   // size 4, two spare boxes
+    println("a[2] = ${a[2]}")                      // O(1): jump straight to box 2
+
+    val moves = insertAt(a, 4, 1, 15)
+    println(a.joinToString() + "   moves=$moves")  // three values had to shift
+
+    val appendMoves = insertAt(a, 5, 5, 99)        // at the end
+    println(a.joinToString() + "   moves=$appendMoves")
+
+    // The same effect with a MutableList: add(index, value) shifts for you.
+    val big = MutableList(1000) { it }
+    big.add(0, -1)                                 // every one of the 1000 items moves
+    println("first=${big[0]} second=${big[1]} size=${big.size}")
+}
+</script></div>
+
+<h3>Fixed size</h3>
+<p>A plain array has a size you choose when you create it, and it cannot grow. In Kotlin, <code>IntArray(5)</code> makes five zeros and <code>intArrayOf(1, 2, 3)</code> makes an array with those values. Asking for <code>arr[5]</code> in a five-box array throws an <code>IndexOutOfBoundsException</code>, which is the computer saying &ldquo;that box does not exist&rdquo;.</p>
+<h2 id="lists">2. Growable lists and the idea of amortised cost</h2>
+
+<p>Most of the time you do not know the size in advance. A <strong>growable list</strong> (Kotlin&#39;s <code>MutableList</code>, backed by <code>ArrayList</code>; Python&#39;s <code>list</code>; Java&#39;s <code>ArrayList</code>) hides a plain array and grows it for you.</p>
+<p>It keeps a hidden array that is usually bigger than needed. The number of boxes is its <strong>capacity</strong>; the number actually used is its <strong>size</strong>. When you add an item and the array is full, the list allocates a new array about twice as big, copies everything across, and carries on.</p>
+<figure class="fig"><div class="diagram"><pre> capacity 4, size 4  (full)
+ [a][b][c][d]
+
+ add(e): no room. Make a new array of capacity 8 and copy 4 items.
+ [a][b][c][d][e][ ][ ][ ]      size 5, capacity 8
+
+ add(f), add(g), add(h): each just fills a spare box, no copying.
+ [a][b][c][d][e][f][g][h]      size 8, capacity 8  (full again)</pre></div><figcaption>Copying is expensive but rare. Because the capacity doubles, each copy buys a lot of cheap adds.</figcaption></figure>
+
+<p>So is <code>add</code> <code>O(1)</code> or <code>O(n)</code>? One unlucky add costs <code>O(n)</code> because of the copy. But look at many adds together. Doubling means the total copying over <code>n</code> adds is about <code>1 + 2 + 4 + &hellip; + n</code>, which is less than <code>2n</code>. Spread over <code>n</code> adds, that is about two copies per add. We say <code>add</code> is <strong>amortised <code>O(1)</code></strong>: <em>on average over a long run it is constant, even though a single call can be slow.</em></p>
+<div class="analogy"><p><strong>Amortised is like a gym membership.</strong> One big payment up front looks expensive, but spread over every visit the cost per visit is small.</p></div>
+<div class="try demo"><h3>Run it: build a tiny ArrayList and count the copying</h3>
+<p>Run it. However large <code>n</code> gets, the number of copies per add stays below 2. That is amortised <code>O(1)</code>.</p>
+<pre><code>class TinyList {
+    private var data = IntArray(1)
+    var size = 0
+        private set
+    var copies = 0
+        private set
+
+    fun add(x: Int) {
+        if (size == data.size) {                    // full: grow to double
+            val bigger = IntArray(data.size * 2)
+            for (i in 0 until size) { bigger[i] = data[i]; copies++ }
+            data = bigger
+        }
+        data[size] = x
+        size++
+    }
+
+    operator fun get(i: Int): Int {
+        if (i !in 0 until size) throw IndexOutOfBoundsException("index $i, size $size")
+        return data[i]
+    }
+}
+
+fun main() {
+    for (n in listOf(10, 1000, 100000)) {
+        val list = TinyList()
+        for (i in 1..n) list.add(i)
+        val perAdd = list.copies.toDouble() / list.size
+        println("n=$n copies=${list.copies} copies per add=${"%.2f".format(perAdd)}")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-growable">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-growable">class TinyList {
+    private var data = IntArray(1)
+    var size = 0
+        private set
+    var copies = 0
+        private set
+
+    fun add(x: Int) {
+        if (size == data.size) {                    // full: grow to double
+            val bigger = IntArray(data.size * 2)
+            for (i in 0 until size) { bigger[i] = data[i]; copies++ }
+            data = bigger
+        }
+        data[size] = x
+        size++
+    }
+
+    operator fun get(i: Int): Int {
+        if (i !in 0 until size) throw IndexOutOfBoundsException("index $i, size $size")
+        return data[i]
+    }
+}
+
+fun main() {
+    for (n in listOf(10, 1000, 100000)) {
+        val list = TinyList()
+        for (i in 1..n) list.add(i)
+        val perAdd = list.copies.toDouble() / list.size
+        println("n=$n copies=${list.copies} copies per add=${"%.2f".format(perAdd)}")
+    }
+}
+</script></div>
+
+<h3>What costs what in a list</h3>
+<table><tr><th>Operation</th><th>Cost</th><th>Why</th></tr><tr><td>read or write <code>list[i]</code></td><td><code>O(1)</code></td><td>index arithmetic</td></tr><tr><td><code>add(x)</code> at the end</td><td>amortised <code>O(1)</code></td><td>sometimes a copy, usually not</td></tr><tr><td><code>add(i, x)</code> or <code>removeAt(i)</code> in the middle</td><td><code>O(n)</code></td><td>items shift</td></tr><tr><td><code>contains(x)</code> or <code>indexOf(x)</code></td><td><code>O(n)</code></td><td>look at items one by one</td></tr><tr><td><code>size</code></td><td><code>O(1)</code></td><td>a stored number</td></tr></table>
+<div class="note"><p><strong>Which to use in Kotlin?</strong> <code>IntArray</code> stores plain numbers with no wrapper objects, so it is smaller and faster; use it when the size is fixed. <code>MutableList&lt;Int&gt;</code> is the everyday choice when the size changes. Both are indexed, so both give <code>O(1)</code> access.</p></div>
+<h2 id="strings">3. Strings: arrays of characters with rules</h2>
+
+<p>A <strong>string</strong> is a sequence of characters, and you can think of it as an array of <code>Char</code>. So <code>s[i]</code> is <code>O(1)</code> and <code>s.length</code> is <code>O(1)</code>. Most things you do to the whole string, such as searching or comparing, are <code>O(n)</code> because they look at the characters.</p>
+<h3>Strings never change</h3>
+<p>In Kotlin, Java and Python a string is <strong>immutable</strong>: once created, it cannot be edited. Methods like <code>uppercase()</code> or <code>replace()</code> do not change the string, they build a <em>new</em> one. That is safe, because nobody can change a string under your feet, but it has a cost.</p>
+<p>Consider building a long string with <code>result = result + "x"</code> in a loop. Each <code>+</code> creates a brand new string and copies everything so far. Copy 1 character, then 2, then 3, up to <code>n</code>: that is about <code>n&sup2; / 2</code> copies in total, so <code>O(n&sup2;)</code>. The fix is a <strong><code>StringBuilder</code></strong>: a growable buffer, just like the growable list, so appending is amortised <code>O(1)</code> and the whole build is <code>O(n)</code>.</p>
+<div class="try demo"><h3>Run it: common string operations and StringBuilder</h3>
+<p>Read each result next to its line. Notice that <code>s</code> is unchanged after <code>uppercase()</code>.</p>
+<pre><code>fun main() {
+    val s = "hello world"
+    val shout = s.uppercase()
+    println("$s -&gt; $shout")                 // s itself did not change
+
+    println(s[4])                           // 'o', O(1)
+    println(s.substring(0, 5))              // hello
+    println(s.indexOf("world"))             // 6
+    println(s.contains("lo w"))             // true
+    println(s.split(" "))                   // [hello, world]
+    println(s.reversed())                   // dlrow olleh
+    println(s.replace('o', '0'))            // hell0 w0rld
+
+    // Build a string piece by piece with StringBuilder: O(n) overall.
+    val sb = StringBuilder()
+    for (i in 1..5) sb.append(i).append(',')
+    sb.setLength(sb.length - 1)             // drop the last comma
+    println(sb.toString())                  // 1,2,3,4,5
+
+    // Strings are sequences of Char, and Char is a number underneath.
+    println('a'.code)                       // 97
+    println('c' - 'a')                      // 2, the position of c in the alphabet
+    println('7'.isDigit())                  // true
+    println('Q'.lowercaseChar())            // q
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-strings">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-strings">fun main() {
+    val s = "hello world"
+    val shout = s.uppercase()
+    println("$s -> $shout")                 // s itself did not change
+
+    println(s[4])                           // 'o', O(1)
+    println(s.substring(0, 5))              // hello
+    println(s.indexOf("world"))             // 6
+    println(s.contains("lo w"))             // true
+    println(s.split(" "))                   // [hello, world]
+    println(s.reversed())                   // dlrow olleh
+    println(s.replace('o', '0'))            // hell0 w0rld
+
+    // Build a string piece by piece with StringBuilder: O(n) overall.
+    val sb = StringBuilder()
+    for (i in 1..5) sb.append(i).append(',')
+    sb.setLength(sb.length - 1)             // drop the last comma
+    println(sb.toString())                  // 1,2,3,4,5
+
+    // Strings are sequences of Char, and Char is a number underneath.
+    println('a'.code)                       // 97
+    println('c' - 'a')                      // 2, the position of c in the alphabet
+    println('7'.isDigit())                  // true
+    println('Q'.lowercaseChar())            // q
+}
+</script></div>
+
+<h3>Counting characters</h3>
+<p>Many string problems come down to <em>how many of each letter are there?</em> If the text only has lowercase letters <code>a</code> to <code>z</code>, you do not need a map. Use an array of 26 counters and turn a letter into an index with <code>c - 'a'</code>.</p>
+<figure class="fig"><div class="diagram"><pre> text = "banana"
+
+ index:  0  1  2  3 ... 13 ... 25
+ letter: a  b  c  d ...  n ...  z
+ count:  3  1  0  0 ...  2 ...  0
+
+ 'a' - 'a' = 0   'b' - 'a' = 1   'n' - 'a' = 13</pre></div><figcaption>A fixed array of 26 counters. Updating one counter is O(1), so counting a string is O(n).</figcaption></figure>
+
+<h3>Palindromes and anagrams</h3>
+<p>A <strong>palindrome</strong> reads the same forwards and backwards, like &ldquo;level&rdquo;. A neat way to check it is with <strong>two pointers</strong>: one starts at the left end, one at the right end, and they walk toward each other comparing characters. Two strings are <strong>anagrams</strong> if they use exactly the same letters the same number of times, like &ldquo;listen&rdquo; and &ldquo;silent&rdquo;. If you count the letters of both, the counts must match.</p>
+<div class="try demo"><h3>Run it: two pointers and letter counts</h3>
+<p>The palindrome check never builds a reversed copy, so it uses no extra memory. The anagram check compares two 26-slot arrays.</p>
+<pre><code>fun isPalindrome(s: String): Boolean {
+    var left = 0
+    var right = s.length - 1
+    while (left &lt; right) {
+        if (s[left] != s[right]) return false
+        left++
+        right--
+    }
+    return true            // O(n) time, O(1) extra space
+}
+
+fun letterCounts(word: String): IntArray {
+    val counts = IntArray(26)
+    for (c in word) counts[c - 'a']++
+    return counts
+}
+
+fun sameLetters(a: String, b: String): Boolean =
+    letterCounts(a).contentEquals(letterCounts(b))     // O(n) time, O(1) space (26 never grows)
+
+fun main() {
+    println(isPalindrome("level"))      // true
+    println(isPalindrome("levels"))     // false
+    println(isPalindrome(""))           // true, nothing to disagree
+    println(sameLetters("listen", "silent"))   // true
+    println(sameLetters("rat", "car"))         // false
+    println(letterCounts("banana").take(14))    // counts for a..n
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-palindrome-anagram">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-palindrome-anagram">fun isPalindrome(s: String): Boolean {
+    var left = 0
+    var right = s.length - 1
+    while (left < right) {
+        if (s[left] != s[right]) return false
+        left++
+        right--
+    }
+    return true            // O(n) time, O(1) extra space
+}
+
+fun letterCounts(word: String): IntArray {
+    val counts = IntArray(26)
+    for (c in word) counts[c - 'a']++
+    return counts
+}
+
+fun sameLetters(a: String, b: String): Boolean =
+    letterCounts(a).contentEquals(letterCounts(b))     // O(n) time, O(1) space (26 never grows)
+
+fun main() {
+    println(isPalindrome("level"))      // true
+    println(isPalindrome("levels"))     // false
+    println(isPalindrome(""))           // true, nothing to disagree
+    println(sameLetters("listen", "silent"))   // true
+    println(sameLetters("rat", "car"))         // false
+    println(letterCounts("banana").take(14))    // counts for a..n
+}
+</script></div>
+<h2 id="hashing">4. Hashing: finding things without searching</h2>
+
+<p>Arrays give you instant access <em>by position</em>. But often you want access <em>by meaning</em>: the price of &ldquo;apple&rdquo;, the user named &ldquo;sara&rdquo;, whether the number 42 has appeared already. Searching a list for those is <code>O(n)</code>. A <strong>hash table</strong> makes it <code>O(1)</code> on average.</p>
+<div class="analogy"><p><strong>Think of a library with numbered shelves.</strong> Instead of scanning every book, a librarian runs a rule on the title that gives a shelf number. To store a book, go to that shelf. To find it later, run the same rule and go to the same shelf. No scanning.</p></div>
+
+<p>The rule is a <strong>hash function</strong>: it turns any key (a string, a number, an object) into an integer called a <strong>hash code</strong>. The table has a row of numbered slots called <strong>buckets</strong>. The bucket for a key is the hash code reduced to a valid bucket number, usually with a remainder: <code>hashCode % bucketCount</code>.</p>
+<figure class="fig"><div class="diagram"><pre> key      hash code     % 4        buckets
+ "cat" -&gt; 98262     -&gt;   2    0: [ ]
+ "dog" -&gt; 99644     -&gt;   0    1: [ ]
+ "cow" -&gt; 98699     -&gt;   3    2: [ "cat" ]
+ "bee" -&gt; 97410     -&gt;   2    3: [ "cow" ]
+                                (and "dog" sits in bucket 0)
+
+ "bee" also lands in bucket 2, where "cat" already is.
+ Bucket 2 now holds a short chain: "cat" -&gt; "bee".   That is a collision.</pre></div><figcaption>Illustrative numbers. The idea: key, then hash code, then bucket number. Two keys can share a bucket.</figcaption></figure>
+
+<h3>Collisions</h3>
+<p>There are far more possible keys than buckets, so two different keys sometimes land in the same bucket. This is called a <strong>collision</strong>, and it is normal. The simplest fix, used above, is <strong>chaining</strong>: each bucket holds a small list of the entries that landed there. To look up a key, jump to its bucket and check the few entries inside, comparing with <code>equals</code>.</p>
+<p>If the hash function spreads keys evenly and the table has enough buckets, every chain stays tiny and a lookup is a couple of steps. When the table gets too full, real implementations <strong>resize</strong>: they make more buckets and re-place every entry, the same trick the growable list uses. That keeps the average cost <code>O(1)</code>.</p>
+<div class="try demo"><h3>Run it: build a hash set with buckets</h3>
+<p>Run it and look at the bucket lines. Any bucket with more than one word is a collision. The second &ldquo;cat&rdquo; is refused, which is what makes it a set.</p>
+<pre><code>class MiniHashSet(private val bucketCount: Int = 8) {
+    private val buckets = Array(bucketCount) { mutableListOf&lt;String&gt;() }
+
+    fun bucketOf(key: String): Int = Math.floorMod(key.hashCode(), bucketCount)
+
+    fun add(key: String): Boolean {
+        val chain = buckets[bucketOf(key)]
+        if (key in chain) return false      // already there
+        chain.add(key)
+        return true
+    }
+
+    fun contains(key: String): Boolean = key in buckets[bucketOf(key)]
+
+    fun show() {
+        for ((i, chain) in buckets.withIndex()) println("bucket $i: $chain")
+    }
+}
+
+fun main() {
+    val set = MiniHashSet()
+    val words = listOf("cat", "dog", "bird", "fish", "cow", "ant", "bee", "cat")
+    for (w in words) {
+        val added = set.add(w)
+        println("%-5s hashCode=%-9d bucket=%d added=%s".format(w, w.hashCode(), set.bucketOf(w), added))
+    }
+    println()
+    set.show()
+    println()
+    println("contains dog? ${set.contains("dog")}")
+    println("contains emu? ${set.contains("emu")}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-mini-hash-set">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-mini-hash-set">class MiniHashSet(private val bucketCount: Int = 8) {
+    private val buckets = Array(bucketCount) { mutableListOf<String>() }
+
+    fun bucketOf(key: String): Int = Math.floorMod(key.hashCode(), bucketCount)
+
+    fun add(key: String): Boolean {
+        val chain = buckets[bucketOf(key)]
+        if (key in chain) return false      // already there
+        chain.add(key)
+        return true
+    }
+
+    fun contains(key: String): Boolean = key in buckets[bucketOf(key)]
+
+    fun show() {
+        for ((i, chain) in buckets.withIndex()) println("bucket $i: $chain")
+    }
+}
+
+fun main() {
+    val set = MiniHashSet()
+    val words = listOf("cat", "dog", "bird", "fish", "cow", "ant", "bee", "cat")
+    for (w in words) {
+        val added = set.add(w)
+        println("%-5s hashCode=%-9d bucket=%d added=%s".format(w, w.hashCode(), set.bucketOf(w), added))
+    }
+    println()
+    set.show()
+    println()
+    println("contains dog? ${set.contains("dog")}")
+    println("contains emu? ${set.contains("emu")}")
+}
+</script></div>
+
+<h3>Why only the average is <code>O(1)</code></h3>
+<p>In the worst case every key collides into one bucket and the table degrades into a single long list: <code>O(n)</code>. A good hash function and resizing make that practically never happen, so we say <em>average</em> <code>O(1)</code>. This is also why a hash table gives up <strong>order</strong>: keys are placed by their hash code, not by when you added them or how they compare, so iterating a plain hash table gives no meaningful order.</p>
+<div class="callout"><strong>Two rules a key must follow</strong><ul>
+<li>If two keys are <code>equals</code>, they must have the same <code>hashCode</code>. Otherwise equal keys go to different buckets and you can never find them.</li>
+<li>A key must not change while it is stored. If its hash code changes, it is now in the wrong bucket.</li>
+</ul></div>
+<h2 id="maps">5. HashMap, HashSet and their relatives</h2>
+
+<p>Two structures are built on a hash table.</p>
+<ul>
+<li>A <strong>hash set</strong> stores unique keys and answers &ldquo;is it in there?&rdquo; in <code>O(1)</code> on average.</li>
+<li>A <strong>hash map</strong> (a <em>dictionary</em>) stores <strong>key-value pairs</strong>: look up a key, get its value. Keys are unique; values can repeat.</li>
+</ul>
+<p>A set is really a map where you only care about the keys. In Kotlin, <code>mapOf</code>, <code>mutableMapOf</code> and <code>HashMap</code> are the usual map types, and <code>setOf</code>, <code>mutableSetOf</code> and <code>HashSet</code> the usual sets.</p>
+<h3>Four flavours and what order means</h3>
+<p>Sometimes you do need order. The standard library offers variations that differ in what order they keep and what that costs.</p>
+<table><tr><th>Type</th><th>Order of iteration</th><th>Lookup, add, remove</th><th>Use it when</th></tr><tr><td><code>HashMap</code> / <code>HashSet</code></td><td>no useful order</td><td>average <code>O(1)</code></td><td>you only need fast lookup</td></tr><tr><td><code>LinkedHashMap</code> / <code>LinkedHashSet</code></td><td>insertion order</td><td>average <code>O(1)</code></td><td>you want fast lookup and a predictable order</td></tr><tr><td><code>TreeMap</code> / <code>TreeSet</code></td><td>sorted by key</td><td><code>O(log n)</code></td><td>you need sorted keys, or &ldquo;the next bigger key&rdquo;</td></tr></table>
+
+<p>A <code>TreeMap</code> keeps its keys sorted using a balanced tree (you will build such trees in Part 4). That costs <code>O(log n)</code> per operation instead of <code>O(1)</code>, but it unlocks questions a hash table cannot answer cheaply: the smallest key, the largest, or the closest key to a given value.</p>
+<div class="try demo"><h3>Run it: the same data in three maps</h3>
+<p>Compare the three printed maps. The first one may come out in any order; do not rely on it.</p>
+<pre><code>import java.util.TreeMap
+
+fun countWords(words: List&lt;String&gt;, into: MutableMap&lt;String, Int&gt;) {
+    for (w in words) into[w] = (into[w] ?: 0) + 1
+}
+
+fun main() {
+    val words = listOf("pear", "apple", "fig", "banana", "apple", "fig", "apple")
+
+    val hash = HashMap&lt;String, Int&gt;()
+    val linked = LinkedHashMap&lt;String, Int&gt;()
+    val tree = TreeMap&lt;String, Int&gt;()
+    countWords(words, hash)
+    countWords(words, linked)
+    countWords(words, tree)
+
+    println("HashMap       $hash")      // same pairs, order not meaningful
+    println("LinkedHashMap $linked")    // first-seen order: pear, apple, fig, banana
+    println("TreeMap       $tree")      // alphabetical
+
+    println(linked["apple"])            // 3
+    println(linked["kiwi"])             // null, missing key
+    println(linked.getOrDefault("kiwi", 0))   // 0
+
+    println(tree.firstKey())            // apple
+    println(tree.lastKey())             // pear
+    println(tree.ceilingKey("b"))       // banana, smallest key at or after "b"
+    println(tree.floorKey("c"))         // banana, largest key at or before "c"
+
+    val seen = LinkedHashSet&lt;Int&gt;()
+    for (x in listOf(3, 1, 3, 2, 1)) seen.add(x)
+    println(seen)                       // [3, 1, 2]: duplicates gone, first-seen order kept
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-map-family">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-map-family">import java.util.TreeMap
+
+fun countWords(words: List<String>, into: MutableMap<String, Int>) {
+    for (w in words) into[w] = (into[w] ?: 0) + 1
+}
+
+fun main() {
+    val words = listOf("pear", "apple", "fig", "banana", "apple", "fig", "apple")
+
+    val hash = HashMap<String, Int>()
+    val linked = LinkedHashMap<String, Int>()
+    val tree = TreeMap<String, Int>()
+    countWords(words, hash)
+    countWords(words, linked)
+    countWords(words, tree)
+
+    println("HashMap       $hash")      // same pairs, order not meaningful
+    println("LinkedHashMap $linked")    // first-seen order: pear, apple, fig, banana
+    println("TreeMap       $tree")      // alphabetical
+
+    println(linked["apple"])            // 3
+    println(linked["kiwi"])             // null, missing key
+    println(linked.getOrDefault("kiwi", 0))   // 0
+
+    println(tree.firstKey())            // apple
+    println(tree.lastKey())             // pear
+    println(tree.ceilingKey("b"))       // banana, smallest key at or after "b"
+    println(tree.floorKey("c"))         // banana, largest key at or before "c"
+
+    val seen = LinkedHashSet<Int>()
+    for (x in listOf(3, 1, 3, 2, 1)) seen.add(x)
+    println(seen)                       // [3, 1, 2]: duplicates gone, first-seen order kept
+}
+</script></div>
+
+<h3>Your own classes as keys</h3>
+<p>A hash table needs two things from a key: <code>hashCode()</code> to pick the bucket, and <code>equals()</code> to confirm a match inside the bucket. Strings and numbers have both built in. For your own class, Kotlin&#39;s <strong><code>data class</code></strong> writes both for you, based on the fields in the constructor. A plain <code>class</code> does not: two separate objects count as different even when all their fields match.</p>
+<div class="try demo"><h3>Run it: data class versus plain class as a key</h3>
+<p>This is why grids and coordinates are usually stored as <code>data class Point</code> (or as a pair) when you need to remember which cells you have visited.</p>
+<pre><code>data class Point(val x: Int, val y: Int)
+
+class Cell(val x: Int, val y: Int)       // plain class: no equals, no hashCode
+
+fun main() {
+    val visited = HashSet&lt;Point&gt;()
+    visited.add(Point(1, 2))
+    println(Point(1, 2) in visited)                              // true: same fields, equal
+    println(Point(1, 2).hashCode() == Point(1, 2).hashCode())    // true
+
+    val plain = HashSet&lt;Cell&gt;()
+    plain.add(Cell(1, 2))
+    println(Cell(1, 2) in plain)                                 // false: a different object
+
+    val names = HashMap&lt;Point, String&gt;()
+    names[Point(0, 0)] = "origin"
+    names[Point(3, 4)] = "far"
+    println(names[Point(0, 0)])          // origin
+    println(names[Point(9, 9)])          // null
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-data-class-keys">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-data-class-keys">data class Point(val x: Int, val y: Int)
+
+class Cell(val x: Int, val y: Int)       // plain class: no equals, no hashCode
+
+fun main() {
+    val visited = HashSet<Point>()
+    visited.add(Point(1, 2))
+    println(Point(1, 2) in visited)                              // true: same fields, equal
+    println(Point(1, 2).hashCode() == Point(1, 2).hashCode())    // true
+
+    val plain = HashSet<Cell>()
+    plain.add(Cell(1, 2))
+    println(Cell(1, 2) in plain)                                 // false: a different object
+
+    val names = HashMap<Point, String>()
+    names[Point(0, 0)] = "origin"
+    names[Point(3, 4)] = "far"
+    println(names[Point(0, 0)])          // origin
+    println(names[Point(9, 9)])          // null
+}
+</script></div>
+<h2 id="counting">6. Counting and grouping with maps</h2>
+
+<p>Two jobs show up everywhere, and both are one loop over a map.</p>
+<ul>
+<li><strong>Frequency counting:</strong> how many times does each thing occur? Map from item to count.</li>
+<li><strong>Grouping:</strong> collect items that share a property. Map from the property (the <em>key</em>) to a list of items.</li>
+</ul>
+<p>The counting pattern is always &ldquo;read the old count, or zero if missing, and add one&rdquo;. Kotlin gives shortcuts so you do not write it by hand: <code>groupingBy { }.eachCount()</code> to count, <code>groupBy { }</code> to group, and <code>getOrPut</code> to create a list the first time a key appears.</p>
+<figure class="fig"><div class="diagram"><pre> words:  eat  tea  tan  ate  nat  bat
+
+ key = the letters sorted        group
+ "aet"  &lt;-  eat, tea, ate       [eat, tea, ate]
+ "ant"  &lt;-  tan, nat            [tan, nat]
+ "abt"  &lt;-  bat                 [bat]</pre></div><figcaption>Anagrams share the same sorted letters. Use that as the key and one pass groups them all.</figcaption></figure>
+<div class="try demo"><h3>Run it: count words, group by length, group anagrams</h3>
+<p>Run it. The shortcut and the hand-written loop give the same counts. The last line shows three anagram groups.</p>
+<pre><code>fun groupAnagrams(words: List&lt;String&gt;): List&lt;List&lt;String&gt;&gt; {
+    val groups = HashMap&lt;String, MutableList&lt;String&gt;&gt;()
+    for (w in words) {
+        val key = w.toCharArray().sorted().joinToString("")   // "eat" -&gt; "aet"
+        groups.getOrPut(key) { mutableListOf() }.add(w)
+    }
+    return groups.values.toList()
+}
+
+fun main() {
+    val words = "to be or not to be".split(" ")
+
+    // Counting by hand
+    val counts = HashMap&lt;String, Int&gt;()
+    for (w in words) counts[w] = (counts[w] ?: 0) + 1
+    println(counts.toSortedMap())
+
+    // Counting with the shortcut
+    println(words.groupingBy { it }.eachCount().toSortedMap())
+
+    // Grouping by a property: here, word length
+    println(words.groupBy { it.length })
+
+    // Most common word
+    val best = counts.maxByOrNull { it.value }
+    println("most common: ${best?.key} x${best?.value}")
+
+    // Grouping anagrams, O(n * k log k) for n words of length k
+    val groups = groupAnagrams(listOf("eat", "tea", "tan", "ate", "nat", "bat"))
+    println(groups.sortedBy { it.first() })
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-counting-grouping">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-counting-grouping">fun groupAnagrams(words: List<String>): List<List<String>> {
+    val groups = HashMap<String, MutableList<String>>()
+    for (w in words) {
+        val key = w.toCharArray().sorted().joinToString("")   // "eat" -> "aet"
+        groups.getOrPut(key) { mutableListOf() }.add(w)
+    }
+    return groups.values.toList()
+}
+
+fun main() {
+    val words = "to be or not to be".split(" ")
+
+    // Counting by hand
+    val counts = HashMap<String, Int>()
+    for (w in words) counts[w] = (counts[w] ?: 0) + 1
+    println(counts.toSortedMap())
+
+    // Counting with the shortcut
+    println(words.groupingBy { it }.eachCount().toSortedMap())
+
+    // Grouping by a property: here, word length
+    println(words.groupBy { it.length })
+
+    // Most common word
+    val best = counts.maxByOrNull { it.value }
+    println("most common: ${best?.key} x${best?.value}")
+
+    // Grouping anagrams, O(n * k log k) for n words of length k
+    val groups = groupAnagrams(listOf("eat", "tea", "tan", "ate", "nat", "bat"))
+    println(groups.sortedBy { it.first() })
+}
+</script></div>
+
+<p>The cost of counting is <code>O(n)</code> time for <code>n</code> items and <code>O(k)</code> extra space, where <code>k</code> is the number of <em>different</em> items. For grouping anagrams, building each key sorts a word of length <code>k</code>, which costs <code>O(k log k)</code>, so the total is <code>O(n * k log k)</code>.</p>
+<h2 id="worked">7. Worked problems: from slow to fast</h2>
+
+<p>Time to use the six-step method from Part 1. In each problem the slow version is the one you would write first, and a set or map removes the repeated searching.</p>
+<h3>Problem A: common items</h3>
+<p><em>Given two lists, which values appear in both?</em> The slow way takes each item of the first list and scans the second one: <code>O(n * m)</code>. The waste is the scanning. Put one list into a hash set, and each check becomes <code>O(1)</code>, so the whole job is <code>O(n + m)</code>.</p>
+<h3>Problem B: the first repeat</h3>
+<p><em>Return the first value that appears a second time as you read left to right.</em> Keep a set of values seen so far. The first time <code>add</code> says &ldquo;already there&rdquo;, you have your answer. One pass, <code>O(n)</code>.</p>
+<div class="try demo"><h3>Run it: two problems solved with a set</h3>
+<p>Both common-item versions agree. Only the cost differs, and it matters once the lists have thousands of items.</p>
+<pre><code>fun commonSlow(a: List&lt;Int&gt;, b: List&lt;Int&gt;): List&lt;Int&gt; {
+    val result = mutableListOf&lt;Int&gt;()
+    for (x in a) if (x in b &amp;&amp; x !in result) result.add(x)   // x in b scans b: O(n * m)
+    return result
+}
+
+fun commonFast(a: List&lt;Int&gt;, b: List&lt;Int&gt;): List&lt;Int&gt; {
+    val inB = b.toHashSet()                     // O(m)
+    val result = LinkedHashSet&lt;Int&gt;()           // unique, keeps order
+    for (x in a) if (x in inB) result.add(x)    // each check is O(1)
+    return result.toList()
+}
+
+fun firstRepeat(nums: List&lt;Int&gt;): Int? {
+    val seen = HashSet&lt;Int&gt;()
+    for (x in nums) {
+        if (!seen.add(x)) return x
+    }
+    return null
+}
+
+fun main() {
+    val a = listOf(4, 9, 5, 9, 4)
+    val b = listOf(9, 4, 9, 8, 4)
+    println(commonSlow(a, b))     // [4, 9]
+    println(commonFast(a, b))     // [4, 9]
+    println(firstRepeat(listOf(2, 5, 1, 2, 3, 5, 1)))   // 2
+    println(firstRepeat(listOf(1, 2, 3)))               // null
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-worked-set">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-worked-set">fun commonSlow(a: List<Int>, b: List<Int>): List<Int> {
+    val result = mutableListOf<Int>()
+    for (x in a) if (x in b && x !in result) result.add(x)   // x in b scans b: O(n * m)
+    return result
+}
+
+fun commonFast(a: List<Int>, b: List<Int>): List<Int> {
+    val inB = b.toHashSet()                     // O(m)
+    val result = LinkedHashSet<Int>()           // unique, keeps order
+    for (x in a) if (x in inB) result.add(x)    // each check is O(1)
+    return result.toList()
+}
+
+fun firstRepeat(nums: List<Int>): Int? {
+    val seen = HashSet<Int>()
+    for (x in nums) {
+        if (!seen.add(x)) return x
+    }
+    return null
+}
+
+fun main() {
+    val a = listOf(4, 9, 5, 9, 4)
+    val b = listOf(9, 4, 9, 8, 4)
+    println(commonSlow(a, b))     // [4, 9]
+    println(commonFast(a, b))     // [4, 9]
+    println(firstRepeat(listOf(2, 5, 1, 2, 3, 5, 1)))   // 2
+    println(firstRepeat(listOf(1, 2, 3)))               // null
+}
+</script></div>
+
+<h3>Problem C: the longest run of consecutive numbers</h3>
+<p><em>Given unsorted numbers, find the length of the longest run of values that follow each other, like 1, 2, 3, 4. The numbers do not need to be next to each other in the input.</em></p>
+<p>Sorting gives <code>O(n log n)</code>, which is fine, but a set does it in <code>O(n)</code>. The key idea: only start counting at the <em>beginning</em> of a run. A number <code>x</code> is the beginning of a run if <code>x - 1</code> is not in the set. From each beginning, walk up <code>x+1, x+2, ...</code> while the numbers are in the set.</p>
+<figure class="fig"><div class="diagram"><pre> numbers: 100  4  200  1  3  2
+
+ set = {1, 2, 3, 4, 100, 200}
+
+ 100 : is 99 in the set?  no  -&gt; start of a run: 100 (length 1)
+   4 : is  3 in the set?  yes -&gt; not a start, skip
+ 200 : is 199 in the set? no  -&gt; start of a run: 200 (length 1)
+   1 : is  0 in the set?  no  -&gt; start: 1, 2, 3, 4  (length 4)   &lt;- longest
+   3 : is  2 in the set?  yes -&gt; skip
+   2 : is  1 in the set?  yes -&gt; skip</pre></div><figcaption>Each number is walked over at most once as part of a run, so the total work is O(n) even though there is a loop inside a loop.</figcaption></figure>
+
+<p>You will write this one yourself in the practice section. Before that, one more kind of data: tables of numbers.</p>
+<h2 id="matrices">8. Two-dimensional arrays and grids</h2>
+
+<p>A <strong>matrix</strong> or <strong>grid</strong> is an array of arrays: rows, each holding columns. You write <code>grid[row][col]</code>. Grids model spreadsheets, game boards, images (a grid of pixels) and maps.</p>
+<figure class="fig"><div class="diagram"><pre>            col 0  col 1  col 2
+          +------+------+------+
+  row 0   |   1  |   2  |   3  |
+          +------+------+------+
+  row 1   |   4  |   5  |   6  |        grid[1][2] = 6
+          +------+------+------+
+  row 2   |   7  |   8  |   9  |        rows = 3, cols = 3
+          +------+------+------+</pre></div><figcaption>The row comes first, then the column. Reading one cell is O(1).</figcaption></figure>
+
+<p>Visiting every cell takes two nested loops, so a grid with <code>R</code> rows and <code>C</code> columns costs <code>O(R * C)</code>. That is linear in the number of cells, not quadratic in anything, so name your sizes carefully when you state the cost.</p>
+<h3>Looking at neighbours</h3>
+<p>A common task is &ldquo;what is next to this cell?&rdquo;. Instead of four copy-pasted <code>if</code> blocks, store the four moves in two small arrays of row and column offsets, loop over them, and check the new position is inside the grid before reading it.</p>
+<figure class="fig"><div class="diagram"><pre>              (r-1, c)
+                 up
+   (r, c-1)   (r, c)   (r, c+1)
+     left      here     right
+                (r+1, c)
+                 down
+
+ dr = [-1, 1,  0, 0]
+ dc = [ 0, 0, -1, 1]</pre></div><figcaption>Direction arrays. The same idea extends to 8 neighbours or knight moves.</figcaption></figure>
+<div class="try demo"><h3>Run it: traversal, neighbours and transpose</h3>
+<p>Run it and check the transposed grid: the first row of the output should be the first column of the input.</p>
+<pre><code>fun main() {
+    val grid = arrayOf(
+        intArrayOf(1, 2, 3),
+        intArrayOf(4, 5, 6),
+        intArrayOf(7, 8, 9),
+    )
+    val rows = grid.size
+    val cols = grid[0].size
+
+    // Row by row: the natural, fast order for arrays.
+    for (r in 0 until rows) println(grid[r].joinToString(" "))
+
+    // Column sums: swap the loop order.
+    for (c in 0 until cols) {
+        var sum = 0
+        for (r in 0 until rows) sum += grid[r][c]
+        println("column $c sum = $sum")
+    }
+
+    // Neighbours with direction arrays, skipping cells outside the grid.
+    val dr = intArrayOf(-1, 1, 0, 0)
+    val dc = intArrayOf(0, 0, -1, 1)
+    fun neighbours(r: Int, c: Int): List&lt;Int&gt; {
+        val result = mutableListOf&lt;Int&gt;()
+        for (k in 0 until 4) {
+            val nr = r + dr[k]
+            val nc = c + dc[k]
+            if (nr in 0 until rows &amp;&amp; nc in 0 until cols) result.add(grid[nr][nc])
+        }
+        return result
+    }
+    println(neighbours(1, 1))    // [2, 8, 4, 6] all four exist
+    println(neighbours(0, 0))    // [4, 2] corner: only two exist
+
+    // Transpose: cell (r, c) moves to (c, r). Rows become columns.
+    val t = Array(cols) { c -&gt; IntArray(rows) { r -&gt; grid[r][c] } }
+    for (row in t) println(row.joinToString(" "))
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-grid">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-grid">fun main() {
+    val grid = arrayOf(
+        intArrayOf(1, 2, 3),
+        intArrayOf(4, 5, 6),
+        intArrayOf(7, 8, 9),
+    )
+    val rows = grid.size
+    val cols = grid[0].size
+
+    // Row by row: the natural, fast order for arrays.
+    for (r in 0 until rows) println(grid[r].joinToString(" "))
+
+    // Column sums: swap the loop order.
+    for (c in 0 until cols) {
+        var sum = 0
+        for (r in 0 until rows) sum += grid[r][c]
+        println("column $c sum = $sum")
+    }
+
+    // Neighbours with direction arrays, skipping cells outside the grid.
+    val dr = intArrayOf(-1, 1, 0, 0)
+    val dc = intArrayOf(0, 0, -1, 1)
+    fun neighbours(r: Int, c: Int): List<Int> {
+        val result = mutableListOf<Int>()
+        for (k in 0 until 4) {
+            val nr = r + dr[k]
+            val nc = c + dc[k]
+            if (nr in 0 until rows && nc in 0 until cols) result.add(grid[nr][nc])
+        }
+        return result
+    }
+    println(neighbours(1, 1))    // [2, 8, 4, 6] all four exist
+    println(neighbours(0, 0))    // [4, 2] corner: only two exist
+
+    // Transpose: cell (r, c) moves to (c, r). Rows become columns.
+    val t = Array(cols) { c -> IntArray(rows) { r -> grid[r][c] } }
+    for (row in t) println(row.joinToString(" "))
+}
+</script></div>
+<div class="note"><p><strong>Rotating a grid</strong> clockwise by 90 degrees is a transpose followed by reversing each row, or equivalently: the cell at row <code>r</code>, column <code>c</code> in the new grid comes from row <code>rows - 1 - c</code>, column <code>r</code> of the old one. You will try it below.</p></div>
+<h2 id="costs">9. The cost table</h2>
+
+<p>Here is everything from this part on one page. Keep it nearby; choosing a structure is mostly looking up the operation you do most often.</p>
+<table><tr><th>Operation</th><th>Array / list</th><th>HashMap / HashSet</th><th>TreeMap / TreeSet</th></tr><tr><td>Access by index</td><td><code>O(1)</code></td><td>not available</td><td>not available</td></tr><tr><td>Search by value / key</td><td><code>O(n)</code></td><td><code>O(1)</code> average</td><td><code>O(log n)</code></td></tr><tr><td>Add at the end</td><td>amortised <code>O(1)</code></td><td>n/a</td><td>n/a</td></tr><tr><td>Add or remove in the middle</td><td><code>O(n)</code></td><td>n/a</td><td>n/a</td></tr><tr><td>Add by key</td><td>n/a</td><td><code>O(1)</code> average</td><td><code>O(log n)</code></td></tr><tr><td>Remove by key</td><td><code>O(n)</code> (find, then shift)</td><td><code>O(1)</code> average</td><td><code>O(log n)</code></td></tr><tr><td>Smallest / largest key</td><td><code>O(n)</code> unsorted</td><td><code>O(n)</code></td><td><code>O(log n)</code></td></tr><tr><td>Iterate everything</td><td><code>O(n)</code></td><td><code>O(n)</code>, no useful order</td><td><code>O(n)</code>, sorted</td></tr><tr><td>Extra memory</td><td>compact</td><td>more: buckets and entries</td><td>more: tree nodes</td></tr></table>
+
+<h3>Choosing quickly</h3>
+<ul>
+<li>You index by position or loop over everything: <strong>array or list</strong>.</li>
+<li>You ask &ldquo;have I seen this?&rdquo; or &ldquo;what is the value for this key?&rdquo;: <strong>hash set or hash map</strong>.</li>
+<li>You also want the keys in sorted order or nearby keys: <strong>TreeMap or TreeSet</strong>.</li>
+<li>You want a predictable order without sorting: <strong>LinkedHashMap or LinkedHashSet</strong>.</li>
+<li>Strings: use <strong>StringBuilder</strong> when you build one from many pieces.</li>
+</ul>
+<h2 id="practice">10. Practice</h2>
+<p>Five exercises, from a warm-up with two pointers to one that rewards a hash set. Each has edge cases (empty, single item, duplicates) and some have large inputs, so a version with a nested loop will be very slow.</p>
+<div class="try"><h3>Try it: palindrome that ignores punctuation</h3>
+<p>Write <code>isPalindrome(s)</code>. Ignore case and skip every character that is not a letter or digit, so &ldquo;A man, a plan, a canal: Panama&rdquo; counts. Use two pointers and no extra string. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun isPalindrome(s: String): Boolean {
+    TODO("move two pointers inward, skipping characters that are not letters or digits")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-palindrome">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-palindrome">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun isPalindrome(s: String): Boolean {
+    TODO("move two pointers inward, skipping characters that are not letters or digits")
+}
+
+fun main() {
+    test("empty string") { eq(isPalindrome(""), true) }
+    test("single character") { eq(isPalindrome("x"), true) }
+    test("plain palindrome") { eq(isPalindrome("level"), true) }
+    test("not a palindrome") { eq(isPalindrome("ab"), false) }
+    test("sentence with punctuation") { eq(isPalindrome("A man, a plan, a canal: Panama"), true) }
+    test("sentence that fails") { eq(isPalindrome("race a car"), false) }
+    test("only punctuation") { eq(isPalindrome(".,!"), true) }
+    test("digit versus letter") { eq(isPalindrome("0P"), false) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Loop while <code>left &lt; right</code>. If the left character is not a letter or digit, move left and try again; same for the right. Compare with <code>lowercaseChar()</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun isPalindrome(s: String): Boolean {
+    var left = 0
+    var right = s.length - 1
+    while (left &lt; right) {
+        if (!s[left].isLetterOrDigit()) { left++; continue }
+        if (!s[right].isLetterOrDigit()) { right--; continue }
+        if (s[left].lowercaseChar() != s[right].lowercaseChar()) return false
+        left++
+        right--
+    }
+    return true
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: valid anagram</h3>
+<p>Write <code>isAnagram(a, b)</code>: true if <code>b</code> uses exactly the same characters as <code>a</code>, the same number of times. It must run in <code>O(n)</code>, so do not sort inside a loop or compare every pair. The last test has 200,000 characters. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun isAnagram(a: String, b: String): Boolean {
+    TODO("count the characters of a, then use up the counts with b")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-anagram">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-anagram">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun isAnagram(a: String, b: String): Boolean {
+    TODO("count the characters of a, then use up the counts with b")
+}
+
+fun main() {
+    test("both empty") { eq(isAnagram("", ""), true) }
+    test("classic pair") { eq(isAnagram("anagram", "nagaram"), true) }
+    test("different letters") { eq(isAnagram("rat", "car"), false) }
+    test("different lengths") { eq(isAnagram("a", "ab"), false) }
+    test("same letters, different counts") { eq(isAnagram("aab", "abb"), false) }
+    test("single character") { eq(isAnagram("z", "z"), true) }
+    test("large input") { eq(isAnagram("a".repeat(100_000) + "b", "b" + "a".repeat(100_000)), true) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> First check the lengths. Count every character of <code>a</code> in a map, then subtract for each character of <code>b</code>. If a count would go below zero, return false.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun isAnagram(a: String, b: String): Boolean {
+    if (a.length != b.length) return false
+    val counts = HashMap&lt;Char, Int&gt;()
+    for (c in a) counts[c] = (counts[c] ?: 0) + 1
+    for (c in b) {
+        val left = (counts[c] ?: 0) - 1
+        if (left &lt; 0) return false
+        counts[c] = left
+    }
+    return true
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: first character that appears once</h3>
+<p>Write <code>firstUniqueChar(s)</code>: return the <em>index</em> of the first character that occurs exactly once in the string, or -1 if there is none. This needs two passes: one to count, one to look. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun firstUniqueChar(s: String): Int {
+    TODO("count every character, then scan again for the first with count 1")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-first-unique">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-first-unique">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun firstUniqueChar(s: String): Int {
+    TODO("count every character, then scan again for the first with count 1")
+}
+
+fun main() {
+    test("empty string") { eq(firstUniqueChar(""), -1) }
+    test("single character") { eq(firstUniqueChar("z"), 0) }
+    test("no unique character") { eq(firstUniqueChar("aabb"), -1) }
+    test("unique in the middle") { eq(firstUniqueChar("swiss"), 1) }
+    test("unique at the end") { eq(firstUniqueChar("aabbc"), 4) }
+    test("repeats before the answer") { eq(firstUniqueChar("level"), 2) }
+    test("large input") { eq(firstUniqueChar("ab".repeat(100_000) + "c"), 200_000) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Build a map of counts in the first loop. In the second loop go left to right and return the first index whose character has a count of exactly 1.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun firstUniqueChar(s: String): Int {
+    val counts = HashMap&lt;Char, Int&gt;()
+    for (c in s) counts[c] = (counts[c] ?: 0) + 1
+    for ((i, c) in s.withIndex()) {
+        if (counts[c] == 1) return i
+    }
+    return -1
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: longest consecutive run</h3>
+<p>Write <code>longestConsecutive(nums)</code>: the length of the longest run of consecutive integers (like 7, 8, 9) that can be formed from the values, in any order. Duplicates count once. Aim for <code>O(n)</code> with a hash set: only start counting at a number whose predecessor is missing. The last two tests have 200,000 numbers. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun longestConsecutive(nums: List&lt;Int&gt;): Int {
+    TODO("put the numbers in a set, and count upward from the start of each run")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-longest-run">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-longest-run">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun longestConsecutive(nums: List<Int>): Int {
+    TODO("put the numbers in a set, and count upward from the start of each run")
+}
+
+fun main() {
+    test("empty list") { eq(longestConsecutive(emptyList()), 0) }
+    test("single number") { eq(longestConsecutive(listOf(5)), 1) }
+    test("example from the picture") { eq(longestConsecutive(listOf(100, 4, 200, 1, 3, 2)), 4) }
+    test("duplicates count once") { eq(longestConsecutive(listOf(1, 1, 1)), 1) }
+    test("whole range, shuffled") { eq(longestConsecutive(listOf(0, 3, 7, 2, 5, 8, 4, 6, 0, 1)), 9) }
+    test("negative numbers") { eq(longestConsecutive(listOf(-1, -2, -3, 10)), 3) }
+    test("large, one long run") { eq(longestConsecutive(List(200_000) { 200_000 - it }), 200_000) }
+    test("large, no runs") { eq(longestConsecutive(List(200_000) { it * 2 }), 1) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Loop over the set. If <code>x - 1</code> is in the set, skip <code>x</code>. Otherwise count how far <code>x + 1, x + 2, ...</code> stay in the set and keep the maximum.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun longestConsecutive(nums: List&lt;Int&gt;): Int {
+    val set = nums.toHashSet()
+    var best = 0
+    for (x in set) {
+        if ((x - 1) in set) continue          // not the start of a run
+        var length = 1
+        while ((x + length) in set) length++
+        if (length &gt; best) best = length
+    }
+    return best
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: rotate a grid clockwise</h3>
+<p>Write <code>rotateClockwise(m)</code>: return a new grid turned 90 degrees clockwise. The grid does not have to be square, so a 2 by 3 grid becomes 3 by 2. The new cell at row <code>r</code>, column <code>c</code> comes from the old cell at row <code>rows - 1 - c</code>, column <code>r</code>. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun rotateClockwise(m: List&lt;List&lt;Int&gt;&gt;): List&lt;List&lt;Int&gt;&gt; {
+    TODO("build the new grid with cols rows and rows columns")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p2-rotate">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p2-rotate">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun rotateClockwise(m: List<List<Int>>): List<List<Int>> {
+    TODO("build the new grid with cols rows and rows columns")
+}
+
+fun main() {
+    test("empty grid") { eq(rotateClockwise(emptyList()), emptyList<List<Int>>()) }
+    test("1 by 1") { eq(rotateClockwise(listOf(listOf(7))), listOf(listOf(7))) }
+    test("2 by 2") { eq(rotateClockwise(listOf(listOf(1, 2), listOf(3, 4))), listOf(listOf(3, 1), listOf(4, 2))) }
+    test("3 by 3") {
+        val m = listOf(listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9))
+        eq(rotateClockwise(m), listOf(listOf(7, 4, 1), listOf(8, 5, 2), listOf(9, 6, 3)))
+    }
+    test("2 by 3 becomes 3 by 2") {
+        eq(rotateClockwise(listOf(listOf(1, 2, 3), listOf(4, 5, 6))), listOf(listOf(4, 1), listOf(5, 2), listOf(6, 3)))
+    }
+    test("four rotations give the start") {
+        val m = listOf(listOf(1, 2, 3), listOf(4, 5, 6))
+        eq(rotateClockwise(rotateClockwise(rotateClockwise(rotateClockwise(m)))), m)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> The result has <code>cols</code> rows and <code>rows</code> columns. Use <code>List(cols) { r -&gt; List(rows) { c -&gt; ... } }</code> and fill each cell from <code>m[rows - 1 - c][r]</code>. Handle the empty grid first.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun rotateClockwise(m: List&lt;List&lt;Int&gt;&gt;): List&lt;List&lt;Int&gt;&gt; {
+    if (m.isEmpty()) return emptyList()
+    val rows = m.size
+    val cols = m[0].size
+    return List(cols) { r -&gt; List(rows) { c -&gt; m[rows - 1 - c][r] } }
+}</code></pre>
+</details></div>
+<div class="note"><p><strong>Stuck?</strong> Try the six steps from Part 1: write the slow version, find the repeated work, then ask which structure removes it. After you pass the tests, say the time and space cost out loud.</p></div>
+
+    <h2 id="takeaways">11. Takeaways</h2>
+    <ul><li>Position is cheap in arrays; searching by value is cheap in hash tables.</li><li>Middle inserts and deletes in arrays cost <code>O(n)</code>; appends are amortised <code>O(1)</code>.</li><li>Never build a long string with repeated <code>+</code>; use <code>StringBuilder</code>.</li><li>A hash map or set is the first tool to reach for when you notice repeated searching.</li><li>Counting and grouping are one-pass jobs with a map: count with <code>eachCount</code>, group with <code>groupBy</code>.</li><li>Pick the map type by the order you need: none, insertion, or sorted.</li><li>Next up: stacks, queues and linked lists, where the order of arrival decides what comes out first.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Array</td><td>A fixed-size row of equal boxes in memory, each reached by its index.</td></tr><tr><td>Index</td><td>The number of a box in an array, starting at 0.</td></tr><tr><td>Capacity</td><td>How many items the hidden array of a growable list can hold before it must grow.</td></tr><tr><td>Amortised</td><td>The average cost per operation over a long run, even if a single operation is sometimes slow.</td></tr><tr><td>Immutable</td><td>Cannot be changed after it is created; changes produce a new value.</td></tr><tr><td>StringBuilder</td><td>A growable buffer for building a string without copying it over and over.</td></tr><tr><td>Palindrome</td><td>A sequence that reads the same forwards and backwards.</td></tr><tr><td>Anagram</td><td>A word made from the same letters as another, in a different order.</td></tr><tr><td>Hash function</td><td>A rule that turns a key into an integer called a hash code.</td></tr><tr><td>Bucket</td><td>One slot of a hash table; keys with the same bucket number share it.</td></tr><tr><td>Collision</td><td>Two different keys landing in the same bucket.</td></tr><tr><td>Hash map</td><td>A structure that stores key-value pairs and finds a value by its key in average <code>O(1)</code>.</td></tr><tr><td>Hash set</td><td>A structure that stores unique values and answers &ldquo;is it in here?&rdquo; in average <code>O(1)</code>.</td></tr><tr><td>Frequency count</td><td>A map from each item to how many times it appears.</td></tr><tr><td>Matrix / grid</td><td>A two-dimensional array, read as <code>grid[row][col]</code>.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-1-start-here.html"><small>&larr; Previous &middot; Part 1</small>Thinking in cost</a><a class="next" href="dsa-part-3-stacks-queues-linked-lists.html"><small>Next &middot; Part 3 &rarr;</small>Stacks, queues and linked lists</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

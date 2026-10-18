@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 1: Start Here and Learn to Think in Cost — Khairul Alam</title>
+  <meta name="description" content="A beginner-friendly start to data structures, algorithms and programming patterns in Kotlin: Big-O, time versus space, a six-step problem-solving method and runnable Kotlin Playground exercises." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 1 of 9</p>
+    <h1>Data Structures and Algorithms, Part 1: Start Here and Learn to Think in Cost</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~25 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Big-O</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a class="on" href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Before any list, tree or graph, you need two skills: knowing roughly how expensive a piece of code is, and having a repeatable way to attack a problem. This first part gives you both, with small programs you can run and change.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>Big-O counts steps as the input grows; it ignores constants and keeps the biggest term.</li><li>The common classes, from fast to slow: <code>O(1)</code>, <code>O(log n)</code>, <code>O(n)</code>, <code>O(n log n)</code>, <code>O(n&sup2;)</code>, <code>O(2&#8319;)</code>.</li><li>You can often trade space for time, for example with a hash set.</li><li>Solve in six steps: restate, try examples, brute force, find the waste, improve, state the cost.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#why">What this series is, and who it is for</a></li><li><a href="#bigo">Big-O: counting steps instead of seconds</a></li><li><a href="#space">Time and space</a></li><li><a href="#kotlin">The Kotlin toolkit used in this series</a></li><li><a href="#method">A method for solving any problem</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="why">1. What this series is, and who it is for</h2>
+
+<p>A <strong>data structure</strong> is a way of arranging data in memory so some jobs become easy. An <strong>algorithm</strong> is a recipe of steps that solves a problem. Together they are the toolbox that every program is built from, whether it is a phone app, a game or a database.</p>
+<p>This series is a gentle, hands-on guide for computer science students and self-taught programmers who are starting out. It assumes you know the basics of any programming language: variables, <code>if</code>, loops and functions. Everything else is explained in plain words, with a picture, a short Kotlin program, and exercises with tests that you run in the free Kotlin Playground.</p>
+<div class="analogy"><p><strong>Think of a kitchen.</strong> A data structure is how you store things: a spice rack, a fridge, a pile of plates. An algorithm is the recipe. A messy kitchen still lets you cook, but it takes much longer, and it gets much worse when you cook for a hundred people instead of two.</p></div>
+
+<p>Here is the map of the nine parts. Each one stands on its own, but they are written to be read in order.</p>
+<table><tr><th>Part</th><th>What you learn</th></tr><tr><td>1. Start here</td><td>How to measure the cost of code (Big-O) and a method for solving problems.</td></tr><tr><td>2. Arrays and hashing</td><td>Arrays, strings, hash maps and sets, the workhorses of everyday code.</td></tr><tr><td>3. Stacks and queues</td><td>Stacks, queues, deques and linked lists.</td></tr><tr><td>4. Trees and heaps</td><td>Binary trees, search trees, heaps and tries.</td></tr><tr><td>5. Graphs</td><td>Modelling networks, breadth-first and depth-first search, shortest paths, union-find.</td></tr><tr><td>6. Sorting and searching</td><td>Classic sorts, binary search and when to use which.</td></tr><tr><td>7. Recursion and DP</td><td>Recursion, backtracking, greedy choices and dynamic programming.</td></tr><tr><td>8. Patterns</td><td>Two pointers, sliding window, prefix sums, monotonic stack and more.</td></tr><tr><td>9. Study path</td><td>A cheat sheet, a practice routine and where to go next.</td></tr></table>
+
+<h3>How to use the code</h3>
+<p>Every program in the series is complete: copy it or press the green or blue <em>Open in Kotlin Playground</em> button, press <strong>Run</strong>, and change things to see what happens. The <em>Try it</em> boxes contain tests that print <code>PASS</code> or <code>FAIL</code>; they fail at first on purpose. Nothing is sent anywhere until you click a button.</p>
+<h2 id="bigo">2. Big-O: counting steps instead of seconds</h2>
+
+<p>How fast is a piece of code? Seconds depend on your laptop, the language and what else is running. Computer scientists count something steadier: <strong>how many basic steps the work takes as the input grows</strong>. We call the input size <code>n</code>.</p>
+<p>Big-O notation keeps only the part that matters when <code>n</code> gets large. It drops constants and smaller terms, because <code>3n + 10</code> and <code>n</code> grow the same way: in a straight line. We write that as <code>O(n)</code>, read &ldquo;order n&rdquo;.</p>
+<figure class="fig"><div class="diagram"><pre> steps
+   ^
+   |                                          / O(n^2)
+   |                                       /
+   |                                    /          ___---  O(n log n)
+   |                                /      __---
+   |                             /   __---       ________  O(n)
+   |                          /__---   ________--
+   |                    __--------_---
+   |       _______------___----
+   |  ___--___________________________________  O(log n)
+   | /.................................................... O(1)
+   +--------------------------------------------------&gt; n (input size)</pre></div><figcaption>The shapes of the common growth rates. Small inputs hide the differences; large inputs make them huge.</figcaption></figure>
+<table><tr><th>Class</th><th>Name</th><th>Example</th><th>Doubling n does&hellip;</th></tr><tr><td>O(1)</td><td>constant</td><td>read <code>list[5]</code></td><td>nothing</td></tr><tr><td>O(log n)</td><td>logarithmic</td><td>binary search</td><td>adds one step</td></tr><tr><td>O(n)</td><td>linear</td><td>find the maximum</td><td>doubles the work</td></tr><tr><td>O(n log n)</td><td>linearithmic</td><td>good sorting</td><td>a little more than doubles</td></tr><tr><td>O(n&sup2;)</td><td>quadratic</td><td>compare every pair</td><td>quadruples the work</td></tr><tr><td>O(2&#8319;)</td><td>exponential</td><td>try every subset</td><td>squares the work</td></tr></table>
+
+<h3>Reading Big-O from code</h3>
+<ul>
+<li>A statement that runs once is <code>O(1)</code>.</li>
+<li>A loop over <code>n</code> items is <code>O(n)</code>.</li>
+<li>A loop inside a loop, both over <code>n</code>, is <code>O(n&sup2;)</code>.</li>
+<li>A loop that halves the problem each time is <code>O(log n)</code>.</li>
+<li>Steps one after another <em>add</em>; steps inside steps <em>multiply</em>. Then keep the biggest term.</li>
+</ul>
+<div class="try demo"><h3>Run it: count the steps yourself</h3>
+<p>Instead of timing, this program counts steps. Run it and watch how each column grows when <code>n</code> is multiplied by ten.</p>
+<pre><code>fun constant(n: Int): Int {
+    var steps = 0
+    steps++                      // one thing, however big n is
+    return steps
+}
+
+fun linear(n: Int): Int {
+    var steps = 0
+    for (i in 1..n) steps++      // n things
+    return steps
+}
+
+fun quadratic(n: Int): Int {
+    var steps = 0
+    for (i in 1..n) for (j in 1..n) steps++   // n * n things
+    return steps
+}
+
+fun logarithmic(n: Int): Int {
+    var steps = 0
+    var x = n
+    while (x &gt; 1) { x /= 2; steps++ }          // halve until one is left
+    return steps
+}
+
+fun main() {
+    println("n      O(1)  O(log n)  O(n)    O(n^2)")
+    for (n in listOf(10, 100, 1000, 10000)) {
+        println("%-6d %-5d %-9d %-7d %d".format(n, constant(n), logarithmic(n), linear(n), quadratic(n)))
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p1-count-steps">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p1-count-steps">fun constant(n: Int): Int {
+    var steps = 0
+    steps++                      // one thing, however big n is
+    return steps
+}
+
+fun linear(n: Int): Int {
+    var steps = 0
+    for (i in 1..n) steps++      // n things
+    return steps
+}
+
+fun quadratic(n: Int): Int {
+    var steps = 0
+    for (i in 1..n) for (j in 1..n) steps++   // n * n things
+    return steps
+}
+
+fun logarithmic(n: Int): Int {
+    var steps = 0
+    var x = n
+    while (x > 1) { x /= 2; steps++ }          // halve until one is left
+    return steps
+}
+
+fun main() {
+    println("n      O(1)  O(log n)  O(n)    O(n^2)")
+    for (n in listOf(10, 100, 1000, 10000)) {
+        println("%-6d %-5d %-9d %-7d %d".format(n, constant(n), logarithmic(n), linear(n), quadratic(n)))
+    }
+}
+</script></div>
+
+<p>Look at the last row. At <code>n = 10,000</code> the linear code takes ten thousand steps and the quadratic code takes a hundred million. That gap is why we care.</p>
+<div class="note"><p><strong>Best, average, worst.</strong> Big-O usually describes the <em>worst case</em>: the most steps the input could force. Searching a list for a value might find it on the first try (best case) or the last (worst case, <code>O(n)</code>). We plan for the worst. Part 9 adds the other two symbols, <code>&Omega;</code> and <code>&Theta;</code>, and a full cheat sheet.</p></div>
+<h2 id="space">3. Time and space</h2>
+
+<p>Code costs two things: <strong>time</strong> (steps) and <strong>space</strong> (extra memory). Big-O describes both. A loop that only keeps a counter uses <code>O(1)</code> extra space. A program that builds a copy of its input uses <code>O(n)</code>.</p>
+<p>The two often trade against each other. A common deal is to spend memory to save time: keep a lookup table so you never repeat work. You will see this again and again, in hash maps (Part 2) and dynamic programming (Part 7).</p>
+<div class="try demo"><h3>Run it: spend memory to save time</h3>
+<p>Same question, two answers. Timings vary by machine, but the fast version should win by a wide margin.</p>
+<pre><code>// Does the list contain a duplicate?
+
+// Slow, small: compare every pair. Time O(n^2), extra space O(1).
+fun hasDuplicateSlow(nums: List&lt;Int&gt;): Boolean {
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] == nums[j]) return true
+    }
+    return false
+}
+
+// Fast, bigger: remember what we have seen. Time O(n), extra space O(n).
+fun hasDuplicateFast(nums: List&lt;Int&gt;): Boolean {
+    val seen = HashSet&lt;Int&gt;()
+    for (x in nums) {
+        if (!seen.add(x)) return true   // add returns false if it was already there
+    }
+    return false
+}
+
+fun main() {
+    val nums = List(20000) { it }       // 0..19999, no duplicates: the worst case
+    var t = System.nanoTime()
+    println("slow: ${hasDuplicateSlow(nums)}  in ${(System.nanoTime() - t) / 1_000_000} ms")
+    t = System.nanoTime()
+    println("fast: ${hasDuplicateFast(nums)}  in ${(System.nanoTime() - t) / 1_000_000} ms")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p1-time-vs-space">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p1-time-vs-space">// Does the list contain a duplicate?
+
+// Slow, small: compare every pair. Time O(n^2), extra space O(1).
+fun hasDuplicateSlow(nums: List<Int>): Boolean {
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] == nums[j]) return true
+    }
+    return false
+}
+
+// Fast, bigger: remember what we have seen. Time O(n), extra space O(n).
+fun hasDuplicateFast(nums: List<Int>): Boolean {
+    val seen = HashSet<Int>()
+    for (x in nums) {
+        if (!seen.add(x)) return true   // add returns false if it was already there
+    }
+    return false
+}
+
+fun main() {
+    val nums = List(20000) { it }       // 0..19999, no duplicates: the worst case
+    var t = System.nanoTime()
+    println("slow: ${hasDuplicateSlow(nums)}  in ${(System.nanoTime() - t) / 1_000_000} ms")
+    t = System.nanoTime()
+    println("fast: ${hasDuplicateFast(nums)}  in ${(System.nanoTime() - t) / 1_000_000} ms")
+}
+</script></div>
+<h2 id="kotlin">4. The Kotlin toolkit used in this series</h2>
+
+<p>All examples use <strong>Kotlin</strong> because it is short to read and runs in the browser. You do not need to know it well. The ideas carry over to Java, Python, C++ or JavaScript, and each Kotlin type used here has a twin in those languages. This is the whole toolkit:</p>
+<table><tr><th>Idea</th><th>Kotlin type</th><th>Python twin</th><th>Java twin</th></tr><tr><td>Fixed-size array</td><td><code>IntArray</code>, <code>Array&lt;T&gt;</code></td><td>list</td><td><code>int[]</code></td></tr><tr><td>Growable list</td><td><code>MutableList</code> / <code>ArrayList</code></td><td>list</td><td><code>ArrayList</code></td></tr><tr><td>Key to value</td><td><code>HashMap</code>, <code>mutableMapOf</code></td><td>dict</td><td><code>HashMap</code></td></tr><tr><td>Unique values</td><td><code>HashSet</code>, <code>mutableSetOf</code></td><td>set</td><td><code>HashSet</code></td></tr><tr><td>Stack, queue, deque</td><td><code>ArrayDeque</code></td><td>collections.deque</td><td><code>ArrayDeque</code></td></tr><tr><td>Smallest first</td><td><code>PriorityQueue</code></td><td>heapq</td><td><code>PriorityQueue</code></td></tr></table>
+<div class="try demo"><h3>Run it: a five-minute tour</h3>
+<p>Run it once and read each line next to its output. You will meet every one of these again.</p>
+<pre><code>import java.util.PriorityQueue
+
+fun main() {
+    // Array and list
+    val arr = intArrayOf(5, 3, 8)
+    val list = mutableListOf(5, 3, 8)
+    list.add(1)
+    println("arr[0]=${arr[0]} list=$list size=${list.size}")
+
+    // Map: count letters
+    val counts = HashMap&lt;Char, Int&gt;()
+    for (c in "banana") counts[c] = (counts[c] ?: 0) + 1
+    println("counts=$counts")
+
+    // Set: unique values
+    val unique = hashSetOf(1, 2, 2, 3, 3, 3)
+    println("unique=$unique")
+
+    // ArrayDeque works as a stack and as a queue
+    val dq = ArrayDeque&lt;Int&gt;()
+    dq.addLast(1); dq.addLast(2); dq.addLast(3)
+    println("removeLast=${dq.removeLast()} removeFirst=${dq.removeFirst()} left=$dq")
+
+    // Priority queue: smallest comes out first
+    val pq = PriorityQueue&lt;Int&gt;()
+    pq.add(7); pq.add(2); pq.add(5)
+    println("poll=${pq.poll()} then ${pq.poll()}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p1-toolkit">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p1-toolkit">import java.util.PriorityQueue
+
+fun main() {
+    // Array and list
+    val arr = intArrayOf(5, 3, 8)
+    val list = mutableListOf(5, 3, 8)
+    list.add(1)
+    println("arr[0]=${arr[0]} list=$list size=${list.size}")
+
+    // Map: count letters
+    val counts = HashMap<Char, Int>()
+    for (c in "banana") counts[c] = (counts[c] ?: 0) + 1
+    println("counts=$counts")
+
+    // Set: unique values
+    val unique = hashSetOf(1, 2, 2, 3, 3, 3)
+    println("unique=$unique")
+
+    // ArrayDeque works as a stack and as a queue
+    val dq = ArrayDeque<Int>()
+    dq.addLast(1); dq.addLast(2); dq.addLast(3)
+    println("removeLast=${dq.removeLast()} removeFirst=${dq.removeFirst()} left=$dq")
+
+    // Priority queue: smallest comes out first
+    val pq = PriorityQueue<Int>()
+    pq.add(7); pq.add(2); pq.add(5)
+    println("poll=${pq.poll()} then ${pq.poll()}")
+}
+</script></div>
+<h2 id="method">5. A method for solving any problem</h2>
+
+<p>The hardest part of a coding problem is usually not the code, it is starting. Use the same six steps every time. They work on exercises, on assignments and on real bugs.</p>
+<ol>
+<li><strong>Restate it.</strong> Say the problem back in your own words. What goes in? What must come out?</li>
+<li><strong>Try small examples by hand.</strong> Include an empty input, a single item and a tricky case.</li>
+<li><strong>Write the simple, slow solution first.</strong> Brute force is fine. A correct slow answer beats a wrong fast one, and it gives you something to test against.</li>
+<li><strong>Find the waste.</strong> Where do you repeat work? Can a different data structure remove it? (Often the answer is a hash map, a sorted order, or a stack.)</li>
+<li><strong>Write the better version</strong> and run your examples through it.</li>
+<li><strong>State the cost.</strong> Say the time and space in Big-O, out loud.</li>
+</ol>
+<p>Here is the method on a small problem. <em>Given a list of numbers and a target, find two numbers that add up to the target.</em></p>
+<div class="try demo"><h3>Run it: brute force, then better</h3>
+<pre><code>// Step 3: brute force. Check every pair. O(n^2) time, O(1) space.
+fun twoSumSlow(nums: IntArray, target: Int): Pair&lt;Int, Int&gt;? {
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] + nums[j] == target) return i to j
+    }
+    return null
+}
+
+// Step 4: the waste is searching for the partner again and again.
+// Remember each number's position, then ask "have I seen target - x?". O(n) time, O(n) space.
+fun twoSumFast(nums: IntArray, target: Int): Pair&lt;Int, Int&gt;? {
+    val seenAt = HashMap&lt;Int, Int&gt;()
+    for ((i, x) in nums.withIndex()) {
+        val need = target - x
+        seenAt[need]?.let { return it to i }
+        seenAt[x] = i
+    }
+    return null
+}
+
+fun main() {
+    val nums = intArrayOf(2, 7, 11, 15)
+    println(twoSumSlow(nums, 9))     // (0, 1)
+    println(twoSumFast(nums, 9))     // (0, 1)
+    println(twoSumFast(nums, 100))   // null
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p1-two-sum">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p1-two-sum">// Step 3: brute force. Check every pair. O(n^2) time, O(1) space.
+fun twoSumSlow(nums: IntArray, target: Int): Pair<Int, Int>? {
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] + nums[j] == target) return i to j
+    }
+    return null
+}
+
+// Step 4: the waste is searching for the partner again and again.
+// Remember each number's position, then ask "have I seen target - x?". O(n) time, O(n) space.
+fun twoSumFast(nums: IntArray, target: Int): Pair<Int, Int>? {
+    val seenAt = HashMap<Int, Int>()
+    for ((i, x) in nums.withIndex()) {
+        val need = target - x
+        seenAt[need]?.let { return it to i }
+        seenAt[x] = i
+    }
+    return null
+}
+
+fun main() {
+    val nums = intArrayOf(2, 7, 11, 15)
+    println(twoSumSlow(nums, 9))     // (0, 1)
+    println(twoSumFast(nums, 9))     // (0, 1)
+    println(twoSumFast(nums, 100))   // null
+}
+</script></div>
+
+<p>Notice the shape of the improvement: we traded a little memory for a big gain in speed. That is the story of most of this series.</p>
+<h2 id="practice">6. Practice</h2>
+<p>Two short exercises. The first rewards a better data structure, the second makes Big-O feel real.</p>
+<div class="try"><h3>Try it: find a duplicate fast</h3>
+<p>Fill in <code>containsDuplicate</code> so it runs in <code>O(n)</code> time. The last test uses 200,000 numbers, so the slow pairwise version will time out. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun containsDuplicate(nums: List&lt;Int&gt;): Boolean {
+    TODO("remember what you have seen")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p1-has-duplicate">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p1-has-duplicate">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun containsDuplicate(nums: List<Int>): Boolean {
+    TODO("remember what you have seen")
+}
+
+fun main() {
+    test("empty list") { eq(containsDuplicate(emptyList()), false) }
+    test("all different") { eq(containsDuplicate(listOf(1, 2, 3)), false) }
+    test("one repeat") { eq(containsDuplicate(listOf(1, 2, 3, 1)), true) }
+    test("big input, no repeat") { eq(containsDuplicate(List(200_000) { it }), false) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> <code>HashSet.add</code> returns <code>false</code> when the value was already inside.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun containsDuplicate(nums: List&lt;Int&gt;): Boolean {
+    val seen = HashSet&lt;Int&gt;()
+    for (x in nums) if (!seen.add(x)) return true
+    return false
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: count the halvings</h3>
+<p>Write <code>stepsToOne(n)</code>: how many times can you halve <code>n</code> (integer division) before it reaches 1? This is the <code>O(log n)</code> loop from above. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun stepsToOne(n: Int): Int {
+    TODO("halve n until it is 1, counting the steps")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p1-count-halvings">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p1-count-halvings">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun stepsToOne(n: Int): Int {
+    TODO("halve n until it is 1, counting the steps")
+}
+
+fun main() {
+    test("1 needs no steps") { eq(stepsToOne(1), 0) }
+    test("8") { eq(stepsToOne(8), 3) }
+    test("10") { eq(stepsToOne(10), 3) }
+    test("one million") { eq(stepsToOne(1_000_000), 19) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Use a <code>while</code> loop and a counter, like <code>logarithmic</code> earlier.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun stepsToOne(n: Int): Int {
+    var x = n
+    var steps = 0
+    while (x &gt; 1) { x /= 2; steps++ }
+    return steps
+}</code></pre>
+</details></div>
+<div class="note"><p><strong>Stuck?</strong> Read the hint, then the solution, then close it and write it again from memory. Understanding it once is not the same as being able to produce it.</p></div>
+
+    <h2 id="takeaways">7. Takeaways</h2>
+    <ul><li>Count steps, not seconds, and describe growth with Big-O.</li><li>Loops multiply, sequences add, halving gives a logarithm.</li><li>Extra memory is often the price of speed.</li><li>Always write the simple version first; it is your test oracle.</li><li>Next up: arrays, strings, hash maps and sets, where the first big speed-ups live.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Data structure</td><td>A way of organising data so some operations are cheap.</td></tr><tr><td>Algorithm</td><td>A finite list of steps that solves a problem.</td></tr><tr><td>Big-O</td><td>A way to describe how the cost of code grows with the input size.</td></tr><tr><td>Worst case</td><td>The input that makes the code do the most work.</td></tr><tr><td>Time complexity</td><td>How many steps the code takes as <code>n</code> grows.</td></tr><tr><td>Space complexity</td><td>How much extra memory the code needs as <code>n</code> grows.</td></tr><tr><td>Brute force</td><td>Trying every possibility; simple, correct, often slow.</td></tr></table>
+
+    <div class="pager">
+      <a class="next" href="dsa-part-2-arrays-strings-hashing.html"><small>Next &middot; Part 2 &rarr;</small>Arrays, strings, hash maps and sets</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

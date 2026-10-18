@@ -1,0 +1,2011 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 8: Programming Patterns for Solving Problems — Khairul Alam</title>
+  <meta name="description" content="Learn the reusable problem-solving patterns in Kotlin: two pointers, fast and slow pointers, sliding window, prefix sums, binary search on the answer, monotonic stack, intervals, top-k with a heap, in-place tricks and bit manipulation, with runnable exercises." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+    /* ── Pattern catalogue (expandable families, popular badge) ── */
+    .conv { border: 1px solid var(--border); background: var(--card); border-radius: 12px; margin: 12px 0; padding: 0 16px; }
+    .conv > summary { cursor: pointer; list-style: none; padding: 13px 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .conv > summary::-webkit-details-marker { display: none; }
+    .conv > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; flex: none; }
+    .conv[open] > summary::after { transform: rotate(-135deg); }
+    .conv > summary small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .conv[open] { padding-bottom: 12px; }
+    .pop { display: inline-block; font-size: .72em; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: #92400e; background: color-mix(in srgb, #f59e0b 22%, var(--card)); border: 1px solid #f59e0b; border-radius: 6px; padding: 1px 7px; margin-left: 8px; vertical-align: middle; white-space: nowrap; }
+    [data-theme="dark"] .pop { color: #fcd34d; }
+    .cat-table td:nth-child(3), .cat-table td:nth-child(4), .cat-table td:nth-child(5) { white-space: nowrap; }
+    .cat-table td:nth-child(4) { color: #f59e0b; text-align: center; }
+    .srcs { color: var(--muted); font-size: .8em; }
+    .cov-s { color: var(--muted); font-style: italic; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 8 of 9</p>
+    <h1>Data Structures and Algorithms, Part 8: Programming Patterns for Solving Problems</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~50 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Patterns</span><span class="tag">Two pointers</span><span class="tag">Sliding window</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a class="on" href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Most problems are old shapes in new clothes. This part teaches the shapes: two pointers, a sliding window, prefix sums, binary search on the answer, a monotonic stack, intervals, a heap for the best k, and a few in-place and bit tricks. For each one you learn the clue, the picture, the slow way, the fast way, and then you run it.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>A pattern is a reusable way of moving through data so you avoid repeated work.</li><li>Two pointers and sliding windows turn many <code>O(n&sup2;)</code> loops into <code>O(n)</code>.</li><li>Prefix sums answer range questions in <code>O(1)</code>; with a hash map they count subarrays with a given sum.</li><li>Binary search works on a range of possible answers when a yes/no check is monotonic.</li><li>Monotonic stacks, interval sweeps, heaps of size <code>k</code> and bit tricks each have a clear clue.</li><li>The decision table at the end maps the words in a problem to the pattern to try first.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#shapes">Why patterns? Recognise the shape, reuse the recipe</a></li><li><a href="#two-pointers">Two pointers</a></li><li><a href="#fast-slow">Fast and slow pointers</a></li><li><a href="#sliding-window">Sliding window</a></li><li><a href="#prefix-sums">Prefix sums</a></li><li><a href="#hash-memory">Hash map as memory (a recap)</a></li><li><a href="#binary-answer">Binary search on the answer</a></li><li><a href="#monotonic-stack">Monotonic stack</a></li><li><a href="#intervals">Intervals</a></li><li><a href="#top-k">Top-k with a heap</a></li><li><a href="#in-place">In-place tricks: Dutch flag and cyclic sort</a></li><li><a href="#bits">Bit manipulation basics</a></li><li><a href="#which">Which pattern? A one-page decision table</a></li><li><a href="#catalogue">Complete pattern catalogue</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="shapes">1. Why patterns? Recognise the shape, reuse the recipe</h2>
+
+<p>After seven parts you know the tools: arrays, maps, stacks, heaps, trees, graphs, sorting and recursion. This part is about something different. It is about <strong>problem-solving patterns</strong>: small, reusable recipes that appear again and again, in different clothes, on top of those tools.</p>
+<p>A pattern is not a new data structure. It is a <em>way of moving through the data</em> that avoids repeated work. Two markers walking toward each other. A window that slides along a list. A running total you keep so you never add the same numbers twice. Once you have seen each recipe, new problems start to look familiar, and that is the real skill: spotting the shape.</p>
+<div class="analogy"><p><strong>Think of chess openings.</strong> Players do not invent a plan from nothing every game. They know a handful of standard shapes and ask, &ldquo;which one does this position look like?&rdquo; Patterns here work the same way. The clue in the problem tells you which opening to play.</p></div>
+
+<p>For every pattern we use the same five steps, so you can compare them:</p>
+<ol>
+<li><strong>The clue.</strong> The words in a problem that suggest the pattern.</li>
+<li><strong>A picture.</strong> What the pointers, window or stack look like.</li>
+<li><strong>The naive way and its cost.</strong> Usually brute force from Part 1.</li>
+<li><strong>The pattern and its cost.</strong> Often <code>O(n&sup2;)</code> down to <code>O(n)</code>.</li>
+<li><strong>A program you can run</strong>, then an exercise with tests.</li>
+</ol>
+<p>The last section is a one-page table that maps clues to patterns. If you only keep one thing from this part, keep that table.</p>
+<h2 id="two-pointers">2. Two pointers</h2>
+
+<p>A <strong>pointer</strong> here just means an index (a position) into an array or string. The two-pointers pattern keeps <em>two</em> indexes and moves them according to a simple rule, so one pass does the work of a nested loop.</p>
+<h3>The clue</h3>
+<ul>
+<li>The data is <strong>sorted</strong>, or you are free to sort it, and you want a pair or a triple.</li>
+<li>You need to work from <strong>both ends</strong> toward the middle (reverse, palindrome).</li>
+<li>You must change an array <strong>in place</strong>, with no extra array (remove duplicates, move zeros).</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> Opposite ends: find two numbers that add up to 9 in a sorted array
+
+   index:  0   1   2   3   4   5
+         +---+---+---+---+---+---+
+         | 1 | 2 | 4 | 7 | 8 | 11|
+         +---+---+---+---+---+---+
+           ^                   ^
+           l                   r        1 + 11 = 12  too big   -&gt; move r left
+           ^               ^
+           l               r            1 + 8  = 9   found it
+
+ Same direction: remove duplicates in place (w = where to write, r = what we read)
+
+         +---+---+---+---+---+---+
+         | 1 | 1 | 2 | 2 | 2 | 3 |
+         +---+---+---+---+---+---+
+               ^   ^
+               w   r      a[r] differs from a[w-1]: write it, move w</pre></div><figcaption>Left and right pointers close in on each other; a read pointer runs ahead of a write pointer.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>To find a pair summing to a target, brute force tries every pair: two nested loops, <code>O(n&sup2;)</code> time. With a sorted array we can reason: if the sum is too small, only a bigger left number can help, so move <code>l</code> right. If it is too big, move <code>r</code> left. Every step throws away one candidate for good, so the cost is <code>O(n)</code> time and <code>O(1)</code> space.</p>
+<table><tr><th>Problem</th><th>Naive</th><th>Two pointers</th></tr><tr><td>Pair with sum (sorted)</td><td><code>O(n&sup2;)</code></td><td><code>O(n)</code>, space <code>O(1)</code></td></tr><tr><td>Reverse in place</td><td>copy into a new array, <code>O(n)</code> space</td><td><code>O(n)</code> time, space <code>O(1)</code></td></tr><tr><td>Remove duplicates (sorted)</td><td>build a new list or shift items, up to <code>O(n&sup2;)</code></td><td><code>O(n)</code> time, space <code>O(1)</code></td></tr><tr><td>Container with most water</td><td><code>O(n&sup2;)</code> pairs</td><td><code>O(n)</code></td></tr></table>
+
+<p>&ldquo;Container with most water&rdquo; deserves a word. You have vertical walls of given heights. Pick two walls; the water held is the shorter height times the distance between them. Start with the widest pair. The shorter wall limits the water, so moving the <em>taller</em> wall inward can only make things worse (narrower, same limit). Move the shorter one instead and keep the best area seen.</p>
+<div class="try demo"><h3>Run it: four classic two-pointer jobs</h3>
+<p>The first line prints the first pair the pointers meet. Try changing the target and predict which pair comes out.</p>
+<pre><code>fun pairSumSorted(a: IntArray, target: Int): Pair&lt;Int, Int&gt;? {
+    var l = 0
+    var r = a.size - 1
+    while (l &lt; r) {
+        val sum = a[l] + a[r]
+        if (sum == target) return l to r
+        if (sum &lt; target) l++ else r--
+    }
+    return null
+}
+
+fun reverseInPlace(a: IntArray) {
+    var l = 0
+    var r = a.size - 1
+    while (l &lt; r) {
+        val t = a[l]; a[l] = a[r]; a[r] = t
+        l++; r--
+    }
+}
+
+// Returns the new length; the first that-many items are the unique values.
+fun removeDuplicates(a: IntArray): Int {
+    if (a.isEmpty()) return 0
+    var w = 1                       // next slot to write
+    for (r in 1 until a.size) {
+        if (a[r] != a[w - 1]) { a[w] = a[r]; w++ }
+    }
+    return w
+}
+
+fun maxWater(h: IntArray): Int {
+    var l = 0
+    var r = h.size - 1
+    var best = 0
+    while (l &lt; r) {
+        best = maxOf(best, minOf(h[l], h[r]) * (r - l))
+        if (h[l] &lt; h[r]) l++ else r--      // move the shorter wall
+    }
+    return best
+}
+
+fun main() {
+    println(pairSumSorted(intArrayOf(1, 2, 4, 7, 8, 11), 9))     // (0, 4): 1 + 8
+    println(pairSumSorted(intArrayOf(1, 2, 3), 100))             // null
+
+    val a = intArrayOf(1, 2, 3, 4, 5)
+    reverseInPlace(a)
+    println(a.toList())
+
+    val b = intArrayOf(1, 1, 2, 2, 2, 3)
+    val k = removeDuplicates(b)
+    println("unique count $k -&gt; ${b.copyOf(k).toList()}")
+
+    println(maxWater(intArrayOf(1, 8, 6, 2, 5, 4, 8, 3, 7)))    // 49
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-two-pointers">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-two-pointers">fun pairSumSorted(a: IntArray, target: Int): Pair<Int, Int>? {
+    var l = 0
+    var r = a.size - 1
+    while (l < r) {
+        val sum = a[l] + a[r]
+        if (sum == target) return l to r
+        if (sum < target) l++ else r--
+    }
+    return null
+}
+
+fun reverseInPlace(a: IntArray) {
+    var l = 0
+    var r = a.size - 1
+    while (l < r) {
+        val t = a[l]; a[l] = a[r]; a[r] = t
+        l++; r--
+    }
+}
+
+// Returns the new length; the first that-many items are the unique values.
+fun removeDuplicates(a: IntArray): Int {
+    if (a.isEmpty()) return 0
+    var w = 1                       // next slot to write
+    for (r in 1 until a.size) {
+        if (a[r] != a[w - 1]) { a[w] = a[r]; w++ }
+    }
+    return w
+}
+
+fun maxWater(h: IntArray): Int {
+    var l = 0
+    var r = h.size - 1
+    var best = 0
+    while (l < r) {
+        best = maxOf(best, minOf(h[l], h[r]) * (r - l))
+        if (h[l] < h[r]) l++ else r--      // move the shorter wall
+    }
+    return best
+}
+
+fun main() {
+    println(pairSumSorted(intArrayOf(1, 2, 4, 7, 8, 11), 9))     // (0, 4): 1 + 8
+    println(pairSumSorted(intArrayOf(1, 2, 3), 100))             // null
+
+    val a = intArrayOf(1, 2, 3, 4, 5)
+    reverseInPlace(a)
+    println(a.toList())
+
+    val b = intArrayOf(1, 1, 2, 2, 2, 3)
+    val k = removeDuplicates(b)
+    println("unique count $k -> ${b.copyOf(k).toList()}")
+
+    println(maxWater(intArrayOf(1, 8, 6, 2, 5, 4, 8, 3, 7)))    // 49
+}
+</script></div>
+<div class="try"><h3>Try it: remove duplicates in place</h3>
+<p>Write <code>removeDuplicates</code> for a <em>sorted</em> array. Keep one copy of each value at the front of the same array and return how many unique values there are. Do not create a second array. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun removeDuplicates(a: IntArray): Int {
+    TODO("a write pointer and a read pointer")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-remove-dups">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-remove-dups">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun removeDuplicates(a: IntArray): Int {
+    TODO("a write pointer and a read pointer")
+}
+
+fun main() {
+    test("typical") { val a = intArrayOf(0, 0, 1, 1, 1, 2, 2, 3); val k = removeDuplicates(a); eq(a.copyOf(k).toList(), listOf(0, 1, 2, 3)) }
+    test("empty") { eq(removeDuplicates(intArrayOf()), 0) }
+    test("single") { val a = intArrayOf(7); val k = removeDuplicates(a); eq(a.copyOf(k).toList(), listOf(7)) }
+    test("all same") { val a = intArrayOf(4, 4, 4, 4); val k = removeDuplicates(a); eq(a.copyOf(k).toList(), listOf(4)) }
+    test("already unique") { val a = intArrayOf(1, 2, 3); val k = removeDuplicates(a); eq(a.copyOf(k).toList(), listOf(1, 2, 3)) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> The first item is always kept. Compare each new item with the last item you wrote, <code>a[w - 1]</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun removeDuplicates(a: IntArray): Int {
+    if (a.isEmpty()) return 0
+    var w = 1
+    for (r in 1 until a.size) {
+        if (a[r] != a[w - 1]) { a[w] = a[r]; w++ }
+    }
+    return w
+}</code></pre>
+</details></div>
+<h2 id="fast-slow">3. Fast and slow pointers</h2>
+
+<p>This is two pointers moving in the <em>same</em> direction at <em>different speeds</em>: the slow one takes one step, the fast one takes two. It is mostly used on linked lists (Part 3), where you cannot jump to the middle by index, and on any sequence that follows a rule like &ldquo;the next value comes from the current one&rdquo;.</p>
+<h3>The clue</h3>
+<ul>
+<li>&ldquo;Find the <strong>middle</strong> of a linked list&rdquo; in one pass.</li>
+<li>&ldquo;Does this list or sequence contain a <strong>cycle</strong> (loop)?&rdquo;</li>
+<li>A value is repeatedly replaced by a function of itself, and you wonder if it ends or loops (the &ldquo;happy number&rdquo; idea).</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> Middle: when fast falls off the end, slow is halfway.
+
+   1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; null
+   s,f
+        s    f
+             s         f          fast jumped two each time
+   middle = 3
+
+ Cycle: fast laps slow, like two runners on a circular track.
+
+   1 -&gt; 2 -&gt; 3 -&gt; 4
+             ^    |
+             +----+       slow moves 1, fast moves 2.
+                          Inside the loop the gap shrinks by 1 each step,
+                          so they must meet.</pre></div><figcaption>Fast moves two steps per slow step. On a loop the gap closes by one each round.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>To find the middle the naive way, walk once to count the nodes, then walk again to the halfway point: two passes, <code>O(n)</code> time. Fast and slow does it in one pass, still <code>O(n)</code> but simpler. To detect a cycle the naive way, store every node you visit in a hash set and stop if you see one twice: <code>O(n)</code> time but <code>O(n)</code> extra space. Fast and slow needs only two variables: <code>O(1)</code> space.</p>
+<p>The happy-number idea: replace a number by the sum of the squares of its digits, again and again. Either you reach 1 (happy) or you loop forever. A loop in a sequence is exactly a cycle, so the same two-speed trick applies without storing anything.</p>
+<div class="try demo"><h3>Run it: middle, cycle and happy number</h3>
+<p>Run it and check the cycle detector before and after the loop is closed.</p>
+<pre><code>class Node(val value: Int, var next: Node? = null)
+
+fun build(vararg values: Int): Node? {
+    var head: Node? = null
+    for (v in values.reversed()) head = Node(v, head)
+    return head
+}
+
+fun middle(head: Node?): Node? {
+    var slow = head
+    var fast = head
+    while (fast != null &amp;&amp; fast.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+    }
+    return slow
+}
+
+fun hasCycle(head: Node?): Boolean {
+    var slow = head
+    var fast = head
+    while (fast != null &amp;&amp; fast.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+        if (slow === fast) return true      // === means "the very same node"
+    }
+    return false
+}
+
+fun digitSquares(n: Int): Int {
+    var x = n
+    var sum = 0
+    while (x &gt; 0) { val d = x % 10; sum += d * d; x /= 10 }
+    return sum
+}
+
+fun isHappy(n: Int): Boolean {
+    var slow = n
+    var fast = digitSquares(n)
+    while (fast != 1 &amp;&amp; slow != fast) {
+        slow = digitSquares(slow)
+        fast = digitSquares(digitSquares(fast))
+    }
+    return fast == 1
+}
+
+fun main() {
+    println("middle of 1..5 = ${middle(build(1, 2, 3, 4, 5))?.value}")
+    println("middle of 1..4 = ${middle(build(1, 2, 3, 4))?.value}   (second middle)")
+
+    val a = Node(1); val b = Node(2); val c = Node(3); val d = Node(4)
+    a.next = b; b.next = c; c.next = d
+    println("cycle before: ${hasCycle(a)}")
+    d.next = b                                  // close a loop back to node 2
+    println("cycle after:  ${hasCycle(a)}")
+
+    println("happy numbers up to 30: ${(1..30).filter { isHappy(it) }}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-fast-slow">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-fast-slow">class Node(val value: Int, var next: Node? = null)
+
+fun build(vararg values: Int): Node? {
+    var head: Node? = null
+    for (v in values.reversed()) head = Node(v, head)
+    return head
+}
+
+fun middle(head: Node?): Node? {
+    var slow = head
+    var fast = head
+    while (fast != null && fast.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+    }
+    return slow
+}
+
+fun hasCycle(head: Node?): Boolean {
+    var slow = head
+    var fast = head
+    while (fast != null && fast.next != null) {
+        slow = slow!!.next
+        fast = fast.next!!.next
+        if (slow === fast) return true      // === means "the very same node"
+    }
+    return false
+}
+
+fun digitSquares(n: Int): Int {
+    var x = n
+    var sum = 0
+    while (x > 0) { val d = x % 10; sum += d * d; x /= 10 }
+    return sum
+}
+
+fun isHappy(n: Int): Boolean {
+    var slow = n
+    var fast = digitSquares(n)
+    while (fast != 1 && slow != fast) {
+        slow = digitSquares(slow)
+        fast = digitSquares(digitSquares(fast))
+    }
+    return fast == 1
+}
+
+fun main() {
+    println("middle of 1..5 = ${middle(build(1, 2, 3, 4, 5))?.value}")
+    println("middle of 1..4 = ${middle(build(1, 2, 3, 4))?.value}   (second middle)")
+
+    val a = Node(1); val b = Node(2); val c = Node(3); val d = Node(4)
+    a.next = b; b.next = c; c.next = d
+    println("cycle before: ${hasCycle(a)}")
+    d.next = b                                  // close a loop back to node 2
+    println("cycle after:  ${hasCycle(a)}")
+
+    println("happy numbers up to 30: ${(1..30).filter { isHappy(it) }}")
+}
+</script></div>
+<div class="try"><h3>Try it: is this number happy?</h3>
+<p>Write <code>isHappy(n)</code>. A number is happy if repeatedly replacing it with the sum of the squares of its digits reaches 1. If it loops forever it is not happy. The helper <code>digitSquares</code> is given. Use two speeds, not a set. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun digitSquares(n: Int): Int {
+    var x = n
+    var sum = 0
+    while (x &gt; 0) { val d = x % 10; sum += d * d; x /= 10 }
+    return sum
+}
+
+fun isHappy(n: Int): Boolean {
+    TODO("slow = one step, fast = two steps; stop at 1 or when they meet")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-happy">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-happy">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun digitSquares(n: Int): Int {
+    var x = n
+    var sum = 0
+    while (x > 0) { val d = x % 10; sum += d * d; x /= 10 }
+    return sum
+}
+
+fun isHappy(n: Int): Boolean {
+    TODO("slow = one step, fast = two steps; stop at 1 or when they meet")
+}
+
+fun main() {
+    test("1 is happy") { eq(isHappy(1), true) }
+    test("19 is happy") { eq(isHappy(19), true) }
+    test("7 is happy") { eq(isHappy(7), true) }
+    test("100 is happy") { eq(isHappy(100), true) }
+    test("2 loops") { eq(isHappy(2), false) }
+    test("4 loops") { eq(isHappy(4), false) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Start <code>slow</code> at <code>n</code> and <code>fast</code> one step ahead. Loop while <code>fast != 1</code> and the two are different.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun digitSquares(n: Int): Int {
+    var x = n
+    var sum = 0
+    while (x &gt; 0) { val d = x % 10; sum += d * d; x /= 10 }
+    return sum
+}
+
+fun isHappy(n: Int): Boolean {
+    var slow = n
+    var fast = digitSquares(n)
+    while (fast != 1 &amp;&amp; slow != fast) {
+        slow = digitSquares(slow)
+        fast = digitSquares(digitSquares(fast))
+    }
+    return fast == 1
+}</code></pre>
+</details></div>
+<h2 id="sliding-window">4. Sliding window</h2>
+
+<p>A <strong>window</strong> is a stretch of consecutive items, a <strong>subarray</strong> or <strong>substring</strong>. The sliding window pattern keeps a window and a running summary of it (a sum, a set of letters). To move the window, you add the new item on the right and remove the old item on the left, instead of recomputing everything.</p>
+<h3>The clue</h3>
+<ul>
+<li>The words <strong>contiguous</strong>, <strong>subarray</strong> or <strong>substring</strong>.</li>
+<li>&ldquo;The best (longest, shortest, largest) stretch such that&hellip;&rdquo;</li>
+<li>A fixed size <code>k</code> (fixed window), or a rule the stretch must satisfy (variable window).</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> Fixed window, k = 3. Slide right: add the new item, drop the old one.
+
+   [ 2  1  5 ] 1  3  2        sum = 8
+     2 [ 1  5  1 ] 3  2       sum = 8 - 2 + 1 = 7
+     2  1 [ 5  1  3 ] 2       sum = 7 - 1 + 3 = 9   &lt;- best so far
+
+ Variable window: grow on the right, shrink on the left when the rule breaks.
+
+   s = "abcabcbb"
+   [a b c] a b c b b          window "abc"  length 3
+    a [b c a] b c b b         'a' repeats, left jumps past the old 'a'
+                  [c b] b     keep going; remember the best length</pre></div><figcaption>Brackets mark the window. Only the two edges change on each step.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>The naive way looks at every window and adds its items up from scratch. For windows of size <code>k</code> that is about <code>n * k</code> steps. Sliding keeps the sum and updates it with one addition and one subtraction, so it is <code>O(n)</code>. For variable windows, brute force checks every start and end pair (and then checks the rule inside), <code>O(n&sup2;)</code> or <code>O(n&sup3;)</code>. The sliding version moves each edge only forward, so each edge makes at most <code>n</code> moves: <code>O(n)</code> total.</p>
+<h3>Two shapes</h3>
+<ul>
+<li><strong>Fixed size:</strong> build the first window, then slide it one step at a time.</li>
+<li><strong>Variable size:</strong> a <code>for</code> loop moves the right edge. After each step, if the window breaks the rule, move the left edge until it is fine again (&ldquo;shrink&rdquo;), or if it satisfies the rule, record the answer and shrink to look for a better one.</li>
+</ul>
+<div class="try demo"><h3>Run it: fixed and variable windows</h3>
+<p>Three windows in one file. Add a println inside the loops to watch <code>left</code> and <code>right</code> move.</p>
+<pre><code>// Fixed: largest sum of any k consecutive numbers.
+fun maxSumOfK(a: IntArray, k: Int): Int? {
+    if (k &lt;= 0 || a.size &lt; k) return null
+    var window = 0
+    for (i in 0 until k) window += a[i]
+    var best = window
+    for (i in k until a.size) {
+        window += a[i] - a[i - k]          // add the new, drop the old
+        best = maxOf(best, window)
+    }
+    return best
+}
+
+// Variable: longest substring with no repeated letter.
+fun longestUnique(s: String): Int {
+    val lastSeen = HashMap&lt;Char, Int&gt;()
+    var left = 0
+    var best = 0
+    for ((right, c) in s.withIndex()) {
+        val prev = lastSeen[c]
+        if (prev != null &amp;&amp; prev &gt;= left) left = prev + 1   // jump past the repeat
+        lastSeen[c] = right
+        best = maxOf(best, right - left + 1)
+    }
+    return best
+}
+
+// Variable: shortest subarray whose sum is at least target (all numbers positive).
+fun smallestSubarray(target: Int, a: IntArray): Int {
+    var left = 0
+    var sum = 0
+    var best = Int.MAX_VALUE
+    for (right in a.indices) {
+        sum += a[right]
+        while (sum &gt;= target) {                // valid: record, then shrink
+            best = minOf(best, right - left + 1)
+            sum -= a[left]
+            left++
+        }
+    }
+    return if (best == Int.MAX_VALUE) 0 else best
+}
+
+fun main() {
+    println(maxSumOfK(intArrayOf(2, 1, 5, 1, 3, 2), 3))   // 9
+    println(maxSumOfK(intArrayOf(1, 2), 5))               // null
+    println(longestUnique("abcabcbb"))                    // 3
+    println(longestUnique("pwwkew"))                      // 3
+    println(smallestSubarray(7, intArrayOf(2, 3, 1, 2, 4, 3)))   // 2  (4 + 3)
+    println(smallestSubarray(100, intArrayOf(1, 2, 3)))          // 0  (none)
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-window">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-window">// Fixed: largest sum of any k consecutive numbers.
+fun maxSumOfK(a: IntArray, k: Int): Int? {
+    if (k <= 0 || a.size < k) return null
+    var window = 0
+    for (i in 0 until k) window += a[i]
+    var best = window
+    for (i in k until a.size) {
+        window += a[i] - a[i - k]          // add the new, drop the old
+        best = maxOf(best, window)
+    }
+    return best
+}
+
+// Variable: longest substring with no repeated letter.
+fun longestUnique(s: String): Int {
+    val lastSeen = HashMap<Char, Int>()
+    var left = 0
+    var best = 0
+    for ((right, c) in s.withIndex()) {
+        val prev = lastSeen[c]
+        if (prev != null && prev >= left) left = prev + 1   // jump past the repeat
+        lastSeen[c] = right
+        best = maxOf(best, right - left + 1)
+    }
+    return best
+}
+
+// Variable: shortest subarray whose sum is at least target (all numbers positive).
+fun smallestSubarray(target: Int, a: IntArray): Int {
+    var left = 0
+    var sum = 0
+    var best = Int.MAX_VALUE
+    for (right in a.indices) {
+        sum += a[right]
+        while (sum >= target) {                // valid: record, then shrink
+            best = minOf(best, right - left + 1)
+            sum -= a[left]
+            left++
+        }
+    }
+    return if (best == Int.MAX_VALUE) 0 else best
+}
+
+fun main() {
+    println(maxSumOfK(intArrayOf(2, 1, 5, 1, 3, 2), 3))   // 9
+    println(maxSumOfK(intArrayOf(1, 2), 5))               // null
+    println(longestUnique("abcabcbb"))                    // 3
+    println(longestUnique("pwwkew"))                      // 3
+    println(smallestSubarray(7, intArrayOf(2, 3, 1, 2, 4, 3)))   // 2  (4 + 3)
+    println(smallestSubarray(100, intArrayOf(1, 2, 3)))          // 0  (none)
+}
+</script></div>
+<div class="note"><p><strong>Why does the variable window stay <code>O(n)</code>?</strong> It has a loop inside a loop, but <code>left</code> only ever moves forward and never passes <code>right</code>. Over the whole run <code>left</code> moves at most <code>n</code> times and <code>right</code> moves at most <code>n</code> times. Two passes, not <code>n</code> passes.</p></div>
+<div class="try"><h3>Try it: longest substring without repeats</h3>
+<p>Write <code>longestUnique(s)</code>: the length of the longest stretch of <code>s</code> in which no letter appears twice. The test <code>abba</code> is the classic trap: the left edge must never move backwards. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun longestUnique(s: String): Int {
+    TODO("variable window with a map from letter to last position")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-longest-unique">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-longest-unique">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun longestUnique(s: String): Int {
+    TODO("variable window with a map from letter to last position")
+}
+
+fun main() {
+    test("empty") { eq(longestUnique(""), 0) }
+    test("single") { eq(longestUnique("a"), 1) }
+    test("all same") { eq(longestUnique("aaaa"), 1) }
+    test("all different") { eq(longestUnique("abcdef"), 6) }
+    test("abcabcbb") { eq(longestUnique("abcabcbb"), 3) }
+    test("pwwkew") { eq(longestUnique("pwwkew"), 3) }
+    test("abba") { eq(longestUnique("abba"), 2) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> When you see a letter again, move <code>left</code> to one past its previous position, but only if that position is inside the current window (<code>prev &gt;= left</code>).</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun longestUnique(s: String): Int {
+    val lastSeen = HashMap&lt;Char, Int&gt;()
+    var left = 0
+    var best = 0
+    for ((right, c) in s.withIndex()) {
+        val prev = lastSeen[c]
+        if (prev != null &amp;&amp; prev &gt;= left) left = prev + 1
+        lastSeen[c] = right
+        best = maxOf(best, right - left + 1)
+    }
+    return best
+}</code></pre>
+</details></div>
+<h2 id="prefix-sums">5. Prefix sums</h2>
+
+<p>A <strong>prefix sum</strong> array stores, at position <code>i</code>, the total of everything before position <code>i</code>. Build it once in <code>O(n)</code>. After that, the sum of <em>any</em> range is one subtraction.</p>
+<h3>The clue</h3>
+<ul>
+<li>Many <strong>range sum</strong> questions on data that does not change.</li>
+<li>&ldquo;How many subarrays have sum equal to <code>k</code>?&rdquo; (especially when numbers can be negative, so a sliding window will not work).</li>
+<li>A grid and many rectangle-sum questions (the 2D version).</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> a        :   3   1   4   1   5
+ prefix p : 0   3   4   8   9  14        p[i] = sum of the first i items
+            ^   ^   ^   ^   ^   ^
+            p0  p1  p2  p3  p4  p5
+
+ sum of a[1..3] (1 + 4 + 1 = 6)  =  p[4] - p[1]  =  9 - 3  =  6
+
+ Subarray sum = k: a range ends at "now" when
+     p[now] - p[earlier] = k      i.e.   p[earlier] = p[now] - k
+ so ask a hash map: "how many earlier prefixes equal p[now] - k?"</pre></div><figcaption>A range sum is the prefix at the end minus the prefix just before the start.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>The naive way adds up the range each time you are asked: <code>O(n)</code> per query, so <code>O(n * q)</code> for <code>q</code> queries. With a prefix array: <code>O(n)</code> once to build, then <code>O(1)</code> per query. It costs <code>O(n)</code> extra space.</p>
+<p>For &ldquo;subarray sum equals <code>k</code>&rdquo;, brute force tries every start and end: <code>O(n&sup2;)</code>. The trick: keep a running total and a hash map counting how often each running total has appeared. A subarray ending here sums to <code>k</code> exactly when an earlier running total equals <code>now - k</code>. One pass, <code>O(n)</code> time and space. Seed the map with <code>0 -> 1</code> so subarrays that start at the very beginning are counted.</p>
+<div class="try demo"><h3>Run it: range queries and subarray sum equals k</h3>
+<p>The map version also works with negative numbers, which a sliding window cannot handle.</p>
+<pre><code>class RangeSum(a: IntArray) {
+    private val prefix = IntArray(a.size + 1)
+    init { for (i in a.indices) prefix[i + 1] = prefix[i] + a[i] }
+
+    // sum of a[from..to], both included
+    fun sum(from: Int, to: Int): Int = prefix[to + 1] - prefix[from]
+}
+
+fun countSubarraysWithSum(a: IntArray, k: Int): Int {
+    val seen = HashMap&lt;Int, Int&gt;()      // running total -&gt; how many times
+    seen[0] = 1
+    var running = 0
+    var count = 0
+    for (x in a) {
+        running += x
+        count += seen[running - k] ?: 0
+        seen[running] = (seen[running] ?: 0) + 1
+    }
+    return count
+}
+
+fun main() {
+    val rs = RangeSum(intArrayOf(3, 1, 4, 1, 5))
+    println(rs.sum(1, 3))      // 6
+    println(rs.sum(0, 4))      // 14
+    println(rs.sum(2, 2))      // 4
+
+    println(countSubarraysWithSum(intArrayOf(1, 1, 1), 2))        // 2
+    println(countSubarraysWithSum(intArrayOf(1, -1, 0), 0))       // 3, negatives are fine
+    println(countSubarraysWithSum(intArrayOf(), 5))               // 0
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-prefix">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-prefix">class RangeSum(a: IntArray) {
+    private val prefix = IntArray(a.size + 1)
+    init { for (i in a.indices) prefix[i + 1] = prefix[i] + a[i] }
+
+    // sum of a[from..to], both included
+    fun sum(from: Int, to: Int): Int = prefix[to + 1] - prefix[from]
+}
+
+fun countSubarraysWithSum(a: IntArray, k: Int): Int {
+    val seen = HashMap<Int, Int>()      // running total -> how many times
+    seen[0] = 1
+    var running = 0
+    var count = 0
+    for (x in a) {
+        running += x
+        count += seen[running - k] ?: 0
+        seen[running] = (seen[running] ?: 0) + 1
+    }
+    return count
+}
+
+fun main() {
+    val rs = RangeSum(intArrayOf(3, 1, 4, 1, 5))
+    println(rs.sum(1, 3))      // 6
+    println(rs.sum(0, 4))      // 14
+    println(rs.sum(2, 2))      // 4
+
+    println(countSubarraysWithSum(intArrayOf(1, 1, 1), 2))        // 2
+    println(countSubarraysWithSum(intArrayOf(1, -1, 0), 0))       // 3, negatives are fine
+    println(countSubarraysWithSum(intArrayOf(), 5))               // 0
+}
+</script></div>
+
+<h3>A brief look at two dimensions</h3>
+<p>For a grid, let <code>p[r][c]</code> be the sum of the rectangle from the top-left corner to just before row <code>r</code>, column <code>c</code>. Any inner rectangle is then four lookups: take the big one, subtract the strip above and the strip to the left, and add back the corner you subtracted twice.</p>
+<figure class="fig"><div class="diagram"><pre> rect(r1,c1 .. r2,c2) = P[r2+1][c2+1]  -  P[r1][c2+1]  -  P[r2+1][c1]  +  P[r1][c1]
+
+      c1        c2
+   +-----------------+
+   |  corner  | above |      big rectangle  minus  above  minus  left
+   |----------+-------+      plus corner (it was removed twice)
+   |  left    | WANT  |
+   +----------+-------+</pre></div></figure>
+<div class="try demo"><h3>Run it: rectangle sums on a grid</h3>
+<pre><code>class GridSum(g: Array&lt;IntArray&gt;) {
+    private val rows = g.size
+    private val cols = if (rows == 0) 0 else g[0].size
+    private val p = Array(rows + 1) { IntArray(cols + 1) }
+
+    init {
+        for (r in 0 until rows) for (c in 0 until cols) {
+            p[r + 1][c + 1] = g[r][c] + p[r][c + 1] + p[r + 1][c] - p[r][c]
+        }
+    }
+
+    fun rect(r1: Int, c1: Int, r2: Int, c2: Int): Int =
+        p[r2 + 1][c2 + 1] - p[r1][c2 + 1] - p[r2 + 1][c1] + p[r1][c1]
+}
+
+fun main() {
+    val grid = arrayOf(
+        intArrayOf(1, 2, 3),
+        intArrayOf(4, 5, 6),
+        intArrayOf(7, 8, 9),
+    )
+    val gs = GridSum(grid)
+    println(gs.rect(0, 0, 2, 2))   // 45, the whole grid
+    println(gs.rect(1, 1, 2, 2))   // 5 + 6 + 8 + 9 = 28
+    println(gs.rect(0, 1, 1, 1))   // 2 + 5 = 7
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-prefix2d">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-prefix2d">class GridSum(g: Array<IntArray>) {
+    private val rows = g.size
+    private val cols = if (rows == 0) 0 else g[0].size
+    private val p = Array(rows + 1) { IntArray(cols + 1) }
+
+    init {
+        for (r in 0 until rows) for (c in 0 until cols) {
+            p[r + 1][c + 1] = g[r][c] + p[r][c + 1] + p[r + 1][c] - p[r][c]
+        }
+    }
+
+    fun rect(r1: Int, c1: Int, r2: Int, c2: Int): Int =
+        p[r2 + 1][c2 + 1] - p[r1][c2 + 1] - p[r2 + 1][c1] + p[r1][c1]
+}
+
+fun main() {
+    val grid = arrayOf(
+        intArrayOf(1, 2, 3),
+        intArrayOf(4, 5, 6),
+        intArrayOf(7, 8, 9),
+    )
+    val gs = GridSum(grid)
+    println(gs.rect(0, 0, 2, 2))   // 45, the whole grid
+    println(gs.rect(1, 1, 2, 2))   // 5 + 6 + 8 + 9 = 28
+    println(gs.rect(0, 1, 1, 1))   // 2 + 5 = 7
+}
+</script></div>
+<div class="try"><h3>Try it: count subarrays with sum k</h3>
+<p>Write <code>subarraySumK(a, k)</code>: how many contiguous subarrays add up to <code>k</code>? Numbers may be negative or zero. Use a running total and a map; the last test is too big for a double loop. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun subarraySumK(a: IntArray, k: Int): Int {
+    TODO("running total + HashMap of how often each total was seen")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-subarray-k">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-subarray-k">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun subarraySumK(a: IntArray, k: Int): Int {
+    TODO("running total + HashMap of how often each total was seen")
+}
+
+fun main() {
+    test("empty") { eq(subarraySumK(intArrayOf(), 0), 0) }
+    test("single hit") { eq(subarraySumK(intArrayOf(5), 5), 1) }
+    test("single miss") { eq(subarraySumK(intArrayOf(5), 3), 0) }
+    test("1 1 1, k=2") { eq(subarraySumK(intArrayOf(1, 1, 1), 2), 2) }
+    test("1 2 3, k=3") { eq(subarraySumK(intArrayOf(1, 2, 3), 3), 2) }
+    test("negatives and zero") { eq(subarraySumK(intArrayOf(1, -1, 0), 0), 3) }
+    test("no answer") { eq(subarraySumK(intArrayOf(1, 2, 3), 100), 0) }
+    test("big input") { eq(subarraySumK(IntArray(100_000) { 1 }, 1), 100_000) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Before adding the current total to the map, look up <code>running - k</code> and add its count to your answer. Start with the map holding <code>0 to 1</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun subarraySumK(a: IntArray, k: Int): Int {
+    val seen = HashMap&lt;Int, Int&gt;()
+    seen[0] = 1
+    var running = 0
+    var count = 0
+    for (x in a) {
+        running += x
+        count += seen[running - k] ?: 0
+        seen[running] = (seen[running] ?: 0) + 1
+    }
+    return count
+}</code></pre>
+</details></div>
+<h2 id="hash-memory">6. Hash map as memory (a recap)</h2>
+
+<p>You met hash maps and sets in Part 2. Here is the pattern in one sentence: <strong>when you keep asking &ldquo;have I seen this before?&rdquo; or &ldquo;where was it?&rdquo;, store what you have seen in a hash map or set, and each question becomes <code>O(1)</code> on average</strong>.</p>
+<h3>The clue</h3>
+<ul>
+<li>You catch yourself scanning the same data again and again to look something up.</li>
+<li>Questions about <strong>counting</strong>, <strong>duplicates</strong>, <strong>pairs</strong> or <strong>grouping</strong>.</li>
+<li>Order does not matter, only membership.</li>
+</ul>
+<h3>A new problem: the longest run of consecutive numbers</h3>
+<p>Given unsorted numbers, find the length of the longest run of consecutive values (like 1, 2, 3, 4), in any order. The naive way sorts first: <code>O(n log n)</code>. With a set we can do <code>O(n)</code>: only start counting at a number whose predecessor is missing, because that number is the start of a run.</p>
+<figure class="fig"><div class="diagram"><pre> numbers: 100  4  200  1  3  2          set = {100, 4, 200, 1, 3, 2}
+
+   100 : 99 not in set  -&gt; start of a run.  101? no.   run length 1
+     4 :  3 is in set   -&gt; not a start, skip
+   200 : 199 not in set -&gt; start.  201? no.            run length 1
+     1 :  0 not in set  -&gt; start.  2, 3, 4 are in set. run length 4   &lt;- best</pre></div><figcaption>Each number is walked over as part of exactly one run, so the total work is linear.</figcaption></figure>
+<div class="try demo"><h3>Run it: longest consecutive run with a set</h3>
+<p>The inner <code>while</code> looks scary, but it only runs from the start of a run, never from the middle.</p>
+<pre><code>fun longestConsecutive(a: IntArray): Int {
+    val set = a.toHashSet()
+    var best = 0
+    for (x in set) {
+        if (x - 1 !in set) {                // x starts a run
+            var y = x
+            while (y + 1 in set) y++
+            best = maxOf(best, y - x + 1)
+        }
+    }
+    return best
+}
+
+fun main() {
+    println(longestConsecutive(intArrayOf(100, 4, 200, 1, 3, 2)))    // 4
+    println(longestConsecutive(intArrayOf(5, 5, 5)))                 // 1
+    println(longestConsecutive(intArrayOf()))                        // 0
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-consecutive">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-consecutive">fun longestConsecutive(a: IntArray): Int {
+    val set = a.toHashSet()
+    var best = 0
+    for (x in set) {
+        if (x - 1 !in set) {                // x starts a run
+            var y = x
+            while (y + 1 in set) y++
+            best = maxOf(best, y - x + 1)
+        }
+    }
+    return best
+}
+
+fun main() {
+    println(longestConsecutive(intArrayOf(100, 4, 200, 1, 3, 2)))    // 4
+    println(longestConsecutive(intArrayOf(5, 5, 5)))                 // 1
+    println(longestConsecutive(intArrayOf()))                        // 0
+}
+</script></div>
+<h2 id="binary-answer">7. Binary search on the answer</h2>
+
+<p>In Part 6 you used binary search to find a value in a sorted list. This pattern applies the same halving idea to a different thing: not a list, but the <strong>range of possible answers</strong>.</p>
+<h3>The clue</h3>
+<ul>
+<li>The question asks for the <strong>smallest</strong> or <strong>largest</strong> value that still works: minimum capacity, slowest speed, smallest time.</li>
+<li>You can write a quick yes/no check: &ldquo;does this value work?&rdquo;</li>
+<li>The check is <strong>monotonic</strong>: if a value works, every bigger value also works (for &ldquo;smallest&rdquo; problems). So the answers look like <code>no no no yes yes yes</code>.</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> candidate answers:   1   2   3   4   5   6   7   8   9  10
+ does it work?        no  no  no  no  no  YES YES YES YES YES
+                                          ^
+                                    smallest that works
+
+   lo=1 ............................................ hi=10
+   mid=5: no  -&gt; lo = 6
+   mid=8: yes -&gt; hi = 8
+   mid=7: yes -&gt; hi = 7
+   mid=6: yes -&gt; hi = 6        lo == hi: answer 6</pre></div><figcaption>Halve the range of answers, keep the half that must contain the boundary between no and yes.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>The naive way tries every candidate answer from the smallest up, running the check each time. If the answers range up to <code>M</code> and the check costs <code>O(n)</code>, that is <code>O(M * n)</code>. Binary search needs only about <code>log M</code> checks: <code>O(n log M)</code>.</p>
+<p>Two problems, one shape. <strong>Koko and the bananas:</strong> piles of bananas, <code>h</code> hours; each hour she picks one pile and eats up to <code>k</code> bananas from it. What is the smallest <code>k</code> that finishes in time? <strong>Shipping:</strong> packages must go in order, one ship, <code>d</code> days; what is the smallest ship capacity? In both, the check is a simple loop.</p>
+<div class="try demo"><h3>Run it: smallest speed and smallest capacity</h3>
+<p>Notice that the search code is almost identical in both. Only the yes/no check changes.</p>
+<pre><code>// Koko: smallest eating speed k so all piles finish within h hours.
+fun hoursNeeded(piles: IntArray, k: Int): Long {
+    var hours = 0L
+    for (p in piles) hours += (p + k - 1) / k      // round up
+    return hours
+}
+
+fun minEatingSpeed(piles: IntArray, h: Int): Int {
+    if (piles.isEmpty()) return 0
+    var lo = 1
+    var hi = piles.max()                  // eating the biggest pile in an hour always works
+    while (lo &lt; hi) {
+        val mid = lo + (hi - lo) / 2
+        if (hoursNeeded(piles, mid) &lt;= h) hi = mid else lo = mid + 1
+    }
+    return lo
+}
+
+// Ship packages in order within the given number of days.
+fun daysNeeded(weights: IntArray, capacity: Int): Int {
+    var days = 1
+    var load = 0
+    for (w in weights) {
+        if (load + w &gt; capacity) { days++; load = 0 }
+        load += w
+    }
+    return days
+}
+
+fun minCapacity(weights: IntArray, days: Int): Int {
+    if (weights.isEmpty()) return 0
+    var lo = weights.max()                // must at least carry the heaviest package
+    var hi = weights.sum()                // one day carries everything
+    while (lo &lt; hi) {
+        val mid = lo + (hi - lo) / 2
+        if (daysNeeded(weights, mid) &lt;= days) hi = mid else lo = mid + 1
+    }
+    return lo
+}
+
+fun main() {
+    println(minEatingSpeed(intArrayOf(3, 6, 7, 11), 8))                  // 4
+    println(minCapacity(intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 5))   // 15
+    println(minCapacity(intArrayOf(3, 2, 2, 4, 1, 4), 3))                // 6
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-binary-answer">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-binary-answer">// Koko: smallest eating speed k so all piles finish within h hours.
+fun hoursNeeded(piles: IntArray, k: Int): Long {
+    var hours = 0L
+    for (p in piles) hours += (p + k - 1) / k      // round up
+    return hours
+}
+
+fun minEatingSpeed(piles: IntArray, h: Int): Int {
+    if (piles.isEmpty()) return 0
+    var lo = 1
+    var hi = piles.max()                  // eating the biggest pile in an hour always works
+    while (lo < hi) {
+        val mid = lo + (hi - lo) / 2
+        if (hoursNeeded(piles, mid) <= h) hi = mid else lo = mid + 1
+    }
+    return lo
+}
+
+// Ship packages in order within the given number of days.
+fun daysNeeded(weights: IntArray, capacity: Int): Int {
+    var days = 1
+    var load = 0
+    for (w in weights) {
+        if (load + w > capacity) { days++; load = 0 }
+        load += w
+    }
+    return days
+}
+
+fun minCapacity(weights: IntArray, days: Int): Int {
+    if (weights.isEmpty()) return 0
+    var lo = weights.max()                // must at least carry the heaviest package
+    var hi = weights.sum()                // one day carries everything
+    while (lo < hi) {
+        val mid = lo + (hi - lo) / 2
+        if (daysNeeded(weights, mid) <= days) hi = mid else lo = mid + 1
+    }
+    return lo
+}
+
+fun main() {
+    println(minEatingSpeed(intArrayOf(3, 6, 7, 11), 8))                  // 4
+    println(minCapacity(intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 5))   // 15
+    println(minCapacity(intArrayOf(3, 2, 2, 4, 1, 4), 3))                // 6
+}
+</script></div>
+<div class="note"><p><strong>Choosing <code>lo</code> and <code>hi</code>.</strong> Set <code>lo</code> to the smallest answer that could possibly work and <code>hi</code> to one that surely works. Then keep <code>hi = mid</code> when <code>mid</code> works (it might be the answer) and <code>lo = mid + 1</code> when it does not.</p></div>
+<div class="try"><h3>Try it: slowest speed that finishes in time</h3>
+<p>Write <code>minEatingSpeed(piles, h)</code>: the smallest whole number of bananas per hour so that all piles are eaten within <code>h</code> hours. She eats from one pile per hour. Return 0 for no piles. Assume <code>h</code> is at least the number of piles. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun minEatingSpeed(piles: IntArray, h: Int): Int {
+    TODO("binary search k between 1 and the biggest pile")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-koko">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-koko">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun minEatingSpeed(piles: IntArray, h: Int): Int {
+    TODO("binary search k between 1 and the biggest pile")
+}
+
+fun main() {
+    test("classic") { eq(minEatingSpeed(intArrayOf(3, 6, 7, 11), 8), 4) }
+    test("one hour per pile") { eq(minEatingSpeed(intArrayOf(30, 11, 23, 4, 20), 5), 30) }
+    test("one spare hour") { eq(minEatingSpeed(intArrayOf(30, 11, 23, 4, 20), 6), 23) }
+    test("single pile") { eq(minEatingSpeed(intArrayOf(5), 1), 5) }
+    test("single pile, lots of time") { eq(minEatingSpeed(intArrayOf(5), 5), 1) }
+    test("all ones") { eq(minEatingSpeed(intArrayOf(1, 1, 1), 3), 1) }
+    test("no piles") { eq(minEatingSpeed(intArrayOf(), 4), 0) }
+    test("huge piles") { eq(minEatingSpeed(intArrayOf(1_000_000_000, 1_000_000_000), 3), 1_000_000_000) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> For a speed <code>k</code>, a pile of <code>p</code> bananas takes <code>(p + k - 1) / k</code> hours (rounding up). Use a <code>Long</code> for the total hours.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun minEatingSpeed(piles: IntArray, h: Int): Int {
+    if (piles.isEmpty()) return 0
+    var lo = 1
+    var hi = piles.max()
+    while (lo &lt; hi) {
+        val mid = lo + (hi - lo) / 2
+        var hours = 0L
+        for (p in piles) hours += (p.toLong() + mid - 1) / mid
+        if (hours &lt;= h) hi = mid else lo = mid + 1
+    }
+    return lo
+}</code></pre>
+</details></div>
+<h2 id="monotonic-stack">8. Monotonic stack</h2>
+
+<p>A <strong>monotonic stack</strong> is a stack (Part 3) whose items are always kept in order, for example each item smaller than the one below it. Before you push a new item you pop everything that breaks the order. Each pop is a moment when you learn an answer for the popped item.</p>
+<h3>The clue</h3>
+<ul>
+<li>&ldquo;For each item, find the <strong>next greater</strong> (or smaller) item to the right or left.&rdquo;</li>
+<li>&ldquo;How many days until&hellip;&rdquo;, &ldquo;how far until a bigger value&rdquo;.</li>
+<li>Bars or buildings, and the biggest rectangle, or the span an item controls.</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> temps:  73  74  75  71  69  72  76  73       days until warmer?
+
+ i=0 73: stack []            push 0                 stack (indexes): [0]
+ i=1 74: 74 &gt; 73, pop 0 -&gt; answer[0] = 1; push 1    [1]
+ i=2 75: 75 &gt; 74, pop 1 -&gt; answer[1] = 1; push 2    [2]
+ i=3 71: 71 &lt; 75, just push                         [2, 3]
+ i=4 69: just push                                  [2, 3, 4]
+ i=5 72: pop 4 (ans 1), pop 3 (ans 2); 72 &lt; 75 push [2, 5]
+ i=6 76: pop 5 (ans 1), pop 2 (ans 4); push         [6]
+ i=7 73: push                                       [6, 7]  never warmer: 0
+
+ Stack holds items still waiting for something bigger. Temperatures on it
+ only go down from bottom to top.</pre></div><figcaption>The stack keeps the items that are still waiting for an answer. A bigger arrival answers all the smaller ones on top.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>The naive way scans to the right from every item until it finds a bigger one: <code>O(n&sup2;)</code> in the worst case (a list that only goes down). With a monotonic stack every item is pushed once and popped at most once, so it is <code>O(n)</code> time and <code>O(n)</code> space. The loop inside a loop is fooled by its own look: the total number of pops can never exceed the number of pushes.</p>
+<p>The &ldquo;largest rectangle in a histogram&rdquo; idea uses the same stack in the other direction. For each bar, how far can it stretch left and right before meeting a shorter bar? When a bar is popped, the bar below it on the stack is the first shorter bar to its left, and the bar that caused the pop is the first shorter bar to its right. That fixes the width, so the area is height times width.</p>
+<div class="try demo"><h3>Run it: next greater, warmer days and the largest rectangle</h3>
+<p>The stack holds indexes, not values, so we can both read the value and compute distances.</p>
+<pre><code>fun nextGreater(a: IntArray): IntArray {
+    val result = IntArray(a.size) { -1 }          // -1 means "none"
+    val stack = ArrayDeque&lt;Int&gt;()                 // indexes, values decreasing
+    for (i in a.indices) {
+        while (stack.isNotEmpty() &amp;&amp; a[stack.last()] &lt; a[i]) {
+            result[stack.removeLast()] = a[i]
+        }
+        stack.addLast(i)
+    }
+    return result
+}
+
+fun dailyTemperatures(t: IntArray): IntArray {
+    val wait = IntArray(t.size)                   // 0 means "never warmer"
+    val stack = ArrayDeque&lt;Int&gt;()
+    for (i in t.indices) {
+        while (stack.isNotEmpty() &amp;&amp; t[stack.last()] &lt; t[i]) {
+            val j = stack.removeLast()
+            wait[j] = i - j
+        }
+        stack.addLast(i)
+    }
+    return wait
+}
+
+fun largestRectangle(h: IntArray): Int {
+    val stack = ArrayDeque&lt;Int&gt;()                 // indexes, heights increasing
+    var best = 0
+    for (i in 0..h.size) {
+        val cur = if (i == h.size) 0 else h[i]    // a final height 0 pops everything
+        while (stack.isNotEmpty() &amp;&amp; h[stack.last()] &gt;= cur) {
+            val height = h[stack.removeLast()]
+            val left = if (stack.isEmpty()) -1 else stack.last()
+            best = maxOf(best, height * (i - left - 1))
+        }
+        stack.addLast(i)
+    }
+    return best
+}
+
+fun main() {
+    println(nextGreater(intArrayOf(2, 1, 5, 3, 6, 4)).toList())                      // [5, 5, 6, 6, -1, -1]
+    println(dailyTemperatures(intArrayOf(73, 74, 75, 71, 69, 72, 76, 73)).toList())  // [1, 1, 4, 2, 1, 1, 0, 0]
+    println(largestRectangle(intArrayOf(2, 1, 5, 6, 2, 3)))                          // 10
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-mono-stack">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-mono-stack">fun nextGreater(a: IntArray): IntArray {
+    val result = IntArray(a.size) { -1 }          // -1 means "none"
+    val stack = ArrayDeque<Int>()                 // indexes, values decreasing
+    for (i in a.indices) {
+        while (stack.isNotEmpty() && a[stack.last()] < a[i]) {
+            result[stack.removeLast()] = a[i]
+        }
+        stack.addLast(i)
+    }
+    return result
+}
+
+fun dailyTemperatures(t: IntArray): IntArray {
+    val wait = IntArray(t.size)                   // 0 means "never warmer"
+    val stack = ArrayDeque<Int>()
+    for (i in t.indices) {
+        while (stack.isNotEmpty() && t[stack.last()] < t[i]) {
+            val j = stack.removeLast()
+            wait[j] = i - j
+        }
+        stack.addLast(i)
+    }
+    return wait
+}
+
+fun largestRectangle(h: IntArray): Int {
+    val stack = ArrayDeque<Int>()                 // indexes, heights increasing
+    var best = 0
+    for (i in 0..h.size) {
+        val cur = if (i == h.size) 0 else h[i]    // a final height 0 pops everything
+        while (stack.isNotEmpty() && h[stack.last()] >= cur) {
+            val height = h[stack.removeLast()]
+            val left = if (stack.isEmpty()) -1 else stack.last()
+            best = maxOf(best, height * (i - left - 1))
+        }
+        stack.addLast(i)
+    }
+    return best
+}
+
+fun main() {
+    println(nextGreater(intArrayOf(2, 1, 5, 3, 6, 4)).toList())                      // [5, 5, 6, 6, -1, -1]
+    println(dailyTemperatures(intArrayOf(73, 74, 75, 71, 69, 72, 76, 73)).toList())  // [1, 1, 4, 2, 1, 1, 0, 0]
+    println(largestRectangle(intArrayOf(2, 1, 5, 6, 2, 3)))                          // 10
+}
+</script></div>
+<div class="try"><h3>Try it: days until a warmer day</h3>
+<p>Write <code>dailyTemperatures(t)</code>: for each day, how many days until a warmer temperature, or 0 if there never is one. A monotonic stack makes it linear. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun dailyTemperatures(t: IntArray): IntArray {
+    TODO("stack of indexes still waiting for a warmer day")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-daily-temps">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-daily-temps">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun dailyTemperatures(t: IntArray): IntArray {
+    TODO("stack of indexes still waiting for a warmer day")
+}
+
+fun main() {
+    test("classic") { eq(dailyTemperatures(intArrayOf(73, 74, 75, 71, 69, 72, 76, 73)).toList(), listOf(1, 1, 4, 2, 1, 1, 0, 0)) }
+    test("empty") { eq(dailyTemperatures(intArrayOf()).toList(), listOf<Int>()) }
+    test("single") { eq(dailyTemperatures(intArrayOf(50)).toList(), listOf(0)) }
+    test("all same") { eq(dailyTemperatures(intArrayOf(5, 5, 5)).toList(), listOf(0, 0, 0)) }
+    test("only getting colder") { eq(dailyTemperatures(intArrayOf(3, 2, 1)).toList(), listOf(0, 0, 0)) }
+    test("only getting warmer") { eq(dailyTemperatures(intArrayOf(1, 2, 3)).toList(), listOf(1, 1, 0)) }
+    test("big input") { eq(dailyTemperatures(IntArray(100_000) { 100_000 - it }).sum(), 0) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Pop while the top day is colder than today. Each popped day <code>j</code> waited <code>i - j</code> days. Equal temperatures are not warmer, so use a strict <code>&lt;</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun dailyTemperatures(t: IntArray): IntArray {
+    val wait = IntArray(t.size)
+    val stack = ArrayDeque&lt;Int&gt;()
+    for (i in t.indices) {
+        while (stack.isNotEmpty() &amp;&amp; t[stack.last()] &lt; t[i]) {
+            val j = stack.removeLast()
+            wait[j] = i - j
+        }
+        stack.addLast(i)
+    }
+    return wait
+}</code></pre>
+</details></div>
+<h2 id="intervals">9. Intervals</h2>
+
+<p>An <strong>interval</strong> is a start and an end: a meeting from 9 to 10, a booking from day 3 to day 7. Intervals <strong>overlap</strong> when they share some time. Interval problems share one big trick: <strong>sort by start time</strong>, and the overlaps become neighbours.</p>
+<h3>The clue</h3>
+<ul>
+<li>Pairs of <code>(start, end)</code>: meetings, bookings, ranges, schedules.</li>
+<li>&ldquo;Merge overlapping&hellip;&rdquo;, &ldquo;insert a new&hellip;&rdquo;, &ldquo;how many at the same time?&rdquo;, &ldquo;do any conflict?&rdquo;</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> Merge after sorting by start:
+
+   time:  1  2  3  4  5  6  7  8  9 10
+   A      [=======]
+   B         [===========]
+   C                           [====]
+   merged [===========]               &lt;- A and B overlap: 1..6
+                               [====] &lt;- C stays alone: 8..10
+
+ Meeting rooms: sweep through the sorted starts and sorted ends.
+
+   starts: 0  5 15       ends: 10 20 30       a start before the next end -&gt; a new room
+   (0,30) (5,10) (15,20)                      an end first -&gt; a room frees up
+   at time 5 : 2 rooms busy
+   at time 10: 1 freed, 15 starts: 2 busy again       maximum = 2 rooms</pre></div><figcaption>After sorting, one pass is enough: each interval either extends the last one or starts a new one.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>Without sorting, merging means comparing every interval with every other one, repeatedly: about <code>O(n&sup2;)</code>. Sorting costs <code>O(n log n)</code> and then the merge is a single <code>O(n)</code> pass, so <code>O(n log n)</code> overall. Counting meeting rooms naively checks every time point against every meeting; the sweep sorts the starts and the ends separately and walks both lists, <code>O(n log n)</code> in total.</p>
+<p>If the list is already sorted and non-overlapping, <strong>insert interval</strong> needs no sort at all: copy the intervals that end before the new one starts, merge all that overlap it, then copy the rest. That is <code>O(n)</code>.</p>
+<div class="try demo"><h3>Run it: merge, insert and count rooms</h3>
+<p>Touching intervals such as <code>(1, 4)</code> and <code>(4, 5)</code> are treated as overlapping when merging, but as sharing a room when counting. Decide which you need and test it.</p>
+<pre><code>fun mergeIntervals(iv: List&lt;Pair&lt;Int, Int&gt;&gt;): List&lt;Pair&lt;Int, Int&gt;&gt; {
+    if (iv.isEmpty()) return emptyList()
+    val sorted = iv.sortedBy { it.first }
+    val out = mutableListOf(sorted[0])
+    for (i in 1 until sorted.size) {
+        val last = out.last()
+        val cur = sorted[i]
+        if (cur.first &lt;= last.second) {
+            out[out.size - 1] = last.first to maxOf(last.second, cur.second)   // overlap: extend
+        } else {
+            out.add(cur)                                                        // gap: new interval
+        }
+    }
+    return out
+}
+
+// iv is sorted and non-overlapping already.
+fun insertInterval(iv: List&lt;Pair&lt;Int, Int&gt;&gt;, add: Pair&lt;Int, Int&gt;): List&lt;Pair&lt;Int, Int&gt;&gt; {
+    val out = mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;()
+    var cur = add
+    var i = 0
+    while (i &lt; iv.size &amp;&amp; iv[i].second &lt; cur.first) { out.add(iv[i]); i++ }      // entirely before
+    while (i &lt; iv.size &amp;&amp; iv[i].first &lt;= cur.second) {                            // overlapping
+        cur = minOf(cur.first, iv[i].first) to maxOf(cur.second, iv[i].second)
+        i++
+    }
+    out.add(cur)
+    while (i &lt; iv.size) { out.add(iv[i]); i++ }                                   // entirely after
+    return out
+}
+
+fun minMeetingRooms(iv: List&lt;Pair&lt;Int, Int&gt;&gt;): Int {
+    val starts = iv.map { it.first }.sorted()
+    val ends = iv.map { it.second }.sorted()
+    var i = 0
+    var j = 0
+    var busy = 0
+    var most = 0
+    while (i &lt; starts.size) {
+        if (starts[i] &lt; ends[j]) { busy++; i++; most = maxOf(most, busy) }   // someone arrives
+        else { busy--; j++ }                                                 // someone leaves
+    }
+    return most
+}
+
+fun main() {
+    println(mergeIntervals(listOf(1 to 3, 2 to 6, 8 to 10, 15 to 18)))   // [(1, 6), (8, 10), (15, 18)]
+    println(insertInterval(listOf(1 to 3, 6 to 9), 2 to 5))              // [(1, 5), (6, 9)]
+    println(minMeetingRooms(listOf(0 to 30, 5 to 10, 15 to 20)))         // 2
+    println(minMeetingRooms(listOf(1 to 2, 2 to 3)))                     // 1, touching ends reuse the room
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-intervals">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-intervals">fun mergeIntervals(iv: List<Pair<Int, Int>>): List<Pair<Int, Int>> {
+    if (iv.isEmpty()) return emptyList()
+    val sorted = iv.sortedBy { it.first }
+    val out = mutableListOf(sorted[0])
+    for (i in 1 until sorted.size) {
+        val last = out.last()
+        val cur = sorted[i]
+        if (cur.first <= last.second) {
+            out[out.size - 1] = last.first to maxOf(last.second, cur.second)   // overlap: extend
+        } else {
+            out.add(cur)                                                        // gap: new interval
+        }
+    }
+    return out
+}
+
+// iv is sorted and non-overlapping already.
+fun insertInterval(iv: List<Pair<Int, Int>>, add: Pair<Int, Int>): List<Pair<Int, Int>> {
+    val out = mutableListOf<Pair<Int, Int>>()
+    var cur = add
+    var i = 0
+    while (i < iv.size && iv[i].second < cur.first) { out.add(iv[i]); i++ }      // entirely before
+    while (i < iv.size && iv[i].first <= cur.second) {                            // overlapping
+        cur = minOf(cur.first, iv[i].first) to maxOf(cur.second, iv[i].second)
+        i++
+    }
+    out.add(cur)
+    while (i < iv.size) { out.add(iv[i]); i++ }                                   // entirely after
+    return out
+}
+
+fun minMeetingRooms(iv: List<Pair<Int, Int>>): Int {
+    val starts = iv.map { it.first }.sorted()
+    val ends = iv.map { it.second }.sorted()
+    var i = 0
+    var j = 0
+    var busy = 0
+    var most = 0
+    while (i < starts.size) {
+        if (starts[i] < ends[j]) { busy++; i++; most = maxOf(most, busy) }   // someone arrives
+        else { busy--; j++ }                                                 // someone leaves
+    }
+    return most
+}
+
+fun main() {
+    println(mergeIntervals(listOf(1 to 3, 2 to 6, 8 to 10, 15 to 18)))   // [(1, 6), (8, 10), (15, 18)]
+    println(insertInterval(listOf(1 to 3, 6 to 9), 2 to 5))              // [(1, 5), (6, 9)]
+    println(minMeetingRooms(listOf(0 to 30, 5 to 10, 15 to 20)))         // 2
+    println(minMeetingRooms(listOf(1 to 2, 2 to 3)))                     // 1, touching ends reuse the room
+}
+</script></div>
+<div class="try"><h3>Try it: merge overlapping intervals</h3>
+<p>Write <code>mergeIntervals</code>. The input may be in any order. Intervals that overlap or touch become one. Return the result sorted by start. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun mergeIntervals(iv: List&lt;Pair&lt;Int, Int&gt;&gt;): List&lt;Pair&lt;Int, Int&gt;&gt; {
+    TODO("sort by start, then extend or append")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-merge">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-merge">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun mergeIntervals(iv: List<Pair<Int, Int>>): List<Pair<Int, Int>> {
+    TODO("sort by start, then extend or append")
+}
+
+fun main() {
+    test("classic") { eq(mergeIntervals(listOf(1 to 3, 2 to 6, 8 to 10, 15 to 18)), listOf(1 to 6, 8 to 10, 15 to 18)) }
+    test("empty") { eq(mergeIntervals(listOf()), listOf()) }
+    test("single") { eq(mergeIntervals(listOf(4 to 9)), listOf(4 to 9)) }
+    test("touching") { eq(mergeIntervals(listOf(1 to 4, 4 to 5)), listOf(1 to 5)) }
+    test("unsorted input") { eq(mergeIntervals(listOf(8 to 10, 1 to 3, 2 to 6)), listOf(1 to 6, 8 to 10)) }
+    test("one swallows the rest") { eq(mergeIntervals(listOf(1 to 10, 2 to 3, 4 to 5)), listOf(1 to 10)) }
+    test("no overlaps") { eq(mergeIntervals(listOf(1 to 2, 3 to 4)), listOf(1 to 2, 3 to 4)) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Compare each interval with the last one in your result. If it starts at or before the last end, the new end is the larger of the two ends (case: one swallows another).</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun mergeIntervals(iv: List&lt;Pair&lt;Int, Int&gt;&gt;): List&lt;Pair&lt;Int, Int&gt;&gt; {
+    if (iv.isEmpty()) return emptyList()
+    val sorted = iv.sortedBy { it.first }
+    val out = mutableListOf(sorted[0])
+    for (i in 1 until sorted.size) {
+        val last = out.last()
+        val cur = sorted[i]
+        if (cur.first &lt;= last.second) {
+            out[out.size - 1] = last.first to maxOf(last.second, cur.second)
+        } else {
+            out.add(cur)
+        }
+    }
+    return out
+}</code></pre>
+</details></div>
+<h2 id="top-k">10. Top-k with a heap</h2>
+
+<p>You met the <strong>heap</strong> in Part 4: a structure that always hands you the smallest item (a min-heap) in <code>O(log n)</code>. The top-k pattern uses it as a small fixed-size leaderboard.</p>
+<h3>The clue</h3>
+<ul>
+<li>&ldquo;The <strong>k largest</strong> / smallest&hellip;&rdquo;, &ldquo;the <strong>k most frequent</strong>&hellip;&rdquo;, &ldquo;the k-th largest&rdquo;.</li>
+<li>You do not need <em>everything</em> sorted, only the best few.</li>
+<li>The data may be a stream, too big to keep all of it.</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> k = 3, numbers arrive: 5  1  9  3  7  8
+
+   keep a MIN-heap that never holds more than k items.
+   when it grows past k, throw away the smallest (the weakest on the board).
+
+   add 5   [5]
+   add 1   [1 5]
+   add 9   [1 5 9]
+   add 3   [1 3 5 9]  -&gt; too many, drop 1  -&gt; [3 5 9]
+   add 7   [3 5 7 9]  -&gt; drop 3            -&gt; [5 7 9]
+   add 8   [5 7 8 9]  -&gt; drop 5            -&gt; [7 8 9]    the three largest</pre></div><figcaption>For the k largest we use a min-heap: the smallest of the winners sits on top, ready to be kicked out.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>The naive way sorts everything, <code>O(n log n)</code>, then takes the first <code>k</code>. The heap never holds more than <code>k</code> items, so every push or pop costs <code>O(log k)</code> and the total is <code>O(n log k)</code> with <code>O(k)</code> space. When <code>k</code> is small compared to <code>n</code>, this is a real saving, and it works on streams.</p>
+<p>For &ldquo;k most frequent&rdquo; first count with a hash map (<code>O(n)</code>), then run the same leaderboard over the counts, ordered by count.</p>
+<div class="try demo"><h3>Run it: k largest and k most frequent</h3>
+<p>In Kotlin you can also write <code>a.sortedDescending().take(k)</code>. It is shorter, and fine for small data. The heap version is what scales.</p>
+<pre><code>import java.util.PriorityQueue
+
+fun kLargest(a: IntArray, k: Int): List&lt;Int&gt; {
+    val heap = PriorityQueue&lt;Int&gt;()          // min-heap
+    for (x in a) {
+        heap.add(x)
+        if (heap.size &gt; k) heap.poll()       // drop the smallest
+    }
+    return heap.sortedDescending()
+}
+
+fun kMostFrequent(words: List&lt;String&gt;, k: Int): List&lt;String&gt; {
+    val counts = HashMap&lt;String, Int&gt;()
+    for (w in words) counts[w] = (counts[w] ?: 0) + 1
+
+    val heap = PriorityQueue&lt;Pair&lt;String, Int&gt;&gt;(compareBy { it.second })
+    for ((word, n) in counts) {
+        heap.add(word to n)
+        if (heap.size &gt; k) heap.poll()       // drop the least frequent
+    }
+    return heap.sortedByDescending { it.second }.map { it.first }
+}
+
+fun main() {
+    println(kLargest(intArrayOf(5, 1, 9, 3, 7, 8), 3))     // [9, 8, 7]
+    println(kLargest(intArrayOf(4, 4), 5))                 // [4, 4], fewer than k items is fine
+    val words = listOf("a", "b", "a", "c", "a", "b", "d")
+    println(kMostFrequent(words, 2))                       // [a, b]
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-top-k">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-top-k">import java.util.PriorityQueue
+
+fun kLargest(a: IntArray, k: Int): List<Int> {
+    val heap = PriorityQueue<Int>()          // min-heap
+    for (x in a) {
+        heap.add(x)
+        if (heap.size > k) heap.poll()       // drop the smallest
+    }
+    return heap.sortedDescending()
+}
+
+fun kMostFrequent(words: List<String>, k: Int): List<String> {
+    val counts = HashMap<String, Int>()
+    for (w in words) counts[w] = (counts[w] ?: 0) + 1
+
+    val heap = PriorityQueue<Pair<String, Int>>(compareBy { it.second })
+    for ((word, n) in counts) {
+        heap.add(word to n)
+        if (heap.size > k) heap.poll()       // drop the least frequent
+    }
+    return heap.sortedByDescending { it.second }.map { it.first }
+}
+
+fun main() {
+    println(kLargest(intArrayOf(5, 1, 9, 3, 7, 8), 3))     // [9, 8, 7]
+    println(kLargest(intArrayOf(4, 4), 5))                 // [4, 4], fewer than k items is fine
+    val words = listOf("a", "b", "a", "c", "a", "b", "d")
+    println(kMostFrequent(words, 2))                       // [a, b]
+}
+</script></div>
+<h2 id="in-place">11. In-place tricks: Dutch flag and cyclic sort</h2>
+
+<p>Sometimes the rules say: do it in the same array, with <code>O(1)</code> extra space. Two small ideas cover a lot of ground.</p>
+<h3>The Dutch national flag</h3>
+<p><strong>The clue:</strong> the array has only a few distinct values (like 0, 1 and 2) and you must group them together in one pass. Keep three zones with three pointers: everything before <code>lo</code> is 0, everything from <code>hi + 1</code> on is 2, and <code>mid</code> scans the unknown middle.</p>
+<figure class="fig"><div class="diagram"><pre>   0 0 0 | 1 1 1 | ? ? ? ? | 2 2
+         ^       ^         ^
+         lo      mid       hi
+
+   a[mid] == 0 : swap with lo, lo++, mid++
+   a[mid] == 1 : mid++
+   a[mid] == 2 : swap with hi, hi--          (mid stays: the swapped-in value is unknown)</pre></div><figcaption>Three zones and one scanner. One pass, no extra array.</figcaption></figure>
+
+<h3>Cyclic sort</h3>
+<p><strong>The clue:</strong> numbers are in a known range such as <code>0..n</code> or <code>1..n</code>, and you must find the missing or duplicate one. Since value <code>v</code> belongs at index <code>v</code>, put each number straight into its home by swapping. Then any index whose value is wrong tells you the answer. Each swap fixes at least one number for good, so it is <code>O(n)</code> time, <code>O(1)</code> space.</p>
+<div class="try demo"><h3>Run it: sort colors and find the missing number</h3>
+<p>Both functions change the array they are given. That is what &ldquo;in place&rdquo; means.</p>
+<pre><code>fun swap(a: IntArray, i: Int, j: Int) { val t = a[i]; a[i] = a[j]; a[j] = t }
+
+fun sortColors(a: IntArray) {
+    var lo = 0
+    var mid = 0
+    var hi = a.size - 1
+    while (mid &lt;= hi) {
+        when (a[mid]) {
+            0 -&gt; { swap(a, lo, mid); lo++; mid++ }
+            1 -&gt; mid++
+            else -&gt; { swap(a, mid, hi); hi-- }
+        }
+    }
+}
+
+// a holds the numbers 0..n with exactly one missing (n = a.size).
+fun missingNumber(a: IntArray): Int {
+    val n = a.size
+    var i = 0
+    while (i &lt; n) {
+        val v = a[i]
+        if (v &lt; n &amp;&amp; a[v] != v) swap(a, i, v) else i++    // send v to its home, index v
+    }
+    for (j in 0 until n) if (a[j] != j) return j
+    return n
+}
+
+fun main() {
+    val colors = intArrayOf(2, 0, 2, 1, 1, 0)
+    sortColors(colors)
+    println(colors.toList())                                  // [0, 0, 1, 1, 2, 2]
+
+    println(missingNumber(intArrayOf(3, 0, 1)))               // 2
+    println(missingNumber(intArrayOf(9, 6, 4, 2, 3, 5, 7, 0, 1)))   // 8
+    println(missingNumber(intArrayOf(0, 1)))                  // 2
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-in-place">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-in-place">fun swap(a: IntArray, i: Int, j: Int) { val t = a[i]; a[i] = a[j]; a[j] = t }
+
+fun sortColors(a: IntArray) {
+    var lo = 0
+    var mid = 0
+    var hi = a.size - 1
+    while (mid <= hi) {
+        when (a[mid]) {
+            0 -> { swap(a, lo, mid); lo++; mid++ }
+            1 -> mid++
+            else -> { swap(a, mid, hi); hi-- }
+        }
+    }
+}
+
+// a holds the numbers 0..n with exactly one missing (n = a.size).
+fun missingNumber(a: IntArray): Int {
+    val n = a.size
+    var i = 0
+    while (i < n) {
+        val v = a[i]
+        if (v < n && a[v] != v) swap(a, i, v) else i++    // send v to its home, index v
+    }
+    for (j in 0 until n) if (a[j] != j) return j
+    return n
+}
+
+fun main() {
+    val colors = intArrayOf(2, 0, 2, 1, 1, 0)
+    sortColors(colors)
+    println(colors.toList())                                  // [0, 0, 1, 1, 2, 2]
+
+    println(missingNumber(intArrayOf(3, 0, 1)))               // 2
+    println(missingNumber(intArrayOf(9, 6, 4, 2, 3, 5, 7, 0, 1)))   // 8
+    println(missingNumber(intArrayOf(0, 1)))                  // 2
+}
+</script></div>
+<h2 id="bits">12. Bit manipulation basics</h2>
+
+<p>Every integer is stored as <strong>bits</strong>: ones and zeros. Working directly on bits is fast and sometimes gives surprisingly short answers. You need only a few operations.</p>
+<table><tr><th>Operation</th><th>Kotlin</th><th>What it does</th></tr><tr><td>AND</td><td><code>a and b</code></td><td>1 where both bits are 1</td></tr><tr><td>OR</td><td><code>a or b</code></td><td>1 where either bit is 1</td></tr><tr><td>XOR</td><td><code>a xor b</code></td><td>1 where the bits differ</td></tr><tr><td>Shift left</td><td><code>a shl 1</code></td><td>moves bits left, doubles the number</td></tr><tr><td>Shift right</td><td><code>a shr 1</code></td><td>moves bits right, halves the number</td></tr><tr><td>Read bit i</td><td><code>(a shr i) and 1</code></td><td>is bit number i set?</td></tr></table>
+
+<h3>The clue</h3>
+<ul>
+<li>&ldquo;Every item appears twice except one&rdquo;: <strong>XOR</strong> cancels pairs.</li>
+<li>&ldquo;Is it a power of two?&rdquo; or &ldquo;count the set bits&rdquo;.</li>
+<li>A small set of yes/no options, stored as one number (a <strong>bitmask</strong>), for example all subsets of 10 items as the numbers 0 to 1023.</li>
+</ul>
+<h3>The picture</h3>
+<figure class="fig"><div class="diagram"><pre> XOR cancels equal numbers:  x xor x = 0   and   x xor 0 = x
+
+   4 xor 1 xor 2 xor 1 xor 2
+ = 4 xor (1 xor 1) xor (2 xor 2)
+ = 4 xor 0 xor 0
+ = 4                                         the single number
+
+ n and (n - 1) clears the lowest 1-bit:
+
+   n      = 0 1 1 0 0       (12)
+   n - 1  = 0 1 0 1 1       (11)
+   n &amp; n-1= 0 1 0 0 0       (8)     one 1-bit removed
+
+ power of two = exactly one 1-bit, so  n &gt; 0 and (n and (n-1)) == 0</pre></div><figcaption>XOR makes pairs vanish. Subtracting one flips the lowest 1-bit and the zeros below it.</figcaption></figure>
+
+<h3>Naive versus pattern</h3>
+<p>To find the number that appears once, you could count with a hash map: <code>O(n)</code> time and <code>O(n)</code> space. XOR does it in <code>O(n)</code> time and <code>O(1)</code> space. To count set bits you could loop over all 32 positions. The <code>n and (n - 1)</code> trick loops only as many times as there are 1-bits.</p>
+<div class="try demo"><h3>Run it: single number, power of two, count bits</h3>
+<p>The last loop enumerates all 8 subsets of 3 items by counting from 0 to 7. Each bit says &ldquo;in&rdquo; or &ldquo;out&rdquo; for one item.</p>
+<pre><code>fun singleNumber(a: IntArray): Int {
+    var x = 0
+    for (v in a) x = x xor v
+    return x
+}
+
+fun isPowerOfTwo(n: Int): Boolean = n &gt; 0 &amp;&amp; (n and (n - 1)) == 0
+
+fun countBits(n: Int): Int {
+    var x = n
+    var count = 0
+    while (x != 0) {
+        x = x and (x - 1)        // remove the lowest 1-bit
+        count++
+    }
+    return count
+}
+
+fun main() {
+    println(singleNumber(intArrayOf(4, 1, 2, 1, 2)))     // 4
+    println(listOf(0, 1, 2, 3, 16, 18, -8).map { isPowerOfTwo(it) })
+    println(listOf(0, 7, 1024, 255).map { countBits(it) })   // [0, 3, 1, 8]
+
+    // Bitmask: list every subset of three items.
+    val items = listOf("x", "y", "z")
+    for (mask in 0 until (1 shl items.size)) {
+        val subset = items.filterIndexed { i, _ -&gt; (mask shr i) and 1 == 1 }
+        println("mask ${Integer.toBinaryString(mask).padStart(3, '0')} -&gt; $subset")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-bits">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-bits">fun singleNumber(a: IntArray): Int {
+    var x = 0
+    for (v in a) x = x xor v
+    return x
+}
+
+fun isPowerOfTwo(n: Int): Boolean = n > 0 && (n and (n - 1)) == 0
+
+fun countBits(n: Int): Int {
+    var x = n
+    var count = 0
+    while (x != 0) {
+        x = x and (x - 1)        // remove the lowest 1-bit
+        count++
+    }
+    return count
+}
+
+fun main() {
+    println(singleNumber(intArrayOf(4, 1, 2, 1, 2)))     // 4
+    println(listOf(0, 1, 2, 3, 16, 18, -8).map { isPowerOfTwo(it) })
+    println(listOf(0, 7, 1024, 255).map { countBits(it) })   // [0, 3, 1, 8]
+
+    // Bitmask: list every subset of three items.
+    val items = listOf("x", "y", "z")
+    for (mask in 0 until (1 shl items.size)) {
+        val subset = items.filterIndexed { i, _ -> (mask shr i) and 1 == 1 }
+        println("mask ${Integer.toBinaryString(mask).padStart(3, '0')} -> $subset")
+    }
+}
+</script></div>
+<div class="try"><h3>Try it: power of two and bit count</h3>
+<p>Fill in both functions using bit operations only (no division, no string conversion). Zero and negative numbers are not powers of two. For <code>countOnes</code>, negative numbers count their 1-bits in 32-bit form. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun isPowerOfTwo(n: Int): Boolean {
+    TODO("exactly one 1-bit, and n is positive")
+}
+
+fun countOnes(n: Int): Int {
+    TODO("remove the lowest 1-bit until nothing is left")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p8-bits-ex">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p8-bits-ex">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun isPowerOfTwo(n: Int): Boolean {
+    TODO("exactly one 1-bit, and n is positive")
+}
+
+fun countOnes(n: Int): Int {
+    TODO("remove the lowest 1-bit until nothing is left")
+}
+
+fun main() {
+    test("1 is 2^0") { eq(isPowerOfTwo(1), true) }
+    test("16") { eq(isPowerOfTwo(16), true) }
+    test("18") { eq(isPowerOfTwo(18), false) }
+    test("zero") { eq(isPowerOfTwo(0), false) }
+    test("negative") { eq(isPowerOfTwo(-8), false) }
+    test("min int") { eq(isPowerOfTwo(Int.MIN_VALUE), false) }
+    test("count 0") { eq(countOnes(0), 0) }
+    test("count 7") { eq(countOnes(7), 3) }
+    test("count 1024") { eq(countOnes(1024), 1) }
+    test("count -1") { eq(countOnes(-1), 32) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> <code>n and (n - 1)</code> removes the lowest 1-bit. A power of two has only one, so removing it leaves 0.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun isPowerOfTwo(n: Int): Boolean = n &gt; 0 &amp;&amp; (n and (n - 1)) == 0
+
+fun countOnes(n: Int): Int {
+    var x = n
+    var count = 0
+    while (x != 0) {
+        x = x and (x - 1)
+        count++
+    }
+    return count
+}</code></pre>
+</details></div>
+<h2 id="which">13. Which pattern? A one-page decision table</h2>
+
+<p>Read the problem, find the clue, pick the pattern. Then check the cost matches what you need.</p>
+<table><tr><th>When you see&hellip;</th><th>Try</th><th>Typical cost</th></tr><tr><td>Sorted array, find a pair or triple; reverse; palindrome</td><td>Two pointers (opposite ends)</td><td><code>O(n)</code> time, <code>O(1)</code> space</td></tr><tr><td>Edit an array in place, keep or remove items</td><td>Two pointers (read and write)</td><td><code>O(n)</code>, <code>O(1)</code></td></tr><tr><td>Middle of a linked list; cycle; a sequence that may loop</td><td>Fast and slow pointers</td><td><code>O(n)</code>, <code>O(1)</code></td></tr><tr><td>Contiguous subarray or substring of size <code>k</code></td><td>Fixed sliding window</td><td><code>O(n)</code></td></tr><tr><td>Longest or shortest stretch satisfying a rule (non-negative data)</td><td>Variable sliding window</td><td><code>O(n)</code></td></tr><tr><td>Many range sums; subarray sum equals <code>k</code> (negatives allowed)</td><td>Prefix sums, plus a hash map</td><td><code>O(n)</code> build, <code>O(1)</code> query</td></tr><tr><td>Seen before? Count? Group? Pair that sums to a target (unsorted)</td><td>Hash map or set</td><td><code>O(n)</code>, <code>O(n)</code> space</td></tr><tr><td>Smallest value that still works; a yes/no check that is monotonic</td><td>Binary search on the answer</td><td><code>O(n log M)</code></td></tr><tr><td>Next greater or smaller; how many days until; histogram bars</td><td>Monotonic stack</td><td><code>O(n)</code></td></tr><tr><td>Pairs of (start, end); merge, insert, overlap, rooms</td><td>Sort by start, then sweep</td><td><code>O(n log n)</code></td></tr><tr><td>k largest, k smallest, k most frequent, k-th largest</td><td>Heap of size <code>k</code></td><td><code>O(n log k)</code></td></tr><tr><td>Few distinct values to group; numbers in <code>1..n</code> with a gap or duplicate</td><td>Dutch flag; cyclic sort</td><td><code>O(n)</code>, <code>O(1)</code></td></tr><tr><td>Every item twice but one; power of two; set bits; subsets as flags</td><td>Bit manipulation (XOR, mask)</td><td><code>O(n)</code> or <code>O(1)</code></td></tr><tr><td>All combinations, choices, paths; or a best value with repeated sub-problems</td><td>Recursion, backtracking, DP (Part 7)</td><td>depends</td></tr><tr><td>Shortest path, connected parts, dependencies</td><td>Graph search (Part 5)</td><td><code>O(V + E)</code></td></tr></table>
+<div class="note"><p><strong>A good habit.</strong> Always write the naive version first and say its cost. The waste in it (a repeated scan, a recomputed sum, an unsorted list) usually points at the pattern. The clue column is a starting guess, not a rule. If the first pattern does not fit, try the next.</p></div>
+
+<h3>Name that pattern</h3>
+<p>Without writing code, decide which pattern each problem needs. Open the answer only after you have chosen.</p>
+<ol>
+<li>Given a sorted list of prices, find two that add to exactly 50.</li>
+<li>Given a text, what is the longest piece that contains at most two different letters?</li>
+<li>Given a list of readings that can be negative, how many consecutive stretches sum to zero?</li>
+<li>Given the daily stock prices, for each day, how many days to wait for a higher price?</li>
+<li>Given a stream of 10 million scores, keep the top 10 at all times.</li>
+<li>Given appointment slots, can one person attend all of them?</li>
+<li>Given a function that tells whether a time limit of <code>t</code> minutes is enough, find the smallest <code>t</code>.</li>
+<li>Given a list where every number appears three times except one that appears once, find it without a map.</li>
+</ol>
+<details><summary>Show the answers</summary>
+<ol>
+<li>Two pointers from both ends.</li>
+<li>Variable sliding window with a small map of letter counts.</li>
+<li>Prefix sums with a hash map (negatives rule out a plain window).</li>
+<li>Monotonic stack (the daily temperatures shape).</li>
+<li>A min-heap of size 10 (top-k).</li>
+<li>Intervals: sort by start and check that each start is not before the previous end.</li>
+<li>Binary search on the answer.</li>
+<li>Bit manipulation: count each bit position across all numbers, modulo 3. The XOR trick from this part is the case where pairs appear twice; the idea of reasoning bit by bit extends to triples.</li>
+</ol>
+</details>
+
+<h2 id="catalogue">14. Complete pattern catalogue</h2>
+
+<p>The sections above teach the most common patterns in depth. To make sure nothing is missing, this catalogue merges two popular cheat sheets: <a href="https://www.grokkingthecodinginterview.com/blog/dsa-patterns-cheat-sheet" target="_blank" rel="noopener">Grokking the Coding Interview</a> (30 common and 11 advanced patterns) and <a href="https://algoark.io/cheatsheet" target="_blank" rel="noopener">AlgoArk</a> (29 patterns), plus the Dutch flag from section 11. Duplicates are merged, which leaves <strong>49 patterns</strong>.</p>
+<p>The <span class="pop">&#9733; Popular</span> mark is my judgment, not a measured statistic: <strong>23 patterns</strong> that you will meet in most interview loops and in everyday code. Neither source ranks its patterns; Grokking only suggests starting with two pointers, sliding window, hash maps and prefix sums. The <em>Where</em> column links to the section of this series that teaches the pattern. Patterns marked <em>Summary here</em> are not taught in this series, so the table row is the summary: the clue, the idea and the cost. Open a family to see its list; popular patterns come first.</p>
+<details class="conv"><summary><span>Arrays and strings<small>12 patterns, 6 popular</small></span></summary>
+<table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
+<tr><td><strong>Two pointers</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Sorted input, pair or triple, both ends, in-place edits</td><td>O(n); O(1)</td><td>&#9733;</td><td><a href="#two-pointers">This part §2</a></td></tr>
+<tr><td><strong>Sliding window</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Longest/shortest/fixed-size contiguous subarray or substring</td><td>O(n); O(1) or O(k)</td><td>&#9733;</td><td><a href="#sliding-window">This part §4</a></td></tr>
+<tr><td><strong>Prefix sum</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Many range sums; subarray sum equals k</td><td>O(n) build, O(1) query</td><td>&#9733;</td><td><a href="#prefix-sums">This part §5</a></td></tr>
+<tr><td><strong>Hash map counting / grouping</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Frequency, seen-before, grouping, anagrams</td><td>O(n); O(n)</td><td>&#9733;</td><td><a href="#hash-memory">This part §6</a></td></tr>
+<tr><td><strong>Two Sum (complement lookup)</strong><br><small class="srcs">AlgoArk</small></td><td>Unsorted data: store what you have seen, look up <code>target - x</code></td><td>O(n); O(n)</td><td>&#9733;</td><td><a href="#hash-memory">This part §6</a></td></tr>
+<tr><td><strong>Kadane's algorithm</strong><br><small class="srcs">AlgoArk</small></td><td>Maximum subarray sum or product: running sum that restarts when it turns negative. <code>cur = max(x, cur + x); best = max(best, cur)</code></td><td>O(n); O(1)</td><td>&#9733;</td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Cyclic sort</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Values in <code>1..n</code> or <code>0..n</code>: missing, duplicate or corrupt numbers</td><td>O(n); O(1)</td><td></td><td><a href="#in-place">This part §11</a></td></tr>
+<tr><td><strong>Dutch national flag</strong><br><small class="srcs">extra</small></td><td>Group a few distinct values (0/1/2) in one pass</td><td>O(n); O(1)</td><td></td><td><a href="#in-place">This part §11</a></td></tr>
+<tr><td><strong>Counting</strong><br><small class="srcs">Grokking advanced</small></td><td>Tally or bucket by value to avoid a scan or sort</td><td>O(n + range)</td><td></td><td><a href="dsa-part-6-sorting-and-searching.html#heapcount">Part 6 §7</a></td></tr>
+<tr><td><strong>Linear-time sorting</strong><br><small class="srcs">Grokking advanced</small></td><td>Small fixed value range: counting or bucket sort beats <code>O(n log n)</code></td><td>O(n + k)</td><td></td><td><a href="dsa-part-6-sorting-and-searching.html#heapcount">Part 6 §7</a></td></tr>
+<tr><td><strong>Simulation</strong><br><small class="srcs">Grokking advanced</small></td><td>Follow the described process step by step; the work is in clean state handling</td><td>varies</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Bit manipulation / XOR</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Every item twice but one; power of two; set bits; bitmask subsets</td><td>O(n) or O(1); O(1)</td><td></td><td><a href="#bits">This part §12</a></td></tr>
+</tbody></table></details>
+<details class="conv"><summary><span>Searching, sorting and heaps<small>9 patterns, 4 popular</small></span></summary>
+<table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
+<tr><td><strong>Binary search (and on the answer)</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Sorted data, first/last position, smallest value that works (monotonic check)</td><td>O(log n) or O(n log M)</td><td>&#9733;</td><td><a href="#binary-answer">This part §7</a></td></tr>
+<tr><td><strong>Modified binary search</strong><br><small class="srcs">Grokking</small></td><td>Rotated array, boundaries, peak element: decide which half still holds the answer</td><td>O(log n); O(1)</td><td>&#9733;</td><td><a href="dsa-part-6-sorting-and-searching.html#binary">Part 6 §3</a></td></tr>
+<tr><td><strong>Merge intervals</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Overlaps, insert, meeting rooms: sort by start, then sweep</td><td>O(n log n); O(n)</td><td>&#9733;</td><td><a href="#intervals">This part §9</a></td></tr>
+<tr><td><strong>Top K elements</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>k largest, smallest, most frequent, closest. Heap of size k, or buckets</td><td>O(n log k)</td><td>&#9733;</td><td><a href="#top-k">This part §10</a></td></tr>
+<tr><td><strong>Two heaps</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Running median, split data into a low half (max-heap) and a high half (min-heap); rebalance sizes after each insert</td><td>O(log n) per insert; O(n)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>K-way merge</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Merge k sorted lists/arrays: a min-heap holds the current head of each list; pop the smallest, push its successor</td><td>O(N log k); O(k)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Ordered set / sorted map</strong><br><small class="srcs">Grokking</small></td><td>Sorted order with fast insert, delete, floor/ceiling (Kotlin: <code>java.util.TreeMap</code>/<code>TreeSet</code>)</td><td>O(log n) per op</td><td></td><td><a href="dsa-part-4-trees-heaps-tries.html#bst">Part 4 §5</a></td></tr>
+<tr><td><strong>Meet in the middle</strong><br><small class="srcs">Grokking advanced</small></td><td>Search space <code>2^n</code> too big: solve each half (<code>2^(n/2)</code>) and combine</td><td>O(2^(n/2))</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Mo's algorithm</strong><br><small class="srcs">Grokking advanced</small></td><td>Many offline range queries on a static array: sort queries by block, move two pointers between them</td><td>O((n + q) sqrt n)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+</tbody></table></details>
+<details class="conv"><summary><span>Linked lists and stacks<small>5 patterns, 4 popular</small></span></summary>
+<table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
+<tr><td><strong>Fast and slow pointers</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Middle of a list, cycle detection, sequences that may loop</td><td>O(n); O(1)</td><td>&#9733;</td><td><a href="#fast-slow">This part §3</a></td></tr>
+<tr><td><strong>In-place linked list reversal</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Reverse a list, a sublist or groups of k by rewiring <code>next</code> pointers</td><td>O(n); O(1)</td><td>&#9733;</td><td><a href="dsa-part-3-stacks-queues-linked-lists.html#classic">Part 3 §3</a></td></tr>
+<tr><td><strong>Stack</strong><br><small class="srcs">Grokking</small></td><td>Valid parentheses, nesting, undo, evaluate expressions</td><td>O(n); O(n)</td><td>&#9733;</td><td><a href="dsa-part-3-stacks-queues-linked-lists.html#stack">Part 3 §5</a></td></tr>
+<tr><td><strong>Monotonic stack</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Next greater/smaller, days until, histogram rectangle</td><td>O(n); O(n)</td><td>&#9733;</td><td><a href="#monotonic-stack">This part §8</a></td></tr>
+<tr><td><strong>Monotonic queue</strong><br><small class="srcs">Grokking advanced</small></td><td>Sliding window maximum/minimum: a deque of indexes whose values decrease; drop the front when it leaves the window</td><td>O(n); O(k)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+</tbody></table></details>
+<details class="conv"><summary><span>Trees and graphs<small>12 patterns, 4 popular</small></span></summary>
+<table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
+<tr><td><strong>Tree BFS (level order)</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Output grouped by level, shortest path in an unweighted graph</td><td>O(n); O(w)</td><td>&#9733;</td><td><a href="dsa-part-4-trees-heaps-tries.html#bfs">Part 4 §3</a></td></tr>
+<tr><td><strong>Tree DFS</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Root-to-leaf paths, path sum, subtree properties, any traversal</td><td>O(n); O(h)</td><td>&#9733;</td><td><a href="dsa-part-4-trees-heaps-tries.html#dfs">Part 4 §2</a></td></tr>
+<tr><td><strong>Graph traversal (BFS and DFS)</strong><br><small class="srcs">Grokking</small></td><td>Connectivity, shortest path in unweighted graphs, components</td><td>O(V + E)</td><td>&#9733;</td><td><a href="dsa-part-5-graphs.html">Part 5</a></td></tr>
+<tr><td><strong>Island (matrix traversal)</strong><br><small class="srcs">Grokking</small></td><td>2D grid: count or fill regions with BFS/DFS from each unvisited cell</td><td>O(rows x cols)</td><td>&#9733;</td><td><a href="dsa-part-5-graphs.html#grids">Part 5 §5</a></td></tr>
+<tr><td><strong>Topological sort</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Prerequisites, build order, dependencies in a DAG</td><td>O(V + E)</td><td></td><td><a href="dsa-part-5-graphs.html#topo">Part 5 §6</a></td></tr>
+<tr><td><strong>Union-find</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Same-group checks, merge groups, cycle in an undirected graph</td><td>near O(1) per op</td><td></td><td><a href="dsa-part-5-graphs.html#unionfind">Part 5 §8</a></td></tr>
+<tr><td><strong>Trie</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Prefix search, autocomplete, word search</td><td>O(L) per word</td><td></td><td><a href="dsa-part-4-trees-heaps-tries.html#trie">Part 4 §8</a></td></tr>
+<tr><td><strong>Serialize and deserialize</strong><br><small class="srcs">Grokking advanced</small></td><td>Turn a tree/graph into a string and back (e.g. pre-order with null markers)</td><td>O(n)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Clone</strong><br><small class="srcs">Grokking advanced</small></td><td>Deep copy a graph or a list with random pointers: map old node to new node, copy in two passes or with DFS</td><td>O(n); O(n)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Articulation points and bridges</strong><br><small class="srcs">Grokking advanced</small></td><td>Which node or edge disconnects the graph: DFS with discovery time and low-link values</td><td>O(V + E)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Segment tree</strong><br><small class="srcs">Grokking advanced</small></td><td>Range query (sum/min/max) with updates in between</td><td>O(log n) per op</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Binary indexed tree (Fenwick)</strong><br><small class="srcs">Grokking advanced</small></td><td>Prefix sums with point updates; shorter than a segment tree</td><td>O(log n) per op</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+</tbody></table></details>
+<details class="conv"><summary><span>Recursion, greedy and dynamic programming<small>10 patterns, 5 popular</small></span></summary>
+<table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
+<tr><td><strong>Subsets, permutations, combinations</strong><br><small class="srcs">Grokking</small></td><td>Generate every choice set; branch on include/exclude</td><td>O(2^n) or O(n!)</td><td>&#9733;</td><td><a href="dsa-part-7-recursion-backtracking-dp.html#backtracking">Part 7 §3</a></td></tr>
+<tr><td><strong>Backtracking</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>N-Queens, Sudoku, word search: place, recurse, undo, prune</td><td>exponential, pruned</td><td>&#9733;</td><td><a href="dsa-part-7-recursion-backtracking-dp.html#backtracking">Part 7 §3</a></td></tr>
+<tr><td><strong>Greedy</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Scheduling, activity selection, jump game, min coins (when the greedy choice is safe)</td><td>O(n log n) or O(n)</td><td>&#9733;</td><td><a href="dsa-part-7-recursion-backtracking-dp.html#greedy">Part 7 §4</a></td></tr>
+<tr><td><strong>Fibonacci-style DP</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Each state depends on the previous one or two: climbing stairs, house robber</td><td>O(n); O(1)</td><td>&#9733;</td><td><a href="dsa-part-7-recursion-backtracking-dp.html#fibonacci">Part 7 §6</a></td></tr>
+<tr><td><strong>0/1 knapsack</strong><br><small class="srcs">Grokking + AlgoArk</small></td><td>Take or skip each item under a capacity: subset sum, partition</td><td>O(n x W); O(W)</td><td>&#9733;</td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Unbounded knapsack</strong><br><small class="srcs">AlgoArk</small></td><td>Items reusable without limit: coin change, rod cutting</td><td>O(n x W); O(W)</td><td></td><td><a href="dsa-part-7-recursion-backtracking-dp.html#dp-1d">Part 7 §7</a></td></tr>
+<tr><td><strong>Longest common subsequence</strong><br><small class="srcs">AlgoArk</small></td><td>Two strings, 2D table over prefixes: LCS, edit distance</td><td>O(m x n)</td><td></td><td><a href="dsa-part-7-recursion-backtracking-dp.html#dp-2d">Part 7 §8</a></td></tr>
+<tr><td><strong>Palindromic subsequence / substring</strong><br><small class="srcs">Grokking</small></td><td>Longest palindrome: expand around the centre, or DP over <code>[i, j]</code> ranges</td><td>O(n^2)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+<tr><td><strong>Matrix / grid DP</strong><br><small class="srcs">AlgoArk</small></td><td>Each cell from its neighbours: min path cost, unique paths with obstacles</td><td>O(m x n)</td><td></td><td><a href="dsa-part-7-recursion-backtracking-dp.html#dp-2d">Part 7 §8</a></td></tr>
+<tr><td><strong>DP on trees</strong><br><small class="srcs">AlgoArk</small></td><td>Post-order DFS where a node combines its children: tree diameter, house robber III</td><td>O(n); O(n)</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+</tbody></table></details>
+<details class="conv"><summary><span>Concurrency<small>1 patterns, 0 popular</small></span></summary>
+<table class="cat-table"><thead><tr><th>Pattern</th><th>Clue and typical problems</th><th>Time; space</th><th>Popular</th><th>Where</th></tr></thead><tbody>
+<tr><td><strong>Multi-threaded patterns</strong><br><small class="srcs">Grokking</small></td><td>Alternate output between threads, shared state, producer-consumer. Tools: locks, semaphores, <code>BlockingQueue</code>, coroutines</td><td>depends</td><td></td><td><span class="cov-s">Summary here</span></td></tr>
+</tbody></table></details>
+<div class="note"><p><strong>How to use this.</strong> Start with the popular rows. If you can name the clue, the idea and the cost of each one without looking, you are ready for most problems. Learn the rest only when a problem shows you the clue.</p></div>
+
+    <h2 id="takeaways">15. Takeaways</h2>
+    <ul><li>Learn to read the clue: sorted and pair, contiguous stretch, range sum, smallest value that works, next greater, start and end pairs, best k.</li><li>Write the naive version first; the repeated work in it usually names the pattern.</li><li>Two edges that only move forward (two pointers, windows, stacks) give linear time even when a loop sits inside a loop.</li><li>Spend memory to save time: prefix arrays, hash maps and stacks all do this.</li><li>Test the edges: empty input, one item, all items equal, and no valid answer.</li><li>Next up: Part 9 puts everything together into a study path and a cheat sheet.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Pattern</td><td>A reusable recipe for a family of problems.</td></tr><tr><td>Pointer (index)</td><td>A number that marks a position in an array or string.</td></tr><tr><td>In place</td><td>Changing the input itself, using only a few extra variables.</td></tr><tr><td>Subarray / substring</td><td>A run of consecutive items of an array or string.</td></tr><tr><td>Window</td><td>The stretch of items between a left edge and a right edge.</td></tr><tr><td>Prefix sum</td><td>The total of all items before a position, stored so range sums are one subtraction.</td></tr><tr><td>Monotonic</td><td>Only going one way: always rising or always falling.</td></tr><tr><td>Monotonic stack</td><td>A stack kept in sorted order by popping items that break the order.</td></tr><tr><td>Interval</td><td>A pair (start, end) describing a stretch of time or positions.</td></tr><tr><td>Sweep</td><td>Walking once through sorted events and keeping a running count.</td></tr><tr><td>Min-heap</td><td>A structure that always gives back its smallest item first.</td></tr><tr><td>Bitmask</td><td>An integer used as a row of yes/no flags, one per bit.</td></tr><tr><td>XOR</td><td>A bit operation that is 1 where two bits differ; equal values cancel to 0.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-7-recursion-backtracking-dp.html"><small>&larr; Previous &middot; Part 7</small>Recursion, backtracking, greedy and dynamic programming</a><a class="next" href="dsa-part-9-study-path-cheat-sheet.html"><small>Next &middot; Part 9 &rarr;</small>Study path and cheat sheet</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

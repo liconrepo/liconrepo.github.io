@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 6: Sorting and Searching — Khairul Alam</title>
+  <meta name="description" content="A beginner-friendly guide to sorting and searching in Kotlin: linear and binary search, bubble, selection, insertion, merge, quick, heap and counting sort, Kotlin comparators, and runnable Playground exercises." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 6 of 9</p>
+    <h1>Data Structures and Algorithms, Part 6: Sorting and Searching</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~35 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Sorting</span><span class="tag">Binary search</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a class="on" href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Sorting and searching are the classic first algorithms for a reason: they are easy to state, there are many ways to solve them, and the costs differ enormously. In this part you will see why order is worth paying for, write binary search without the usual bugs, and meet the main sorting algorithms and when each one fits.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>Linear search checks everything, <code>O(n)</code>. Binary search needs sorted data and halves the range each step, <code>O(log n)</code>.</li><li>Avoid the three binary search bugs: overflow in the middle, off-by-one bounds, and a range that stops shrinking.</li><li>Bubble, selection and insertion sort are <code>O(n&sup2;)</code>; insertion sort shines on nearly sorted data.</li><li>Merge sort and heap sort guarantee <code>O(n log n)</code>; quicksort is fast on average but <code>O(n&sup2;)</code> with bad pivots.</li><li>No comparison sort can beat <code>n log n</code>, but counting sort skips comparing for small integer ranges.</li><li>In Kotlin use <code>sorted</code>, <code>sortedBy</code> and <code>sortedWith</code>; they are stable (TimSort).</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#why">Why sorting and searching matter</a></li><li><a href="#linear">Linear search: look at everything</a></li><li><a href="#binary">Binary search: halve the problem</a></li><li><a href="#simple">Simple sorts: bubble, selection, insertion</a></li><li><a href="#merge">Merge sort: divide and conquer</a></li><li><a href="#quick">Quicksort: partition around a pivot</a></li><li><a href="#heapcount">Heap sort and counting sort</a></li><li><a href="#kotlin">What Kotlin gives you: sorted, sortedBy, sortedWith</a></li><li><a href="#compare">Comparing the algorithms</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="why">1. Why sorting and searching matter</h2>
+
+<p><strong>Searching</strong> means finding an item in a collection. <strong>Sorting</strong> means putting the items in order, for example numbers from small to large or names from A to Z. These two jobs show up everywhere: a contacts app, a spreadsheet column, a file manager, a database index.</p>
+<p>They are also the best place to learn how to think about algorithms. The problems are easy to state, there are many different solutions, and the costs differ by a lot. You get to see Big-O (Part 1) pay off in a very practical way.</p>
+<div class="analogy"><p><strong>Think of a library shelf.</strong> If the books are in random order, finding one means checking every spine. If the books are sorted by title, you open the shelf near the middle, see whether your title comes before or after, and throw away half the shelf in one move. Sorting is work you do once so that every later search is cheap.</p></div>
+
+<p>That is the big idea of this part: <em>pay once to put the data in order, then enjoy fast searches, easy duplicate detection, easy merging and easy range questions.</em></p>
+<h3>What sorting makes easy</h3>
+<ul>
+<li><strong>Searching</strong> drops from <code>O(n)</code> to <code>O(log n)</code> (binary search).</li>
+<li><strong>Duplicates</strong> end up next to each other, so one pass finds them.</li>
+<li><strong>Minimum, maximum, median</strong> and the k-th smallest are just positions in the list.</li>
+<li><strong>Merging</strong> two sorted lists takes a single pass.</li>
+<li><strong>Humans</strong> read ordered results far more easily.</li>
+</ul>
+<h3>Words we will use</h3>
+<ul>
+<li>A <strong>comparison sort</strong> decides the order only by comparing two items at a time (<em>is a smaller than b?</em>). Bubble, insertion, merge and quicksort are all comparison sorts.</li>
+<li>A sort is <strong>stable</strong> if items that compare as equal keep their original relative order. If two students both have grade 90 and Ana came before Ben in the input, a stable sort keeps Ana before Ben.</li>
+<li>A sort is <strong>in-place</strong> if it rearranges the data inside the original array and needs only a small amount of extra memory, <code>O(1)</code> or <code>O(log n)</code>.</li>
+</ul>
+<h2 id="linear">2. Linear search: look at everything</h2>
+
+<p>The simplest search is to walk through the items from the start and compare each one with the target. If you find it, return its position. If you reach the end, return <code>-1</code> (a common way to say &ldquo;not found&rdquo;).</p>
+<p>It works on any list, sorted or not. In the worst case the target is last or missing, so you look at all <code>n</code> items: <code>O(n)</code> time, <code>O(1)</code> extra space.</p>
+<div class="try demo"><h3>Run it: linear search with a step counter</h3>
+<p>Each result is (position, number of items looked at). Notice that a missing value costs as much as the last position.</p>
+<pre><code>fun linearSearch(list: List&lt;Int&gt;, target: Int): Int {
+    for ((i, x) in list.withIndex()) {
+        if (x == target) return i
+    }
+    return -1
+}
+
+fun linearSearchCounting(list: List&lt;Int&gt;, target: Int): Pair&lt;Int, Int&gt; {
+    var looks = 0
+    for ((i, x) in list.withIndex()) {
+        looks++
+        if (x == target) return i to looks
+    }
+    return -1 to looks
+}
+
+fun main() {
+    val data = listOf(41, 7, 19, 3, 88, 25, 60)
+    println(linearSearch(data, 88))     // 4
+    println(linearSearch(data, 5))      // -1
+    println(linearSearch(emptyList(), 5)) // -1
+
+    val big = List(1000) { it * 3 }
+    println("present at the end: " + linearSearchCounting(big, 2997))
+    println("absent:             " + linearSearchCounting(big, 2998))
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-linear-search">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-linear-search">fun linearSearch(list: List<Int>, target: Int): Int {
+    for ((i, x) in list.withIndex()) {
+        if (x == target) return i
+    }
+    return -1
+}
+
+fun linearSearchCounting(list: List<Int>, target: Int): Pair<Int, Int> {
+    var looks = 0
+    for ((i, x) in list.withIndex()) {
+        looks++
+        if (x == target) return i to looks
+    }
+    return -1 to looks
+}
+
+fun main() {
+    val data = listOf(41, 7, 19, 3, 88, 25, 60)
+    println(linearSearch(data, 88))     // 4
+    println(linearSearch(data, 5))      // -1
+    println(linearSearch(emptyList(), 5)) // -1
+
+    val big = List(1000) { it * 3 }
+    println("present at the end: " + linearSearchCounting(big, 2997))
+    println("absent:             " + linearSearchCounting(big, 2998))
+}
+</script></div>
+
+<p>Linear search is perfectly fine for short lists or for data you will only search once. Sorting a list just to search it once would cost more than the search itself. The payoff comes when you search many times.</p>
+<h2 id="binary">3. Binary search: halve the problem</h2>
+
+<p><strong>Binary search</strong> finds a value in a <em>sorted</em> list by checking the middle item. If the middle is too small, the target must be in the right half. If it is too big, it must be in the left half. Either way you throw half the items away, then repeat on what is left.</p>
+<p>It is the number guessing game: &ldquo;I am thinking of a number from 1 to 100.&rdquo; Guess 50. &ldquo;Higher.&rdquo; Guess 75. Seven guesses are always enough, because <code>2<sup>7</sup> = 128</code> is more than 100.</p>
+<figure class="fig"><div class="diagram"><pre> find 23 in: [ 2  5  8 12 16 23 38 56 72 91 ]
+              0  1  2  3  4  5  6  7  8  9
+
+ step 1   lo=0                      hi=9     mid=4  a[4]=16 &lt; 23 -&gt; go right
+          [ 2  5  8 12 16 23 38 56 72 91 ]
+
+ step 2                lo=5         hi=9     mid=7  a[7]=56 &gt; 23 -&gt; go left
+                      [23 38 56 72 91 ]
+
+ step 3                lo=5  hi=6            mid=5  a[5]=23 == 23 -&gt; found at 5
+                      [23 38 ]</pre></div><figcaption>Each step discards half of what remains. Ten items took three looks.</figcaption></figure>
+
+<p>The cost: each step halves the range, so after <code>k</code> steps about <code>n / 2<sup>k</sup></code> items remain. We stop when that reaches 1, which takes about <code>log<sub>2</sub> n</code> steps. For one million items that is about 20 looks. For one billion, about 30. Time is <code>O(log n)</code> and extra space is <code>O(1)</code>.</p>
+<div class="try demo"><h3>Run it: binary search that shows its work</h3>
+<p>Run it and compare the printed lines with the diagram above.</p>
+<pre><code>fun binarySearch(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    while (lo &lt;= hi) {
+        val mid = lo + (hi - lo) / 2
+        println("lo=$lo hi=$hi mid=$mid a[mid]=${a[mid]}")
+        if (a[mid] == target) return mid
+        if (a[mid] &lt; target) lo = mid + 1 else hi = mid - 1
+    }
+    return -1
+}
+
+fun main() {
+    val a = intArrayOf(2, 5, 8, 12, 16, 23, 38, 56, 72, 91)
+    println("found at " + binarySearch(a, 23))
+    println("---")
+    println("found at " + binarySearch(a, 10))   // absent
+    println("---")
+    println("found at " + binarySearch(intArrayOf(), 10))  // empty
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-binary-search">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-binary-search">fun binarySearch(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    while (lo <= hi) {
+        val mid = lo + (hi - lo) / 2
+        println("lo=$lo hi=$hi mid=$mid a[mid]=${a[mid]}")
+        if (a[mid] == target) return mid
+        if (a[mid] < target) lo = mid + 1 else hi = mid - 1
+    }
+    return -1
+}
+
+fun main() {
+    val a = intArrayOf(2, 5, 8, 12, 16, 23, 38, 56, 72, 91)
+    println("found at " + binarySearch(a, 23))
+    println("---")
+    println("found at " + binarySearch(a, 10))   // absent
+    println("---")
+    println("found at " + binarySearch(intArrayOf(), 10))  // empty
+}
+</script></div>
+
+<h3>The three classic bugs</h3>
+<p>Binary search is famous for being easy to explain and surprisingly easy to get wrong. Almost every mistake is one of these three.</p>
+<p><strong>1. The middle overflows.</strong> The obvious <code>(lo + hi) / 2</code> adds two numbers that might be near the top of the <code>Int</code> range. The sum wraps around to a negative number and you index outside the array. Use <code>lo + (hi - lo) / 2</code>, which never overflows.</p>
+<div class="try demo"><h3>Run it: the overflow bug</h3>
+<p>Real arrays rarely reach two billion items, but the habit is free and it has caused real bugs in shipped libraries.</p>
+<pre><code>fun main() {
+    val lo = 2_000_000_000
+    val hi = 2_100_000_000
+    println("max Int      = ${Int.MAX_VALUE}")
+    println("(lo + hi)/2  = ${(lo + hi) / 2}      &lt;- wrapped around, negative!")
+    println("lo+(hi-lo)/2 = ${lo + (hi - lo) / 2}  &lt;- correct")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-mid-overflow">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-mid-overflow">fun main() {
+    val lo = 2_000_000_000
+    val hi = 2_100_000_000
+    println("max Int      = ${Int.MAX_VALUE}")
+    println("(lo + hi)/2  = ${(lo + hi) / 2}      <- wrapped around, negative!")
+    println("lo+(hi-lo)/2 = ${lo + (hi - lo) / 2}  <- correct")
+}
+</script></div>
+
+<p><strong>2. Off-by-one errors.</strong> You must decide what <code>lo</code> and <code>hi</code> mean and stick to it. In the version above both are <em>inclusive</em> (the answer can be at <code>lo</code> or at <code>hi</code>), so the loop runs while <code>lo &lt;= hi</code> and we move to <code>mid + 1</code> or <code>mid - 1</code>. Mixing styles, for example starting <code>hi</code> at <code>size</code> but looping while <code>lo &lt;= hi</code>, reads one past the end.</p>
+<p><strong>3. The infinite loop.</strong> If you write <code>lo = mid</code> or <code>hi = mid</code> without the <code>+ 1</code> or <code>- 1</code>, the range may stop shrinking. With <code>lo = 4</code>, <code>hi = 5</code> the middle is 4, and <code>lo = mid</code> leaves <code>lo = 4</code> forever. Every step must make the range strictly smaller.</p>
+<div class="note"><p><strong>A habit that prevents all three.</strong> Before you write the loop, say in words what <code>lo</code> and <code>hi</code> mean (inclusive or not), what the loop condition is, and why each branch makes the range smaller. Then test an empty array, one item, and a target that is smaller than everything and bigger than everything.</p></div>
+
+<h3>First position of a value: lower bound</h3>
+<p>What if the list has duplicates, like <code>[1, 3, 3, 3, 7]</code>? Plain binary search may land on any of the 3s. A more useful question is: <em>where is the first position whose value is at least the target?</em> This is called the <strong>lower bound</strong>. It is also exactly the place where the target would be inserted to keep the list sorted, and it works even when the target is absent.</p>
+<p>It uses a different style: <code>hi</code> is <em>exclusive</em> (one past the last candidate), the loop runs while <code>lo &lt; hi</code>, and we never stop early. We keep narrowing until <code>lo == hi</code>.</p>
+<div class="try demo"><h3>Run it: lower bound, counting and a rotated array</h3>
+<p>The same loop answers several questions. The rotated-array search at the bottom is optional reading, but notice it is still a halving loop.</p>
+<pre><code>// First index whose value is &gt;= target (a.size if there is none).
+fun lowerBound(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size            // exclusive
+    while (lo &lt; hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] &lt; target) lo = mid + 1 else hi = mid
+    }
+    return lo
+}
+
+// How many times does target appear? Two lower bounds, no extra loop.
+fun countOf(a: IntArray, target: Int): Int =
+    lowerBound(a, target + 1) - lowerBound(a, target)
+
+// Bonus: a sorted array rotated at some point, like [6, 7, 9, 1, 2, 4].
+// At every step, at least one half is still sorted. Values are distinct.
+fun searchRotated(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    while (lo &lt;= hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] == target) return mid
+        if (a[lo] &lt;= a[mid]) {                       // left half is sorted
+            if (target &gt;= a[lo] &amp;&amp; target &lt; a[mid]) hi = mid - 1 else lo = mid + 1
+        } else {                                     // right half is sorted
+            if (target &gt; a[mid] &amp;&amp; target &lt;= a[hi]) lo = mid + 1 else hi = mid - 1
+        }
+    }
+    return -1
+}
+
+fun main() {
+    val a = intArrayOf(1, 3, 3, 3, 7, 9)
+    println("lowerBound(3) = ${lowerBound(a, 3)}")   // 1, the first 3
+    println("lowerBound(4) = ${lowerBound(a, 4)}")   // 4, where 4 would go
+    println("lowerBound(0) = ${lowerBound(a, 0)}")   // 0
+    println("lowerBound(100) = ${lowerBound(a, 100)}") // 6, past the end
+    println("count of 3 = ${countOf(a, 3)}, count of 5 = ${countOf(a, 5)}")
+
+    val rotated = intArrayOf(6, 7, 9, 1, 2, 4)
+    println("rotated: 2 is at ${searchRotated(rotated, 2)}, 9 is at ${searchRotated(rotated, 9)}, 5 is at ${searchRotated(rotated, 5)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-lower-bound">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-lower-bound">// First index whose value is >= target (a.size if there is none).
+fun lowerBound(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size            // exclusive
+    while (lo < hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] < target) lo = mid + 1 else hi = mid
+    }
+    return lo
+}
+
+// How many times does target appear? Two lower bounds, no extra loop.
+fun countOf(a: IntArray, target: Int): Int =
+    lowerBound(a, target + 1) - lowerBound(a, target)
+
+// Bonus: a sorted array rotated at some point, like [6, 7, 9, 1, 2, 4].
+// At every step, at least one half is still sorted. Values are distinct.
+fun searchRotated(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    while (lo <= hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] == target) return mid
+        if (a[lo] <= a[mid]) {                       // left half is sorted
+            if (target >= a[lo] && target < a[mid]) hi = mid - 1 else lo = mid + 1
+        } else {                                     // right half is sorted
+            if (target > a[mid] && target <= a[hi]) lo = mid + 1 else hi = mid - 1
+        }
+    }
+    return -1
+}
+
+fun main() {
+    val a = intArrayOf(1, 3, 3, 3, 7, 9)
+    println("lowerBound(3) = ${lowerBound(a, 3)}")   // 1, the first 3
+    println("lowerBound(4) = ${lowerBound(a, 4)}")   // 4, where 4 would go
+    println("lowerBound(0) = ${lowerBound(a, 0)}")   // 0
+    println("lowerBound(100) = ${lowerBound(a, 100)}") // 6, past the end
+    println("count of 3 = ${countOf(a, 3)}, count of 5 = ${countOf(a, 5)}")
+
+    val rotated = intArrayOf(6, 7, 9, 1, 2, 4)
+    println("rotated: 2 is at ${searchRotated(rotated, 2)}, 9 is at ${searchRotated(rotated, 9)}, 5 is at ${searchRotated(rotated, 5)}")
+}
+</script></div>
+
+<p>Binary search works on more than lists. Any time you can ask a yes or no question that flips from &ldquo;no&rdquo; to &ldquo;yes&rdquo; exactly once as a number grows (&ldquo;is a speed of <code>x</code> fast enough?&rdquo;), you can binary search over the <em>answer</em>. You will see that trick again in Part 8.</p>
+<h2 id="simple">4. Simple sorts: bubble, selection, insertion</h2>
+
+<p>Let us start with three easy sorts. All three take <code>O(n&sup2;)</code> time in the worst case, so you would not use them for a million items, but they are short, they are in-place, and they teach the core idea: <em>put one more item in its correct place, then repeat.</em></p>
+<h3>Bubble sort</h3>
+<p>Walk through the list and swap any neighbours that are in the wrong order. After one pass the largest item has &ldquo;bubbled&rdquo; to the end. Repeat on the shorter remaining list. If a whole pass makes no swap, the list is already sorted and we stop early. Stable.</p>
+<h3>Selection sort</h3>
+<p>Find the smallest item in the unsorted part and swap it to the front of that part. Repeat. It always does about <code>n&sup2;/2</code> comparisons, even on sorted input, but it makes at most <code>n - 1</code> swaps, which matters if swapping is expensive. Not stable, because a long-distance swap can jump an item over its equal.</p>
+<h3>Insertion sort</h3>
+<div class="analogy"><p><strong>Sorting a hand of cards.</strong> You pick up one card at a time and slide it left into the right spot among the cards you already hold. The cards in your hand are always sorted. That is insertion sort.</p></div>
+
+<p>Keep the left part of the array sorted. Take the next item (the <em>key</em>), shift every bigger item in the sorted part one step right, and drop the key into the gap. Stable and in-place.</p>
+<figure class="fig"><div class="diagram"><pre> sorted | unsorted
+ [ 2  5 | 4  6  1  3 ]    key = 4
+   2  5 &gt; 4 ? 5 is bigger: shift 5 right
+ [ 2  _  5  6  1  3 ]
+   2 &gt; 4 ? no: stop, drop the key in the gap
+ [ 2  4  5 | 6  1  3 ]    sorted part grew by one</pre></div><figcaption>One step of insertion sort.</figcaption></figure>
+<div class="try demo"><h3>Run it: three simple sorts, with a trace</h3>
+<p>The trace shows the sorted left part growing by one item after each step.</p>
+<pre><code>fun swap(a: IntArray, i: Int, j: Int) {
+    val t = a[i]; a[i] = a[j]; a[j] = t
+}
+
+fun bubbleSort(a: IntArray) {
+    for (end in a.size - 1 downTo 1) {
+        var swapped = false
+        for (i in 0 until end) {
+            if (a[i] &gt; a[i + 1]) { swap(a, i, i + 1); swapped = true }
+        }
+        if (!swapped) return          // already sorted: stop early
+    }
+}
+
+fun selectionSort(a: IntArray) {
+    for (i in 0 until a.size - 1) {
+        var smallest = i
+        for (j in i + 1 until a.size) if (a[j] &lt; a[smallest]) smallest = j
+        swap(a, i, smallest)
+    }
+}
+
+fun insertionSort(a: IntArray, trace: Boolean = false) {
+    for (i in 1 until a.size) {
+        val key = a[i]
+        var j = i - 1
+        while (j &gt;= 0 &amp;&amp; a[j] &gt; key) {
+            a[j + 1] = a[j]           // shift the bigger item right
+            j--
+        }
+        a[j + 1] = key                // drop the key into the gap
+        if (trace) println("after inserting a[$i]=$key: ${a.toList()}")
+    }
+}
+
+fun main() {
+    val original = intArrayOf(5, 2, 4, 6, 1, 3)
+
+    val b = original.copyOf(); bubbleSort(b); println("bubble:    ${b.toList()}")
+    val s = original.copyOf(); selectionSort(s); println("selection: ${s.toList()}")
+    println("insertion, step by step (start: ${original.toList()}):")
+    val ins = original.copyOf(); insertionSort(ins, trace = true)
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-simple-sorts">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-simple-sorts">fun swap(a: IntArray, i: Int, j: Int) {
+    val t = a[i]; a[i] = a[j]; a[j] = t
+}
+
+fun bubbleSort(a: IntArray) {
+    for (end in a.size - 1 downTo 1) {
+        var swapped = false
+        for (i in 0 until end) {
+            if (a[i] > a[i + 1]) { swap(a, i, i + 1); swapped = true }
+        }
+        if (!swapped) return          // already sorted: stop early
+    }
+}
+
+fun selectionSort(a: IntArray) {
+    for (i in 0 until a.size - 1) {
+        var smallest = i
+        for (j in i + 1 until a.size) if (a[j] < a[smallest]) smallest = j
+        swap(a, i, smallest)
+    }
+}
+
+fun insertionSort(a: IntArray, trace: Boolean = false) {
+    for (i in 1 until a.size) {
+        val key = a[i]
+        var j = i - 1
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j]           // shift the bigger item right
+            j--
+        }
+        a[j + 1] = key                // drop the key into the gap
+        if (trace) println("after inserting a[$i]=$key: ${a.toList()}")
+    }
+}
+
+fun main() {
+    val original = intArrayOf(5, 2, 4, 6, 1, 3)
+
+    val b = original.copyOf(); bubbleSort(b); println("bubble:    ${b.toList()}")
+    val s = original.copyOf(); selectionSort(s); println("selection: ${s.toList()}")
+    println("insertion, step by step (start: ${original.toList()}):")
+    val ins = original.copyOf(); insertionSort(ins, trace = true)
+}
+</script></div>
+
+<h3>Insertion sort loves nearly sorted data</h3>
+<p>Look at the inner <code>while</code> loop of insertion sort: it only runs as long as items are out of order. On a list that is already sorted it never runs, so the whole sort is <code>O(n)</code>. On a list where only a few items are out of place, it is close to <code>O(n)</code>. On a reversed list it is the full <code>O(n&sup2;)</code>. That is why serious libraries use insertion sort for small chunks, and for data that is &ldquo;almost done&rdquo;, such as a leaderboard with one new score.</p>
+<div class="try demo"><h3>Run it: count the shifts</h3>
+<p>We count steps instead of measuring seconds, as in Part 1. The three answers are 0, 3 and 499,500.</p>
+<pre><code>// Returns how many times an item was shifted right.
+fun insertionSortShifts(a: IntArray): Int {
+    var shifts = 0
+    for (i in 1 until a.size) {
+        val key = a[i]
+        var j = i - 1
+        while (j &gt;= 0 &amp;&amp; a[j] &gt; key) { a[j + 1] = a[j]; j--; shifts++ }
+        a[j + 1] = key
+    }
+    return shifts
+}
+
+fun main() {
+    val n = 1000
+    val sorted = IntArray(n) { it }
+    val nearly = IntArray(n) { it }.also {          // swap three neighbouring pairs
+        for (i in intArrayOf(100, 500, 900)) { val t = it[i]; it[i] = it[i + 1]; it[i + 1] = t }
+    }
+    val reversed = IntArray(n) { n - it }
+
+    println("already sorted:  ${insertionSortShifts(sorted)} shifts")
+    println("nearly sorted:   ${insertionSortShifts(nearly)} shifts")
+    println("reverse sorted:  ${insertionSortShifts(reversed)} shifts")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-insertion-shifts">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-insertion-shifts">// Returns how many times an item was shifted right.
+fun insertionSortShifts(a: IntArray): Int {
+    var shifts = 0
+    for (i in 1 until a.size) {
+        val key = a[i]
+        var j = i - 1
+        while (j >= 0 && a[j] > key) { a[j + 1] = a[j]; j--; shifts++ }
+        a[j + 1] = key
+    }
+    return shifts
+}
+
+fun main() {
+    val n = 1000
+    val sorted = IntArray(n) { it }
+    val nearly = IntArray(n) { it }.also {          // swap three neighbouring pairs
+        for (i in intArrayOf(100, 500, 900)) { val t = it[i]; it[i] = it[i + 1]; it[i + 1] = t }
+    }
+    val reversed = IntArray(n) { n - it }
+
+    println("already sorted:  ${insertionSortShifts(sorted)} shifts")
+    println("nearly sorted:   ${insertionSortShifts(nearly)} shifts")
+    println("reverse sorted:  ${insertionSortShifts(reversed)} shifts")
+}
+</script></div>
+<h2 id="merge">5. Merge sort: divide and conquer</h2>
+
+<p>The simple sorts are slow because each item may travel a long way one step at a time. <strong>Merge sort</strong> uses a different idea called <strong>divide and conquer</strong>: split the problem into smaller copies of itself, solve those, and combine the answers.</p>
+<ol>
+<li><strong>Divide:</strong> split the list into a left half and a right half.</li>
+<li><strong>Conquer:</strong> sort each half (by calling the same function; a list of 0 or 1 items is already sorted).</li>
+<li><strong>Combine:</strong> merge the two sorted halves into one sorted list.</li>
+</ol>
+<figure class="fig"><div class="diagram"><pre>                [5 2 9 1 7 3 8 4]
+                 /              \
+          [5 2 9 1]            [7 3 8 4]        divide
+           /     \              /     \
+        [5 2]   [9 1]        [7 3]   [8 4]
+        /  \     /  \         /  \     /  \
+       [5] [2] [9] [1]      [7] [3] [8] [4]     single items: sorted
+        \  /     \  /         \  /     \  /
+        [2 5]   [1 9]        [3 7]   [4 8]      merge
+           \     /              \     /
+          [1 2 5 9]            [3 4 7 8]
+                 \              /
+                [1 2 3 4 5 7 8 9]               merge</pre></div><figcaption>Splitting makes about log n levels. Merging does about n work on every level.</figcaption></figure>
+
+<p>The magic is the merge step. Two sorted lists can be combined with two fingers: point at the front of each list, take the smaller front item, move that finger forward, and repeat. Each item is touched once, so merging <code>n</code> items costs <code>O(n)</code>.</p>
+<p>The cost of the whole sort: the halving gives about <code>log n</code> levels, and each level does <code>O(n)</code> merging, so the total is <code>O(n log n)</code>. This holds in the best, average and worst case. For a million items that is about 20 million steps instead of a trillion for <code>O(n&sup2;)</code>.</p>
+<p>Merge sort needs <code>O(n)</code> extra space for the merged lists. It is <strong>stable</strong> as long as the merge takes from the left list when two items are equal (the <code>&lt;=</code> in the code below).</p>
+<div class="try demo"><h3>Run it: merge and merge sort</h3>
+<p>Run it, then try changing <code>&lt;=</code> to <code>&lt;</code> and think about what changes for equal items.</p>
+<pre><code>fun merge(left: List&lt;Int&gt;, right: List&lt;Int&gt;): List&lt;Int&gt; {
+    val out = ArrayList&lt;Int&gt;(left.size + right.size)
+    var i = 0
+    var j = 0
+    while (i &lt; left.size &amp;&amp; j &lt; right.size) {
+        // &lt;= takes from the left on ties, which keeps the sort stable
+        if (left[i] &lt;= right[j]) out.add(left[i++]) else out.add(right[j++])
+    }
+    while (i &lt; left.size) out.add(left[i++])     // leftovers from one side
+    while (j &lt; right.size) out.add(right[j++])
+    return out
+}
+
+fun mergeSort(a: List&lt;Int&gt;): List&lt;Int&gt; {
+    if (a.size &lt;= 1) return a                    // base case: already sorted
+    val mid = a.size / 2
+    val left = mergeSort(a.subList(0, mid))
+    val right = mergeSort(a.subList(mid, a.size))
+    return merge(left, right)
+}
+
+fun main() {
+    println(merge(listOf(1, 4, 9), listOf(2, 3, 10, 11)))
+    println(mergeSort(listOf(5, 2, 9, 1, 7, 3, 8, 4)))
+    println(mergeSort(listOf(3, 1, 3, 1, 3)))    // duplicates
+    println(mergeSort(emptyList()))
+    println(mergeSort(listOf(42)))
+    println(mergeSort(List(10) { 10 - it }))     // reverse sorted
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-merge-sort">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-merge-sort">fun merge(left: List<Int>, right: List<Int>): List<Int> {
+    val out = ArrayList<Int>(left.size + right.size)
+    var i = 0
+    var j = 0
+    while (i < left.size && j < right.size) {
+        // <= takes from the left on ties, which keeps the sort stable
+        if (left[i] <= right[j]) out.add(left[i++]) else out.add(right[j++])
+    }
+    while (i < left.size) out.add(left[i++])     // leftovers from one side
+    while (j < right.size) out.add(right[j++])
+    return out
+}
+
+fun mergeSort(a: List<Int>): List<Int> {
+    if (a.size <= 1) return a                    // base case: already sorted
+    val mid = a.size / 2
+    val left = mergeSort(a.subList(0, mid))
+    val right = mergeSort(a.subList(mid, a.size))
+    return merge(left, right)
+}
+
+fun main() {
+    println(merge(listOf(1, 4, 9), listOf(2, 3, 10, 11)))
+    println(mergeSort(listOf(5, 2, 9, 1, 7, 3, 8, 4)))
+    println(mergeSort(listOf(3, 1, 3, 1, 3)))    // duplicates
+    println(mergeSort(emptyList()))
+    println(mergeSort(listOf(42)))
+    println(mergeSort(List(10) { 10 - it }))     // reverse sorted
+}
+</script></div>
+
+<p>Merge sort is a great choice when you need guaranteed <code>O(n log n)</code>, when stability matters, or when the data is too big for memory and sits on disk in pieces (merging sorted pieces is the heart of &ldquo;external sorting&rdquo;).</p>
+<h2 id="quick">6. Quicksort: partition around a pivot</h2>
+
+<p><strong>Quicksort</strong> also divides and conquers, but it does the hard work <em>before</em> the recursive calls instead of after. It picks one item, the <strong>pivot</strong>, and <strong>partitions</strong> the array: everything smaller than the pivot moves to its left, everything bigger moves to its right. The pivot is now in its final sorted position. Then it sorts the left part and the right part the same way.</p>
+<figure class="fig"><div class="diagram"><pre> pivot = last item (6). Walk j from the left; i marks the end of the "small" zone.
+
+ [ 7  2  9  4  3  8  1 | 6 ]   start, i=0
+ [ 2  7  9  4  3  8  1 | 6 ]   2 &lt; 6: swap into the small zone, i=1
+ [ 2  4  9  7  3  8  1 | 6 ]   4 &lt; 6: swap, i=2
+ [ 2  4  3  7  9  8  1 | 6 ]   3 &lt; 6: swap, i=3
+ [ 2  4  3  1  9  8  7 | 6 ]   1 &lt; 6: swap, i=4
+ [ 2  4  3  1 | 6 | 8  7  9 ]  finally swap the pivot into position i
+
+   smaller than 6   pivot   bigger than 6</pre></div><figcaption>One partition step (the Lomuto scheme). After it, 6 will never move again.</figcaption></figure>
+
+<h3>Choosing the pivot</h3>
+<p>Quicksort is fast only if the pivot splits the array into two parts of similar size. Then there are about <code>log n</code> levels and each level does <code>O(n)</code> work: <code>O(n log n)</code> on average.</p>
+<p>If the pivot is always the smallest or largest item, one side is empty and the other has <code>n - 1</code> items. The recursion becomes <code>n</code> levels deep and the total is <code>O(n&sup2;)</code>. This is the <strong>worst case</strong>. It happens if you always pick the first or last item and the input is already sorted. Common fixes: pick the middle item, pick a random item, or take the median of the first, middle and last.</p>
+<p>Another trap is many equal items. The simple partition above treats equal items as &ldquo;not smaller&rdquo;, so a list of identical numbers splits badly. Production code uses a three-way partition (smaller, equal, larger) to avoid this. The demo below lets you see the damage.</p>
+<p>Quicksort works <strong>in-place</strong>: it only swaps items inside the array. It needs <code>O(log n)</code> stack space for the recursion on average. It is <strong>not stable</strong>, since swaps jump over equal items. In practice it is often the fastest comparison sort, because it is cache-friendly and does little extra work.</p>
+<div class="try demo"><h3>Run it: partition, quicksort and the worst case</h3>
+<p>With a good pivot the comparison count stays near <code>n log n</code> (about 10,000 here). When every item is equal it explodes to about <code>n&sup2;/2</code> (about 500,000).</p>
+<pre><code>var comparisons = 0
+
+fun swap(a: IntArray, i: Int, j: Int) {
+    val t = a[i]; a[i] = a[j]; a[j] = t
+}
+
+// Uses a[hi] as the pivot. Returns the pivot's final index.
+fun partition(a: IntArray, lo: Int, hi: Int): Int {
+    val pivot = a[hi]
+    var i = lo
+    for (j in lo until hi) {
+        comparisons++
+        if (a[j] &lt; pivot) { swap(a, i, j); i++ }
+    }
+    swap(a, i, hi)
+    return i
+}
+
+fun quickSort(a: IntArray, lo: Int = 0, hi: Int = a.size - 1) {
+    if (lo &gt;= hi) return
+    swap(a, lo + (hi - lo) / 2, hi)   // use the middle item as the pivot
+    val p = partition(a, lo, hi)
+    quickSort(a, lo, p - 1)
+    quickSort(a, p + 1, hi)
+}
+
+fun main() {
+    // One partition step, matching the picture above
+    val a = intArrayOf(7, 2, 9, 4, 3, 8, 1, 6)
+    val p = partition(a, 0, a.size - 1)
+    println("after partition: ${a.toList()}  pivot index = $p")
+
+    println(intArrayOf(5, 2, 9, 1, 7, 3, 8, 4).also { quickSort(it) }.toList())
+    println(intArrayOf().also { quickSort(it) }.toList())
+    println(intArrayOf(3, 3, 3, 1, 2, 2).also { quickSort(it) }.toList())
+
+    val n = 1000
+    comparisons = 0
+    quickSort(IntArray(n) { (it * 7919) % n })       // a scrambled permutation of 0..999
+    println("scrambled input:    $comparisons comparisons")
+    comparisons = 0
+    quickSort(IntArray(n) { it })                    // already sorted, but the middle pivot copes
+    println("sorted input:       $comparisons comparisons")
+    comparisons = 0
+    quickSort(IntArray(n) { 5 })                     // every item equal: the bad case
+    println("all items equal:    $comparisons comparisons")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-quick-sort">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-quick-sort">var comparisons = 0
+
+fun swap(a: IntArray, i: Int, j: Int) {
+    val t = a[i]; a[i] = a[j]; a[j] = t
+}
+
+// Uses a[hi] as the pivot. Returns the pivot's final index.
+fun partition(a: IntArray, lo: Int, hi: Int): Int {
+    val pivot = a[hi]
+    var i = lo
+    for (j in lo until hi) {
+        comparisons++
+        if (a[j] < pivot) { swap(a, i, j); i++ }
+    }
+    swap(a, i, hi)
+    return i
+}
+
+fun quickSort(a: IntArray, lo: Int = 0, hi: Int = a.size - 1) {
+    if (lo >= hi) return
+    swap(a, lo + (hi - lo) / 2, hi)   // use the middle item as the pivot
+    val p = partition(a, lo, hi)
+    quickSort(a, lo, p - 1)
+    quickSort(a, p + 1, hi)
+}
+
+fun main() {
+    // One partition step, matching the picture above
+    val a = intArrayOf(7, 2, 9, 4, 3, 8, 1, 6)
+    val p = partition(a, 0, a.size - 1)
+    println("after partition: ${a.toList()}  pivot index = $p")
+
+    println(intArrayOf(5, 2, 9, 1, 7, 3, 8, 4).also { quickSort(it) }.toList())
+    println(intArrayOf().also { quickSort(it) }.toList())
+    println(intArrayOf(3, 3, 3, 1, 2, 2).also { quickSort(it) }.toList())
+
+    val n = 1000
+    comparisons = 0
+    quickSort(IntArray(n) { (it * 7919) % n })       // a scrambled permutation of 0..999
+    println("scrambled input:    $comparisons comparisons")
+    comparisons = 0
+    quickSort(IntArray(n) { it })                    // already sorted, but the middle pivot copes
+    println("sorted input:       $comparisons comparisons")
+    comparisons = 0
+    quickSort(IntArray(n) { 5 })                     // every item equal: the bad case
+    println("all items equal:    $comparisons comparisons")
+}
+</script></div>
+<h2 id="heapcount">7. Heap sort and counting sort</h2>
+
+<h3>Heap sort in a paragraph</h3>
+<p>In Part 4 you met the <strong>heap</strong>, a tree stored in an array where the smallest (or largest) item is always on top and can be removed in <code>O(log n)</code>. <strong>Heap sort</strong> uses that directly: put every item into a heap, then remove the top over and over. Items come out in order. That is <code>n</code> insertions and <code>n</code> removals at <code>O(log n)</code> each, so <code>O(n log n)</code> in every case. The classic in-place version builds the heap inside the array itself, using <code>O(1)</code> extra space, but it is not stable and is usually slower than quicksort in practice. Its real value is the guarantee: no bad inputs.</p>
+<div class="try demo"><h3>Run it: heap sort with a priority queue</h3>
+<p>This version uses extra memory for the heap, but it shows the idea in four lines.</p>
+<pre><code>import java.util.PriorityQueue
+
+fun heapSort(a: List&lt;Int&gt;): List&lt;Int&gt; {
+    val heap = PriorityQueue&lt;Int&gt;()      // smallest item on top
+    for (x in a) heap.add(x)             // n inserts, O(log n) each
+    val out = ArrayList&lt;Int&gt;(a.size)
+    while (heap.isNotEmpty()) out.add(heap.poll())   // n removals, O(log n) each
+    return out
+}
+
+fun main() {
+    println(heapSort(listOf(9, 4, 7, 1, 8, 2, 2)))
+    println(heapSort(emptyList()))
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-heap-sort">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-heap-sort">import java.util.PriorityQueue
+
+fun heapSort(a: List<Int>): List<Int> {
+    val heap = PriorityQueue<Int>()      // smallest item on top
+    for (x in a) heap.add(x)             // n inserts, O(log n) each
+    val out = ArrayList<Int>(a.size)
+    while (heap.isNotEmpty()) out.add(heap.poll())   // n removals, O(log n) each
+    return out
+}
+
+fun main() {
+    println(heapSort(listOf(9, 4, 7, 1, 8, 2, 2)))
+    println(heapSort(emptyList()))
+}
+</script></div>
+
+<h3>Counting sort: beating n log n by not comparing</h3>
+<p>If the values are small whole numbers in a known range, such as ages from 0 to 120 or exam scores from 0 to 100, you can sort <em>without comparing items at all</em>. Make an array of counters, one per possible value. Walk the input once and add one to <code>counts[value]</code>. Then walk the counters in order and write each value out as many times as it was counted.</p>
+<p>The cost is <code>O(n + k)</code> time and <code>O(n + k)</code> space, where <code>k</code> is the size of the range. If <code>k</code> is small this is faster than any comparison sort. If <code>k</code> is huge (say, any 32-bit number), the counter array is too big and the idea stops being useful.</p>
+<div class="try demo"><h3>Run it: counting sort and a bucket idea</h3>
+<p>Bucket sort splits the range into buckets, then sorts inside each small bucket. If the data is spread evenly, each bucket is tiny and the whole thing is close to <code>O(n)</code>.</p>
+<pre><code>fun countingSort(a: IntArray, maxValue: Int): IntArray {
+    val counts = IntArray(maxValue + 1)
+    for (x in a) counts[x]++                       // tally each value
+    val out = IntArray(a.size)
+    var next = 0
+    for (v in 0..maxValue) {
+        repeat(counts[v]) { out[next++] = v }      // write v, counts[v] times
+    }
+    return out
+}
+
+// Bucket idea: group items by a small key first, then deal with each group.
+// Here we bucket scores into grades, then print the groups in order.
+fun main() {
+    val ages = intArrayOf(31, 18, 22, 18, 64, 31, 5, 0, 22)
+    println(countingSort(ages, 120).toList())
+    println(countingSort(intArrayOf(), 10).toList())
+
+    val scores = listOf(95, 67, 82, 74, 100, 58, 88, 79, 91)
+    val buckets = Array(11) { ArrayList&lt;Int&gt;() }   // one bucket per ten points
+    for (s in scores) buckets[s / 10].add(s)
+    for (b in buckets.indices) {
+        if (buckets[b].isNotEmpty()) println("${b * 10}s: ${buckets[b].sorted()}")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-counting-sort">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-counting-sort">fun countingSort(a: IntArray, maxValue: Int): IntArray {
+    val counts = IntArray(maxValue + 1)
+    for (x in a) counts[x]++                       // tally each value
+    val out = IntArray(a.size)
+    var next = 0
+    for (v in 0..maxValue) {
+        repeat(counts[v]) { out[next++] = v }      // write v, counts[v] times
+    }
+    return out
+}
+
+// Bucket idea: group items by a small key first, then deal with each group.
+// Here we bucket scores into grades, then print the groups in order.
+fun main() {
+    val ages = intArrayOf(31, 18, 22, 18, 64, 31, 5, 0, 22)
+    println(countingSort(ages, 120).toList())
+    println(countingSort(intArrayOf(), 10).toList())
+
+    val scores = listOf(95, 67, 82, 74, 100, 58, 88, 79, 91)
+    val buckets = Array(11) { ArrayList<Int>() }   // one bucket per ten points
+    for (s in scores) buckets[s / 10].add(s)
+    for (b in buckets.indices) {
+        if (buckets[b].isNotEmpty()) println("${b * 10}s: ${buckets[b].sorted()}")
+    }
+}
+</script></div>
+<h2 id="kotlin">8. What Kotlin gives you: sorted, sortedBy, sortedWith</h2>
+
+<p>In real programs you almost never write your own sort. Kotlin and Java already have a very good one. Knowing what it does lets you use it with confidence.</p>
+<table><tr><th>Function</th><th>What it does</th></tr><tr><td><code>list.sorted()</code></td><td>Returns a <em>new</em> sorted list, using the natural order (numbers by value, strings alphabetically).</td></tr><tr><td><code>list.sortedDescending()</code></td><td>Same, largest first.</td></tr><tr><td><code>list.sortedBy { it.age }</code></td><td>Returns a new list sorted by a key you extract from each item.</td></tr><tr><td><code>list.sortedWith(comparator)</code></td><td>Returns a new list sorted by a full <code>Comparator</code>.</td></tr><tr><td><code>mutableList.sort()</code>, <code>sortBy</code>, <code>sortWith</code></td><td>Sort the mutable list <em>in place</em>. Arrays have the same family: <code>array.sort()</code>.</td></tr></table>
+
+<p>Under the hood, sorting a list of objects uses <strong>TimSort</strong>. TimSort is a hybrid: it finds runs of data that are already in order, uses insertion sort on small pieces and merge sort to combine them. It takes <code>O(n log n)</code> in the worst case, close to <code>O(n)</code> on nearly sorted data, uses up to <code>O(n)</code> extra space, and is <strong>stable</strong>. Sorting an array of primitives such as <code>IntArray</code> uses a tuned quicksort instead (dual-pivot), which is not stable, but for plain numbers stability cannot be seen because equal numbers look identical.</p>
+<h3>Comparators and multi-key sorting</h3>
+<p>A <strong>comparator</strong> is a rule that says which of two items comes first. Kotlin builds them from small pieces: <code>compareBy</code> for the first key, <code>thenBy</code> for each tie-breaker, and the <code>Descending</code> variants to flip a key. Because the sort is stable, you can also sort in several passes, but one comparator is clearer.</p>
+<div class="try demo"><h3>Run it: sort by city, then age, then name</h3>
+<p>In the first output, Ana and Chen and Eli (all 25) stay in the order they had in the input. That is stability at work.</p>
+<pre><code>data class Person(val name: String, val age: Int, val city: String)
+
+fun main() {
+    val people = listOf(
+        Person("Mika", 31, "Osaka"),
+        Person("Ana", 25, "Tokyo"),
+        Person("Ben", 31, "Tokyo"),
+        Person("Chen", 25, "Osaka"),
+        Person("Dara", 31, "Osaka"),
+        Person("Eli", 25, "Tokyo"),
+    )
+
+    println("by age (stable, so ties keep input order):")
+    people.sortedBy { it.age }.forEach { println("  $it") }
+
+    val cmp = compareBy&lt;Person&gt; { it.city }
+        .thenByDescending { it.age }
+        .thenBy { it.name }
+    println("by city, then oldest first, then name:")
+    people.sortedWith(cmp).forEach { println("  $it") }
+
+    // In-place sorting of a mutable list, and a reversed comparator
+    val names = mutableListOf("pear", "fig", "banana", "kiwi")
+    names.sortWith(compareBy&lt;String&gt; { it.length }.thenBy { it })
+    println(names)
+    names.sortWith(compareByDescending&lt;String&gt; { it.length })
+    println(names)
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-comparators">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-comparators">data class Person(val name: String, val age: Int, val city: String)
+
+fun main() {
+    val people = listOf(
+        Person("Mika", 31, "Osaka"),
+        Person("Ana", 25, "Tokyo"),
+        Person("Ben", 31, "Tokyo"),
+        Person("Chen", 25, "Osaka"),
+        Person("Dara", 31, "Osaka"),
+        Person("Eli", 25, "Tokyo"),
+    )
+
+    println("by age (stable, so ties keep input order):")
+    people.sortedBy { it.age }.forEach { println("  $it") }
+
+    val cmp = compareBy<Person> { it.city }
+        .thenByDescending { it.age }
+        .thenBy { it.name }
+    println("by city, then oldest first, then name:")
+    people.sortedWith(cmp).forEach { println("  $it") }
+
+    // In-place sorting of a mutable list, and a reversed comparator
+    val names = mutableListOf("pear", "fig", "banana", "kiwi")
+    names.sortWith(compareBy<String> { it.length }.thenBy { it })
+    println(names)
+    names.sortWith(compareByDescending<String> { it.length })
+    println(names)
+}
+</script></div>
+<div class="note"><p><strong>Never write a comparator as <code>a - b</code>.</strong> If the numbers are large or have opposite signs, the subtraction can overflow and give the wrong sign. Use <code>compareBy</code>, or <code>a.compareTo(b)</code>.</p></div>
+<h2 id="compare">9. Comparing the algorithms</h2>
+
+<p>Here is everything side by side. &ldquo;Space&rdquo; means extra memory beyond the input.</p>
+<table><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th></tr><tr><td>Bubble (early exit)</td><td>O(n)</td><td>O(n&sup2;)</td><td>O(n&sup2;)</td><td>O(1)</td><td>yes</td></tr><tr><td>Selection</td><td>O(n&sup2;)</td><td>O(n&sup2;)</td><td>O(n&sup2;)</td><td>O(1)</td><td>no</td></tr><tr><td>Insertion</td><td>O(n)</td><td>O(n&sup2;)</td><td>O(n&sup2;)</td><td>O(1)</td><td>yes</td></tr><tr><td>Merge</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>yes</td></tr><tr><td>Quick</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n&sup2;)</td><td>O(log n)</td><td>no</td></tr><tr><td>Heap</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>no</td></tr><tr><td>Counting</td><td>O(n + k)</td><td>O(n + k)</td><td>O(n + k)</td><td>O(n + k)</td><td>yes</td></tr><tr><td>TimSort (Kotlin lists)</td><td>O(n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>yes</td></tr></table>
+
+<h3>Which one should I use?</h3>
+<ul>
+<li><strong>Just need a sorted list in a program:</strong> call <code>sorted()</code> or <code>sortedBy</code>. Done.</li>
+<li><strong>Tiny or nearly sorted data:</strong> insertion sort.</li>
+<li><strong>Need stability and a guaranteed bound:</strong> merge sort.</li>
+<li><strong>Need in-place and fast on average:</strong> quicksort with a good pivot.</li>
+<li><strong>Need a guaranteed bound and no extra memory:</strong> heap sort.</li>
+<li><strong>Small integer range:</strong> counting sort.</li>
+</ul>
+<h3>Why comparison sorts cannot beat n log n</h3>
+<p>Here is a simple argument. Suppose you have <code>n</code> distinct items. They could be in <code>n!</code> different orders (<code>n</code> choices for the first place, <code>n - 1</code> for the second, and so on). A sorting algorithm must figure out which one it is.</p>
+<p>Each comparison is a yes or no question, so it can at best cut the number of possible orders in half. To narrow <code>n!</code> possibilities down to one, you need at least <code>log<sub>2</sub>(n!)</code> questions. It turns out that <code>log<sub>2</sub>(n!)</code> grows like <code>n log n</code>. So <em>no</em> algorithm that works only by comparing two items at a time can be faster than <code>O(n log n)</code> in the worst case.</p>
+<figure class="fig"><div class="diagram"><pre> Sorting 3 items a, b, c: 3! = 6 possible orders.
+
+                      a &lt; b ?
+                    /         \
+                 yes           no
+               b &lt; c ?       a &lt; c ?
+              /      \      /      \
+            yes      no   yes      no
+        a b c      a &lt; c ?  b a c   b &lt; c ?
+                  /     \          /      \
+               a c b   c a b     b c a    c b a
+
+ Each path from the top is a run of comparisons. Six orders need at least
+ 3 levels, because 2 questions give only 4 outcomes and 3 give 8.</pre></div><figcaption>A decision tree. Every possible order must be a leaf, and a tree with L leaves is at least log2(L) levels tall.</figcaption></figure>
+<div class="try demo"><h3>Run it: how many yes/no questions are needed?</h3>
+<p>The minimum number of comparisons stays close to <code>n log n</code> as <code>n</code> grows. Counting sort escapes this limit only because it never compares two items.</p>
+<pre><code>import kotlin.math.ceil
+import kotlin.math.ln
+
+// log2(n!) = log2(1) + log2(2) + ... + log2(n)
+fun log2Factorial(n: Int): Double {
+    var sum = 0.0
+    for (k in 2..n) sum += ln(k.toDouble()) / ln(2.0)
+    return sum
+}
+
+fun main() {
+    println("n     min comparisons   n*log2(n)")
+    for (n in listOf(3, 5, 10, 100, 1000, 100000)) {
+        val minimum = ceil(log2Factorial(n)).toLong()
+        val nlogn = (n * (ln(n.toDouble()) / ln(2.0))).toLong()
+        println("%-6d %-17d %d".format(n, minimum, nlogn))
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-lower-bound-math">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-lower-bound-math">import kotlin.math.ceil
+import kotlin.math.ln
+
+// log2(n!) = log2(1) + log2(2) + ... + log2(n)
+fun log2Factorial(n: Int): Double {
+    var sum = 0.0
+    for (k in 2..n) sum += ln(k.toDouble()) / ln(2.0)
+    return sum
+}
+
+fun main() {
+    println("n     min comparisons   n*log2(n)")
+    for (n in listOf(3, 5, 10, 100, 1000, 100000)) {
+        val minimum = ceil(log2Factorial(n)).toLong()
+        val nlogn = (n * (ln(n.toDouble()) / ln(2.0))).toLong()
+        println("%-6d %-17d %d".format(n, minimum, nlogn))
+    }
+}
+</script></div>
+
+<h3>Binary search on a sorted list versus a hash lookup</h3>
+<p>Part 2 showed that a hash set can answer &ldquo;is this value here?&rdquo; in <code>O(1)</code> on average, which is faster than binary search's <code>O(log n)</code>. So why ever sort? Because a sorted array can answer questions a hash cannot:</p>
+<ul>
+<li>the <strong>nearest</strong> value, the <strong>next larger</strong> value, or where a new value belongs;</li>
+<li>how many values lie in a <strong>range</strong>;</li>
+<li>the items <strong>in order</strong>, with no extra work;</li>
+<li>it needs less memory (no table of buckets), and its layout is friendly to the CPU cache.</li>
+</ul>
+<p>If you only ever ask &ldquo;is it there?&rdquo;, use a hash set. If you need order, use a sorted array or a tree (Part 4).</p>
+<div class="try demo"><h3>Run it: what order buys you</h3>
+<p>The last two questions have no good hash-map answer without scanning every key.</p>
+<pre><code>fun lowerBound(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size
+    while (lo &lt; hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] &lt; target) lo = mid + 1 else hi = mid
+    }
+    return lo
+}
+
+fun main() {
+    val sorted = IntArray(500_000) { it * 2 }            // 0, 2, 4, ...
+    val hash = sorted.toHashSet()
+
+    // Both can answer "is it there?"
+    println("hash has 1234:  ${1234 in hash}")
+    println("hash has 1235:  ${1235 in hash}")
+    println("sorted has 1234: ${lowerBound(sorted, 1234).let { it &lt; sorted.size &amp;&amp; sorted[it] == 1234 }}")
+
+    // Only the sorted array can answer these cheaply
+    val i = lowerBound(sorted, 1235)
+    println("smallest value &gt;= 1235: ${sorted[i]}")
+    println("values in [100, 200): ${lowerBound(sorted, 200) - lowerBound(sorted, 100)}")
+
+    // How many halvings does a search need for one million items?
+    var n = 1_000_000
+    var steps = 0
+    while (n &gt; 0) { n /= 2; steps++ }
+    println("about $steps looks to search one million sorted items")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-binary-vs-hash">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-binary-vs-hash">fun lowerBound(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size
+    while (lo < hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] < target) lo = mid + 1 else hi = mid
+    }
+    return lo
+}
+
+fun main() {
+    val sorted = IntArray(500_000) { it * 2 }            // 0, 2, 4, ...
+    val hash = sorted.toHashSet()
+
+    // Both can answer "is it there?"
+    println("hash has 1234:  ${1234 in hash}")
+    println("hash has 1235:  ${1235 in hash}")
+    println("sorted has 1234: ${lowerBound(sorted, 1234).let { it < sorted.size && sorted[it] == 1234 }}")
+
+    // Only the sorted array can answer these cheaply
+    val i = lowerBound(sorted, 1235)
+    println("smallest value >= 1235: ${sorted[i]}")
+    println("values in [100, 200): ${lowerBound(sorted, 200) - lowerBound(sorted, 100)}")
+
+    // How many halvings does a search need for one million items?
+    var n = 1_000_000
+    var steps = 0
+    while (n > 0) { n /= 2; steps++ }
+    println("about $steps looks to search one million sorted items")
+}
+</script></div>
+<h2 id="practice">10. Practice</h2>
+<p>Five exercises. The first two train the careful, edge-case-heavy thinking that binary search demands. The next two have you build the two halves of merge sort and the simplest sort. The last one uses the standard library the way real programs do. Every test list includes the empty case, one item, and duplicates where they make sense.</p>
+<div class="try"><h3>Try it: binary search</h3>
+<p>Write <code>binarySearch(a, target)</code> for a sorted <code>IntArray</code>. Return the index of the target, or <code>-1</code> if it is absent. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun binarySearch(a: IntArray, target: Int): Int {
+    TODO("keep lo and hi, check the middle, discard half")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-ex-binary-search">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-ex-binary-search">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun binarySearch(a: IntArray, target: Int): Int {
+    TODO("keep lo and hi, check the middle, discard half")
+}
+
+fun main() {
+    test("empty array") { eq(binarySearch(intArrayOf(), 5), -1) }
+    test("one item, found") { eq(binarySearch(intArrayOf(5), 5), 0) }
+    test("one item, absent") { eq(binarySearch(intArrayOf(5), 3), -1) }
+    test("first item") { eq(binarySearch(intArrayOf(1, 3, 5, 7, 9), 1), 0) }
+    test("last item") { eq(binarySearch(intArrayOf(1, 3, 5, 7, 9), 9), 4) }
+    test("middle item") { eq(binarySearch(intArrayOf(1, 3, 5, 7, 9), 5), 2) }
+    test("absent, in between") { eq(binarySearch(intArrayOf(1, 3, 5, 7, 9), 4), -1) }
+    test("absent, too small") { eq(binarySearch(intArrayOf(1, 3, 5, 7, 9), 0), -1) }
+    test("absent, too big") { eq(binarySearch(intArrayOf(1, 3, 5, 7, 9), 10), -1) }
+    test("even length") { eq(binarySearch(intArrayOf(2, 4, 6, 8), 8), 3) }
+    test("large array") {
+        val big = IntArray(1_000_000) { it * 2 }
+        eq(binarySearch(big, 999_998), 499_999)
+        eq(binarySearch(big, 999_999), -1)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Both <code>lo</code> and <code>hi</code> are inclusive, so loop while <code>lo &lt;= hi</code> and move to <code>mid + 1</code> or <code>mid - 1</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun binarySearch(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    while (lo &lt;= hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] == target) return mid
+        if (a[mid] &lt; target) lo = mid + 1 else hi = mid - 1
+    }
+    return -1
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: first position of a value</h3>
+<p>Write <code>firstIndexOf(a, target)</code> for a sorted <code>IntArray</code> that may contain duplicates. Return the index of the <em>first</em> copy of the target, or <code>-1</code> if it is absent. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun firstIndexOf(a: IntArray, target: Int): Int {
+    TODO("find the lower bound, then check that it really holds the target")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-first-position">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-first-position">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun firstIndexOf(a: IntArray, target: Int): Int {
+    TODO("find the lower bound, then check that it really holds the target")
+}
+
+fun main() {
+    test("empty array") { eq(firstIndexOf(intArrayOf(), 4), -1) }
+    test("single, found") { eq(firstIndexOf(intArrayOf(4), 4), 0) }
+    test("no duplicates") { eq(firstIndexOf(intArrayOf(1, 2, 3, 4), 3), 2) }
+    test("duplicates in the middle") { eq(firstIndexOf(intArrayOf(1, 3, 3, 3, 7), 3), 1) }
+    test("all the same") { eq(firstIndexOf(intArrayOf(8, 8, 8, 8), 8), 0) }
+    test("duplicates at the end") { eq(firstIndexOf(intArrayOf(1, 2, 9, 9), 9), 2) }
+    test("absent, in between") { eq(firstIndexOf(intArrayOf(1, 3, 3, 7), 5), -1) }
+    test("absent, too big") { eq(firstIndexOf(intArrayOf(1, 3, 3, 7), 100), -1) }
+    test("absent, too small") { eq(firstIndexOf(intArrayOf(1, 3, 3, 7), -5), -1) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Use <code>hi = a.size</code> (exclusive) and loop while <code>lo &lt; hi</code>. If <code>a[mid] &lt; target</code>, go right; otherwise keep <code>mid</code> as a candidate with <code>hi = mid</code>. At the end, check that position <code>lo</code> exists and holds the target.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun firstIndexOf(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size
+    while (lo &lt; hi) {
+        val mid = lo + (hi - lo) / 2
+        if (a[mid] &lt; target) lo = mid + 1 else hi = mid
+    }
+    return if (lo &lt; a.size &amp;&amp; a[lo] == target) lo else -1
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: insertion sort</h3>
+<p>Write <code>insertionSort(a)</code> that sorts an <code>IntArray</code> in place, smallest first. It should not return anything. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun insertionSort(a: IntArray) {
+    TODO("take each item and slide it left into the sorted part")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-insertion-sort">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-insertion-sort">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun insertionSort(a: IntArray) {
+    TODO("take each item and slide it left into the sorted part")
+}
+
+fun main() {
+    test("empty") { val a = intArrayOf(); insertionSort(a); eq(a.toList(), listOf<Int>()) }
+    test("one item") { val a = intArrayOf(7); insertionSort(a); eq(a.toList(), listOf(7)) }
+    test("already sorted") { val a = intArrayOf(1, 2, 3, 4); insertionSort(a); eq(a.toList(), listOf(1, 2, 3, 4)) }
+    test("reverse sorted") { val a = intArrayOf(5, 4, 3, 2, 1); insertionSort(a); eq(a.toList(), listOf(1, 2, 3, 4, 5)) }
+    test("duplicates") { val a = intArrayOf(3, 1, 3, 2, 1); insertionSort(a); eq(a.toList(), listOf(1, 1, 2, 3, 3)) }
+    test("negatives") { val a = intArrayOf(0, -4, 8, -1); insertionSort(a); eq(a.toList(), listOf(-4, -1, 0, 8)) }
+    test("all equal") { val a = intArrayOf(2, 2, 2); insertionSort(a); eq(a.toList(), listOf(2, 2, 2)) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Remember the item at index <code>i</code> as <code>key</code>. Shift larger items one step right while you walk left, then write <code>key</code> into the gap at <code>j + 1</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun insertionSort(a: IntArray) {
+    for (i in 1 until a.size) {
+        val key = a[i]
+        var j = i - 1
+        while (j &gt;= 0 &amp;&amp; a[j] &gt; key) {
+            a[j + 1] = a[j]
+            j--
+        }
+        a[j + 1] = key
+    }
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: merge two sorted lists</h3>
+<p>Write <code>mergeSorted(left, right)</code>. Both lists are already sorted; return one new sorted list that has all items from both. Use two fingers, not a full sort. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun mergeSorted(left: List&lt;Int&gt;, right: List&lt;Int&gt;): List&lt;Int&gt; {
+    TODO("compare the front of each list, take the smaller one")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-merge-two">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-merge-two">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun mergeSorted(left: List<Int>, right: List<Int>): List<Int> {
+    TODO("compare the front of each list, take the smaller one")
+}
+
+fun main() {
+    test("both empty") { eq(mergeSorted(emptyList(), emptyList()), listOf<Int>()) }
+    test("left empty") { eq(mergeSorted(emptyList(), listOf(1, 2)), listOf(1, 2)) }
+    test("right empty") { eq(mergeSorted(listOf(1, 2), emptyList()), listOf(1, 2)) }
+    test("interleaved") { eq(mergeSorted(listOf(1, 4, 7), listOf(2, 3, 9)), listOf(1, 2, 3, 4, 7, 9)) }
+    test("all left smaller") { eq(mergeSorted(listOf(1, 2), listOf(3, 4)), listOf(1, 2, 3, 4)) }
+    test("all right smaller") { eq(mergeSorted(listOf(5, 6), listOf(1, 2)), listOf(1, 2, 5, 6)) }
+    test("duplicates") { eq(mergeSorted(listOf(1, 2, 2), listOf(2, 2, 3)), listOf(1, 2, 2, 2, 2, 3)) }
+    test("different lengths") { eq(mergeSorted(listOf(5), listOf(1, 2, 3, 4)), listOf(1, 2, 3, 4, 5)) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Loop while both lists still have items. When one runs out, copy the rest of the other list; it is already sorted.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun mergeSorted(left: List&lt;Int&gt;, right: List&lt;Int&gt;): List&lt;Int&gt; {
+    val out = ArrayList&lt;Int&gt;(left.size + right.size)
+    var i = 0
+    var j = 0
+    while (i &lt; left.size &amp;&amp; j &lt; right.size) {
+        if (left[i] &lt;= right[j]) out.add(left[i++]) else out.add(right[j++])
+    }
+    while (i &lt; left.size) out.add(left[i++])
+    while (j &lt; right.size) out.add(right[j++])
+    return out
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: sort with several keys</h3>
+<p>Sort students by <code>grade</code> from highest to lowest. Students with the same grade go in alphabetical order by <code>name</code>. Return a new list. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>data class Student(val name: String, val grade: Int)
+
+fun rank(students: List&lt;Student&gt;): List&lt;Student&gt; {
+    TODO("build a comparator with compareBy, thenBy and a descending key")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p6-multi-key">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p6-multi-key">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+data class Student(val name: String, val grade: Int)
+
+fun rank(students: List<Student>): List<Student> {
+    TODO("build a comparator with compareBy, thenBy and a descending key")
+}
+
+fun main() {
+    fun names(l: List<Student>) = l.map { it.name }
+
+    test("empty") { eq(rank(emptyList()), listOf<Student>()) }
+    test("one student") { eq(names(rank(listOf(Student("Ana", 80)))), listOf("Ana")) }
+    test("by grade, high first") {
+        val l = listOf(Student("Ana", 70), Student("Ben", 90), Student("Cy", 80))
+        eq(names(rank(l)), listOf("Ben", "Cy", "Ana"))
+    }
+    test("ties by name") {
+        val l = listOf(Student("Zed", 90), Student("Amy", 90), Student("Kim", 90))
+        eq(names(rank(l)), listOf("Amy", "Kim", "Zed"))
+    }
+    test("mixed") {
+        val l = listOf(Student("Dan", 85), Student("Eve", 92), Student("Bob", 85), Student("Fay", 92), Student("Al", 60))
+        eq(names(rank(l)), listOf("Eve", "Fay", "Bob", "Dan", "Al"))
+    }
+    test("does not change the input") {
+        val l = listOf(Student("B", 1), Student("A", 2))
+        rank(l)
+        eq(names(l), listOf("B", "A"))
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Start with <code>compareByDescending&lt;Student&gt; { it.grade }</code> and chain <code>.thenBy { it.name }</code>, then pass it to <code>sortedWith</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>data class Student(val name: String, val grade: Int)
+
+fun rank(students: List&lt;Student&gt;): List&lt;Student&gt; =
+    students.sortedWith(compareByDescending&lt;Student&gt; { it.grade }.thenBy { it.name })</code></pre>
+</details></div>
+<div class="note"><p><strong>Stretch idea.</strong> Once these pass, write <code>mergeSort</code> using your own <code>mergeSorted</code>, then compare your answers with <code>sorted()</code> on random lists. A trusted slow or built-in version is the best test you can have.</p></div>
+
+    <h2 id="takeaways">11. Takeaways</h2>
+    <ul><li>Sorting is work you do once so that later searches, merges and range questions become cheap.</li><li>Binary search is easy to explain and easy to get wrong: say what <code>lo</code> and <code>hi</code> mean, use <code>lo + (hi - lo) / 2</code>, and always shrink the range.</li><li>Lower bound (first position with value at least the target) answers several questions with one loop.</li><li>Insertion sort is the right tool for tiny or nearly sorted data; merge sort for stability and guarantees; quicksort for fast in-place work with a sensible pivot.</li><li>Comparison sorts need at least about <code>n log n</code> comparisons, because <code>n!</code> orders need <code>log(n!)</code> yes or no answers.</li><li>In everyday Kotlin, call the built-in stable sort and build comparators with <code>compareBy</code> and <code>thenBy</code>.</li><li>Next up: recursion, backtracking, greedy choices and dynamic programming.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Sorting</td><td>Putting items into a defined order, such as smallest to largest.</td></tr><tr><td>Linear search</td><td>Checking items one by one from the start; <code>O(n)</code>.</td></tr><tr><td>Binary search</td><td>Finding an item in a sorted list by repeatedly halving the range; <code>O(log n)</code>.</td></tr><tr><td>Lower bound</td><td>The first position whose value is at least the target; where the target would be inserted.</td></tr><tr><td>Comparison sort</td><td>A sort that decides order only by comparing two items at a time.</td></tr><tr><td>Stable sort</td><td>A sort that keeps equal items in their original relative order.</td></tr><tr><td>In-place</td><td>Rearranging the original array using only a small amount of extra memory.</td></tr><tr><td>Divide and conquer</td><td>Split a problem into smaller copies, solve them, and combine the answers.</td></tr><tr><td>Pivot</td><td>The item quicksort uses to split the array into smaller and larger items.</td></tr><tr><td>Partition</td><td>Rearranging so that items smaller than the pivot come before it and larger ones after.</td></tr><tr><td>TimSort</td><td>The hybrid of insertion and merge sort used by Java and Kotlin for lists of objects; stable.</td></tr><tr><td>Comparator</td><td>A rule that says which of two items comes first.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-5-graphs.html"><small>&larr; Previous &middot; Part 5</small>Graphs and how to walk them</a><a class="next" href="dsa-part-7-recursion-backtracking-dp.html"><small>Next &middot; Part 7 &rarr;</small>Recursion, backtracking, greedy and dynamic programming</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 5: Graphs and How to Walk Them — Khairul Alam</title>
+  <meta name="description" content="A beginner-friendly guide to graphs in Kotlin: adjacency lists, BFS, DFS, grids, topological sort, Dijkstra, union-find, with runnable Kotlin Playground examples and tested exercises." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 5 of 9</p>
+    <h1>Data Structures and Algorithms, Part 5: Graphs and How to Walk Them</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~40 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Graphs</span><span class="tag">BFS</span><span class="tag">DFS</span><span class="tag">Dijkstra</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a class="on" href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Maps, friend networks, course prerequisites and game boards all look different, yet they share one shape: things connected to other things. That shape is a graph. In this part you learn how to store one, how to walk it in two different ways, and how a handful of short algorithms answer questions about paths, groups and order.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>A graph is vertices joined by edges; they can be directed or undirected, weighted or not.</li><li>Store graphs as adjacency lists (<code>O(V + E)</code> memory) unless they are small and dense.</li><li>BFS uses a queue and finds the fewest-edge path; DFS uses a stack or recursion and explores deep first. Both cost <code>O(V + E)</code>.</li><li>Grids are graphs: cells are vertices and the four neighbours are edges.</li><li>Topological sort orders a DAG and exposes cycles; Dijkstra finds cheapest paths with non-negative weights in <code>O((V + E) log V)</code>; union-find tracks merging groups.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#what">What a graph is, and what it models</a></li><li><a href="#repr">How to store a graph</a></li><li><a href="#bfs">Breadth-first search: explore in rings</a></li><li><a href="#dfs">Depth-first search: go deep, then back up</a></li><li><a href="#grids">Grids are graphs too</a></li><li><a href="#topo">Topological sort: ordering tasks with prerequisites</a></li><li><a href="#dijkstra">Dijkstra: shortest paths with weights</a></li><li><a href="#unionfind">Union-find: tracking groups that merge</a></li><li><a href="#more">Other graph tools, and a complexity table</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="what">1. What a graph is, and what it models</h2>
+
+<p>A <strong>graph</strong> is a set of things and the connections between them. The things are called <strong>vertices</strong> (or <strong>nodes</strong>; one is a <em>vertex</em>). The connections are called <strong>edges</strong>. That is the whole definition. A graph is just dots and lines.</p>
+<p>It sounds too simple to be useful, but a huge number of real problems are graphs in disguise:</p>
+<ul>
+<li><strong>A road map.</strong> Towns are vertices, roads are edges.</li>
+<li><strong>A friends network.</strong> People are vertices, friendships are edges.</li>
+<li><strong>Course prerequisites.</strong> Courses are vertices, &ldquo;take this before that&rdquo; is an edge.</li>
+<li><strong>The web.</strong> Pages are vertices, links are edges.</li>
+<li><strong>A maze or a game board.</strong> Cells are vertices, legal moves are edges.</li>
+</ul>
+<div class="analogy"><p><strong>Think of a subway map.</strong> Stations are vertices and the lines between them are edges. The map ignores real distances and shapes. It only keeps what matters for the question &ldquo;how do I get from here to there?&rdquo;. A graph does the same: it keeps the connections and throws away the rest.</p></div>
+
+<h3>The words you need</h3>
+<ul>
+<li><strong>Undirected</strong> edge: works both ways, like a friendship. <strong>Directed</strong> edge: works one way, like &ldquo;follows&rdquo; or &ldquo;is a prerequisite of&rdquo;. We draw it as an arrow.</li>
+<li><strong>Weighted</strong> edge: has a number on it, such as a distance or a cost. An <strong>unweighted</strong> graph treats every edge as equal.</li>
+<li><strong>Neighbours</strong> of a vertex are the vertices it shares an edge with. The <strong>degree</strong> of a vertex is how many edges touch it. (For directed graphs we split this into <em>in-degree</em>, arrows coming in, and <em>out-degree</em>, arrows going out.)</li>
+<li>A <strong>path</strong> is a walk along edges from one vertex to another. Its <strong>length</strong> is the number of edges.</li>
+<li>A <strong>cycle</strong> is a path that starts and ends at the same vertex.</li>
+<li>A graph is <strong>connected</strong> if there is a path between every pair of vertices. If not, it falls into separate pieces, and each piece is a <strong>connected component</strong>.</li>
+<li>A <strong>DAG</strong> is a <em>directed acyclic graph</em>: arrows only, and no cycles. Course prerequisites should always form a DAG.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre> Undirected, unweighted          Directed (a DAG)           Weighted, undirected
+
+      (0)---(1)                    (Math)                        (A)
+       |   / |                       |                         4/   \1
+       |  /  |                       v                        /     \
+      (2)---(3)      (4)          (Algebra)----&gt;(Calculus)   (B)--2--(C)
+                      |
+     one component   (5)        arrows show "before"       numbers are costs
+     {0,1,2,3} and {4,5} = two components</pre></div><figcaption>Three small graphs. The left one has two connected components.</figcaption></figure>
+
+<p>In the rest of this part, <code>V</code> means the number of vertices and <code>E</code> means the number of edges. Almost every cost below is written in terms of those two numbers.</p>
+<h2 id="repr">2. How to store a graph</h2>
+
+<p>Before we can walk a graph, the computer needs to hold it in memory. There are three common ways. Each answers the question &ldquo;who are the neighbours of vertex <code>u</code>?&rdquo; at a different price.</p>
+<h3>1. Adjacency list</h3>
+<p>For every vertex, keep a list of its neighbours. In Kotlin that is an <code>Array&lt;MutableList&lt;Int&gt;&gt;</code> when vertices are numbered <code>0 until n</code>, or a <code>Map&lt;Int, List&lt;Int&gt;&gt;</code> when vertex ids are arbitrary (names, big numbers). This is the default choice.</p>
+<h3>2. Adjacency matrix</h3>
+<p>A square table with one row and one column per vertex. Cell <code>[u][v]</code> says whether an edge from <code>u</code> to <code>v</code> exists (or stores its weight). Checking one specific edge is instant, but the table has <code>V &times; V</code> cells even if the graph has almost no edges.</p>
+<h3>3. Edge list</h3>
+<p>Just a list of pairs, like <code>(0, 1), (0, 2)</code>. It is the simplest form and it is how data often arrives. It is awkward for walking, so we usually convert it to an adjacency list first. Some algorithms (like Kruskal's, later) want exactly this form.</p>
+<figure class="fig"><div class="diagram"><pre> The graph:   0---1        Adjacency list         Adjacency matrix
+              |   |        0: [1, 2]                 0 1 2 3
+              2---3        1: [0, 3]               0 0 1 1 0
+                           2: [0, 3]               1 1 0 0 1
+                           3: [1, 2]               2 1 0 0 1
+                                                   3 0 1 1 0
+ Edge list: (0,1) (0,2) (1,3) (2,3)</pre></div><figcaption>The same four-vertex graph stored three ways.</figcaption></figure>
+<table><tr><th></th><th>Adjacency list</th><th>Adjacency matrix</th></tr><tr><td>Memory</td><td><code>O(V + E)</code></td><td><code>O(V&sup2;)</code></td></tr><tr><td>Is there an edge u-v?</td><td><code>O(degree of u)</code></td><td><code>O(1)</code></td></tr><tr><td>List all neighbours of u</td><td><code>O(degree of u)</code></td><td><code>O(V)</code></td></tr><tr><td>Best for</td><td>sparse graphs (few edges), most real problems</td><td>dense graphs, or tiny graphs where fast edge checks matter</td></tr></table>
+
+<p>A graph is <strong>sparse</strong> when <code>E</code> is much smaller than <code>V&sup2;</code>, which is true for road maps and friend networks. That is why the list wins most of the time.</p>
+<div class="try demo"><h3>Run it: one graph, three representations</h3>
+<p>Run it. Notice that an undirected edge is stored twice in the list, once for each end. For a directed graph you would store it once.</p>
+<pre><code>fun main() {
+    val n = 4
+    val edges = listOf(0 to 1, 0 to 2, 1 to 3, 2 to 3)
+
+    // Adjacency list (undirected: store each edge in both directions)
+    val adj = Array(n) { mutableListOf&lt;Int&gt;() }
+    for ((a, b) in edges) {
+        adj[a].add(b)
+        adj[b].add(a)
+    }
+    for (u in 0 until n) println("$u: ${adj[u]}")
+
+    // Adjacency matrix
+    val matrix = Array(n) { BooleanArray(n) }
+    for ((a, b) in edges) {
+        matrix[a][b] = true
+        matrix[b][a] = true
+    }
+    println("edge 1-3 exists? ${matrix[1][3]}")
+    println("edge 0-3 exists? ${matrix[0][3]}")
+
+    // Names as vertices: a Map works when ids are not 0..n-1
+    val friends = mapOf(
+        "Ana" to listOf("Ben", "Cy"),
+        "Ben" to listOf("Ana"),
+        "Cy" to listOf("Ana")
+    )
+    println("Ana's friends: ${friends["Ana"]}")
+    println("Zed's friends: ${friends["Zed"] ?: emptyList()}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-represent">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-represent">fun main() {
+    val n = 4
+    val edges = listOf(0 to 1, 0 to 2, 1 to 3, 2 to 3)
+
+    // Adjacency list (undirected: store each edge in both directions)
+    val adj = Array(n) { mutableListOf<Int>() }
+    for ((a, b) in edges) {
+        adj[a].add(b)
+        adj[b].add(a)
+    }
+    for (u in 0 until n) println("$u: ${adj[u]}")
+
+    // Adjacency matrix
+    val matrix = Array(n) { BooleanArray(n) }
+    for ((a, b) in edges) {
+        matrix[a][b] = true
+        matrix[b][a] = true
+    }
+    println("edge 1-3 exists? ${matrix[1][3]}")
+    println("edge 0-3 exists? ${matrix[0][3]}")
+
+    // Names as vertices: a Map works when ids are not 0..n-1
+    val friends = mapOf(
+        "Ana" to listOf("Ben", "Cy"),
+        "Ben" to listOf("Ana"),
+        "Cy" to listOf("Ana")
+    )
+    println("Ana's friends: ${friends["Ana"]}")
+    println("Zed's friends: ${friends["Zed"] ?: emptyList()}")
+}
+</script></div>
+
+<div class="note"><p><strong>Weights.</strong> For a weighted graph, store pairs in the list: <code>adj[u]</code> becomes a list of <code>(neighbour, weight)</code>. We do exactly that in the Dijkstra section.</p></div>
+<h2 id="bfs">3. Breadth-first search: explore in rings</h2>
+
+<p>Walking a graph means visiting vertices by following edges. The two classic ways differ in <em>which vertex you visit next</em>. We start with <strong>breadth-first search</strong>, or <strong>BFS</strong>.</p>
+<div class="analogy"><p><strong>Think of a ripple in a pond.</strong> Drop a stone at the start vertex. The ripple first touches everything one step away, then everything two steps away, then three, and so on. BFS visits vertices in exactly that order: closest first.</p></div>
+
+<p>To do this we need a <strong>queue</strong> (Part 3): first in, first out. The recipe:</p>
+<ol>
+<li>Put the start vertex in the queue and mark it <strong>visited</strong>.</li>
+<li>Take the vertex at the front of the queue.</li>
+<li>For each neighbour that is not yet visited: mark it visited and add it to the back of the queue.</li>
+<li>Repeat from step 2 until the queue is empty.</li>
+</ol>
+<p>The visited marks matter. Without them, a graph with a cycle would make us walk around it forever.</p>
+<figure class="fig"><div class="diagram"><pre>        (0)                 level 0:  0
+       /   \
+     (1)   (2)              level 1:  1  2
+      |   /   \
+     (3) (4)  (5)           level 2:  3  4  5
+      |
+     (6)                    level 3:  6
+
+ queue over time (front on the left):
+   [0]  -&gt;  [1 2]  -&gt;  [2 3]  -&gt;  [3 4 5]  -&gt;  [4 5]  -&gt;  [5]  -&gt;  [6]  -&gt;  []</pre></div><figcaption>BFS from vertex 0. Vertices come out of the queue in order of distance from the start.</figcaption></figure>
+
+<h3>Shortest path in an unweighted graph</h3>
+<p>Here is the useful fact. Because BFS visits vertices closest first, the first time it reaches a vertex is along a path with the <em>fewest edges</em>. So BFS gives you the shortest path for free, as long as every edge counts the same. We record two things for each vertex: its <code>dist</code> (edges from the start) and its <code>parent</code> (who we came from), so we can rebuild the route backwards.</p>
+<div class="try demo"><h3>Run it: BFS distances and a shortest path</h3>
+<p>Vertex 7 has no edges, so its distance stays <code>-1</code>. Use that to tell &ldquo;unreachable&rdquo; apart from a real distance.</p>
+<pre><code>fun bfs(adj: Array&lt;MutableList&lt;Int&gt;&gt;, start: Int): Pair&lt;IntArray, IntArray&gt; {
+    val dist = IntArray(adj.size) { -1 }     // -1 means "not reached yet"
+    val parent = IntArray(adj.size) { -1 }
+    val queue = ArrayDeque&lt;Int&gt;()
+    dist[start] = 0
+    queue.addLast(start)
+    while (queue.isNotEmpty()) {
+        val u = queue.removeFirst()
+        for (v in adj[u]) {
+            if (dist[v] == -1) {             // not visited
+                dist[v] = dist[u] + 1
+                parent[v] = u
+                queue.addLast(v)
+            }
+        }
+    }
+    return dist to parent
+}
+
+fun pathTo(parent: IntArray, dist: IntArray, target: Int): List&lt;Int&gt; {
+    if (dist[target] == -1) return emptyList()   // unreachable
+    val path = ArrayList&lt;Int&gt;()
+    var cur = target
+    while (cur != -1) {
+        path.add(cur)
+        cur = parent[cur]
+    }
+    path.reverse()
+    return path
+}
+
+fun main() {
+    val n = 8   // vertex 7 is alone: the graph is disconnected
+    val edges = listOf(0 to 1, 0 to 2, 1 to 3, 2 to 4, 2 to 5, 3 to 6)
+    val adj = Array(n) { mutableListOf&lt;Int&gt;() }
+    for ((a, b) in edges) { adj[a].add(b); adj[b].add(a) }
+
+    val (dist, parent) = bfs(adj, 0)
+    println("distances from 0: ${dist.toList()}")
+    println("path 0 -&gt; 6: ${pathTo(parent, dist, 6)}")
+    println("path 0 -&gt; 5: ${pathTo(parent, dist, 5)}")
+    println("path 0 -&gt; 7: ${pathTo(parent, dist, 7)}   (unreachable)")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-bfs">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-bfs">fun bfs(adj: Array<MutableList<Int>>, start: Int): Pair<IntArray, IntArray> {
+    val dist = IntArray(adj.size) { -1 }     // -1 means "not reached yet"
+    val parent = IntArray(adj.size) { -1 }
+    val queue = ArrayDeque<Int>()
+    dist[start] = 0
+    queue.addLast(start)
+    while (queue.isNotEmpty()) {
+        val u = queue.removeFirst()
+        for (v in adj[u]) {
+            if (dist[v] == -1) {             // not visited
+                dist[v] = dist[u] + 1
+                parent[v] = u
+                queue.addLast(v)
+            }
+        }
+    }
+    return dist to parent
+}
+
+fun pathTo(parent: IntArray, dist: IntArray, target: Int): List<Int> {
+    if (dist[target] == -1) return emptyList()   // unreachable
+    val path = ArrayList<Int>()
+    var cur = target
+    while (cur != -1) {
+        path.add(cur)
+        cur = parent[cur]
+    }
+    path.reverse()
+    return path
+}
+
+fun main() {
+    val n = 8   // vertex 7 is alone: the graph is disconnected
+    val edges = listOf(0 to 1, 0 to 2, 1 to 3, 2 to 4, 2 to 5, 3 to 6)
+    val adj = Array(n) { mutableListOf<Int>() }
+    for ((a, b) in edges) { adj[a].add(b); adj[b].add(a) }
+
+    val (dist, parent) = bfs(adj, 0)
+    println("distances from 0: ${dist.toList()}")
+    println("path 0 -> 6: ${pathTo(parent, dist, 6)}")
+    println("path 0 -> 5: ${pathTo(parent, dist, 5)}")
+    println("path 0 -> 7: ${pathTo(parent, dist, 7)}   (unreachable)")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Each vertex enters the queue at most once, and each edge is looked at once (twice in an undirected graph). That is <code>O(V + E)</code> time and <code>O(V)</code> extra space for the queue and the arrays.</p>
+<h2 id="dfs">4. Depth-first search: go deep, then back up</h2>
+
+<p><strong>Depth-first search</strong>, or <strong>DFS</strong>, picks a different order. It follows one path as far as it can go, and only when it is stuck does it back up and try another branch.</p>
+<div class="analogy"><p><strong>Think of exploring a maze with a ball of string.</strong> You walk down a corridor and keep choosing the next unexplored turn. At a dead end you follow the string back to the last junction that still has an untried way. BFS is a crowd spreading out evenly; DFS is one person going deep.</p></div>
+
+<p>The natural way to write it is <strong>recursion</strong>: a function that calls itself for each unvisited neighbour. The call stack remembers where to back up to. You can also write it with an explicit <strong>stack</strong> (Part 3) instead. It is the same idea as BFS with the queue swapped for a stack.</p>
+<figure class="fig"><div class="diagram"><pre>        (0)
+       /   \            DFS order from 0 (neighbours taken left to right):
+     (1)   (2)
+      |   /   \          0 -&gt; 1 -&gt; 3 -&gt; (dead end, back to 1, back to 0)
+     (3) (4)  (5)        -&gt; 2 -&gt; 4 -&gt; (dead end, back to 2) -&gt; 5
+
+                         visit order: 0 1 3 2 4 5</pre></div><figcaption>DFS dives down the left side first, then backs up.</figcaption></figure>
+<div class="try demo"><h3>Run it: DFS two ways, components and cycles</h3>
+<p>Four jobs from one idea. The two orders may differ, because the stack version pushes neighbours and so takes the last one first. Both are valid depth-first walks.</p>
+<pre><code>// Recursive DFS: the call stack remembers where to back up to.
+fun dfsRecursive(adj: Array&lt;MutableList&lt;Int&gt;&gt;, u: Int, visited: BooleanArray, order: MutableList&lt;Int&gt;) {
+    visited[u] = true
+    order.add(u)
+    for (v in adj[u]) {
+        if (!visited[v]) dfsRecursive(adj, v, visited, order)
+    }
+}
+
+// Iterative DFS: same idea with our own stack.
+fun dfsIterative(adj: Array&lt;MutableList&lt;Int&gt;&gt;, start: Int): List&lt;Int&gt; {
+    val visited = BooleanArray(adj.size)
+    val order = ArrayList&lt;Int&gt;()
+    val stack = ArrayDeque&lt;Int&gt;()
+    stack.addLast(start)
+    while (stack.isNotEmpty()) {
+        val u = stack.removeLast()
+        if (visited[u]) continue
+        visited[u] = true
+        order.add(u)
+        for (v in adj[u]) if (!visited[v]) stack.addLast(v)
+    }
+    return order
+}
+
+// Connected components: start a new DFS from every vertex we have not seen.
+fun countComponents(adj: Array&lt;MutableList&lt;Int&gt;&gt;): Int {
+    val visited = BooleanArray(adj.size)
+    var count = 0
+    for (u in adj.indices) {
+        if (!visited[u]) {
+            count++
+            dfsRecursive(adj, u, visited, ArrayList())
+        }
+    }
+    return count
+}
+
+// Cycle in an undirected graph: meeting an already-visited vertex
+// that is not the one we just came from means we closed a loop.
+fun hasCycle(adj: Array&lt;MutableList&lt;Int&gt;&gt;): Boolean {
+    val visited = BooleanArray(adj.size)
+    fun go(u: Int, from: Int): Boolean {
+        visited[u] = true
+        for (v in adj[u]) {
+            if (!visited[v]) {
+                if (go(v, u)) return true
+            } else if (v != from) {
+                return true
+            }
+        }
+        return false
+    }
+    for (u in adj.indices) {
+        if (!visited[u] &amp;&amp; go(u, -1)) return true
+    }
+    return false
+}
+
+fun build(n: Int, edges: List&lt;Pair&lt;Int, Int&gt;&gt;): Array&lt;MutableList&lt;Int&gt;&gt; {
+    val adj = Array(n) { mutableListOf&lt;Int&gt;() }
+    for ((a, b) in edges) { adj[a].add(b); adj[b].add(a) }
+    return adj
+}
+
+fun main() {
+    val tree = build(6, listOf(0 to 1, 0 to 2, 1 to 3, 2 to 4, 2 to 5))
+    val order = ArrayList&lt;Int&gt;()
+    dfsRecursive(tree, 0, BooleanArray(6), order)
+    println("recursive order: $order")
+    println("iterative order: ${dfsIterative(tree, 0)}")
+    println("components in tree: ${countComponents(tree)}")
+    println("tree has cycle? ${hasCycle(tree)}")
+
+    val loop = build(5, listOf(0 to 1, 1 to 2, 2 to 0, 3 to 4))
+    println("components in loop graph: ${countComponents(loop)}")
+    println("loop graph has cycle? ${hasCycle(loop)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-dfs">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-dfs">// Recursive DFS: the call stack remembers where to back up to.
+fun dfsRecursive(adj: Array<MutableList<Int>>, u: Int, visited: BooleanArray, order: MutableList<Int>) {
+    visited[u] = true
+    order.add(u)
+    for (v in adj[u]) {
+        if (!visited[v]) dfsRecursive(adj, v, visited, order)
+    }
+}
+
+// Iterative DFS: same idea with our own stack.
+fun dfsIterative(adj: Array<MutableList<Int>>, start: Int): List<Int> {
+    val visited = BooleanArray(adj.size)
+    val order = ArrayList<Int>()
+    val stack = ArrayDeque<Int>()
+    stack.addLast(start)
+    while (stack.isNotEmpty()) {
+        val u = stack.removeLast()
+        if (visited[u]) continue
+        visited[u] = true
+        order.add(u)
+        for (v in adj[u]) if (!visited[v]) stack.addLast(v)
+    }
+    return order
+}
+
+// Connected components: start a new DFS from every vertex we have not seen.
+fun countComponents(adj: Array<MutableList<Int>>): Int {
+    val visited = BooleanArray(adj.size)
+    var count = 0
+    for (u in adj.indices) {
+        if (!visited[u]) {
+            count++
+            dfsRecursive(adj, u, visited, ArrayList())
+        }
+    }
+    return count
+}
+
+// Cycle in an undirected graph: meeting an already-visited vertex
+// that is not the one we just came from means we closed a loop.
+fun hasCycle(adj: Array<MutableList<Int>>): Boolean {
+    val visited = BooleanArray(adj.size)
+    fun go(u: Int, from: Int): Boolean {
+        visited[u] = true
+        for (v in adj[u]) {
+            if (!visited[v]) {
+                if (go(v, u)) return true
+            } else if (v != from) {
+                return true
+            }
+        }
+        return false
+    }
+    for (u in adj.indices) {
+        if (!visited[u] && go(u, -1)) return true
+    }
+    return false
+}
+
+fun build(n: Int, edges: List<Pair<Int, Int>>): Array<MutableList<Int>> {
+    val adj = Array(n) { mutableListOf<Int>() }
+    for ((a, b) in edges) { adj[a].add(b); adj[b].add(a) }
+    return adj
+}
+
+fun main() {
+    val tree = build(6, listOf(0 to 1, 0 to 2, 1 to 3, 2 to 4, 2 to 5))
+    val order = ArrayList<Int>()
+    dfsRecursive(tree, 0, BooleanArray(6), order)
+    println("recursive order: $order")
+    println("iterative order: ${dfsIterative(tree, 0)}")
+    println("components in tree: ${countComponents(tree)}")
+    println("tree has cycle? ${hasCycle(tree)}")
+
+    val loop = build(5, listOf(0 to 1, 1 to 2, 2 to 0, 3 to 4))
+    println("components in loop graph: ${countComponents(loop)}")
+    println("loop graph has cycle? ${hasCycle(loop)}")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Like BFS, DFS touches each vertex and edge a constant number of times: <code>O(V + E)</code> time. The extra space is the visited array plus the recursion depth, which can reach <code>O(V)</code> on a long chain.</p>
+<div class="note"><p><strong>BFS or DFS?</strong> Need the fewest steps in an unweighted graph? Use BFS. Need to explore everything, count pieces, detect cycles, or follow a path to its end? DFS is usually shorter to write. For plain reachability and components, either works. Very deep recursion can overflow the call stack, which is the reason to know the explicit-stack version.</p></div>
+<h2 id="grids">5. Grids are graphs too</h2>
+
+<p>A maze, a chessboard, a photo and a game map are all grids. A grid is a graph in disguise: each <strong>cell</strong> is a vertex, and it has an edge to the cells next to it. Most problems use four directions (up, down, left, right). We do not build an adjacency list. We compute the neighbours on the spot with a list of direction steps.</p>
+<figure class="fig"><div class="diagram"><pre> Grid ('1' = land, '0' = water)         Moves from cell (r, c):
+
+   c: 0 1 2 3 4                                (r-1, c)
+ r0   1 1 0 0 0                                   |
+ r1   1 0 0 1 0                      (r, c-1) -- (r, c) -- (r, c+1)
+ r2   0 0 1 1 0                                   |
+ r3   0 0 0 0 1                                (r+1, c)
+
+ Land cells that touch (up/down/left/right) form one island.
+ Here: {(0,0),(0,1),(1,0)}, {(1,3),(2,2),(2,3)}, {(3,4)}  -&gt;  3 islands</pre></div><figcaption>Counting islands means counting connected components of land cells.</figcaption></figure>
+
+<p>The classic exercise is <strong>flood fill</strong>: stand on one land cell, then spread to every connected land cell, marking each as seen (like paint spreading in an image editor). Run it from each unseen land cell, and the number of runs is the number of islands. Always check the bounds before you touch a cell.</p>
+<div class="try demo"><h3>Run it: count islands with flood fill</h3>
+<p>The arrays <code>dr</code> and <code>dc</code> hold the four moves. Add diagonal moves to them and you get 8-direction neighbours with no other change.</p>
+<pre><code>val dr = intArrayOf(-1, 1, 0, 0)   // row change for up, down, left, right
+val dc = intArrayOf(0, 0, -1, 1)   // column change
+
+fun countIslands(grid: List&lt;String&gt;): Int {
+    if (grid.isEmpty()) return 0
+    val rows = grid.size
+    val cols = grid[0].length
+    val seen = Array(rows) { BooleanArray(cols) }
+    var islands = 0
+
+    for (r in 0 until rows) {
+        for (c in 0 until cols) {
+            if (grid[r][c] == '1' &amp;&amp; !seen[r][c]) {
+                islands++
+                // flood fill from (r, c) with a stack
+                val stack = ArrayDeque&lt;Pair&lt;Int, Int&gt;&gt;()
+                seen[r][c] = true
+                stack.addLast(r to c)
+                while (stack.isNotEmpty()) {
+                    val (cr, cc) = stack.removeLast()
+                    for (d in 0 until 4) {
+                        val nr = cr + dr[d]
+                        val nc = cc + dc[d]
+                        val inside = nr in 0 until rows &amp;&amp; nc in 0 until cols
+                        if (inside &amp;&amp; grid[nr][nc] == '1' &amp;&amp; !seen[nr][nc]) {
+                            seen[nr][nc] = true
+                            stack.addLast(nr to nc)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return islands
+}
+
+fun main() {
+    val grid = listOf(
+        "11000",
+        "10010",
+        "00110",
+        "00001"
+    )
+    println("islands: ${countIslands(grid)}")            // 3
+    println("all water: ${countIslands(listOf("000", "000"))}")
+    println("one big island: ${countIslands(listOf("111", "111"))}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-islands">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-islands">val dr = intArrayOf(-1, 1, 0, 0)   // row change for up, down, left, right
+val dc = intArrayOf(0, 0, -1, 1)   // column change
+
+fun countIslands(grid: List<String>): Int {
+    if (grid.isEmpty()) return 0
+    val rows = grid.size
+    val cols = grid[0].length
+    val seen = Array(rows) { BooleanArray(cols) }
+    var islands = 0
+
+    for (r in 0 until rows) {
+        for (c in 0 until cols) {
+            if (grid[r][c] == '1' && !seen[r][c]) {
+                islands++
+                // flood fill from (r, c) with a stack
+                val stack = ArrayDeque<Pair<Int, Int>>()
+                seen[r][c] = true
+                stack.addLast(r to c)
+                while (stack.isNotEmpty()) {
+                    val (cr, cc) = stack.removeLast()
+                    for (d in 0 until 4) {
+                        val nr = cr + dr[d]
+                        val nc = cc + dc[d]
+                        val inside = nr in 0 until rows && nc in 0 until cols
+                        if (inside && grid[nr][nc] == '1' && !seen[nr][nc]) {
+                            seen[nr][nc] = true
+                            stack.addLast(nr to nc)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return islands
+}
+
+fun main() {
+    val grid = listOf(
+        "11000",
+        "10010",
+        "00110",
+        "00001"
+    )
+    println("islands: ${countIslands(grid)}")            // 3
+    println("all water: ${countIslands(listOf("000", "000"))}")
+    println("one big island: ${countIslands(listOf("111", "111"))}")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Every cell is pushed at most once and has four neighbours to check, so a grid with <code>R</code> rows and <code>C</code> columns costs <code>O(R &times; C)</code> time and space. Swap the stack for a queue and you get BFS on the grid, which finds the shortest route through a maze.</p>
+<h2 id="topo">6. Topological sort: ordering tasks with prerequisites</h2>
+
+<p>Say you must finish some courses before others. Calculus needs Algebra, Algebra needs Basic Math, and so on. In which order can you take everything? That order is a <strong>topological sort</strong>: a line-up of the vertices of a directed graph so that every arrow points forward.</p>
+<p>It exists only for a <strong>DAG</strong>. If course A needs B and B needs A, no valid order exists. That is a cycle, and finding the sort is also how we detect it.</p>
+<h3>Kahn's algorithm</h3>
+<p>It uses the <strong>in-degree</strong> of each vertex: how many arrows point into it, that is, how many prerequisites are still unmet.</p>
+<ol>
+<li>Count the in-degree of every vertex.</li>
+<li>Put every vertex with in-degree 0 into a queue. They have no prerequisites, so they can go first.</li>
+<li>Take one out and add it to the answer. For each vertex it points to, lower that vertex's in-degree by one (one prerequisite is now done). If it reaches 0, add it to the queue.</li>
+<li>When the queue is empty: if the answer holds all <code>V</code> vertices, you have an order. If it holds fewer, the leftover vertices sit on a cycle.</li>
+</ol>
+<figure class="fig"><div class="diagram"><pre> Courses:  0 Math --&gt; 1 Algebra --&gt; 3 Calculus
+           0 Math --&gt; 2 Logic   --&gt; 3 Calculus
+
+ in-degree:  0:0   1:1   2:1   3:2
+ queue [0]          take 0 -&gt; in-deg of 1 and 2 drop to 0 -&gt; queue [1, 2]
+ queue [1, 2]       take 1 -&gt; in-deg of 3 drops to 1
+ queue [2]          take 2 -&gt; in-deg of 3 drops to 0 -&gt; queue [3]
+ queue [3]          take 3 -&gt; done
+
+ order: 0 1 2 3      (answer has 4 of 4 vertices, so no cycle)</pre></div><figcaption>Kahn walkthrough. A cycle would leave some in-degrees stuck above zero.</figcaption></figure>
+<div class="try demo"><h3>Run it: course schedule with Kahn's algorithm</h3>
+<p>The answer is not always unique. Any order where every prerequisite comes first is valid.</p>
+<pre><code>// prereqs: pair (course, mustTakeFirst). Returns an order, or an empty list on a cycle.
+fun courseOrder(n: Int, prereqs: List&lt;Pair&lt;Int, Int&gt;&gt;): List&lt;Int&gt; {
+    val next = Array(n) { mutableListOf&lt;Int&gt;() }   // arrow: prerequisite -&gt; course
+    val inDegree = IntArray(n)
+    for ((course, first) in prereqs) {
+        next[first].add(course)
+        inDegree[course]++
+    }
+    val queue = ArrayDeque&lt;Int&gt;()
+    for (v in 0 until n) if (inDegree[v] == 0) queue.addLast(v)
+
+    val order = ArrayList&lt;Int&gt;()
+    while (queue.isNotEmpty()) {
+        val u = queue.removeFirst()
+        order.add(u)
+        for (v in next[u]) {
+            inDegree[v]--
+            if (inDegree[v] == 0) queue.addLast(v)
+        }
+    }
+    return if (order.size == n) order else emptyList()
+}
+
+fun main() {
+    val names = listOf("Math", "Algebra", "Logic", "Calculus")
+    val ok = courseOrder(4, listOf(1 to 0, 2 to 0, 3 to 1, 3 to 2))
+    println("order: ${ok.map { names[it] }}")
+
+    val cyclic = courseOrder(3, listOf(0 to 1, 1 to 2, 2 to 0))
+    println("cyclic prerequisites: $cyclic   (empty means impossible)")
+
+    println("no prerequisites: ${courseOrder(3, emptyList())}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-topo">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-topo">// prereqs: pair (course, mustTakeFirst). Returns an order, or an empty list on a cycle.
+fun courseOrder(n: Int, prereqs: List<Pair<Int, Int>>): List<Int> {
+    val next = Array(n) { mutableListOf<Int>() }   // arrow: prerequisite -> course
+    val inDegree = IntArray(n)
+    for ((course, first) in prereqs) {
+        next[first].add(course)
+        inDegree[course]++
+    }
+    val queue = ArrayDeque<Int>()
+    for (v in 0 until n) if (inDegree[v] == 0) queue.addLast(v)
+
+    val order = ArrayList<Int>()
+    while (queue.isNotEmpty()) {
+        val u = queue.removeFirst()
+        order.add(u)
+        for (v in next[u]) {
+            inDegree[v]--
+            if (inDegree[v] == 0) queue.addLast(v)
+        }
+    }
+    return if (order.size == n) order else emptyList()
+}
+
+fun main() {
+    val names = listOf("Math", "Algebra", "Logic", "Calculus")
+    val ok = courseOrder(4, listOf(1 to 0, 2 to 0, 3 to 1, 3 to 2))
+    println("order: ${ok.map { names[it] }}")
+
+    val cyclic = courseOrder(3, listOf(0 to 1, 1 to 2, 2 to 0))
+    println("cyclic prerequisites: $cyclic   (empty means impossible)")
+
+    println("no prerequisites: ${courseOrder(3, emptyList())}")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Every vertex enters the queue once and every edge lowers one in-degree once: <code>O(V + E)</code> time, <code>O(V + E)</code> space for the lists.</p>
+<h2 id="dijkstra">7. Dijkstra: shortest paths with weights</h2>
+
+<p>BFS counts edges, so it breaks down once edges have different costs. A road of 1 km and a road of 100 km are both &ldquo;one edge&rdquo;. For weighted graphs we use <strong>Dijkstra's algorithm</strong> (said &ldquo;DYKE-struh&rdquo;).</p>
+<p>The idea is BFS with a smarter queue. Keep for every vertex the <strong>best distance found so far</strong>, starting at infinity except the start (0). Then repeat: take the unfinished vertex with the <em>smallest</em> known distance, and use its edges to see if any neighbour can be reached more cheaply. That check is called <strong>relaxing</strong> an edge:</p>
+<pre><code>if (dist[u] + weight &lt; dist[v]) {
+    dist[v] = dist[u] + weight    // found a cheaper way to v, through u
+}</code></pre>
+
+<p>To find &ldquo;the smallest known distance&rdquo; quickly we use a <strong>priority queue</strong> (a heap, Part 4). It hands back the smallest item in <code>O(log n)</code>.</p>
+<h3>Why the weights must not be negative</h3>
+<p>When Dijkstra takes the vertex with the smallest distance, it declares that distance final. That is safe only because any other route would have to go through vertices that are already at least as far away, and adding more non-negative edges can never make it shorter. A negative edge breaks this promise: a longer route could later become cheaper. For graphs with negative weights you need a different tool (see Bellman-Ford below).</p>
+<figure class="fig"><div class="diagram"><pre> Graph (undirected):                 Start at A. dist = [A:0, B:inf, C:inf, D:inf]
+
+        4                            take A (0):  relax A-B: 0+4=4   -&gt; B:4
+    A ------- B                                   relax A-C: 0+1=1   -&gt; C:1
+    |       / |
+  1 |   2  /  | 1                    take C (1):  relax C-B: 1+2=3   -&gt; B:3  (better than 4!)
+    |    /    |                                   relax C-D: 1+5=6   -&gt; D:6
+    C ------- D
+        5                            take B (3):  relax B-D: 3+1=4   -&gt; D:4  (better than 6!)
+
+                                     take D (4):  nothing to improve.
+
+ Final: A:0  C:1  B:3  D:4      shortest route A -&gt; D is A, C, B, D = 4</pre></div><figcaption>Dijkstra step by step. A distance can improve several times before it becomes final.</figcaption></figure>
+<div class="try demo"><h3>Run it: Dijkstra with a PriorityQueue</h3>
+<p>The same numbers as the picture. The line <code>if (d &gt; dist[u]) continue</code> skips old queue entries; Java's <code>PriorityQueue</code> cannot update an item in place, so we add a fresh entry and ignore the stale one later.</p>
+<pre><code>import java.util.PriorityQueue
+
+const val INF = Int.MAX_VALUE
+
+// adj[u] holds pairs (neighbour, weight)
+fun dijkstra(adj: Array&lt;MutableList&lt;Pair&lt;Int, Int&gt;&gt;&gt;, start: Int): Pair&lt;IntArray, IntArray&gt; {
+    val dist = IntArray(adj.size) { INF }
+    val parent = IntArray(adj.size) { -1 }
+    dist[start] = 0
+    // each entry is (distance when queued, vertex); smallest distance comes out first
+    val pq = PriorityQueue&lt;Pair&lt;Int, Int&gt;&gt;(compareBy { it.first })
+    pq.add(0 to start)
+
+    while (pq.isNotEmpty()) {
+        val (d, u) = pq.poll()
+        if (d &gt; dist[u]) continue            // stale entry: we already found better
+        for ((v, w) in adj[u]) {
+            if (d + w &lt; dist[v]) {           // relax the edge
+                dist[v] = d + w
+                parent[v] = u
+                pq.add(dist[v] to v)
+            }
+        }
+    }
+    return dist to parent
+}
+
+fun main() {
+    val names = "ABCD"
+    val adj = Array(4) { mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;() }
+    fun edge(a: Int, b: Int, w: Int) { adj[a].add(b to w); adj[b].add(a to w) }
+    edge(0, 1, 4)   // A-B
+    edge(0, 2, 1)   // A-C
+    edge(2, 1, 2)   // C-B
+    edge(1, 3, 1)   // B-D
+    edge(2, 3, 5)   // C-D
+
+    val (dist, parent) = dijkstra(adj, 0)
+    for (v in 0 until 4) println("A to ${names[v]}: ${dist[v]}")
+
+    val route = ArrayList&lt;Char&gt;()
+    var cur = 3
+    while (cur != -1) { route.add(names[cur]); cur = parent[cur] }
+    println("route to D: ${route.reversed()}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-dijkstra">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-dijkstra">import java.util.PriorityQueue
+
+const val INF = Int.MAX_VALUE
+
+// adj[u] holds pairs (neighbour, weight)
+fun dijkstra(adj: Array<MutableList<Pair<Int, Int>>>, start: Int): Pair<IntArray, IntArray> {
+    val dist = IntArray(adj.size) { INF }
+    val parent = IntArray(adj.size) { -1 }
+    dist[start] = 0
+    // each entry is (distance when queued, vertex); smallest distance comes out first
+    val pq = PriorityQueue<Pair<Int, Int>>(compareBy { it.first })
+    pq.add(0 to start)
+
+    while (pq.isNotEmpty()) {
+        val (d, u) = pq.poll()
+        if (d > dist[u]) continue            // stale entry: we already found better
+        for ((v, w) in adj[u]) {
+            if (d + w < dist[v]) {           // relax the edge
+                dist[v] = d + w
+                parent[v] = u
+                pq.add(dist[v] to v)
+            }
+        }
+    }
+    return dist to parent
+}
+
+fun main() {
+    val names = "ABCD"
+    val adj = Array(4) { mutableListOf<Pair<Int, Int>>() }
+    fun edge(a: Int, b: Int, w: Int) { adj[a].add(b to w); adj[b].add(a to w) }
+    edge(0, 1, 4)   // A-B
+    edge(0, 2, 1)   // A-C
+    edge(2, 1, 2)   // C-B
+    edge(1, 3, 1)   // B-D
+    edge(2, 3, 5)   // C-D
+
+    val (dist, parent) = dijkstra(adj, 0)
+    for (v in 0 until 4) println("A to ${names[v]}: ${dist[v]}")
+
+    val route = ArrayList<Char>()
+    var cur = 3
+    while (cur != -1) { route.add(names[cur]); cur = parent[cur] }
+    println("route to D: ${route.reversed()}")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Each edge can add one entry to the heap, and each heap operation is <code>O(log n)</code>. Total: <code>O((V + E) log V)</code> time and <code>O(V + E)</code> space. Unreachable vertices keep the value <code>INF</code>.</p>
+<div class="note"><p><strong>Overflow warning.</strong> <code>Int.MAX_VALUE + 5</code> wraps around to a huge negative number. That is why the code checks the queue entry <code>d</code> rather than adding a weight to <code>INF</code>. If you ever add to an infinity value, use <code>Long</code> or test for infinity first.</p></div>
+<h2 id="unionfind">8. Union-find: tracking groups that merge</h2>
+
+<p>Sometimes you do not need paths at all. You only need to answer, again and again: &ldquo;are these two things in the same group?&rdquo; and &ldquo;merge these two groups&rdquo;. Think of friend circles forming as people become friends. A structure built for exactly this is the <strong>union-find</strong>, also called a <strong>disjoint set</strong>.</p>
+<p>Every group is a little tree. Each element stores its <strong>parent</strong> in an array; the root of the tree is the group's leader, and the root is its own parent. Two operations:</p>
+<ul>
+<li><code>find(x)</code>: climb parents until you reach the root. Two elements are in the same group exactly when their roots match.</li>
+<li><code>union(a, b)</code>: find both roots and hang one root under the other.</li>
+</ul>
+<p>Two small tricks keep the trees flat, which keeps everything fast:</p>
+<ul>
+<li><strong>Path compression.</strong> While climbing in <code>find</code>, point every vertex on the way straight at the root. The next <code>find</code> is then almost free.</li>
+<li><strong>Union by rank.</strong> Attach the shorter tree under the taller one, so trees never grow tall. (<em>Rank</em> is an upper estimate of the tree's height.)</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre> start: every element alone         union(0,1), union(2,3), union(1,3)
+
+   0   1   2   3   4                          0                 4
+                                             / \
+ parent: [0, 1, 2, 3, 4]                    1   2    parent: [0, 0, 0, 2, 4]
+                                                 \
+                                                  3          (after compression,
+ find(3): 3 -&gt; 2 -&gt; 0                                         3 would point to 0)</pre></div><figcaption>Groups are trees. The root is the leader, and path compression makes later lookups shorter.</figcaption></figure>
+<div class="try demo"><h3>Run it: a union-find class, components and Kruskal's idea</h3>
+<p>Part 1 shows a cycle check (an edge inside a group is redundant). Part 2 is Kruskal's algorithm in a few lines, which builds a minimum spanning tree.</p>
+<pre><code>class UnionFind(n: Int) {
+    private val parent = IntArray(n) { it }   // everyone is their own leader
+    private val rank = IntArray(n)
+    var groups = n
+        private set
+
+    fun find(x: Int): Int {
+        if (parent[x] != x) parent[x] = find(parent[x])   // path compression
+        return parent[x]
+    }
+
+    // Returns false if a and b were already in the same group.
+    fun union(a: Int, b: Int): Boolean {
+        val ra = find(a)
+        val rb = find(b)
+        if (ra == rb) return false
+        when {
+            rank[ra] &lt; rank[rb] -&gt; parent[ra] = rb
+            rank[ra] &gt; rank[rb] -&gt; parent[rb] = ra
+            else -&gt; {
+                parent[rb] = ra
+                rank[ra]++
+            }
+        }
+        groups--
+        return true
+    }
+}
+
+fun main() {
+    // 1. Connected components of an edge list, without any DFS
+    val uf = UnionFind(6)
+    uf.union(0, 1)
+    uf.union(1, 2)
+    uf.union(3, 4)
+    println("groups: ${uf.groups}")                       // {0,1,2} {3,4} {5} -&gt; 3
+    println("0 and 2 together? ${uf.find(0) == uf.find(2)}")
+    println("0 and 4 together? ${uf.find(0) == uf.find(4)}")
+    println("redundant edge 0-2 merged anything? ${uf.union(0, 2)}")   // false: it would close a cycle
+
+    // 2. Kruskal's idea: build a cheapest network that connects everything.
+    //    Take edges from cheapest to dearest; keep an edge only if it joins two different groups.
+    val roads = listOf(            // (weight, a, b)
+        Triple(4, 0, 1), Triple(1, 0, 2), Triple(2, 2, 1), Triple(1, 1, 3), Triple(5, 2, 3)
+    )
+    val network = UnionFind(4)
+    var total = 0
+    for ((w, a, b) in roads.sortedBy { it.first }) {
+        if (network.union(a, b)) {
+            total += w
+            println("keep edge $a-$b (cost $w)")
+        }
+    }
+    println("cheapest way to connect all 4 towns costs $total")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-unionfind">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-unionfind">class UnionFind(n: Int) {
+    private val parent = IntArray(n) { it }   // everyone is their own leader
+    private val rank = IntArray(n)
+    var groups = n
+        private set
+
+    fun find(x: Int): Int {
+        if (parent[x] != x) parent[x] = find(parent[x])   // path compression
+        return parent[x]
+    }
+
+    // Returns false if a and b were already in the same group.
+    fun union(a: Int, b: Int): Boolean {
+        val ra = find(a)
+        val rb = find(b)
+        if (ra == rb) return false
+        when {
+            rank[ra] < rank[rb] -> parent[ra] = rb
+            rank[ra] > rank[rb] -> parent[rb] = ra
+            else -> {
+                parent[rb] = ra
+                rank[ra]++
+            }
+        }
+        groups--
+        return true
+    }
+}
+
+fun main() {
+    // 1. Connected components of an edge list, without any DFS
+    val uf = UnionFind(6)
+    uf.union(0, 1)
+    uf.union(1, 2)
+    uf.union(3, 4)
+    println("groups: ${uf.groups}")                       // {0,1,2} {3,4} {5} -> 3
+    println("0 and 2 together? ${uf.find(0) == uf.find(2)}")
+    println("0 and 4 together? ${uf.find(0) == uf.find(4)}")
+    println("redundant edge 0-2 merged anything? ${uf.union(0, 2)}")   // false: it would close a cycle
+
+    // 2. Kruskal's idea: build a cheapest network that connects everything.
+    //    Take edges from cheapest to dearest; keep an edge only if it joins two different groups.
+    val roads = listOf(            // (weight, a, b)
+        Triple(4, 0, 1), Triple(1, 0, 2), Triple(2, 2, 1), Triple(1, 1, 3), Triple(5, 2, 3)
+    )
+    val network = UnionFind(4)
+    var total = 0
+    for ((w, a, b) in roads.sortedBy { it.first }) {
+        if (network.union(a, b)) {
+            total += w
+            println("keep edge $a-$b (cost $w)")
+        }
+    }
+    println("cheapest way to connect all 4 towns costs $total")
+}
+</script></div>
+
+<p><strong>Cost.</strong> With both tricks, each <code>find</code> and <code>union</code> takes nearly constant time. Formally it is <code>O(&alpha;(n))</code>, where <code>&alpha;</code> grows so slowly that it never exceeds 4 for any input that fits in a computer. Treat it as &ldquo;practically <code>O(1)</code>&rdquo;. Setup is <code>O(n)</code>.</p>
+<h2 id="more">9. Other graph tools, and a complexity table</h2>
+
+<p>There are a few more famous graph algorithms. You do not need their code yet, but you should know which question each answers.</p>
+<ul>
+<li><strong>Bellman-Ford.</strong> Shortest paths like Dijkstra, but it allows <em>negative</em> edge weights and can detect a negative cycle (a loop whose total cost is below zero, which makes &ldquo;shortest&rdquo; meaningless). It simply relaxes every edge <code>V - 1</code> times, so it runs in <code>O(V &times; E)</code>: slower, but more general.</li>
+<li><strong>A* (A-star).</strong> Dijkstra with a hint. It adds a guess of the remaining distance to the goal (for a map, the straight-line distance) so it explores less. Used in games and route finding when you have one target, not all of them.</li>
+<li><strong>Minimum spanning tree (MST).</strong> Given a connected weighted graph, pick the cheapest set of edges that still connects every vertex, with no cycles. Think of laying cable to link buildings at the least cost. Kruskal's algorithm (shown above) and Prim's algorithm both solve it.</li>
+<li><strong>All-pairs shortest paths (Floyd-Warshall).</strong> Shortest distance between every pair of vertices, in <code>O(V&sup3;)</code>, for small graphs.</li>
+</ul>
+<h3>Choosing the right tool</h3>
+<table><tr><th>Question</th><th>Tool</th><th>Time</th></tr><tr><td>Fewest edges from a start (unweighted)</td><td>BFS</td><td><code>O(V + E)</code></td></tr><tr><td>Is it reachable? How many components? Is there a cycle?</td><td>DFS, BFS or union-find</td><td><code>O(V + E)</code></td></tr><tr><td>Order tasks with prerequisites; detect a cycle in a directed graph</td><td>Topological sort (Kahn)</td><td><code>O(V + E)</code></td></tr><tr><td>Cheapest path, non-negative weights</td><td>Dijkstra</td><td><code>O((V + E) log V)</code></td></tr><tr><td>Cheapest path, negative weights allowed</td><td>Bellman-Ford</td><td><code>O(V &times; E)</code></td></tr><tr><td>Cheapest way to connect everything</td><td>Kruskal or Prim (MST)</td><td><code>O(E log E)</code></td></tr><tr><td>Merge groups, ask "same group?"</td><td>Union-find</td><td>almost <code>O(1)</code> each</td></tr></table>
+<div class="callout"><strong>A good habit</strong><p>When a new problem mentions &ldquo;connected&rdquo;, &ldquo;network&rdquo;, &ldquo;dependencies&rdquo;, &ldquo;shortest route&rdquo; or &ldquo;neighbouring cells&rdquo;, ask: <em>what are my vertices, and what are my edges?</em> Once you can draw the graph, the right algorithm is usually one row of the table above.</p></div>
+<h2 id="practice">10. Practice</h2>
+<p>Five exercises, one for each big idea: walking, counting pieces, grids, ordering and weighted paths. Remember the edge cases: a single vertex, a graph in separate pieces, a cycle, and a target you cannot reach.</p>
+<div class="try"><h3>Try it: is there a path?</h3>
+<p>Write <code>hasPath(n, edges, from, to)</code> for an undirected graph with vertices <code>0 until n</code>. Return <code>true</code> if you can walk from <code>from</code> to <code>to</code>. Use BFS or DFS. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun hasPath(n: Int, edges: List&lt;Pair&lt;Int, Int&gt;&gt;, from: Int, to: Int): Boolean {
+    TODO("build the adjacency list, then walk from 'from' and look for 'to'")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-has-path">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-has-path">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun hasPath(n: Int, edges: List<Pair<Int, Int>>, from: Int, to: Int): Boolean {
+    TODO("build the adjacency list, then walk from 'from' and look for 'to'")
+}
+
+fun main() {
+    test("single node to itself") { eq(hasPath(1, emptyList(), 0, 0), true) }
+    test("direct edge") { eq(hasPath(2, listOf(0 to 1), 0, 1), true) }
+    test("long chain") { eq(hasPath(5, listOf(0 to 1, 1 to 2, 2 to 3, 3 to 4), 4, 0), true) }
+    test("disconnected target") { eq(hasPath(4, listOf(0 to 1, 2 to 3), 0, 3), false) }
+    test("graph with a cycle") { eq(hasPath(4, listOf(0 to 1, 1 to 2, 2 to 0), 0, 2), true) }
+    test("isolated vertex") { eq(hasPath(3, listOf(0 to 1), 0, 2), false) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Copy the BFS from this part and return <code>true</code> the moment you take <code>to</code> off the queue. A vertex is always reachable from itself.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun hasPath(n: Int, edges: List&lt;Pair&lt;Int, Int&gt;&gt;, from: Int, to: Int): Boolean {
+    val adj = Array(n) { mutableListOf&lt;Int&gt;() }
+    for ((a, b) in edges) { adj[a].add(b); adj[b].add(a) }
+    val seen = BooleanArray(n)
+    val queue = ArrayDeque&lt;Int&gt;()
+    seen[from] = true
+    queue.addLast(from)
+    while (queue.isNotEmpty()) {
+        val u = queue.removeFirst()
+        if (u == to) return true
+        for (v in adj[u]) {
+            if (!seen[v]) { seen[v] = true; queue.addLast(v) }
+        }
+    }
+    return false
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: count connected components</h3>
+<p>Write <code>countComponents(n, edges)</code> for an undirected graph with vertices <code>0 until n</code>. Vertices with no edges count as their own component. Try union-find or DFS. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun countComponents(n: Int, edges: List&lt;Pair&lt;Int, Int&gt;&gt;): Int {
+    TODO("count the separate pieces")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-components">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-components">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun countComponents(n: Int, edges: List<Pair<Int, Int>>): Int {
+    TODO("count the separate pieces")
+}
+
+fun main() {
+    test("no vertices") { eq(countComponents(0, emptyList()), 0) }
+    test("single node") { eq(countComponents(1, emptyList()), 1) }
+    test("no edges") { eq(countComponents(4, emptyList()), 4) }
+    test("two pieces") { eq(countComponents(5, listOf(0 to 1, 1 to 2, 3 to 4)), 2) }
+    test("one cycle") { eq(countComponents(3, listOf(0 to 1, 1 to 2, 2 to 0)), 1) }
+    test("duplicate edges") { eq(countComponents(3, listOf(0 to 1, 1 to 0, 0 to 1)), 2) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Start with <code>n</code> groups. Every edge that joins two different groups lowers the count by one.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun countComponents(n: Int, edges: List&lt;Pair&lt;Int, Int&gt;&gt;): Int {
+    val parent = IntArray(n) { it }
+    fun find(x: Int): Int {
+        if (parent[x] != x) parent[x] = find(parent[x])
+        return parent[x]
+    }
+    var groups = n
+    for ((a, b) in edges) {
+        val ra = find(a)
+        val rb = find(b)
+        if (ra != rb) { parent[ra] = rb; groups-- }
+    }
+    return groups
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: count the islands</h3>
+<p>Write <code>countIslands(grid)</code>. Each row is a string of <code>'1'</code> (land) and <code>'0'</code> (water). Land cells touching up, down, left or right belong to the same island. Diagonals do not count. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun countIslands(grid: List&lt;String&gt;): Int {
+    TODO("flood fill from every unseen land cell")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-islands-ex">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-islands-ex">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun countIslands(grid: List<String>): Int {
+    TODO("flood fill from every unseen land cell")
+}
+
+fun main() {
+    test("empty grid") { eq(countIslands(emptyList()), 0) }
+    test("single land cell") { eq(countIslands(listOf("1")), 1) }
+    test("single water cell") { eq(countIslands(listOf("0")), 0) }
+    test("three islands") { eq(countIslands(listOf("11000", "10010", "00110", "00001")), 3) }
+    test("diagonals are separate") { eq(countIslands(listOf("10", "01")), 2) }
+    test("whole grid is land") { eq(countIslands(listOf("111", "111", "111")), 1) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Loop over every cell. When you meet unseen land, add one to the count and spread out, marking all connected land as seen. Check the bounds before reading a neighbour.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun countIslands(grid: List&lt;String&gt;): Int {
+    if (grid.isEmpty()) return 0
+    val rows = grid.size
+    val cols = grid[0].length
+    val seen = Array(rows) { BooleanArray(cols) }
+    val dr = intArrayOf(-1, 1, 0, 0)
+    val dc = intArrayOf(0, 0, -1, 1)
+    var islands = 0
+    for (r in 0 until rows) for (c in 0 until cols) {
+        if (grid[r][c] != '1' || seen[r][c]) continue
+        islands++
+        val stack = ArrayDeque&lt;Pair&lt;Int, Int&gt;&gt;()
+        seen[r][c] = true
+        stack.addLast(r to c)
+        while (stack.isNotEmpty()) {
+            val (cr, cc) = stack.removeLast()
+            for (d in 0 until 4) {
+                val nr = cr + dr[d]
+                val nc = cc + dc[d]
+                if (nr in 0 until rows &amp;&amp; nc in 0 until cols &amp;&amp; grid[nr][nc] == '1' &amp;&amp; !seen[nr][nc]) {
+                    seen[nr][nc] = true
+                    stack.addLast(nr to nc)
+                }
+            }
+        }
+    }
+    return islands
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: can you finish every course?</h3>
+<p>Write <code>canFinish(n, prereqs)</code>. Courses are <code>0 until n</code>. A pair <code>(a, b)</code> means &ldquo;take <code>b</code> before <code>a</code>&rdquo;. Return <code>true</code> if some order lets you finish all courses, and <code>false</code> if the prerequisites contain a cycle. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun canFinish(n: Int, prereqs: List&lt;Pair&lt;Int, Int&gt;&gt;): Boolean {
+    TODO("Kahn's algorithm: can every vertex be taken off the queue?")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-can-finish">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-can-finish">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun canFinish(n: Int, prereqs: List<Pair<Int, Int>>): Boolean {
+    TODO("Kahn's algorithm: can every vertex be taken off the queue?")
+}
+
+fun main() {
+    test("no courses") { eq(canFinish(0, emptyList()), true) }
+    test("no prerequisites") { eq(canFinish(3, emptyList()), true) }
+    test("simple chain") { eq(canFinish(3, listOf(1 to 0, 2 to 1)), true) }
+    test("two courses need each other") { eq(canFinish(2, listOf(1 to 0, 0 to 1)), false) }
+    test("diamond is fine") { eq(canFinish(4, listOf(1 to 0, 2 to 0, 3 to 1, 3 to 2)), true) }
+    test("cycle hidden at the end") { eq(canFinish(4, listOf(1 to 0, 2 to 3, 3 to 2)), false) }
+    test("course needs itself") { eq(canFinish(1, listOf(0 to 0)), false) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Count how many courses you manage to take off the queue. If that number is less than <code>n</code>, a cycle blocked the rest.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun canFinish(n: Int, prereqs: List&lt;Pair&lt;Int, Int&gt;&gt;): Boolean {
+    val next = Array(n) { mutableListOf&lt;Int&gt;() }
+    val inDegree = IntArray(n)
+    for ((course, first) in prereqs) {
+        next[first].add(course)
+        inDegree[course]++
+    }
+    val queue = ArrayDeque&lt;Int&gt;()
+    for (v in 0 until n) if (inDegree[v] == 0) queue.addLast(v)
+    var taken = 0
+    while (queue.isNotEmpty()) {
+        val u = queue.removeFirst()
+        taken++
+        for (v in next[u]) {
+            inDegree[v]--
+            if (inDegree[v] == 0) queue.addLast(v)
+        }
+    }
+    return taken == n
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: shortest distances with weights</h3>
+<p>Write <code>shortestDistances(n, edges, src)</code> for a <em>directed</em> weighted graph. Each edge is <code>Triple(from, to, weight)</code> with a weight of 0 or more. Return a list of <code>n</code> distances from <code>src</code>, using <code>-1</code> for vertices that cannot be reached. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun shortestDistances(n: Int, edges: List&lt;Triple&lt;Int, Int, Int&gt;&gt;, src: Int): List&lt;Int&gt; {
+    TODO("Dijkstra with a PriorityQueue")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p5-shortest">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p5-shortest">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun shortestDistances(n: Int, edges: List<Triple<Int, Int, Int>>, src: Int): List<Int> {
+    TODO("Dijkstra with a PriorityQueue")
+}
+
+fun main() {
+    test("single node") { eq(shortestDistances(1, emptyList(), 0), listOf(0)) }
+    test("simple chain") { eq(shortestDistances(3, listOf(Triple(0, 1, 5), Triple(1, 2, 2)), 0), listOf(0, 5, 7)) }
+    test("cheaper detour wins") {
+        val e = listOf(Triple(0, 1, 10), Triple(0, 2, 3), Triple(2, 1, 4))
+        eq(shortestDistances(3, e, 0), listOf(0, 7, 3))
+    }
+    test("unreachable is -1") { eq(shortestDistances(3, listOf(Triple(0, 1, 1)), 0), listOf(0, 1, -1)) }
+    test("edges are one-way") { eq(shortestDistances(2, listOf(Triple(0, 1, 4)), 1), listOf(-1, 0)) }
+    test("zero weight edge") { eq(shortestDistances(3, listOf(Triple(0, 1, 0), Triple(1, 2, 0)), 0), listOf(0, 0, 0)) }
+    test("cycle does not loop forever") {
+        val e = listOf(Triple(0, 1, 1), Triple(1, 2, 1), Triple(2, 0, 1))
+        eq(shortestDistances(3, e, 0), listOf(0, 1, 2))
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Follow the Dijkstra demo. Keep <code>Int.MAX_VALUE</code> as infinity while working, and convert it to <code>-1</code> only at the very end.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun shortestDistances(n: Int, edges: List&lt;Triple&lt;Int, Int, Int&gt;&gt;, src: Int): List&lt;Int&gt; {
+    val adj = Array(n) { mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;() }
+    for ((a, b, w) in edges) adj[a].add(b to w)
+    val dist = IntArray(n) { Int.MAX_VALUE }
+    dist[src] = 0
+    val pq = java.util.PriorityQueue&lt;Pair&lt;Int, Int&gt;&gt;(compareBy { it.first })
+    pq.add(0 to src)
+    while (pq.isNotEmpty()) {
+        val (d, u) = pq.poll()
+        if (d &gt; dist[u]) continue
+        for ((v, w) in adj[u]) {
+            if (d + w &lt; dist[v]) {
+                dist[v] = d + w
+                pq.add(dist[v] to v)
+            }
+        }
+    }
+    return dist.map { if (it == Int.MAX_VALUE) -1 else it }
+}</code></pre>
+</details></div>
+<div class="note"><p><strong>Stuck?</strong> Draw the graph on paper with five or six vertices, and run the algorithm by hand, writing the queue or stack after every step. If the paper version works, the code usually follows.</p></div>
+
+    <h2 id="takeaways">11. Takeaways</h2>
+    <ul><li>Ask first: what are the vertices, and what are the edges?</li><li>Mark vertices as visited, or a cycle will trap your walk forever.</li><li>BFS for fewest steps, DFS for exploring, Kahn for ordering, Dijkstra for weighted shortest paths, union-find for merging groups.</li><li>Most graph algorithms cost <code>O(V + E)</code>; adding a heap adds a <code>log V</code> factor.</li><li>Test the awkward cases: one vertex, a disconnected graph, a cycle, an unreachable target.</li><li>Next up: sorting and searching, the other great family of everyday algorithms.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Vertex (node)</td><td>One thing in a graph, such as a town, a person or a course.</td></tr><tr><td>Edge</td><td>A connection between two vertices.</td></tr><tr><td>Directed / undirected</td><td>Directed edges go one way (arrows); undirected edges go both ways.</td></tr><tr><td>Weighted</td><td>Edges carry a number such as a distance or cost.</td></tr><tr><td>Degree</td><td>The number of edges touching a vertex. In-degree counts arrows in, out-degree arrows out.</td></tr><tr><td>Path / cycle</td><td>A walk along edges / a walk that ends where it started.</td></tr><tr><td>Connected component</td><td>A maximal piece of a graph where every vertex can reach every other.</td></tr><tr><td>DAG</td><td>Directed acyclic graph: arrows only and no cycles.</td></tr><tr><td>Adjacency list</td><td>For each vertex, a list of its neighbours.</td></tr><tr><td>BFS / DFS</td><td>Breadth-first search (closest first, with a queue) / depth-first search (deep first, with a stack).</td></tr><tr><td>Topological sort</td><td>A line-up of a DAG so every arrow points forward.</td></tr><tr><td>Relaxing an edge</td><td>Updating a distance when a cheaper route through that edge is found.</td></tr><tr><td>Union-find</td><td>A structure that merges groups and answers "same group?" in nearly constant time.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-4-trees-heaps-tries.html"><small>&larr; Previous &middot; Part 4</small>Trees, heaps and tries</a><a class="next" href="dsa-part-6-sorting-and-searching.html"><small>Next &middot; Part 6 &rarr;</small>Sorting and searching</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

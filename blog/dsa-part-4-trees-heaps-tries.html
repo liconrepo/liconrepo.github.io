@@ -1,0 +1,1573 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 4: Trees, Heaps and Tries — Khairul Alam</title>
+  <meta name="description" content="Learn binary trees, tree traversals, binary search trees, balanced trees, heaps, priority queues and tries in Kotlin, with pictures, runnable examples and exercises with tests." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 4 of 9</p>
+    <h1>Data Structures and Algorithms, Part 4: Trees, Heaps and Tries</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~40 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Trees</span><span class="tag">Heaps</span><span class="tag">Tries</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a class="on" href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">Lines are not enough for data that branches, nests or needs the smallest item fast. This part introduces trees: how to walk them, how a search tree finds things in about log n steps, how a heap keeps the smallest value on top, and how a trie answers questions about prefixes.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li>A tree has a root, parents and children; a binary tree gives each node at most two children.</li><li>DFS (pre, in, post-order) goes deep with recursion; BFS (level-order) goes wide with a queue. Both cost <code>O(n)</code>.</li><li>A binary search tree is <code>O(log n)</code> when balanced and <code>O(n)</code> when skewed; in-order gives sorted output.</li><li>A heap stores a tree in an array and gives the smallest item in <code>O(1)</code>, with <code>O(log n)</code> push and pop.</li><li>A trie shares prefixes, so insert and lookup cost <code>O(L)</code> for a word of length <code>L</code>.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#tree">What a tree is</a></li><li><a href="#dfs">Walking a tree depth first</a></li><li><a href="#bfs">Walking a tree level by level</a></li><li><a href="#measure">Height, size, mirror and comparing trees</a></li><li><a href="#bst">Binary search trees</a></li><li><a href="#balanced">Balanced trees in the real world</a></li><li><a href="#heap">Heaps and priority queues</a></li><li><a href="#trie">Tries: trees for words</a></li><li><a href="#cost">Complexity at a glance</a></li><li><a href="#practice">Practice</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="tree">1. What a tree is</h2>
+
+<p>So far the structures in this series were lines: arrays, lists, stacks, queues. A line has a first item, a last item, and everything else sits in between. Many things in the real world are not lines. They branch. A <strong>tree</strong> is the data structure for things that branch.</p>
+<div class="analogy"><p><strong>Think of a family tree, or the folders on your computer.</strong> One folder at the top holds other folders, and each of those holds more folders and files. Every folder has exactly one parent folder (except the top one), and it may have many children.</p></div>
+
+<p>Here are the words you need. They are used in every tree discussion, so learn them now.</p>
+<ul>
+<li><strong>Node</strong>: one box in the tree. It holds a value and links to its children.</li>
+<li><strong>Root</strong>: the single node at the top. It has no parent.</li>
+<li><strong>Parent and child</strong>: a node directly above another is its parent; the ones directly below are its children.</li>
+<li><strong>Leaf</strong>: a node with no children.</li>
+<li><strong>Depth</strong> of a node: how many steps you take going down from the root to reach it. The root has depth 0.</li>
+<li><strong>Height</strong> of the tree: the depth of its deepest node. Books differ on whether to count steps or nodes. In the code below, "max depth" counts the <em>nodes</em> on the longest path, so a single node has max depth 1 and an empty tree has 0. Both ways are fine, just be clear about which one you use.</li>
+<li><strong>Subtree</strong>: any node together with everything below it. Every child of a node is the root of its own smaller tree.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre>            8            &lt;- root (depth 0)
+          /   \
+         3     10        &lt;- depth 1 (3 is the parent of 1 and 6)
+        / \      \
+       1   6      14     &lt;- depth 2
+          / \    /
+         4   7  13       &lt;- depth 3 (4, 7, 13 are leaves, and so is 1)</pre></div><figcaption>A binary tree: every node has at most two children, called left and right.</figcaption></figure>
+
+<p>In this part we mostly use <strong>binary trees</strong>, where each node has at most two children: a left one and a right one. The node is small. It stores a value and two links, and a link is either another node or <code>null</code> (nothing there).</p>
+<div class="try demo"><h3>Run it: build a tree and print it sideways</h3>
+<p>A node is just a value plus two optional links. A tree is just a reference to its root. Notice that <code>printSideways</code> calls itself on the children: trees and recursion fit together naturally, because each child is itself a smaller tree.</p>
+<pre><code>class TreeNode(
+    val value: Int,
+    var left: TreeNode? = null,
+    var right: TreeNode? = null
+)
+
+// Print the tree turned on its side: right child on top, root at the left.
+fun printSideways(node: TreeNode?, depth: Int = 0) {
+    if (node == null) return
+    printSideways(node.right, depth + 1)
+    println("    ".repeat(depth) + node.value)
+    printSideways(node.left, depth + 1)
+}
+
+fun main() {
+    //         8
+    //       /   \
+    //      3     10
+    //     / \      \
+    //    1   6      14
+    val root = TreeNode(
+        8,
+        TreeNode(3, TreeNode(1), TreeNode(6)),
+        TreeNode(10, null, TreeNode(14))
+    )
+    printSideways(root)
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-node">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-node">class TreeNode(
+    val value: Int,
+    var left: TreeNode? = null,
+    var right: TreeNode? = null
+)
+
+// Print the tree turned on its side: right child on top, root at the left.
+fun printSideways(node: TreeNode?, depth: Int = 0) {
+    if (node == null) return
+    printSideways(node.right, depth + 1)
+    println("    ".repeat(depth) + node.value)
+    printSideways(node.left, depth + 1)
+}
+
+fun main() {
+    //         8
+    //       /   \
+    //      3     10
+    //     / \      \
+    //    1   6      14
+    val root = TreeNode(
+        8,
+        TreeNode(3, TreeNode(1), TreeNode(6)),
+        TreeNode(10, null, TreeNode(14))
+    )
+    printSideways(root)
+}
+</script></div>
+
+<p>An empty tree is simply <code>null</code>. That one fact makes the code in this part short: every function starts by asking "is this node <code>null</code>?", and that is the stopping point of the recursion.</p>
+<h2 id="dfs">2. Walking a tree depth first</h2>
+
+<p>To <strong>traverse</strong> a tree means to visit every node once. There are two big families. The first goes <strong>deep</strong> before it goes wide: it follows one branch to the bottom, then backs up and tries the next. It is called <strong>depth-first search</strong> (DFS).</p>
+<div class="analogy"><p><strong>Exploring a maze with one hand on the wall.</strong> You keep going down a corridor until it ends, then step back to the last fork and try the other way.</p></div>
+
+<p>For a binary tree the recursion is three lines long. The only choice is <em>when</em> you handle the current node compared with its two subtrees. That gives three famous orders:</p>
+<ul>
+<li><strong>Pre-order</strong>: node, then left, then right. Good for copying a tree or printing it as an outline.</li>
+<li><strong>In-order</strong>: left, then node, then right. On a search tree this gives sorted output (see below).</li>
+<li><strong>Post-order</strong>: left, then right, then node. Good when you need the children's answers first, such as deleting a tree or computing sizes.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre>        4
+       / \
+      2   6
+     / \ / \
+    1  3 5  7
+
+pre-order : 4 2 1 3 6 5 7     (node first)
+in-order  : 1 2 3 4 5 6 7     (node in the middle)
+post-order: 1 3 2 5 7 6 4     (node last)</pre></div><figcaption>The same tree, three visiting orders.</figcaption></figure>
+<div class="try demo"><h3>Run it: pre-order, in-order and post-order</h3>
+<p>The three functions are identical except for the line that adds the value. Move that one line and you change the order.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun preOrder(node: TreeNode?, out: MutableList&lt;Int&gt; = mutableListOf()): List&lt;Int&gt; {
+    if (node == null) return out
+    out.add(node.value)          // visit the node first
+    preOrder(node.left, out)
+    preOrder(node.right, out)
+    return out
+}
+
+fun inOrder(node: TreeNode?, out: MutableList&lt;Int&gt; = mutableListOf()): List&lt;Int&gt; {
+    if (node == null) return out
+    inOrder(node.left, out)
+    out.add(node.value)          // visit the node in the middle
+    inOrder(node.right, out)
+    return out
+}
+
+fun postOrder(node: TreeNode?, out: MutableList&lt;Int&gt; = mutableListOf()): List&lt;Int&gt; {
+    if (node == null) return out
+    postOrder(node.left, out)
+    postOrder(node.right, out)
+    out.add(node.value)          // visit the node last
+    return out
+}
+
+fun main() {
+    val root = TreeNode(
+        4,
+        TreeNode(2, TreeNode(1), TreeNode(3)),
+        TreeNode(6, TreeNode(5), TreeNode(7))
+    )
+    println("pre-order : ${preOrder(root)}")
+    println("in-order  : ${inOrder(root)}")
+    println("post-order: ${postOrder(root)}")
+    println("empty tree: ${inOrder(null)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-dfs">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-dfs">class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun preOrder(node: TreeNode?, out: MutableList<Int> = mutableListOf()): List<Int> {
+    if (node == null) return out
+    out.add(node.value)          // visit the node first
+    preOrder(node.left, out)
+    preOrder(node.right, out)
+    return out
+}
+
+fun inOrder(node: TreeNode?, out: MutableList<Int> = mutableListOf()): List<Int> {
+    if (node == null) return out
+    inOrder(node.left, out)
+    out.add(node.value)          // visit the node in the middle
+    inOrder(node.right, out)
+    return out
+}
+
+fun postOrder(node: TreeNode?, out: MutableList<Int> = mutableListOf()): List<Int> {
+    if (node == null) return out
+    postOrder(node.left, out)
+    postOrder(node.right, out)
+    out.add(node.value)          // visit the node last
+    return out
+}
+
+fun main() {
+    val root = TreeNode(
+        4,
+        TreeNode(2, TreeNode(1), TreeNode(3)),
+        TreeNode(6, TreeNode(5), TreeNode(7))
+    )
+    println("pre-order : ${preOrder(root)}")
+    println("in-order  : ${inOrder(root)}")
+    println("post-order: ${postOrder(root)}")
+    println("empty tree: ${inOrder(null)}")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Each node is visited once, so the time is <code>O(n)</code>. The recursion uses the call stack, which is as deep as the tree is tall. Call that height <code>h</code>: the extra space is <code>O(h)</code>. For a nicely balanced tree <code>h</code> is about <code>log n</code>; for a tree that is just a long chain, <code>h</code> is <code>n</code>.</p>
+<div class="note"><p><strong>Very deep trees.</strong> A chain of a hundred thousand nodes can overflow the call stack. In that case you can write the same walk with your own explicit <code>ArrayDeque</code> used as a stack (Part 3). The idea is the same, you just manage the stack yourself.</p></div>
+<h2 id="bfs">3. Walking a tree level by level</h2>
+
+<p>The second family goes <strong>wide</strong> first. It visits the root, then all nodes at depth 1, then all nodes at depth 2, and so on. This is <strong>breadth-first search</strong> (BFS), also called <strong>level-order</strong> traversal.</p>
+<div class="analogy"><p><strong>A ripple on a pond.</strong> The wave spreads outward one ring at a time. First ring is the root, second ring is its children, third ring is their children.</p></div>
+
+<p>Recursion does not give this order naturally. We use a <strong>queue</strong> (Part 3): first in, first out. Put the root in the queue. Then repeat: take the front node, visit it, and put its children at the back. Because children join the back, a whole level is processed before the next one starts.</p>
+<p>To report the levels separately, we note the queue size at the start of each round. That many nodes are exactly the current level.</p>
+<div class="try demo"><h3>Run it: level-order with a queue</h3>
+<p>Each node enters and leaves the queue once, so this is <code>O(n)</code> time. The queue can hold one whole level at a time, which for a wide tree is about <code>n / 2</code> nodes, so the space is <code>O(n)</code>.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun levelOrder(root: TreeNode?): List&lt;List&lt;Int&gt;&gt; {
+    val result = mutableListOf&lt;List&lt;Int&gt;&gt;()
+    if (root == null) return result
+    val queue = ArrayDeque&lt;TreeNode&gt;()
+    queue.addLast(root)
+    while (queue.isNotEmpty()) {
+        val levelSize = queue.size          // how many nodes are in this level
+        val level = mutableListOf&lt;Int&gt;()
+        repeat(levelSize) {
+            val node = queue.removeFirst()
+            level.add(node.value)
+            node.left?.let { queue.addLast(it) }
+            node.right?.let { queue.addLast(it) }
+        }
+        result.add(level)
+    }
+    return result
+}
+
+fun main() {
+    val root = TreeNode(
+        3,
+        TreeNode(9),
+        TreeNode(20, TreeNode(15), TreeNode(7))
+    )
+    println(levelOrder(root))     // [[3], [9, 20], [15, 7]]
+    println(levelOrder(null))     // []
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-bfs">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-bfs">class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun levelOrder(root: TreeNode?): List<List<Int>> {
+    val result = mutableListOf<List<Int>>()
+    if (root == null) return result
+    val queue = ArrayDeque<TreeNode>()
+    queue.addLast(root)
+    while (queue.isNotEmpty()) {
+        val levelSize = queue.size          // how many nodes are in this level
+        val level = mutableListOf<Int>()
+        repeat(levelSize) {
+            val node = queue.removeFirst()
+            level.add(node.value)
+            node.left?.let { queue.addLast(it) }
+            node.right?.let { queue.addLast(it) }
+        }
+        result.add(level)
+    }
+    return result
+}
+
+fun main() {
+    val root = TreeNode(
+        3,
+        TreeNode(9),
+        TreeNode(20, TreeNode(15), TreeNode(7))
+    )
+    println(levelOrder(root))     // [[3], [9, 20], [15, 7]]
+    println(levelOrder(null))     // []
+}
+</script></div>
+
+<h3>Which walk should I pick?</h3>
+<table><tr><th>If you need&hellip;</th><th>Use</th></tr><tr><td>an answer built from the answers of both subtrees (size, height, sum)</td><td>DFS, usually post-order</td></tr><tr><td>sorted output from a search tree</td><td>DFS, in-order</td></tr><tr><td>to copy or save the shape of a tree</td><td>DFS, pre-order</td></tr><tr><td>nodes grouped by depth, or the nearest node to the root</td><td>BFS (level-order)</td></tr></table>
+<h2 id="measure">4. Height, size, mirror and comparing trees</h2>
+
+<p>Most tree questions follow one habit. Ask: <em>if I trust the answer for my left child and my right child, how do I build the answer for me?</em> Then add the base case: an empty tree. Let us practise that habit four times.</p>
+<ul>
+<li><strong>Size</strong> (number of nodes): <code>1 + size(left) + size(right)</code>. Empty tree: 0.</li>
+<li><strong>Max depth</strong> (nodes on the longest root-to-leaf path): <code>1 + max(depth(left), depth(right))</code>. Empty tree: 0.</li>
+<li><strong>Mirror</strong> (swap left and right everywhere): swap the two children, then mirror each of them.</li>
+<li><strong>Same tree</strong>: two trees are equal if both are empty, or both roots match and their left subtrees match and their right subtrees match.</li>
+</ul>
+<div class="try demo"><h3>Run it: size, depth, mirror and equality</h3>
+<p>Each function is one line of thinking plus the empty-tree case. All of them visit every node once: <code>O(n)</code> time and <code>O(h)</code> stack space.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun size(node: TreeNode?): Int =
+    if (node == null) 0 else 1 + size(node.left) + size(node.right)
+
+fun maxDepth(node: TreeNode?): Int =
+    if (node == null) 0 else 1 + maxOf(maxDepth(node.left), maxDepth(node.right))
+
+// Build a new mirrored tree and leave the original alone.
+fun mirror(node: TreeNode?): TreeNode? {
+    if (node == null) return null
+    return TreeNode(node.value, mirror(node.right), mirror(node.left))
+}
+
+fun sameTree(a: TreeNode?, b: TreeNode?): Boolean {
+    if (a == null &amp;&amp; b == null) return true
+    if (a == null || b == null) return false
+    return a.value == b.value &amp;&amp; sameTree(a.left, b.left) &amp;&amp; sameTree(a.right, b.right)
+}
+
+fun inOrder(node: TreeNode?): List&lt;Int&gt; =
+    if (node == null) emptyList() else inOrder(node.left) + node.value + inOrder(node.right)
+
+fun main() {
+    val t = TreeNode(1, TreeNode(2, TreeNode(4)), TreeNode(3))
+    println("size = ${size(t)}")                  // 4
+    println("max depth = ${maxDepth(t)}")         // 3
+    val m = mirror(t)
+    println("in-order before: ${inOrder(t)}")     // [4, 2, 1, 3]
+    println("in-order mirror: ${inOrder(m)}")     // [3, 1, 2, 4]
+    println("t same as t? ${sameTree(t, t)}")     // true
+    println("t same as mirror? ${sameTree(t, m)}")  // false
+    println("empty same as empty? ${sameTree(null, null)}")  // true
+    println("single node depth = ${maxDepth(TreeNode(9))}")   // 1
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-measure">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-measure">class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun size(node: TreeNode?): Int =
+    if (node == null) 0 else 1 + size(node.left) + size(node.right)
+
+fun maxDepth(node: TreeNode?): Int =
+    if (node == null) 0 else 1 + maxOf(maxDepth(node.left), maxDepth(node.right))
+
+// Build a new mirrored tree and leave the original alone.
+fun mirror(node: TreeNode?): TreeNode? {
+    if (node == null) return null
+    return TreeNode(node.value, mirror(node.right), mirror(node.left))
+}
+
+fun sameTree(a: TreeNode?, b: TreeNode?): Boolean {
+    if (a == null && b == null) return true
+    if (a == null || b == null) return false
+    return a.value == b.value && sameTree(a.left, b.left) && sameTree(a.right, b.right)
+}
+
+fun inOrder(node: TreeNode?): List<Int> =
+    if (node == null) emptyList() else inOrder(node.left) + node.value + inOrder(node.right)
+
+fun main() {
+    val t = TreeNode(1, TreeNode(2, TreeNode(4)), TreeNode(3))
+    println("size = ${size(t)}")                  // 4
+    println("max depth = ${maxDepth(t)}")         // 3
+    val m = mirror(t)
+    println("in-order before: ${inOrder(t)}")     // [4, 2, 1, 3]
+    println("in-order mirror: ${inOrder(m)}")     // [3, 1, 2, 4]
+    println("t same as t? ${sameTree(t, t)}")     // true
+    println("t same as mirror? ${sameTree(t, m)}")  // false
+    println("empty same as empty? ${sameTree(null, null)}")  // true
+    println("single node depth = ${maxDepth(TreeNode(9))}")   // 1
+}
+</script></div>
+
+<p>Check the habit on the weird shapes too: an empty tree, a single node, and a <strong>skewed</strong> tree, where every node has only one child so the tree looks like a linked list. A good solution handles all three without special code.</p>
+<h2 id="bst">5. Binary search trees</h2>
+
+<p>A plain binary tree puts no rules on where values go. A <strong>binary search tree</strong> (BST) adds one rule that makes searching fast:</p>
+<p><strong>For every node, all values in its left subtree are smaller, and all values in its right subtree are larger.</strong></p>
+<div class="analogy"><p><strong>The guessing game "higher or lower".</strong> At each node you ask one question and throw away half of what is left. Smaller than this node? Go left. Bigger? Go right.</p></div>
+<figure class="fig"><div class="diagram"><pre>Search for 6 in this tree:
+
+            8      6 &lt; 8, go left
+          /   \
+         3     10
+        / \      \
+       1   6      14   6 &gt; 3, go right ... found 6 after 3 steps
+          / \
+         4   7</pre></div><figcaption>Three comparisons instead of looking at all seven nodes.</figcaption></figure>
+
+<h3>Insert, search and why in-order is sorted</h3>
+<p>Insert works like search: walk down until you fall off the tree, and put the new node in that empty spot. Now think about in-order traversal (left, node, right). All smaller values are on the left, so they come first, then the node, then all larger values. That holds at every node, so the whole output comes out <strong>sorted</strong>. A BST gives you sorted data almost for free.</p>
+<div class="try demo"><h3>Run it: a small binary search tree</h3>
+<p>The values went in unsorted and came out sorted, without any sorting step. Try inserting your own numbers.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+class Bst {
+    var root: TreeNode? = null
+    var size = 0
+        private set
+
+    // Returns false if the value was already there.
+    fun insert(value: Int): Boolean {
+        val newNode = TreeNode(value)
+        var cur = root
+        if (cur == null) { root = newNode; size++; return true }
+        while (true) {
+            if (value == cur!!.value) return false
+            if (value &lt; cur.value) {
+                if (cur.left == null) { cur.left = newNode; size++; return true }
+                cur = cur.left
+            } else {
+                if (cur.right == null) { cur.right = newNode; size++; return true }
+                cur = cur.right
+            }
+        }
+    }
+
+    fun contains(value: Int): Boolean {
+        var cur = root
+        while (cur != null) {
+            cur = when {
+                value == cur.value -&gt; return true
+                value &lt; cur.value -&gt; cur.left
+                else -&gt; cur.right
+            }
+        }
+        return false
+    }
+
+    fun toSortedList(): List&lt;Int&gt; {
+        val out = mutableListOf&lt;Int&gt;()
+        fun walk(n: TreeNode?) {
+            if (n == null) return
+            walk(n.left); out.add(n.value); walk(n.right)
+        }
+        walk(root)
+        return out
+    }
+
+    fun height(): Int {
+        fun h(n: TreeNode?): Int = if (n == null) 0 else 1 + maxOf(h(n.left), h(n.right))
+        return h(root)
+    }
+}
+
+fun main() {
+    val tree = Bst()
+    for (x in listOf(8, 3, 10, 1, 6, 14, 4, 7, 6)) {
+        val added = tree.insert(x)
+        if (!added) println("$x was already in the tree")
+    }
+    println("sorted: ${tree.toSortedList()}")
+    println("contains 7? ${tree.contains(7)}")
+    println("contains 5? ${tree.contains(5)}")
+    println("size=${tree.size} height=${tree.height()}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-bst">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-bst">class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+class Bst {
+    var root: TreeNode? = null
+    var size = 0
+        private set
+
+    // Returns false if the value was already there.
+    fun insert(value: Int): Boolean {
+        val newNode = TreeNode(value)
+        var cur = root
+        if (cur == null) { root = newNode; size++; return true }
+        while (true) {
+            if (value == cur!!.value) return false
+            if (value < cur.value) {
+                if (cur.left == null) { cur.left = newNode; size++; return true }
+                cur = cur.left
+            } else {
+                if (cur.right == null) { cur.right = newNode; size++; return true }
+                cur = cur.right
+            }
+        }
+    }
+
+    fun contains(value: Int): Boolean {
+        var cur = root
+        while (cur != null) {
+            cur = when {
+                value == cur.value -> return true
+                value < cur.value -> cur.left
+                else -> cur.right
+            }
+        }
+        return false
+    }
+
+    fun toSortedList(): List<Int> {
+        val out = mutableListOf<Int>()
+        fun walk(n: TreeNode?) {
+            if (n == null) return
+            walk(n.left); out.add(n.value); walk(n.right)
+        }
+        walk(root)
+        return out
+    }
+
+    fun height(): Int {
+        fun h(n: TreeNode?): Int = if (n == null) 0 else 1 + maxOf(h(n.left), h(n.right))
+        return h(root)
+    }
+}
+
+fun main() {
+    val tree = Bst()
+    for (x in listOf(8, 3, 10, 1, 6, 14, 4, 7, 6)) {
+        val added = tree.insert(x)
+        if (!added) println("$x was already in the tree")
+    }
+    println("sorted: ${tree.toSortedList()}")
+    println("contains 7? ${tree.contains(7)}")
+    println("contains 5? ${tree.contains(5)}")
+    println("size=${tree.size} height=${tree.height()}")
+}
+</script></div>
+
+<h3>Fast when balanced, slow when skewed</h3>
+<p>Search, insert and "does it contain" all walk one path from the root down. The cost is the height <code>h</code>. If the tree is <strong>balanced</strong> (both sides about the same size), each step halves the problem, so <code>h</code> is about <code>log n</code> and the operations are <code>O(log n)</code>. A million values need only about 20 steps.</p>
+<p>But the shape depends on insert order. Insert <code>1, 2, 3, 4, 5</code> in that order and each value goes to the right of the last. You get a chain, the tree is <strong>skewed</strong>, the height is <code>n</code>, and every operation is <code>O(n)</code>. That is no better than a list.</p>
+<figure class="fig"><div class="diagram"><pre> Inserted 3, 1, 5, 2, 4         Inserted 1, 2, 3, 4, 5
+ (balanced, height 3)           (skewed, height 5)
+
+        3                       1
+       / \                       \
+      1   5                       2
+       \ /                         \
+       2 4                           3
+                                      \
+                                       4
+                                        \
+                                         5</pre></div><figcaption>Same five values, very different cost.</figcaption></figure>
+<div class="try demo"><h3>Run it: measure balanced against skewed</h3>
+<p>The same 1000 values give a height of 1000 or about 10. No timing here, we simply count the height.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun insert(root: TreeNode?, value: Int): TreeNode {
+    if (root == null) return TreeNode(value)
+    if (value &lt; root.value) root.left = insert(root.left, value)
+    else if (value &gt; root.value) root.right = insert(root.right, value)
+    return root
+}
+
+fun height(n: TreeNode?): Int = if (n == null) 0 else 1 + maxOf(height(n.left), height(n.right))
+
+// Insert the middle first, then the middles of each half: a balanced order.
+fun balancedOrder(lo: Int, hi: Int, out: MutableList&lt;Int&gt;) {
+    if (lo &gt; hi) return
+    val mid = (lo + hi) / 2
+    out.add(mid)
+    balancedOrder(lo, mid - 1, out)
+    balancedOrder(mid + 1, hi, out)
+}
+
+fun main() {
+    val n = 1000
+    var skewed: TreeNode? = null
+    for (x in 1..n) skewed = insert(skewed, x)          // sorted input
+
+    val order = mutableListOf&lt;Int&gt;()
+    balancedOrder(1, n, order)
+    var balanced: TreeNode? = null
+    for (x in order) balanced = insert(balanced, x)     // same values, smart order
+
+    println("values: $n")
+    println("height when inserted in sorted order: ${height(skewed)}")
+    println("height when inserted middle-first   : ${height(balanced)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-skew">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-skew">class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun insert(root: TreeNode?, value: Int): TreeNode {
+    if (root == null) return TreeNode(value)
+    if (value < root.value) root.left = insert(root.left, value)
+    else if (value > root.value) root.right = insert(root.right, value)
+    return root
+}
+
+fun height(n: TreeNode?): Int = if (n == null) 0 else 1 + maxOf(height(n.left), height(n.right))
+
+// Insert the middle first, then the middles of each half: a balanced order.
+fun balancedOrder(lo: Int, hi: Int, out: MutableList<Int>) {
+    if (lo > hi) return
+    val mid = (lo + hi) / 2
+    out.add(mid)
+    balancedOrder(lo, mid - 1, out)
+    balancedOrder(mid + 1, hi, out)
+}
+
+fun main() {
+    val n = 1000
+    var skewed: TreeNode? = null
+    for (x in 1..n) skewed = insert(skewed, x)          // sorted input
+
+    val order = mutableListOf<Int>()
+    balancedOrder(1, n, order)
+    var balanced: TreeNode? = null
+    for (x in order) balanced = insert(balanced, x)     // same values, smart order
+
+    println("values: $n")
+    println("height when inserted in sorted order: ${height(skewed)}")
+    println("height when inserted middle-first   : ${height(balanced)}")
+}
+</script></div>
+
+<h3>Checking that a tree really is a BST</h3>
+<p>A common mistake is to check only that each node is bigger than its left child and smaller than its right child. That is not enough. In the tree below every parent-child pair looks fine, yet 3 sits in the right subtree of 5, so it breaks the rule.</p>
+<figure class="fig"><div class="diagram"><pre>        5
+       / \
+      1   6
+         / \
+        3   7      &lt;- 3 is smaller than 5 but sits to its right: NOT a BST</pre></div></figure>
+
+<p>The fix is to carry down a <strong>range</strong> of allowed values. The root may be anything. Going left, the upper limit becomes the parent's value; going right, the lower limit becomes the parent's value. Every node must be strictly inside its range.</p>
+<pre><code>fun isValidBst(node: TreeNode?, low: Int? = null, high: Int? = null): Boolean {
+    if (node == null) return true
+    if (low != null &amp;&amp; node.value &lt;= low) return false
+    if (high != null &amp;&amp; node.value &gt;= high) return false
+    return isValidBst(node.left, low, node.value) &amp;&amp;
+           isValidBst(node.right, node.value, high)
+}</code></pre>
+
+<p>You will write this one yourself in the practice section. It is <code>O(n)</code> time and <code>O(h)</code> space.</p>
+<div class="note"><p><strong>Another way to check.</strong> Do an in-order walk. If the numbers come out strictly increasing, it is a BST. That follows directly from the sorted-output fact above.</p></div>
+<h2 id="balanced">6. Balanced trees in the real world</h2>
+
+<p>Since a skewed tree is slow, people invented trees that <strong>keep themselves balanced</strong>. After each insert or delete they check the shape and, if one side has become too tall, they fix it with small local changes called <strong>rotations</strong>. A rotation lifts one node up and pushes another down while keeping the BST rule true.</p>
+<figure class="fig"><div class="diagram"><pre> left-heavy chain         after a right rotation
+
+      3                         2
+     /                         / \
+    2          ----&gt;          1   3
+   /
+  1</pre></div><figcaption>A rotation turns a chain of three into a balanced triangle. The in-order order (1, 2, 3) never changes.</figcaption></figure>
+
+<p>Two well-known designs are the <strong>AVL tree</strong> (very strict about balance, so lookups are fastest) and the <strong>red-black tree</strong> (a bit looser, so inserts and deletes do less repair work). You do not need to implement them now. It is enough to know that they guarantee <code>O(log n)</code> for search, insert and delete, even in the worst case.</p>
+<p>The good news is that you rarely have to write one. Kotlin and Java ship a red-black tree as <code>java.util.TreeMap</code> (and <code>TreeSet</code> for just keys). It keeps its keys sorted and offers operations a hash map cannot: smallest and largest key, "the next key above this one", and "all keys between a and b".</p>
+<div class="try demo"><h3>Run it: a sorted map for free</h3>
+<p>Every call here is <code>O(log n)</code> because the map is a balanced tree underneath. Use a <code>HashMap</code> when you only need fast lookup, and a <code>TreeMap</code> when you also need order.</p>
+<pre><code>import java.util.TreeMap
+
+fun main() {
+    val scores = TreeMap&lt;Int, String&gt;()
+    scores[70] = "Mia"
+    scores[95] = "Omar"
+    scores[82] = "Lena"
+    scores[60] = "Ken"
+
+    println("in key order : $scores")
+    println("lowest       : ${scores.firstKey()} ${scores.firstEntry().value}")
+    println("highest      : ${scores.lastKey()} ${scores.lastEntry().value}")
+    println("first &gt;= 80  : ${scores.ceilingKey(80)}")     // 82
+    println("last  &lt;= 80  : ${scores.floorKey(80)}")       // 70
+    println("between 65..90: ${scores.subMap(65, true, 90, true)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-treemap">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-treemap">import java.util.TreeMap
+
+fun main() {
+    val scores = TreeMap<Int, String>()
+    scores[70] = "Mia"
+    scores[95] = "Omar"
+    scores[82] = "Lena"
+    scores[60] = "Ken"
+
+    println("in key order : $scores")
+    println("lowest       : ${scores.firstKey()} ${scores.firstEntry().value}")
+    println("highest      : ${scores.lastKey()} ${scores.lastEntry().value}")
+    println("first >= 80  : ${scores.ceilingKey(80)}")     // 82
+    println("last  <= 80  : ${scores.floorKey(80)}")       // 70
+    println("between 65..90: ${scores.subMap(65, true, 90, true)}")
+}
+</script></div>
+<h2 id="heap">7. Heaps and priority queues</h2>
+
+<p>Sometimes you do not need everything sorted. You only need the <strong>smallest</strong> (or largest) item, again and again, while new items keep arriving. Think of a hospital emergency room: the most urgent patient is seen next, no matter who arrived first. That is a <strong>priority queue</strong>: a queue where the item with the best priority leaves first.</p>
+<p>The standard way to build one is a <strong>heap</strong>. A (min-)heap is a binary tree with two rules:</p>
+<ol>
+<li><strong>Heap rule:</strong> every parent is smaller than or equal to its children. So the smallest value is always at the root.</li>
+<li><strong>Shape rule:</strong> the tree is filled level by level, left to right, with no gaps. This keeps it short, with height about <code>log n</code>.</li>
+</ol>
+<figure class="fig"><div class="diagram"><pre> A min-heap as a tree               The same heap stored in an array
+
+           2                        index:  0  1  2  3  4  5  6
+         /   \                       value: [2, 4, 3, 9, 5, 8, 7]
+        4     3
+       / \   / \
+      9   5 8   7</pre></div><figcaption>Because there are no gaps, the tree fits neatly into an array, row after row.</figcaption></figure>
+
+<h3>The array trick</h3>
+<p>Since the shape has no gaps, we do not need node objects or links. We just use an array and compute where the relatives are from the index <code>i</code>:</p>
+<table><tr><th>Relative</th><th>Index</th></tr><tr><td>left child of <code>i</code></td><td><code>2*i + 1</code></td></tr><tr><td>right child of <code>i</code></td><td><code>2*i + 2</code></td></tr><tr><td>parent of <code>i</code></td><td><code>(i - 1) / 2</code> (integer division)</td></tr></table>
+
+<p>Check with the picture: index 1 holds 4. Its children are at <code>3</code> and <code>4</code>, which hold 9 and 5. Its parent is at <code>(1-1)/2 = 0</code>, which holds 2. It works.</p>
+<h3>Push: add at the end, then sift up</h3>
+<p>Put the new value in the first free spot (the end of the array). That keeps the shape rule, but the value might be smaller than its parent. So <strong>sift up</strong>: while it is smaller than its parent, swap them. It climbs at most the height of the tree, so push is <code>O(log n)</code>.</p>
+<h3>Pop: take the root, move the last item up, then sift down</h3>
+<p>The smallest value is at index 0. Remove it, then move the very last item into the root's place (to keep the shape rule). Now the root may be too big. So <strong>sift down</strong>: swap it with its smaller child until neither child is smaller. Again at most one trip down the tree: <code>O(log n)</code>. Peeking at the smallest value is <code>O(1)</code>.</p>
+<figure class="fig"><div class="diagram"><pre> push 1 into [2, 4, 3, 9, 5, 8, 7]
+
+ 1. add at the end:   [2, 4, 3, 9, 5, 8, 7, 1]      (index 7, parent is index 3 = 9)
+ 2. 1 &lt; 9, swap:      [2, 4, 3, 1, 5, 8, 7, 9]      (now index 3, parent is index 1 = 4)
+ 3. 1 &lt; 4, swap:      [2, 1, 3, 4, 5, 8, 7, 9]      (now index 1, parent is index 0 = 2)
+ 4. 1 &lt; 2, swap:      [1, 2, 3, 4, 5, 8, 7, 9]      (now index 0, no parent, done)</pre></div><figcaption>Sift up: the new value climbs until its parent is smaller.</figcaption></figure>
+<div class="try demo"><h3>Run it: build your own MinHeap</h3>
+<p>Watch the array after each push, and compare it with the sift-up picture. Popping everything gives the numbers in sorted order.</p>
+<pre><code>class MinHeap {
+    private val a = ArrayList&lt;Int&gt;()
+
+    val size: Int get() = a.size
+    fun isEmpty() = a.isEmpty()
+
+    fun peek(): Int {
+        if (a.isEmpty()) throw NoSuchElementException("heap is empty")
+        return a[0]
+    }
+
+    fun push(x: Int) {
+        a.add(x)                  // put it in the first free spot
+        siftUp(a.size - 1)
+    }
+
+    fun pop(): Int {
+        if (a.isEmpty()) throw NoSuchElementException("heap is empty")
+        val top = a[0]
+        val last = a.removeAt(a.size - 1)
+        if (a.isNotEmpty()) {
+            a[0] = last           // move the last item to the root
+            siftDown(0)
+        }
+        return top
+    }
+
+    private fun siftUp(start: Int) {
+        var i = start
+        while (i &gt; 0) {
+            val parent = (i - 1) / 2
+            if (a[i] &gt;= a[parent]) break
+            swap(i, parent)
+            i = parent
+        }
+    }
+
+    private fun siftDown(start: Int) {
+        var i = start
+        while (true) {
+            val left = 2 * i + 1
+            val right = 2 * i + 2
+            var smallest = i
+            if (left &lt; a.size &amp;&amp; a[left] &lt; a[smallest]) smallest = left
+            if (right &lt; a.size &amp;&amp; a[right] &lt; a[smallest]) smallest = right
+            if (smallest == i) break
+            swap(i, smallest)
+            i = smallest
+        }
+    }
+
+    private fun swap(i: Int, j: Int) {
+        val t = a[i]; a[i] = a[j]; a[j] = t
+    }
+
+    override fun toString() = a.toString()
+}
+
+fun main() {
+    val heap = MinHeap()
+    for (x in listOf(9, 4, 7, 1, 8, 2)) {
+        heap.push(x)
+        println("push $x -&gt; $heap")
+    }
+    print("pop order:")
+    while (!heap.isEmpty()) print(" ${heap.pop()}")
+    println()
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-minheap">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-minheap">class MinHeap {
+    private val a = ArrayList<Int>()
+
+    val size: Int get() = a.size
+    fun isEmpty() = a.isEmpty()
+
+    fun peek(): Int {
+        if (a.isEmpty()) throw NoSuchElementException("heap is empty")
+        return a[0]
+    }
+
+    fun push(x: Int) {
+        a.add(x)                  // put it in the first free spot
+        siftUp(a.size - 1)
+    }
+
+    fun pop(): Int {
+        if (a.isEmpty()) throw NoSuchElementException("heap is empty")
+        val top = a[0]
+        val last = a.removeAt(a.size - 1)
+        if (a.isNotEmpty()) {
+            a[0] = last           // move the last item to the root
+            siftDown(0)
+        }
+        return top
+    }
+
+    private fun siftUp(start: Int) {
+        var i = start
+        while (i > 0) {
+            val parent = (i - 1) / 2
+            if (a[i] >= a[parent]) break
+            swap(i, parent)
+            i = parent
+        }
+    }
+
+    private fun siftDown(start: Int) {
+        var i = start
+        while (true) {
+            val left = 2 * i + 1
+            val right = 2 * i + 2
+            var smallest = i
+            if (left < a.size && a[left] < a[smallest]) smallest = left
+            if (right < a.size && a[right] < a[smallest]) smallest = right
+            if (smallest == i) break
+            swap(i, smallest)
+            i = smallest
+        }
+    }
+
+    private fun swap(i: Int, j: Int) {
+        val t = a[i]; a[i] = a[j]; a[j] = t
+    }
+
+    override fun toString() = a.toString()
+}
+
+fun main() {
+    val heap = MinHeap()
+    for (x in listOf(9, 4, 7, 1, 8, 2)) {
+        heap.push(x)
+        println("push $x -> $heap")
+    }
+    print("pop order:")
+    while (!heap.isEmpty()) print(" ${heap.pop()}")
+    println()
+}
+</script></div>
+
+<p>Pushing <code>n</code> items and popping them all is itself a sorting method called <strong>heap sort</strong>: <code>O(n log n)</code> time. Real heap sort does it inside one array without extra space, but the idea is the same.</p>
+<h3>The ready-made one: PriorityQueue</h3>
+<p>In everyday code use <code>java.util.PriorityQueue</code>. It is a min-heap by default. To change the order, hand it a <strong>comparator</strong>: a small rule that says which of two items comes first. Use <code>compareBy</code> for the field to sort on, or reverse it to get a max-heap.</p>
+<div class="try demo"><h3>Run it: PriorityQueue, comparators, top-k and heap sort</h3>
+<p>Top-k keeps only <code>k</code> items in the heap, so it costs <code>O(n log k)</code> time and <code>O(k)</code> space. That beats sorting everything when <code>k</code> is small and <code>n</code> is huge, for example the ten best scores out of ten million.</p>
+<pre><code>import java.util.PriorityQueue
+
+data class Task(val name: String, val priority: Int)
+
+// The k largest numbers, using a min-heap that never grows past k items.
+fun kLargest(nums: List&lt;Int&gt;, k: Int): List&lt;Int&gt; {
+    val heap = PriorityQueue&lt;Int&gt;()          // smallest of the kept ones is on top
+    for (x in nums) {
+        heap.add(x)
+        if (heap.size &gt; k) heap.poll()       // throw away the smallest
+    }
+    return heap.sortedDescending()
+}
+
+fun heapSort(nums: List&lt;Int&gt;): List&lt;Int&gt; {
+    val heap = PriorityQueue&lt;Int&gt;(nums)
+    val out = mutableListOf&lt;Int&gt;()
+    while (heap.isNotEmpty()) out.add(heap.poll())
+    return out
+}
+
+fun main() {
+    // 1. Min-heap by default
+    val mins = PriorityQueue&lt;Int&gt;()
+    mins.addAll(listOf(5, 1, 4))
+    println("smallest first: ${mins.poll()}")
+
+    // 2. Max-heap by reversing the order
+    val maxs = PriorityQueue&lt;Int&gt;(compareByDescending { it })
+    maxs.addAll(listOf(5, 1, 4))
+    println("largest first : ${maxs.poll()}")
+
+    // 3. Order custom objects with a comparator
+    val tasks = PriorityQueue&lt;Task&gt;(compareBy { it.priority })
+    tasks.add(Task("write report", 3))
+    tasks.add(Task("fix crash", 1))
+    tasks.add(Task("reply to mail", 2))
+    while (tasks.isNotEmpty()) println("do: ${tasks.poll().name}")
+
+    // 4. Top-k and heap sort
+    val data = listOf(7, 2, 9, 4, 11, 3, 8)
+    println("top 3 : ${kLargest(data, 3)}")
+    println("sorted: ${heapSort(data)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-pq">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-pq">import java.util.PriorityQueue
+
+data class Task(val name: String, val priority: Int)
+
+// The k largest numbers, using a min-heap that never grows past k items.
+fun kLargest(nums: List<Int>, k: Int): List<Int> {
+    val heap = PriorityQueue<Int>()          // smallest of the kept ones is on top
+    for (x in nums) {
+        heap.add(x)
+        if (heap.size > k) heap.poll()       // throw away the smallest
+    }
+    return heap.sortedDescending()
+}
+
+fun heapSort(nums: List<Int>): List<Int> {
+    val heap = PriorityQueue<Int>(nums)
+    val out = mutableListOf<Int>()
+    while (heap.isNotEmpty()) out.add(heap.poll())
+    return out
+}
+
+fun main() {
+    // 1. Min-heap by default
+    val mins = PriorityQueue<Int>()
+    mins.addAll(listOf(5, 1, 4))
+    println("smallest first: ${mins.poll()}")
+
+    // 2. Max-heap by reversing the order
+    val maxs = PriorityQueue<Int>(compareByDescending { it })
+    maxs.addAll(listOf(5, 1, 4))
+    println("largest first : ${maxs.poll()}")
+
+    // 3. Order custom objects with a comparator
+    val tasks = PriorityQueue<Task>(compareBy { it.priority })
+    tasks.add(Task("write report", 3))
+    tasks.add(Task("fix crash", 1))
+    tasks.add(Task("reply to mail", 2))
+    while (tasks.isNotEmpty()) println("do: ${tasks.poll().name}")
+
+    // 4. Top-k and heap sort
+    val data = listOf(7, 2, 9, 4, 11, 3, 8)
+    println("top 3 : ${kLargest(data, 3)}")
+    println("sorted: ${heapSort(data)}")
+}
+</script></div>
+<div class="note"><p><strong>Careful.</strong> Iterating over a <code>PriorityQueue</code> or printing it does <em>not</em> give sorted order. Only <code>poll()</code> gives the smallest. The array is only partly ordered, just enough to keep the smallest on top.</p></div>
+<h2 id="trie">8. Tries: trees for words</h2>
+
+<p>How does a phone keyboard suggest words while you type? It needs to find all words that start with what you have typed so far. Scanning every word in the dictionary for each key press would be slow. A <strong>trie</strong> (say "try", from re<em>trie</em>val), also called a <strong>prefix tree</strong>, is built for exactly this.</p>
+<div class="analogy"><p><strong>A dictionary with thumb tabs.</strong> You flip to the tab for the first letter, then to the section for the second letter, and so on. Each step narrows the words down.</p></div>
+
+<p>In a trie each node stands for a letter, and a path from the root spells a prefix. Words that share a beginning share the same nodes. A flag on a node says "a word ends here". Below we store <code>car</code>, <code>cat</code>, <code>can</code> and <code>do</code>. The nodes marked with a star end a word.</p>
+<figure class="fig"><div class="diagram"><pre>         (root)
+         /    \
+        c      d
+        |      |
+        a      o*          &lt;- "do" ends here
+      / | \
+     r* t* n*              &lt;- "car", "cat", "can"</pre></div><figcaption>Three words share the path c, a. Only the last letter differs.</figcaption></figure>
+
+<p>Each node keeps a map from letter to child node. Operations walk one letter at a time:</p>
+<ul>
+<li><strong>insert(word)</strong>: follow the letters, creating missing nodes, and mark the last node as a word end.</li>
+<li><strong>search(word)</strong>: follow the letters; the word exists only if the path exists <em>and</em> the last node is marked as a word end. (Otherwise you only found a prefix: <code>ca</code> is on the path but not a stored word.)</li>
+<li><strong>startsWith(prefix)</strong>: follow the letters; it only needs the path to exist.</li>
+</ul>
+<div class="try demo"><h3>Run it: a trie with autocomplete</h3>
+<p>Type a prefix, get a list of words. This is the heart of autocomplete.</p>
+<pre><code>class TrieNode {
+    val next = HashMap&lt;Char, TrieNode&gt;()
+    var isWord = false
+}
+
+class Trie {
+    private val root = TrieNode()
+
+    fun insert(word: String) {
+        var cur = root
+        for (c in word) cur = cur.next.getOrPut(c) { TrieNode() }
+        cur.isWord = true
+    }
+
+    private fun find(prefix: String): TrieNode? {
+        var cur = root
+        for (c in prefix) cur = cur.next[c] ?: return null
+        return cur
+    }
+
+    fun search(word: String): Boolean = find(word)?.isWord == true
+
+    fun startsWith(prefix: String): Boolean = find(prefix) != null
+
+    // Autocomplete: every stored word that begins with the prefix, in alphabetical order.
+    fun wordsWithPrefix(prefix: String): List&lt;String&gt; {
+        val start = find(prefix) ?: return emptyList()
+        val out = mutableListOf&lt;String&gt;()
+        fun collect(node: TrieNode, soFar: String) {
+            if (node.isWord) out.add(soFar)
+            for (c in node.next.keys.sorted()) collect(node.next.getValue(c), soFar + c)
+        }
+        collect(start, prefix)
+        return out
+    }
+}
+
+fun main() {
+    val trie = Trie()
+    for (w in listOf("car", "cat", "can", "candy", "do", "dog")) trie.insert(w)
+
+    println("search car    : ${trie.search("car")}")
+    println("search ca     : ${trie.search("ca")}")        // a prefix, not a word
+    println("startsWith ca : ${trie.startsWith("ca")}")
+    println("startsWith x  : ${trie.startsWith("x")}")
+    println("ca* -&gt; ${trie.wordsWithPrefix("ca")}")
+    println("do* -&gt; ${trie.wordsWithPrefix("do")}")
+    println("z*  -&gt; ${trie.wordsWithPrefix("z")}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-trie">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-trie">class TrieNode {
+    val next = HashMap<Char, TrieNode>()
+    var isWord = false
+}
+
+class Trie {
+    private val root = TrieNode()
+
+    fun insert(word: String) {
+        var cur = root
+        for (c in word) cur = cur.next.getOrPut(c) { TrieNode() }
+        cur.isWord = true
+    }
+
+    private fun find(prefix: String): TrieNode? {
+        var cur = root
+        for (c in prefix) cur = cur.next[c] ?: return null
+        return cur
+    }
+
+    fun search(word: String): Boolean = find(word)?.isWord == true
+
+    fun startsWith(prefix: String): Boolean = find(prefix) != null
+
+    // Autocomplete: every stored word that begins with the prefix, in alphabetical order.
+    fun wordsWithPrefix(prefix: String): List<String> {
+        val start = find(prefix) ?: return emptyList()
+        val out = mutableListOf<String>()
+        fun collect(node: TrieNode, soFar: String) {
+            if (node.isWord) out.add(soFar)
+            for (c in node.next.keys.sorted()) collect(node.next.getValue(c), soFar + c)
+        }
+        collect(start, prefix)
+        return out
+    }
+}
+
+fun main() {
+    val trie = Trie()
+    for (w in listOf("car", "cat", "can", "candy", "do", "dog")) trie.insert(w)
+
+    println("search car    : ${trie.search("car")}")
+    println("search ca     : ${trie.search("ca")}")        // a prefix, not a word
+    println("startsWith ca : ${trie.startsWith("ca")}")
+    println("startsWith x  : ${trie.startsWith("x")}")
+    println("ca* -> ${trie.wordsWithPrefix("ca")}")
+    println("do* -> ${trie.wordsWithPrefix("do")}")
+    println("z*  -> ${trie.wordsWithPrefix("z")}")
+}
+</script></div>
+
+<p><strong>Cost.</strong> Let <code>L</code> be the length of the word. Insert, search and startsWith take <code>O(L)</code> time, and notably they do <em>not</em> depend on how many words are stored. The price is memory: the trie holds up to one node per letter stored, so space is <code>O(total letters)</code>. A hash set also finds a whole word in about <code>O(L)</code> time, but it cannot answer prefix questions without scanning everything. That is where the trie wins.</p>
+<h2 id="cost">9. Complexity at a glance</h2>
+
+<p>Here are the costs from this part in one place. <code>n</code> is the number of items, <code>h</code> the tree height, <code>k</code> the number you keep, and <code>L</code> the word length.</p>
+<table><tr><th>Structure / operation</th><th>Time</th><th>Notes</th></tr><tr><td>Any tree traversal (DFS or BFS)</td><td><code>O(n)</code></td><td>Visits each node once. Space <code>O(h)</code> for DFS, up to <code>O(n)</code> for BFS.</td></tr><tr><td>Height, size, mirror, same-tree</td><td><code>O(n)</code></td><td>One pass over the nodes.</td></tr><tr><td>BST search / insert, balanced</td><td><code>O(log n)</code></td><td>Height is about <code>log n</code>.</td></tr><tr><td>BST search / insert, skewed</td><td><code>O(n)</code></td><td>Height is <code>n</code>, like a list.</td></tr><tr><td>AVL / red-black / <code>TreeMap</code></td><td><code>O(log n)</code></td><td>Always, because the tree rebalances itself.</td></tr><tr><td>Heap: peek smallest</td><td><code>O(1)</code></td><td>It is at index 0.</td></tr><tr><td>Heap: push and pop</td><td><code>O(log n)</code></td><td>One trip up or down the tree.</td></tr><tr><td>Heap: build from <code>n</code> items by pushing</td><td><code>O(n log n)</code></td><td>Heap sort uses this idea.</td></tr><tr><td>Top-k with a heap of size k</td><td><code>O(n log k)</code></td><td>Space <code>O(k)</code>.</td></tr><tr><td>Trie insert / search / startsWith</td><td><code>O(L)</code></td><td>Independent of the number of words.</td></tr></table>
+
+<p>Notice the theme: a tree turns a long line into a short, branching path. Going from <code>n</code> steps to about <code>log n</code> is the whole point, and the catch is always the same, namely keeping the tree balanced.</p>
+<h2 id="practice">10. Practice</h2>
+<p>Five exercises, from a first recursion on a tree to a data structure of your own. Each one has edge cases on purpose: an empty tree, a single node and a skewed tree. Think about those before you run the tests.</p>
+<div class="try"><h3>Try it: maximum depth of a tree</h3>
+<p>Fill in <code>maxDepth</code>: the number of nodes on the longest path from the root down to a leaf. An empty tree has depth 0. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun maxDepth(root: TreeNode?): Int {
+    TODO("1 + the larger depth of the two children")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-max-depth">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-max-depth">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun maxDepth(root: TreeNode?): Int {
+    TODO("1 + the larger depth of the two children")
+}
+
+fun main() {
+    test("empty tree") { eq(maxDepth(null), 0) }
+    test("single node") { eq(maxDepth(TreeNode(1)), 1) }
+    test("balanced") { eq(maxDepth(TreeNode(1, TreeNode(2), TreeNode(3))), 2) }
+    test("left chain") { eq(maxDepth(TreeNode(1, TreeNode(2, TreeNode(3, TreeNode(4))))), 4) }
+    test("right chain") { eq(maxDepth(TreeNode(1, null, TreeNode(2, null, TreeNode(3)))), 3) }
+    test("uneven") { eq(maxDepth(TreeNode(1, TreeNode(2, TreeNode(4, TreeNode(8))), TreeNode(3))), 4) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> The empty tree is the base case. For any other node, ask both children for their depth, take the larger, and add one for yourself.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun maxDepth(root: TreeNode?): Int {
+    if (root == null) return 0
+    return 1 + maxOf(maxDepth(root.left), maxDepth(root.right))
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: level-order traversal</h3>
+<p>Write <code>levelOrder</code>, which returns the values grouped by level, top to bottom, each level left to right. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun levelOrder(root: TreeNode?): List&lt;List&lt;Int&gt;&gt; {
+    TODO("use a queue; process one whole level per round")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-level-order">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-level-order">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun levelOrder(root: TreeNode?): List<List<Int>> {
+    TODO("use a queue; process one whole level per round")
+}
+
+fun main() {
+    test("empty tree") { eq(levelOrder(null), emptyList<List<Int>>()) }
+    test("single node") { eq(levelOrder(TreeNode(5)), listOf(listOf(5))) }
+    test("three levels") {
+        val t = TreeNode(3, TreeNode(9), TreeNode(20, TreeNode(15), TreeNode(7)))
+        eq(levelOrder(t), listOf(listOf(3), listOf(9, 20), listOf(15, 7)))
+    }
+    test("left chain") {
+        val t = TreeNode(1, TreeNode(2, TreeNode(3)))
+        eq(levelOrder(t), listOf(listOf(1), listOf(2), listOf(3)))
+    }
+    test("right child only at root") {
+        val t = TreeNode(1, null, TreeNode(2, TreeNode(3), null))
+        eq(levelOrder(t), listOf(listOf(1), listOf(2), listOf(3)))
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> At the start of each round, read <code>queue.size</code>: that is how many nodes belong to the current level. Process exactly that many, adding their children to the back.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun levelOrder(root: TreeNode?): List&lt;List&lt;Int&gt;&gt; {
+    val result = mutableListOf&lt;List&lt;Int&gt;&gt;()
+    if (root == null) return result
+    val queue = ArrayDeque&lt;TreeNode&gt;()
+    queue.addLast(root)
+    while (queue.isNotEmpty()) {
+        val level = mutableListOf&lt;Int&gt;()
+        repeat(queue.size) {
+            val node = queue.removeFirst()
+            level.add(node.value)
+            node.left?.let { queue.addLast(it) }
+            node.right?.let { queue.addLast(it) }
+        }
+        result.add(level)
+    }
+    return result
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: is it a binary search tree?</h3>
+<p>Write <code>isValidBst</code>. Duplicates are not allowed. Remember that comparing a node only to its parent is not enough: pass the allowed range down. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun isValidBst(root: TreeNode?): Boolean {
+    TODO("carry a low and a high limit down the tree")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-valid-bst">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-valid-bst">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun isValidBst(root: TreeNode?): Boolean {
+    TODO("carry a low and a high limit down the tree")
+}
+
+fun main() {
+    test("empty tree") { eq(isValidBst(null), true) }
+    test("single node") { eq(isValidBst(TreeNode(7)), true) }
+    test("valid") { eq(isValidBst(TreeNode(2, TreeNode(1), TreeNode(3))), true) }
+    test("left child too big") { eq(isValidBst(TreeNode(2, TreeNode(3), null)), false) }
+    test("duplicate value") { eq(isValidBst(TreeNode(2, TreeNode(2), null)), false) }
+    test("deep node breaks an ancestor") {
+        // 5 -> right child 6 has a left child 3, which is smaller than 5
+        val t = TreeNode(5, TreeNode(1), TreeNode(6, TreeNode(3), TreeNode(7)))
+        eq(isValidBst(t), false)
+    }
+    test("valid skewed chain") { eq(isValidBst(TreeNode(1, null, TreeNode(2, null, TreeNode(3)))), true) }
+    test("values at the Int limits") {
+        eq(isValidBst(TreeNode(Int.MAX_VALUE, TreeNode(Int.MIN_VALUE), null)), true)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Use <code>null</code> to mean "no limit". Going left, the new high is the current value. Going right, the new low is the current value.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class TreeNode(val value: Int, var left: TreeNode? = null, var right: TreeNode? = null)
+
+fun isValidBst(root: TreeNode?): Boolean {
+    fun check(node: TreeNode?, low: Int?, high: Int?): Boolean {
+        if (node == null) return true
+        if (low != null &amp;&amp; node.value &lt;= low) return false
+        if (high != null &amp;&amp; node.value &gt;= high) return false
+        return check(node.left, low, node.value) &amp;&amp; check(node.right, node.value, high)
+    }
+    return check(root, null, null)
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: the k largest numbers</h3>
+<p>Write <code>kLargest(nums, k)</code>: return the <code>k</code> largest numbers, biggest first. Use a <code>PriorityQueue</code> that never holds more than <code>k</code> items. If there are fewer than <code>k</code> numbers, return them all. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun kLargest(nums: List&lt;Int&gt;, k: Int): List&lt;Int&gt; {
+    TODO("keep a min-heap of size k, throw away the smallest when it grows")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-k-largest">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-k-largest">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun kLargest(nums: List<Int>, k: Int): List<Int> {
+    TODO("keep a min-heap of size k, throw away the smallest when it grows")
+}
+
+fun main() {
+    test("empty list") { eq(kLargest(emptyList(), 3), emptyList<Int>()) }
+    test("k is zero") { eq(kLargest(listOf(4, 5), 0), emptyList<Int>()) }
+    test("basic") { eq(kLargest(listOf(7, 2, 9, 4, 11, 3, 8), 3), listOf(11, 9, 8)) }
+    test("k bigger than the list") { eq(kLargest(listOf(2, 5), 5), listOf(5, 2)) }
+    test("duplicates") { eq(kLargest(listOf(5, 5, 1, 5), 2), listOf(5, 5)) }
+    test("negative numbers") { eq(kLargest(listOf(-3, -1, -7), 1), listOf(-1)) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Add each number, and whenever the heap holds more than <code>k</code> items, <code>poll()</code> removes the smallest. What is left are the largest <code>k</code>. Handle <code>k = 0</code> first.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun kLargest(nums: List&lt;Int&gt;, k: Int): List&lt;Int&gt; {
+    if (k &lt;= 0) return emptyList()
+    val heap = java.util.PriorityQueue&lt;Int&gt;()
+    for (x in nums) {
+        heap.add(x)
+        if (heap.size &gt; k) heap.poll()
+    }
+    return heap.sortedDescending()
+}</code></pre>
+</details></div>
+<div class="try"><h3>Try it: build a trie</h3>
+<p>Complete the three methods of <code>Trie</code>. Remember: <code>search</code> needs the last node to be marked as a word end, while <code>startsWith</code> only needs the path. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class TrieNode {
+    val next = HashMap&lt;Char, TrieNode&gt;()
+    var isWord = false
+}
+
+class Trie {
+    private val root = TrieNode()
+
+    fun insert(word: String) {
+        TODO("walk the letters, create missing nodes, mark the end")
+    }
+
+    fun search(word: String): Boolean {
+        TODO("path must exist and end on a word")
+    }
+
+    fun startsWith(prefix: String): Boolean {
+        TODO("path must exist")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p4-trie-build">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p4-trie-build">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class TrieNode {
+    val next = HashMap<Char, TrieNode>()
+    var isWord = false
+}
+
+class Trie {
+    private val root = TrieNode()
+
+    fun insert(word: String) {
+        TODO("walk the letters, create missing nodes, mark the end")
+    }
+
+    fun search(word: String): Boolean {
+        TODO("path must exist and end on a word")
+    }
+
+    fun startsWith(prefix: String): Boolean {
+        TODO("path must exist")
+    }
+}
+
+fun main() {
+    test("empty trie") {
+        val t = Trie()
+        eq(t.search("a"), false)
+        eq(t.startsWith("a"), false)
+    }
+    test("insert and search") {
+        val t = Trie()
+        t.insert("apple")
+        eq(t.search("apple"), true)
+    }
+    test("prefix is not a word") {
+        val t = Trie()
+        t.insert("apple")
+        eq(t.search("app"), false)
+        eq(t.startsWith("app"), true)
+    }
+    test("word that is a prefix of another") {
+        val t = Trie()
+        t.insert("app")
+        t.insert("apple")
+        eq(t.search("app"), true)
+        eq(t.search("apple"), true)
+        eq(t.search("apples"), false)
+    }
+    test("different branch") {
+        val t = Trie()
+        t.insert("car")
+        eq(t.startsWith("cat"), false)
+        eq(t.search("dog"), false)
+    }
+    test("empty prefix matches everything") {
+        val t = Trie()
+        t.insert("x")
+        eq(t.startsWith(""), true)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Write a small helper that follows a string from the root and returns the node it ends on, or <code>null</code> if a letter is missing. Then <code>search</code> and <code>startsWith</code> are one line each.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class TrieNode {
+    val next = HashMap&lt;Char, TrieNode&gt;()
+    var isWord = false
+}
+
+class Trie {
+    private val root = TrieNode()
+
+    fun insert(word: String) {
+        var cur = root
+        for (c in word) cur = cur.next.getOrPut(c) { TrieNode() }
+        cur.isWord = true
+    }
+
+    private fun find(prefix: String): TrieNode? {
+        var cur = root
+        for (c in prefix) cur = cur.next[c] ?: return null
+        return cur
+    }
+
+    fun search(word: String): Boolean = find(word)?.isWord == true
+
+    fun startsWith(prefix: String): Boolean = find(prefix) != null
+}</code></pre>
+</details></div>
+<div class="note"><p><strong>Going further.</strong> Try writing <code>sameTree</code> and <code>mirror</code> from the earlier demo without looking, then add a <code>delete</code> to the search tree. Deleting is the trickiest operation: a node with two children is replaced by the smallest value of its right subtree.</p></div>
+
+    <h2 id="takeaways">11. Takeaways</h2>
+    <ul><li>Most tree code is: handle the empty tree, trust the answers from both children, combine them.</li><li>Pick DFS when answers come from subtrees, BFS when depth or levels matter.</li><li>A BST is only fast if it stays balanced; use <code>TreeMap</code> or <code>TreeSet</code> instead of writing your own.</li><li>Validate a BST with a range, not by comparing a node with its parent alone.</li><li>A heap is a tree in an array: children at <code>2i+1</code> and <code>2i+2</code>, parent at <code>(i-1)/2</code>.</li><li>Use a size-k heap for top-k; use a trie when you need prefix queries.</li><li>Next up: graphs, where nodes can connect to any other node and trees are just a special case.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Node</td><td>One box in a tree, holding a value and links to its children.</td></tr><tr><td>Root</td><td>The top node of a tree. It has no parent.</td></tr><tr><td>Leaf</td><td>A node with no children.</td></tr><tr><td>Depth</td><td>The number of steps down from the root to a node.</td></tr><tr><td>Height</td><td>The length of the longest path from a node down to a leaf.</td></tr><tr><td>Subtree</td><td>A node together with everything below it.</td></tr><tr><td>Binary tree</td><td>A tree where each node has at most a left and a right child.</td></tr><tr><td>Traversal</td><td>Visiting every node of a tree once, in some order.</td></tr><tr><td>Binary search tree</td><td>A binary tree where left values are smaller and right values are larger, at every node.</td></tr><tr><td>Balanced tree</td><td>A tree whose height stays close to <code>log n</code>.</td></tr><tr><td>Skewed tree</td><td>A tree that has degenerated into a chain, with height close to <code>n</code>.</td></tr><tr><td>Heap</td><td>A tree, usually stored in an array, where every parent is no larger than its children (min-heap).</td></tr><tr><td>Priority queue</td><td>A queue where the item with the best priority leaves first.</td></tr><tr><td>Sift up / sift down</td><td>Swapping a value with its parent or child until the heap rule holds again.</td></tr><tr><td>Trie</td><td>A prefix tree: each path from the root spells a prefix, and shared prefixes share nodes.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-3-stacks-queues-linked-lists.html"><small>&larr; Previous &middot; Part 3</small>Stacks, queues and linked lists</a><a class="next" href="dsa-part-5-graphs.html"><small>Next &middot; Part 5 &rarr;</small>Graphs and how to walk them</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>

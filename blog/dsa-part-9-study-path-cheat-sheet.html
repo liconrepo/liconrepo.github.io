@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Structures and Algorithms, Part 9: Study Path and Cheat Sheet — Khairul Alam</title>
+  <meta name="description" content="The wrap-up of the data structures and algorithms series in Kotlin: a Big-O, Theta and Omega primer, complete time and space cheat sheets, a which-structure-to-use table, a study routine, debugging and randomized testing habits, real-world examples, capstone projects and further reading." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+
+    /* ── Runnable exercises ── */
+    .try { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 6%, var(--card)); border-radius: 14px; padding: 6px 20px 16px; margin: 28px 0; }
+    .try h3 { margin-top: 14px; }
+    .pg-btn { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 6px; padding: 9px 16px; border-radius: 10px; background: #10b981; color: #04140d; font-weight: 600; font-size: calc(14px * var(--fs, 1)); text-decoration: none; border: 1px solid color-mix(in srgb, #10b981 70%, #000); }
+    .pg-btn:hover { background: #34d399; }
+    .try pre { margin: 12px 0; }
+    .try-hint { font-size: calc(14px * var(--fs, 1)); color: var(--sub); }
+    .try details { margin-top: 8px; }
+    .try summary { cursor: pointer; color: var(--accent); font-size: calc(14px * var(--fs, 1)); font-weight: 500; }
+      /* ── Series navigation ── */
+    .series { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 0; }
+    .series a { flex: 1 1 140px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: calc(13px * var(--fs, 1)); color: var(--sub); line-height: 1.4; }
+    .series a small { display: block; font-size: .8em; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .series a:hover { border-color: var(--border-h); color: var(--text); }
+    .series a.on { border-color: var(--accent); color: var(--text); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 44px; flex-wrap: wrap; }
+    .pager a { flex: 1 1 240px; text-decoration: none; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 14px 16px; color: var(--text); }
+    .pager a small { display: block; color: var(--muted); font-size: calc(12px * var(--fs, 1)); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+    .pager a:hover { border-color: var(--border-h); }
+    .pager .next { text-align: right; }
+    .try.demo { border-color: var(--border); background: var(--card); }
+    .try.demo .pg-btn { background: var(--accent); color: #fff; border-color: transparent; }
+</style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Data Structures, Algorithms and Programming Patterns &middot; Part 9 of 9</p>
+    <h1>Data Structures and Algorithms, Part 9: Study Path and Cheat Sheet</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~40 min with exercises</span></div>
+    <div class="tags"><span class="tag">Data structures</span><span class="tag">Algorithms</span><span class="tag">Cheat sheet</span><span class="tag">Study plan</span><span class="tag">Kotlin</span><span class="tag">For beginners</span></div>
+    <div class="series" role="navigation" aria-label="Series">
+      <a href="dsa-part-1-start-here.html"><small>Part 1</small>Start here</a><a href="dsa-part-2-arrays-strings-hashing.html"><small>Part 2</small>Arrays and hashing</a><a href="dsa-part-3-stacks-queues-linked-lists.html"><small>Part 3</small>Stacks and queues</a><a href="dsa-part-4-trees-heaps-tries.html"><small>Part 4</small>Trees and heaps</a><a href="dsa-part-5-graphs.html"><small>Part 5</small>Graphs</a><a href="dsa-part-6-sorting-and-searching.html"><small>Part 6</small>Sorting and search</a><a href="dsa-part-7-recursion-backtracking-dp.html"><small>Part 7</small>Recursion and DP</a><a href="dsa-part-8-problem-solving-patterns.html"><small>Part 8</small>Patterns</a><a class="on" href="dsa-part-9-study-path-cheat-sheet.html"><small>Part 9</small>Study path</a>
+    </div>
+
+    <p class="lede">You now know the main data structures and the main ways to solve problems with them. This last part is the one to bookmark: a recap, a Big-O cheat sheet, a table for choosing a structure, a practice routine, testing habits, real systems that use these ideas, and projects to build next.</p>
+
+    <div class="callout">
+      <strong>This part in 60 seconds</strong>
+      <ul><li><code>O</code> is an upper bound, <code>&Omega;</code> a lower bound and <code>&Theta;</code> a tight bound; best, average and worst case are a separate idea.</li><li>The cheat sheets list the best, average and worst cost and the space of every structure and algorithm in the series.</li><li>Choose a structure by the operation you need most: lookup, order, smallest-first, LIFO or FIFO, prefix, connectivity, shortest path.</li><li>Study by predicting, running, breaking and rewriting from memory, with spaced repetition and a mistakes log.</li><li>Test fast code against a brute-force version on many seeded random inputs.</li><li>Build one of the capstone projects to make the ideas yours.</li></ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol><li><a href="#recap">The series on one page</a></li><li><a href="#notation">Big-O, Theta and Omega</a></li><li><a href="#fullsheet">Complete cheat sheet: best, average and worst</a></li><li><a href="#bigo">Big-O cheat sheet</a></li><li><a href="#choose">Which structure should I use?</a></li><li><a href="#study">How to study this material</a></li><li><a href="#debug">Debugging and testing algorithms</a></li><li><a href="#real">Where this shows up in real systems</a></li><li><a href="#capstone">Capstone mini-projects</a></li><li><a href="#reading">Further reading</a></li><li><a href="#takeaways">Takeaways</a></li></ol>
+    </details>
+
+<h2 id="recap">1. The series on one page</h2>
+
+<p>You have come a long way. This part is a map you can come back to: what each part gave you, a cheat sheet of costs, and a plan for what to do next. Keep it open in a tab while you practise.</p>
+<figure class="fig"><div class="diagram"><pre> Part 1  Cost        Big-O, time vs space, six-step method
+    |
+ Part 2  Arrays / strings / hash maps / sets   (the workhorses)
+    |
+ Part 3  Stacks / queues / deques / linked lists  (order rules)
+    |
+ Part 4  Trees / BST / heaps / tries           (hierarchy, "smallest first")
+    |
+ Part 5  Graphs: BFS, DFS, shortest path, union-find   (connections)
+    |
+ Part 6  Sorting and binary search             (put things in order, find fast)
+    |
+ Part 7  Recursion, backtracking, greedy, DP   (break problems down)
+    |
+ Part 8  Patterns: two pointers, window, prefix sums, ...
+    |
+ Part 9  Study path and cheat sheet            (you are here)</pre></div><figcaption>Each part builds on the one before it.</figcaption></figure>
+<table><tr><th>Part</th><th>The one idea to remember</th></tr><tr><td><a href="dsa-part-1-start-here.html">1. Start here</a></td><td>Count steps as the input grows. Write the slow, correct version first.</td></tr><tr><td><a href="dsa-part-2-arrays-strings-hashing.html">2. Arrays and hashing</a></td><td>A hash map turns "search the whole list" into "look it up".</td></tr><tr><td><a href="dsa-part-3-stacks-queues-linked-lists.html">3. Stacks and queues</a></td><td>Last in, first out (stack) and first in, first out (queue) solve many ordering problems.</td></tr><tr><td><a href="dsa-part-4-trees-heaps-tries.html">4. Trees and heaps</a></td><td>Shape matters: a balanced tree gives <code>O(log n)</code>; a heap gives the smallest item fast.</td></tr><tr><td><a href="dsa-part-5-graphs.html">5. Graphs</a></td><td>Many problems are really "things and connections". BFS finds fewest steps; DFS explores deep.</td></tr><tr><td><a href="dsa-part-6-sorting-and-searching.html">6. Sorting and searching</a></td><td>Sorted data lets you throw away half the search space each step.</td></tr><tr><td><a href="dsa-part-7-recursion-backtracking-dp.html">7. Recursion and DP</a></td><td>Solve small versions first; remember answers you have already computed.</td></tr><tr><td><a href="dsa-part-8-problem-solving-patterns.html">8. Patterns</a></td><td>Familiar shapes (window, two pointers, prefix sums) turn <code>O(n&sup2;)</code> into <code>O(n)</code>.</td></tr></table>
+<h2 id="notation">2. Big-O, Theta and Omega</h2>
+
+<p>Part 1 used Big-O for everything. There are really three symbols, and together they say how a cost <em>sits</em> against a growth rate. Think of a speed limit sign.</p>
+<div class="analogy"><p><strong>Driving to work.</strong> <code>O</code> is the speed limit: you never go faster than this (an <em>upper</em> bound). <code>&Omega;</code> is the minimum speed on a motorway: you never go slower (a <em>lower</em> bound). <code>&Theta;</code> is when the two signs show the same number: you drive at exactly that pace, give or take a constant (a <em>tight</em> bound).</p></div>
+<table><tr><th>Symbol</th><th>Say it</th><th>Plain meaning</th><th>Like</th></tr><tr><td><code>O(g)</code></td><td>big-O</td><td>The cost grows <strong>no faster</strong> than <code>g</code>.</td><td>&le; (at most)</td></tr><tr><td><code>&Omega;(g)</code></td><td>big-omega</td><td>The cost grows <strong>at least as fast</strong> as <code>g</code>.</td><td>&ge; (at least)</td></tr><tr><td><code>&Theta;(g)</code></td><td>theta</td><td>The cost grows <strong>exactly like</strong> <code>g</code>: both <code>O</code> and <code>&Omega;</code>.</td><td>= (the same rate)</td></tr></table>
+
+<h3>The definition, in words</h3>
+<p>Say <code>f(n)</code> is the number of steps. We write <code>f(n) = O(g(n))</code> when, for large enough <code>n</code>, <code>f(n)</code> is never more than some constant times <code>g(n)</code>. We write <code>f(n) = &Omega;(g(n))</code> when it is never less than some (smaller) constant times <code>g(n)</code>. We write <code>f(n) = &Theta;(g(n))</code> when both are true.</p>
+<figure class="fig"><div class="diagram"><pre> steps
+   ^                      c2 * g(n)   &lt;- upper bound: f is under this   (O)
+   |                    /
+   |                  /  .  f(n)
+   |                /  .
+   |              /  .       Theta = f(n) squeezed between
+   |            /.            c1 * g(n) and c2 * g(n)
+   |          /         c1 * g(n)   &lt;- lower bound: f is over this     (Omega)
+   |        /
+   +--------+---------------------------&gt; n
+            n0  (the bounds only need to hold from here on)</pre></div><figcaption>Theta means f is sandwiched between two scaled copies of g once n is big enough.</figcaption></figure>
+
+<p>Example: <code>f(n) = 3n + 10</code>. It is <code>O(n)</code> because <code>3n + 10 &le; 4n</code> once <code>n &ge; 10</code>. It is <code>&Omega;(n)</code> because <code>3n + 10 &ge; 3n</code>. So it is <code>&Theta;(n)</code>. It is also true, but loose, that it is <code>O(n&sup2;)</code>. Always give the tightest bound you can.</p>
+<div class="try demo"><h3>Run it: watch the bounds hold</h3>
+<p>The ratio <code>f/n</code> settles near a constant, which is what <code>&Theta;(n)</code> means. The ratio <code>f/n&sup2;</code> keeps falling to zero, so <code>n&sup2;</code> is a true but loose upper bound.</p>
+<pre><code>fun f(n: Int): Long = 3L * n + 10        // the real cost, in steps
+
+fun main() {
+    println("n         f(n)        f/n     f/n^2")
+    for (n in listOf(10, 100, 1000, 10_000, 100_000)) {
+        val steps = f(n)
+        println("%-9d %-11d %-7.2f %.6f".format(n, steps, steps.toDouble() / n, steps.toDouble() / n / n))
+    }
+    // f/n settles near 3: f is Theta(n). f/n^2 keeps shrinking: f is O(n^2) but not Omega(n^2).
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-bounds">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-bounds">fun f(n: Int): Long = 3L * n + 10        // the real cost, in steps
+
+fun main() {
+    println("n         f(n)        f/n     f/n^2")
+    for (n in listOf(10, 100, 1000, 10_000, 100_000)) {
+        val steps = f(n)
+        println("%-9d %-11d %-7.2f %.6f".format(n, steps, steps.toDouble() / n, steps.toDouble() / n / n))
+    }
+    // f/n settles near 3: f is Theta(n). f/n^2 keeps shrinking: f is O(n^2) but not Omega(n^2).
+}
+</script></div>
+
+<h3>Best case and worst case are not the same thing as O and &Omega;</h3>
+<p>This trips up almost everyone. <strong>Best, average and worst</strong> describe <em>which input</em> you feed the code. <strong>O, &Omega; and &Theta;</strong> describe <em>how you bound a growth rate</em>. You can use any symbol on any case: &ldquo;the worst case is <code>&Theta;(n)</code>&rdquo; and &ldquo;the best case is <code>O(1)</code>&rdquo; are both fine sentences.</p>
+<p>Cheat sheets squeeze this into one convention, and so do we below: <strong>&Omega; = best case, &Theta; = average (typical) case, O = worst case</strong>. It is a handy shortcut, not a law. Where an algorithm costs the same for every input, one &Theta; covers all three.</p>
+<div class="try demo"><h3>Run it: one algorithm, three costs</h3>
+<p>The best case stays at 1 step for any <code>n</code>, the typical case is about half the list, and the worst case is the whole list.</p>
+<pre><code>// Linear search: how many items do we look at?
+fun stepsToFind(list: List&lt;Int&gt;, target: Int): Int {
+    var steps = 0
+    for (x in list) { steps++; if (x == target) return steps }
+    return steps                       // not found: we looked at everything
+}
+
+fun main() {
+    println("n        best (first)   typical (middle)   worst (last or missing)")
+    for (n in listOf(10, 1000, 100_000)) {
+        val list = List(n) { it }
+        val best = stepsToFind(list, 0)
+        val middle = stepsToFind(list, n / 2)
+        val worst = stepsToFind(list, -1)
+        println("%-8d %-14d %-18d %d".format(n, best, middle, worst))
+    }
+    // best is Omega(1) (always 1), typical is Theta(n) (about n/2), worst is O(n).
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-search-cases">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-search-cases">// Linear search: how many items do we look at?
+fun stepsToFind(list: List<Int>, target: Int): Int {
+    var steps = 0
+    for (x in list) { steps++; if (x == target) return steps }
+    return steps                       // not found: we looked at everything
+}
+
+fun main() {
+    println("n        best (first)   typical (middle)   worst (last or missing)")
+    for (n in listOf(10, 1000, 100_000)) {
+        val list = List(n) { it }
+        val best = stepsToFind(list, 0)
+        val middle = stepsToFind(list, n / 2)
+        val worst = stepsToFind(list, -1)
+        println("%-8d %-14d %-18d %d".format(n, best, middle, worst))
+    }
+    // best is Omega(1) (always 1), typical is Theta(n) (about n/2), worst is O(n).
+}
+</script></div>
+
+<h3>Growth rates, ranked</h3>
+<p>Learn this ladder by heart. Each rung eventually beats every rung below it, however large the constants.</p>
+<p><code>1 &lt; log n &lt; &radic;n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n! &lt; n&#8319;</code></p>
+<table><tr><th>n</th><th>log&#8322; n</th><th>n</th><th>n log&#8322; n</th><th>n&sup2;</th><th>n&sup3;</th><th>2&#8319;</th><th>n!</th></tr><tr><td>10</td><td>3</td><td>10</td><td>33</td><td>100</td><td>1,000</td><td>1,024</td><td>3.6 million</td></tr><tr><td>100</td><td>7</td><td>100</td><td>664</td><td>10,000</td><td>1 million</td><td>1.3 &times; 10&sup3;&#8304;</td><td>9 &times; 10&#185;&#8309;&#8311;</td></tr><tr><td>1,000</td><td>10</td><td>1,000</td><td>9,966</td><td>1 million</td><td>1 billion</td><td>more than the atoms in the universe</td><td>unimaginable</td></tr></table>
+
+<h3>Rules for simplifying</h3>
+<ul>
+<li><strong>Drop constants:</strong> <code>5n</code> is <code>&Theta;(n)</code>.</li>
+<li><strong>Keep the biggest term:</strong> <code>n&sup2; + 100n + 7</code> is <code>&Theta;(n&sup2;)</code>.</li>
+<li><strong>Steps in a row add:</strong> <code>O(n) + O(n&sup2;) = O(n&sup2;)</code>.</li>
+<li><strong>Steps inside steps multiply:</strong> a loop of <code>n</code> around a body of <code>O(log n)</code> is <code>O(n log n)</code>.</li>
+<li><strong>Different inputs, different letters:</strong> looping over lists of sizes <code>m</code> and <code>n</code> is <code>O(m &middot; n)</code>, not <code>O(n&sup2;)</code>.</li>
+<li>The base of a logarithm does not matter: <code>log&#8322; n</code> and <code>log&#8321;&#8320; n</code> differ by a constant.</li>
+</ul>
+<h3>Common recurrences</h3>
+<p>Recursive code is analysed with a recurrence: the cost of size <code>n</code> in terms of smaller sizes. These four cover most of what you will meet.</p>
+<table><tr><th>Recurrence</th><th>What it looks like</th><th>Result</th><th>Example</th></tr><tr><td><code>T(n) = T(n-1) + O(1)</code></td><td>one call, one fewer item</td><td><code>&Theta;(n)</code></td><td>sum a list recursively</td></tr><tr><td><code>T(n) = T(n/2) + O(1)</code></td><td>one call on half</td><td><code>&Theta;(log n)</code></td><td>binary search</td></tr><tr><td><code>T(n) = 2T(n/2) + O(n)</code></td><td>two halves, linear merge</td><td><code>&Theta;(n log n)</code></td><td>merge sort</td></tr><tr><td><code>T(n) = 2T(n-1) + O(1)</code></td><td>two calls, one fewer item</td><td><code>&Theta;(2&#8319;)</code></td><td>naive Fibonacci, all subsets</td></tr></table>
+
+<details><summary>Quick quiz: name the class (answers hidden)</summary>
+<ol>
+<li>A loop from 1 to <code>n</code> containing another loop from 1 to <code>n</code>. <strong>&Theta;(n&sup2;)</strong></li>
+<li>A loop that does <code>i *= 2</code> until it passes <code>n</code>. <strong>&Theta;(log n)</strong></li>
+<li>Two separate loops over <code>n</code>, one after the other. <strong>&Theta;(n)</strong>, because <code>n + n = 2n</code>.</li>
+<li>An outer loop over <code>n</code> and an inner loop that runs <code>i</code> times. <strong>&Theta;(n&sup2;)</strong>, since <code>1 + 2 + ... + n = n(n+1)/2</code>.</li>
+<li>Reading one item from a <code>HashMap</code>. <strong>&Theta;(1)</strong> on average, <strong>O(n)</strong> in the worst case.</li>
+</ol>
+</details>
+<div class="try"><h3>Try it: see &Omega; and O with your own eyes</h3>
+<p>Write <code>insertionSortSteps</code>: sort a copy of the list with insertion sort and return how many comparisons it made. A sorted list should cost about <code>n</code> (the best case, &Omega;(n)); a reversed list about <code>n&sup2;/2</code> (the worst case, O(n&sup2;)). Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun insertionSortSteps(input: List&lt;Int&gt;): Int {
+    TODO("sort a copy and count how many times you compare two items")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-insertion-cases">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-insertion-cases">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun insertionSortSteps(input: List<Int>): Int {
+    TODO("sort a copy and count how many times you compare two items")
+}
+
+fun main() {
+    test("empty list needs no comparisons") { eq(insertionSortSteps(emptyList()), 0) }
+    test("sorted: n - 1 comparisons (best case)") { eq(insertionSortSteps(List(100) { it }), 99) }
+    test("reversed: n(n-1)/2 comparisons (worst case)") { eq(insertionSortSteps(List(100) { 100 - it }), 4950) }
+    test("mixed lands in between") {
+        val steps = insertionSortSteps(listOf(3, 1, 2, 5, 4))
+        check(steps in 4..10) { "expected between 4 and 10 but got $steps" }
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Count one comparison each time you test <code>a[j] &gt; key</code>, including the test that stops the inner loop.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun insertionSortSteps(input: List&lt;Int&gt;): Int {
+    val a = input.toMutableList()
+    var comparisons = 0
+    for (i in 1 until a.size) {
+        val key = a[i]
+        var j = i - 1
+        while (j &gt;= 0) {
+            comparisons++
+            if (a[j] &gt; key) { a[j + 1] = a[j]; j-- } else break
+        }
+        a[j + 1] = key
+    }
+    return comparisons
+}</code></pre>
+</details></div>
+<h2 id="fullsheet">3. Complete cheat sheet: best, average and worst</h2>
+
+<p>Columns follow the convention above: <strong>&Omega;</strong> best, <strong>&Theta;</strong> average or typical, <strong>O</strong> worst. When one value is shown, all three agree. Variables: <code>n</code> items, <code>V</code> vertices, <code>E</code> edges, <code>k</code> key or word length, <code>m</code> a value range.</p>
+<h3>Data structures: average and worst case</h3>
+<table><tr><th>Structure</th><th>Access</th><th>Search</th><th>Insert</th><th>Delete</th><th>Space</th></tr><tr><td>Array</td><td>&Theta;(1) / O(1)</td><td>&Theta;(n) / O(n)</td><td>&Theta;(n) / O(n)</td><td>&Theta;(n) / O(n)</td><td>O(n)</td></tr><tr><td>Dynamic array (<code>ArrayList</code>)</td><td>&Theta;(1) / O(1)</td><td>&Theta;(n) / O(n)</td><td>end: &Theta;(1) amortised, O(n) worst; middle: O(n)</td><td>end: &Theta;(1); middle: O(n)</td><td>O(n)</td></tr><tr><td>Singly linked list</td><td>&Theta;(n) / O(n)</td><td>&Theta;(n) / O(n)</td><td>head: &Theta;(1); tail: O(n), or O(1) with a tail pointer</td><td>head: &Theta;(1); given node: O(n) to find the previous one</td><td>O(n)</td></tr><tr><td>Doubly linked list</td><td>&Theta;(n) / O(n)</td><td>&Theta;(n) / O(n)</td><td>both ends: &Theta;(1)</td><td>given node: &Theta;(1)</td><td>O(n)</td></tr><tr><td>Stack</td><td>top: &Theta;(1)</td><td>&Theta;(n) / O(n)</td><td>push: &Theta;(1)</td><td>pop: &Theta;(1)</td><td>O(n)</td></tr><tr><td>Queue / deque</td><td>ends: &Theta;(1)</td><td>&Theta;(n) / O(n)</td><td>enqueue: &Theta;(1)</td><td>dequeue: &Theta;(1)</td><td>O(n)</td></tr><tr><td>Hash table</td><td>n/a</td><td>&Theta;(1) / O(n)</td><td>&Theta;(1) / O(n)</td><td>&Theta;(1) / O(n)</td><td>O(n)</td></tr><tr><td>Binary search tree</td><td>n/a</td><td>&Theta;(log n) / O(n)</td><td>&Theta;(log n) / O(n)</td><td>&Theta;(log n) / O(n)</td><td>O(n)</td></tr><tr><td>Balanced tree (AVL, red-black, <code>TreeMap</code>)</td><td>n/a</td><td>&Theta;(log n) / O(log n)</td><td>&Theta;(log n) / O(log n)</td><td>&Theta;(log n) / O(log n)</td><td>O(n)</td></tr><tr><td>B-tree (databases, file systems)</td><td>n/a</td><td>&Theta;(log n) / O(log n)</td><td>&Theta;(log n) / O(log n)</td><td>&Theta;(log n) / O(log n)</td><td>O(n)</td></tr><tr><td>Binary heap</td><td>min or max: &Theta;(1)</td><td>&Theta;(n) / O(n)</td><td>&Omega;(1), average &Theta;(1), O(log n)</td><td>remove top: &Theta;(log n) / O(log n)</td><td>O(n)</td></tr><tr><td>Trie</td><td>n/a</td><td>&Theta;(k) / O(k)</td><td>&Theta;(k) / O(k)</td><td>&Theta;(k) / O(k)</td><td>O(total letters)</td></tr><tr><td>Union-find (path compression + rank)</td><td>n/a</td><td>find: almost &Theta;(1)</td><td>union: almost &Theta;(1)</td><td>n/a</td><td>O(n)</td></tr></table>
+<div class="note"><p>A heap insert only moves up when the new item is smaller than its parent. On random data that is rare, so the average is constant; the worst case climbs the whole height, <code>log n</code>. Building a heap from <code>n</code> items at once is <code>&Theta;(n)</code>.</p></div>
+
+<h3>Graph representations</h3>
+<table><tr><th>Representation</th><th>Space</th><th>Is there an edge a to b?</th><th>List the neighbours of a</th><th>Add edge</th><th>Best for</th></tr><tr><td>Adjacency list</td><td>O(V + E)</td><td>O(degree of a)</td><td>O(degree of a)</td><td>O(1)</td><td>sparse graphs (most real ones)</td></tr><tr><td>Adjacency matrix</td><td>O(V&sup2;)</td><td>O(1)</td><td>O(V)</td><td>O(1)</td><td>dense graphs, fast edge lookups</td></tr><tr><td>Edge list</td><td>O(E)</td><td>O(E)</td><td>O(E)</td><td>O(1)</td><td>sorting edges (Kruskal)</td></tr></table>
+
+<h3>Sorting algorithms</h3>
+<table><tr><th>Algorithm</th><th>&Omega; best</th><th>&Theta; average</th><th>O worst</th><th>Extra space</th><th>Stable?</th></tr><tr><td>Bubble (with early exit)</td><td>&Omega;(n)</td><td>&Theta;(n&sup2;)</td><td>O(n&sup2;)</td><td>O(1)</td><td>yes</td></tr><tr><td>Selection</td><td>&Omega;(n&sup2;)</td><td>&Theta;(n&sup2;)</td><td>O(n&sup2;)</td><td>O(1)</td><td>no</td></tr><tr><td>Insertion</td><td>&Omega;(n)</td><td>&Theta;(n&sup2;)</td><td>O(n&sup2;)</td><td>O(1)</td><td>yes</td></tr><tr><td>Merge</td><td>&Omega;(n log n)</td><td>&Theta;(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>yes</td></tr><tr><td>Quick</td><td>&Omega;(n log n)</td><td>&Theta;(n log n)</td><td>O(n&sup2;)</td><td>O(log n)</td><td>no</td></tr><tr><td>Heap</td><td>&Omega;(n log n)</td><td>&Theta;(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>no</td></tr><tr><td>Tim sort (<code>sorted()</code> in Kotlin)</td><td>&Omega;(n)</td><td>&Theta;(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>yes</td></tr><tr><td>Counting</td><td>&Omega;(n + m)</td><td>&Theta;(n + m)</td><td>O(n + m)</td><td>O(m)</td><td>yes</td></tr><tr><td>Radix (<code>d</code> digits)</td><td>&Omega;(d &middot; (n + m))</td><td>&Theta;(d &middot; (n + m))</td><td>O(d &middot; (n + m))</td><td>O(n + m)</td><td>yes</td></tr><tr><td>Bucket</td><td>&Omega;(n + m)</td><td>&Theta;(n + m)</td><td>O(n&sup2;)</td><td>O(n + m)</td><td>yes</td></tr></table>
+
+<p>No sort that works only by comparing items can beat <code>&Omega;(n log n)</code> in the worst case (Part 6 shows why). Counting, radix and bucket sort escape that limit by not comparing.</p>
+<h3>Searching, graph and other algorithms</h3>
+<table><tr><th>Algorithm</th><th>&Omega; best</th><th>&Theta; average</th><th>O worst</th><th>Extra space</th><th>Needs</th></tr><tr><td>Linear search</td><td>&Omega;(1)</td><td>&Theta;(n)</td><td>O(n)</td><td>O(1)</td><td>nothing</td></tr><tr><td>Binary search</td><td>&Omega;(1)</td><td>&Theta;(log n)</td><td>O(log n)</td><td>O(1)</td><td>sorted data</td></tr><tr><td>Hash lookup</td><td>&Omega;(1)</td><td>&Theta;(1)</td><td>O(n)</td><td>O(n)</td><td>a good hash function</td></tr><tr><td>Quickselect (k-th smallest)</td><td>&Omega;(n)</td><td>&Theta;(n)</td><td>O(n&sup2;)</td><td>O(1)</td><td>nothing</td></tr><tr><td>BFS and DFS</td><td>&Theta;(V + E)</td><td>&Theta;(V + E)</td><td>O(V + E)</td><td>O(V)</td><td>adjacency list</td></tr><tr><td>Topological sort</td><td>&Theta;(V + E)</td><td>&Theta;(V + E)</td><td>O(V + E)</td><td>O(V)</td><td>a DAG</td></tr><tr><td>Dijkstra (binary heap)</td><td>&Theta;((V + E) log V)</td><td>&Theta;((V + E) log V)</td><td>O((V + E) log V)</td><td>O(V)</td><td>no negative weights</td></tr><tr><td>Bellman-Ford</td><td>&Omega;(E)</td><td>&Theta;(V &middot; E)</td><td>O(V &middot; E)</td><td>O(V)</td><td>handles negative weights</td></tr><tr><td>Floyd-Warshall (all pairs)</td><td>&Theta;(V&sup3;)</td><td>&Theta;(V&sup3;)</td><td>O(V&sup3;)</td><td>O(V&sup2;)</td><td>matrix of distances</td></tr><tr><td>Kruskal (minimum spanning tree)</td><td>&Theta;(E log E)</td><td>&Theta;(E log E)</td><td>O(E log E)</td><td>O(V)</td><td>sorted edges, union-find</td></tr><tr><td>Prim (binary heap)</td><td>&Theta;(E log V)</td><td>&Theta;(E log V)</td><td>O(E log V)</td><td>O(V)</td><td>adjacency list</td></tr><tr><td>Merge <code>k</code> sorted lists (heap)</td><td>&Theta;(N log k)</td><td>&Theta;(N log k)</td><td>O(N log k)</td><td>O(k)</td><td><code>N</code> items in total</td></tr><tr><td>Sieve of Eratosthenes</td><td>&Theta;(n log log n)</td><td>&Theta;(n log log n)</td><td>O(n log log n)</td><td>O(n)</td><td>primes up to <code>n</code></td></tr><tr><td>Euclid&rsquo;s gcd</td><td>&Omega;(1)</td><td>&Theta;(log n)</td><td>O(log n)</td><td>O(1)</td><td>two integers</td></tr><tr><td>Fast power (<code>x&#8319;</code> by squaring)</td><td>&Theta;(log n)</td><td>&Theta;(log n)</td><td>O(log n)</td><td>O(1)</td><td>nothing</td></tr></table>
+
+<h3>Dynamic programming and backtracking</h3>
+<table><tr><th>Problem</th><th>Time (&Theta;)</th><th>Extra space</th><th>Note</th></tr><tr><td>Fibonacci, naive recursion</td><td>&Theta;(2&#8319;)</td><td>O(n)</td><td>repeats sub-problems</td></tr><tr><td>Fibonacci, memo or table</td><td>&Theta;(n)</td><td>O(n), or O(1) with two variables</td><td>remember each answer once</td></tr><tr><td>Climbing stairs, house robber</td><td>&Theta;(n)</td><td>O(1) with rolling variables</td><td>one-dimensional DP</td></tr><tr><td>Coin change (fewest coins)</td><td>&Theta;(n &middot; amount)</td><td>O(amount)</td><td><code>n</code> coin types</td></tr><tr><td>Longest common subsequence</td><td>&Theta;(m &middot; n)</td><td>O(m &middot; n), or O(min(m, n)) for the length only</td><td>two strings</td></tr><tr><td>Edit distance</td><td>&Theta;(m &middot; n)</td><td>O(m &middot; n)</td><td>two strings</td></tr><tr><td>0/1 knapsack</td><td>&Theta;(n &middot; W)</td><td>O(W)</td><td><code>W</code> is the capacity</td></tr><tr><td>All subsets (backtracking)</td><td>&Theta;(n &middot; 2&#8319;)</td><td>O(n) depth</td><td>the output itself is huge</td></tr><tr><td>All permutations (backtracking)</td><td>&Theta;(n &middot; n!)</td><td>O(n) depth</td><td>only for small <code>n</code></td></tr></table>
+
+<h3>Space complexity in one glance</h3>
+<ul>
+<li><code>O(1)</code>: a few variables (iterative loops, two pointers, in-place swaps).</li>
+<li><code>O(log n)</code>: recursion that halves the input (binary search, quicksort&rsquo;s call stack).</li>
+<li><code>O(n)</code>: one extra copy or table (hash set, merge sort buffer, memo array).</li>
+<li><code>O(n&sup2;)</code>: a table over pairs (adjacency matrix, LCS table).</li>
+<li>Recursion depth counts as space: a recursion <code>n</code> calls deep uses <code>O(n)</code> stack, even if it allocates nothing else.</li>
+</ul>
+<div class="note"><p><strong>Quick reading tips.</strong> If you see a sort anywhere, add <code>n log n</code>. If you see a hash map, assume <code>O(1)</code> per operation. If you see nested loops, multiply. If you see recursion that branches twice with only one fewer item, think <code>2&#8319;</code>.</p></div>
+<h2 id="bigo">4. Big-O cheat sheet</h2>
+
+<p>Costs below are for the usual implementation and for the worst case unless the note says otherwise. <code>n</code> is the number of items, <code>V</code> and <code>E</code> are vertices and edges of a graph, and <code>k</code> is the length of a word or key.</p>
+<h3>Data structures</h3>
+<table><tr><th>Structure</th><th>Access by position</th><th>Search</th><th>Insert</th><th>Delete</th><th>Notes</th></tr><tr><td>Array (fixed)</td><td><code>O(1)</code></td><td><code>O(n)</code></td><td><code>O(n)</code> (shift)</td><td><code>O(n)</code> (shift)</td><td>Space <code>O(n)</code>. Size cannot change.</td></tr><tr><td>Dynamic array (<code>ArrayList</code>)</td><td><code>O(1)</code></td><td><code>O(n)</code></td><td><code>O(1)</code> amortised at the end, <code>O(n)</code> in the middle</td><td><code>O(1)</code> at the end, <code>O(n)</code> elsewhere</td><td>Doubles its storage when full, so occasional copies average out.</td></tr><tr><td>Linked list</td><td><code>O(n)</code></td><td><code>O(n)</code></td><td><code>O(1)</code> once you hold the node</td><td><code>O(1)</code> once you hold the node</td><td>Extra memory for the links. Poor for cache.</td></tr><tr><td>Stack (<code>ArrayDeque</code>)</td><td>top only</td><td><code>O(n)</code></td><td>push <code>O(1)</code></td><td>pop <code>O(1)</code></td><td>Last in, first out.</td></tr><tr><td>Queue (<code>ArrayDeque</code>)</td><td>front only</td><td><code>O(n)</code></td><td>enqueue <code>O(1)</code></td><td>dequeue <code>O(1)</code></td><td>First in, first out.</td></tr><tr><td>Hash map / set</td><td>n/a</td><td><code>O(1)</code> average, <code>O(n)</code> worst</td><td><code>O(1)</code> average</td><td><code>O(1)</code> average</td><td>No useful order. Worst case needs many collisions.</td></tr><tr><td>BST, unbalanced</td><td>n/a</td><td><code>O(h)</code>, up to <code>O(n)</code></td><td><code>O(h)</code></td><td><code>O(h)</code></td><td>Height <code>h</code> can be <code>n</code> if you insert sorted data.</td></tr><tr><td>BST, balanced (<code>TreeMap</code>)</td><td>n/a</td><td><code>O(log n)</code></td><td><code>O(log n)</code></td><td><code>O(log n)</code></td><td>Keeps keys in order; in-order walk is <code>O(n)</code>.</td></tr><tr><td>Binary heap (<code>PriorityQueue</code>)</td><td>min or max <code>O(1)</code></td><td><code>O(n)</code></td><td><code>O(log n)</code></td><td>remove top <code>O(log n)</code></td><td>Building a heap from <code>n</code> items is <code>O(n)</code>.</td></tr><tr><td>Trie</td><td>n/a</td><td><code>O(k)</code></td><td><code>O(k)</code></td><td><code>O(k)</code></td><td>Cost depends on word length, not on how many words. Space can be large.</td></tr><tr><td>Graph, adjacency list</td><td>n/a</td><td>BFS or DFS <code>O(V + E)</code></td><td>add edge <code>O(1)</code></td><td>remove edge <code>O(degree)</code></td><td>Space <code>O(V + E)</code>. Adjacency matrix: space <code>O(V&sup2;)</code>.</td></tr></table>
+
+<h3>Algorithms</h3>
+<table><tr><th>Algorithm</th><th>Time</th><th>Extra space</th><th>Notes</th></tr><tr><td>Linear search</td><td><code>O(n)</code></td><td><code>O(1)</code></td><td>Works on any list.</td></tr><tr><td>Binary search</td><td><code>O(log n)</code></td><td><code>O(1)</code></td><td>Needs sorted data.</td></tr><tr><td>Insertion sort</td><td><code>O(n&sup2;)</code> worst, <code>O(n)</code> if nearly sorted</td><td><code>O(1)</code></td><td>Good for tiny or almost-sorted input. Stable.</td></tr><tr><td>Merge sort</td><td><code>O(n log n)</code></td><td><code>O(n)</code></td><td>Stable. Predictable.</td></tr><tr><td>Quick sort</td><td><code>O(n log n)</code> average, <code>O(n&sup2;)</code> worst</td><td><code>O(log n)</code></td><td>Fast in practice. Bad pivots hurt.</td></tr><tr><td>Heap sort</td><td><code>O(n log n)</code></td><td><code>O(1)</code></td><td>In place, not stable.</td></tr><tr><td>Counting sort</td><td><code>O(n + m)</code></td><td><code>O(m)</code></td><td><code>m</code> is the range of the values.</td></tr><tr><td>BFS / DFS</td><td><code>O(V + E)</code></td><td><code>O(V)</code></td><td>BFS uses a queue, DFS a stack or recursion.</td></tr><tr><td>Dijkstra (with heap)</td><td><code>O((V + E) log V)</code></td><td><code>O(V)</code></td><td>Non-negative edge weights only.</td></tr><tr><td>Union-find (with path compression)</td><td>almost <code>O(1)</code> per operation</td><td><code>O(n)</code></td><td>Grows like the inverse Ackermann function, which is under 5 for any real input.</td></tr><tr><td>Fibonacci, naive recursion</td><td><code>O(2&#8319;)</code></td><td><code>O(n)</code> (stack)</td><td>Repeats the same sub-problems.</td></tr><tr><td>Fibonacci, DP</td><td><code>O(n)</code></td><td><code>O(1)</code> with two variables</td><td>Remember the last two answers.</td></tr><tr><td>Longest common subsequence, DP</td><td><code>O(m &middot; n)</code></td><td><code>O(m &middot; n)</code>, or <code>O(min(m, n))</code> if you keep one row</td><td>Two strings of lengths <code>m</code> and <code>n</code>.</td></tr><tr><td>0/1 knapsack, DP</td><td><code>O(n &middot; W)</code></td><td><code>O(W)</code> with one row</td><td><code>W</code> is the capacity.</td></tr><tr><td>Subsets / permutations (backtracking)</td><td><code>O(2&#8319;)</code> / <code>O(n!)</code></td><td><code>O(n)</code> (depth)</td><td>Output itself is that big.</td></tr></table>
+<div class="note"><p><strong>Amortised</strong> means "averaged over many operations". One <code>ArrayList.add</code> may copy everything, but across a million adds the cost per add is still constant.</p></div>
+
+<p>Standard-library names to remember: <code>sorted()</code> and <code>sortedBy</code> are <code>O(n log n)</code>, <code>HashMap</code> is the hash map, <code>TreeMap</code> is the balanced tree map, <code>PriorityQueue</code> is the heap, and <code>ArrayDeque</code> is both stack and queue.</p>
+<h2 id="choose">5. Which structure should I use?</h2>
+
+<p>Start from what you <em>need to do</em>, not from the structure. Ask which operation will run most often, then pick the structure that makes it cheap.</p>
+<table><tr><th>I need to&hellip;</th><th>Use</th><th>Why</th><th>Watch out for</th></tr><tr><td>Look up a value by key, fast</td><td><code>HashMap</code></td><td><code>O(1)</code> average lookup.</td><td>No order. Keys need good <code>hashCode</code> and <code>equals</code>.</td></tr><tr><td>Check "have I seen this?"</td><td><code>HashSet</code></td><td><code>O(1)</code> average membership test.</td><td>Stores values only.</td></tr><tr><td>Walk keys in sorted order</td><td><code>TreeMap</code> / <code>TreeSet</code></td><td>Balanced tree, <code>O(log n)</code> per operation, ordered iteration.</td><td>Slower than a hash map for plain lookup.</td></tr><tr><td>Keep insertion order</td><td><code>LinkedHashMap</code></td><td>Hash lookup plus a list of the order.</td><td>A little more memory.</td></tr><tr><td>Always take the smallest (or largest) next</td><td><code>PriorityQueue</code></td><td>Top in <code>O(1)</code>, remove in <code>O(log n)</code>.</td><td>Not sorted inside; you can only take the top cheaply.</td></tr><tr><td>Undo, match brackets, backtrack (LIFO)</td><td>Stack (<code>ArrayDeque</code>)</td><td>Push and pop at one end.</td><td>Use <code>addLast</code> / <code>removeLast</code> consistently.</td></tr><tr><td>Process in arrival order (FIFO), BFS</td><td>Queue (<code>ArrayDeque</code>)</td><td>Add at one end, remove at the other.</td><td>Do not use <code>removeAt(0)</code> on an <code>ArrayList</code>; it is <code>O(n)</code>.</td></tr><tr><td>Find all words with a given prefix</td><td>Trie</td><td>Cost depends on the prefix length.</td><td>Uses a lot of memory for many short words.</td></tr><tr><td>Ask "are these two things connected?" while links keep being added</td><td>Union-find</td><td>Nearly constant per operation.</td><td>Cannot split groups apart again.</td></tr><tr><td>Find the fewest steps (all steps cost the same)</td><td>Graph and BFS</td><td>BFS reaches nodes in order of distance.</td><td>Weighted edges need Dijkstra.</td></tr><tr><td>Find the cheapest path with weights</td><td>Graph and Dijkstra (heap)</td><td>Always expands the cheapest known node.</td><td>Fails with negative weights.</td></tr><tr><td>Get an item by position</td><td>Array / <code>ArrayList</code></td><td><code>O(1)</code> access.</td><td>Insert in the middle is <code>O(n)</code>.</td></tr><tr><td>Add and remove in the middle often, holding the node</td><td>Linked list</td><td><code>O(1)</code> splice.</td><td>In practice arrays are often faster, so measure first.</td></tr><tr><td>Search sorted data by value</td><td>Sorted array and binary search</td><td><code>O(log n)</code>.</td><td>Keeping it sorted after inserts costs <code>O(n)</code>.</td></tr><tr><td>Sum or count over many ranges</td><td>Prefix sums</td><td><code>O(1)</code> per range after <code>O(n)</code> setup.</td><td>Needs the data to stay fixed.</td></tr></table>
+<div class="note"><p><strong>A rule of thumb.</strong> When in doubt, start with an <code>ArrayList</code> and a <code>HashMap</code>. They solve a surprising share of problems. Reach for something fancier when you can name the exact operation that is too slow.</p></div>
+<h2 id="study">6. How to study this material</h2>
+
+<p>Reading is the easy part and the weakest. You learn algorithms the way you learn an instrument: by playing, making mistakes and repeating. Here is a routine that works for one session of about an hour.</p>
+<ol>
+<li><strong>Read</strong> one short section. Do not take notes yet.</li>
+<li><strong>Predict.</strong> Before you run a demo, write down what you think it prints. Being wrong here is useful; it shows where your mental model is off.</li>
+<li><strong>Run.</strong> Compare the output with your prediction.</li>
+<li><strong>Break it.</strong> Change a line on purpose: an off-by-one, a wrong comparison, an empty input. See what fails and how it fails.</li>
+<li><strong>Rewrite from memory.</strong> Close the page and write the code again. Peek only when you are truly stuck.</li>
+<li><strong>Explain aloud.</strong> Tell a friend, a rubber duck or an empty room how it works and what it costs. Gaps in your explanation are gaps in your understanding.</li>
+</ol>
+<h3>Habits that make it stick</h3>
+<ul>
+<li><strong>Spaced repetition.</strong> Revisit a topic after 1 day, 3 days, 1 week and 3 weeks. Rewrite the key code each time. Short and often beats long and once.</li>
+<li><strong>Keep a mistakes log.</strong> A simple file with the date, the problem, what went wrong and the fix. Read it every week. You will notice you make the same three or four mistakes.</li>
+<li><strong>Time-box being stuck.</strong> Give yourself 20 to 30 minutes of honest struggle. Then read a hint, then more of the solution. After that, close it and solve it yourself the next day. Struggling a little builds skill; struggling for hours just drains you.</li>
+<li><strong>Trace by hand with a table.</strong> Take a tiny input and write one row per loop step with the variables as columns. The next demo does this in code.</li>
+<li><strong>Change one thing at a time.</strong> When you modify code, run it after each small change.</li>
+</ul>
+<figure class="fig"><div class="diagram"><pre> Trace of binary search for 7 in [1, 3, 5, 7, 9, 11]
+
+ step | lo | hi | mid | a[mid] | decision
+ -----+----+----+-----+--------+--------------------
+   1  | 0  | 5  |  2  |   5    | 5 &lt; 7, go right: lo = 3
+   2  | 3  | 5  |  4  |   9    | 9 &gt; 7, go left:  hi = 3
+   3  | 3  | 3  |  3  |   7    | found at index 3</pre></div><figcaption>A hand trace is just a table. Draw it on paper before you trust the code.</figcaption></figure>
+
+<h3>An 8-week example schedule</h3>
+<p>About 4 to 6 hours a week works well. Adjust to your timetable; finishing slowly is better than rushing.</p>
+<table><tr><th>Week</th><th>Read</th><th>Do</th><th>Review</th></tr><tr><td>1</td><td><a href="dsa-part-1-start-here.html">Part 1</a></td><td>Both exercises. Count steps for ten small functions you have written.</td><td>Redo the six-step method on a new problem.</td></tr><tr><td>2</td><td><a href="dsa-part-2-arrays-strings-hashing.html">Part 2</a></td><td>All exercises. Rebuild a word counter with a <code>HashMap</code>.</td><td>Rewrite Part 1 exercises from memory.</td></tr><tr><td>3</td><td><a href="dsa-part-3-stacks-queues-linked-lists.html">Part 3</a></td><td>Implement a stack, a queue and a linked list by hand.</td><td>Part 2 hash map idea in your own words.</td></tr><tr><td>4</td><td><a href="dsa-part-4-trees-heaps-tries.html">Part 4</a></td><td>Write a BST insert and search. Build a small trie.</td><td>Parts 2 and 3 key code from memory.</td></tr><tr><td>5</td><td><a href="dsa-part-5-graphs.html">Part 5</a></td><td>BFS and DFS on a grid and on an adjacency list.</td><td>Draw a tree and a graph and walk both on paper.</td></tr><tr><td>6</td><td><a href="dsa-part-6-sorting-and-searching.html">Part 6</a></td><td>Write merge sort and binary search without looking.</td><td>Trace binary search by hand with a table.</td></tr><tr><td>7</td><td><a href="dsa-part-7-recursion-backtracking-dp.html">Part 7</a></td><td>Fibonacci three ways, subsets, a small DP table.</td><td>Part 5 BFS from memory.</td></tr><tr><td>8</td><td><a href="dsa-part-8-problem-solving-patterns.html">Part 8</a> and this part</td><td>Start one capstone project (section 7).</td><td>Reread your mistakes log. Redo the three weakest exercises.</td></tr></table>
+<h2 id="debug">7. Debugging and testing algorithms</h2>
+
+<p>Algorithm bugs are sneaky: the code runs, the answer is just wrong for one input. A few habits catch most of them.</p>
+<ul>
+<li><strong>Write the small tests first.</strong> Before the code, list inputs and expected outputs: empty, one item, two items, all equal, already sorted, reversed, duplicates, negative numbers.</li>
+<li><strong>Keep the brute force.</strong> The slow, obviously correct version is your answer key for the fast one.</li>
+<li><strong>Print the state.</strong> Print the variables at the top of each loop step, the same columns as your hand trace. Remove the prints when it works.</li>
+<li><strong>Name the invariant.</strong> An invariant is a sentence that is true at the start of every loop step, such as "if the target exists, it is inside <code>a[lo..hi]</code>". If you can say it, you can check it with <code>check(...)</code>.</li>
+<li><strong>Shrink the failing case.</strong> Once a test fails, try to make the input smaller while it still fails. A bug on three numbers is much easier to see than a bug on three thousand.</li>
+</ul>
+<h3>Off-by-one checklist</h3>
+<ul>
+<li>Does the range include or exclude the last index? (<code>0 until n</code> versus <code>0..n</code>.)</li>
+<li>Is the loop <code>&lt;</code> or <code>&lt;=</code>? Try a list with one element.</li>
+<li>In binary search, does <code>lo</code> or <code>hi</code> move past <code>mid</code>, or can it get stuck?</li>
+<li>Is <code>mid</code> computed as <code>lo + (hi - lo) / 2</code>, which cannot overflow?</li>
+<li>Do you handle the empty input before touching <code>a[0]</code>?</li>
+<li>Is a "length" confused with a "last index"? Length is one more.</li>
+</ul>
+<h3>Watching an invariant at work</h3>
+<div class="try demo"><h3>Run it: binary search with a checked invariant</h3>
+<p>The same trace table as before, now printed by the program. The two <code>check</code> lines would stop the run if the invariant ever became false.</p>
+<pre><code>fun binarySearch(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    var step = 1
+    while (lo &lt;= hi) {
+        // Invariant: everything left of lo is smaller than target,
+        // everything right of hi is bigger than target.
+        if (lo &gt; 0) check(a[lo - 1] &lt; target) { "invariant broken on the left" }
+        if (hi &lt; a.size - 1) check(a[hi + 1] &gt; target) { "invariant broken on the right" }
+
+        val mid = lo + (hi - lo) / 2
+        println("step $step: lo=$lo hi=$hi mid=$mid a[mid]=${a[mid]}")
+        step++
+        when {
+            a[mid] == target -&gt; return mid
+            a[mid] &lt; target -&gt; lo = mid + 1
+            else -&gt; hi = mid - 1
+        }
+    }
+    return -1
+}
+
+fun main() {
+    val a = intArrayOf(1, 3, 5, 7, 9, 11)
+    println("found at ${binarySearch(a, 7)}")
+    println("found at ${binarySearch(a, 4)}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-invariant">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-invariant">fun binarySearch(a: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = a.size - 1
+    var step = 1
+    while (lo <= hi) {
+        // Invariant: everything left of lo is smaller than target,
+        // everything right of hi is bigger than target.
+        if (lo > 0) check(a[lo - 1] < target) { "invariant broken on the left" }
+        if (hi < a.size - 1) check(a[hi + 1] > target) { "invariant broken on the right" }
+
+        val mid = lo + (hi - lo) / 2
+        println("step $step: lo=$lo hi=$hi mid=$mid a[mid]=${a[mid]}")
+        step++
+        when {
+            a[mid] == target -> return mid
+            a[mid] < target -> lo = mid + 1
+            else -> hi = mid - 1
+        }
+    }
+    return -1
+}
+
+fun main() {
+    val a = intArrayOf(1, 3, 5, 7, 9, 11)
+    println("found at ${binarySearch(a, 7)}")
+    println("found at ${binarySearch(a, 4)}")
+}
+</script></div>
+
+<h3>A tiny property-style test</h3>
+<p>Hand-written tests only cover the cases you thought of. A <strong>randomized test</strong> generates hundreds of small inputs and compares the fast solution with the brute force. Using a fixed seed means the "random" inputs are the same on every run, so a failure can be repeated.</p>
+<p>Below, the maximum sum of a contiguous slice. <code>maxSumBuggy</code> looks right but starts its best at 0, so it is wrong when every number is negative. Watch the test find that.</p>
+<div class="try demo"><h3>Run it: fast versus brute force on random inputs</h3>
+<p>Run it. The correct version passes; the buggy one is caught and the program prints a small input that breaks it.</p>
+<pre><code>import kotlin.random.Random
+
+// Slow but obviously correct: try every slice. O(n^2)
+fun maxSumBrute(a: List&lt;Int&gt;): Int {
+    var best = a[0]
+    for (i in a.indices) {
+        var sum = 0
+        for (j in i until a.size) {
+            sum += a[j]
+            if (sum &gt; best) best = sum
+        }
+    }
+    return best
+}
+
+// Fast and correct: best slice that ends here. O(n)
+fun maxSumFast(a: List&lt;Int&gt;): Int {
+    var current = a[0]
+    var best = a[0]
+    for (i in 1 until a.size) {
+        current = maxOf(a[i], current + a[i])
+        best = maxOf(best, current)
+    }
+    return best
+}
+
+// Fast but wrong: starting at 0 means "take nothing" is allowed.
+fun maxSumBuggy(a: List&lt;Int&gt;): Int {
+    var current = 0
+    var best = 0
+    for (x in a) {
+        current = maxOf(0, current + x)
+        best = maxOf(best, current)
+    }
+    return best
+}
+
+fun compare(name: String, fast: (List&lt;Int&gt;) -&gt; Int) {
+    val random = Random(12345)               // fixed seed: same inputs every run
+    repeat(1000) { trial -&gt;
+        val size = random.nextInt(1, 8)       // small inputs are easy to read
+        val a = List(size) { random.nextInt(-5, 6) }
+        val expected = maxSumBrute(a)
+        val actual = fast(a)
+        if (actual != expected) {
+            println("$name FAILED on trial $trial: input=$a expected=$expected got=$actual")
+            return
+        }
+    }
+    println("$name passed 1000 random trials")
+}
+
+fun main() {
+    compare("maxSumFast ", ::maxSumFast)
+    compare("maxSumBuggy", ::maxSumBuggy)
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-random-test">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-random-test">import kotlin.random.Random
+
+// Slow but obviously correct: try every slice. O(n^2)
+fun maxSumBrute(a: List<Int>): Int {
+    var best = a[0]
+    for (i in a.indices) {
+        var sum = 0
+        for (j in i until a.size) {
+            sum += a[j]
+            if (sum > best) best = sum
+        }
+    }
+    return best
+}
+
+// Fast and correct: best slice that ends here. O(n)
+fun maxSumFast(a: List<Int>): Int {
+    var current = a[0]
+    var best = a[0]
+    for (i in 1 until a.size) {
+        current = maxOf(a[i], current + a[i])
+        best = maxOf(best, current)
+    }
+    return best
+}
+
+// Fast but wrong: starting at 0 means "take nothing" is allowed.
+fun maxSumBuggy(a: List<Int>): Int {
+    var current = 0
+    var best = 0
+    for (x in a) {
+        current = maxOf(0, current + x)
+        best = maxOf(best, current)
+    }
+    return best
+}
+
+fun compare(name: String, fast: (List<Int>) -> Int) {
+    val random = Random(12345)               // fixed seed: same inputs every run
+    repeat(1000) { trial ->
+        val size = random.nextInt(1, 8)       // small inputs are easy to read
+        val a = List(size) { random.nextInt(-5, 6) }
+        val expected = maxSumBrute(a)
+        val actual = fast(a)
+        if (actual != expected) {
+            println("$name FAILED on trial $trial: input=$a expected=$expected got=$actual")
+            return
+        }
+    }
+    println("$name passed 1000 random trials")
+}
+
+fun main() {
+    compare("maxSumFast ", ::maxSumFast)
+    compare("maxSumBuggy", ::maxSumBuggy)
+}
+</script></div>
+<div class="note"><p><strong>Why small inputs?</strong> A failure on a list of three numbers is easy to trace by hand. Random tests with huge inputs find bugs too, but they are painful to read.</p></div>
+
+<p>Now try the idea yourself. The function below is slow. Write the fast version so that it matches the brute force and also handles a large input.</p>
+<div class="try"><h3>Try it: count pairs quickly</h3>
+<p>The function <code>countPairsBrute</code> counts index pairs <code>i &lt; j</code> with <code>nums[i] + nums[j] == target</code> in <code>O(n&sup2;)</code>. Fill in <code>countPairsFast</code> in <code>O(n)</code>. One test compares the two on random inputs; another uses 100,000 numbers. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>fun countPairsBrute(nums: List&lt;Int&gt;, target: Int): Long {
+    var count = 0L
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] + nums[j] == target) count++
+    }
+    return count
+}
+
+fun countPairsFast(nums: List&lt;Int&gt;, target: Int): Long {
+    TODO("walk once; keep a map of how many times each value has appeared")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-fast-pairs">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-fast-pairs">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+fun countPairsBrute(nums: List<Int>, target: Int): Long {
+    var count = 0L
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] + nums[j] == target) count++
+    }
+    return count
+}
+
+fun countPairsFast(nums: List<Int>, target: Int): Long {
+    TODO("walk once; keep a map of how many times each value has appeared")
+}
+
+fun main() {
+    test("small example") { eq(countPairsFast(listOf(1, 2, 3, 4, 3), 6), 2L) }
+    test("no pairs") { eq(countPairsFast(listOf(1, 1, 1), 10), 0L) }
+    test("empty") { eq(countPairsFast(emptyList(), 5), 0L) }
+    test("matches brute force on random inputs") {
+        val random = kotlin.random.Random(7)
+        repeat(300) {
+            val a = List(random.nextInt(0, 12)) { random.nextInt(-4, 5) }
+            val t = random.nextInt(-6, 7)
+            eq(countPairsFast(a, t), countPairsBrute(a, t))
+        }
+    }
+    test("100000 ones, target 2") { eq(countPairsFast(List(100_000) { 1 }, 2), 4_999_950_000L) }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> For each number <code>x</code>, the pairs it completes with earlier numbers equal how many times <code>target - x</code> was seen before. Add that, then record <code>x</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>fun countPairsBrute(nums: List&lt;Int&gt;, target: Int): Long {
+    var count = 0L
+    for (i in nums.indices) for (j in i + 1 until nums.size) {
+        if (nums[i] + nums[j] == target) count++
+    }
+    return count
+}
+
+fun countPairsFast(nums: List&lt;Int&gt;, target: Int): Long {
+    val seen = HashMap&lt;Int, Int&gt;()
+    var count = 0L
+    for (x in nums) {
+        count += seen[target - x] ?: 0
+        seen[x] = (seen[x] ?: 0) + 1
+    }
+    return count
+}</code></pre>
+</details></div>
+<h2 id="real">8. Where this shows up in real systems</h2>
+
+<p>None of this is only for exercises. The same ideas sit under software you use every day.</p>
+<table><tr><th>Where</th><th>Structure or algorithm</th><th>What it does there</th></tr><tr><td>Databases</td><td>B-trees and hash indexes</td><td>A B-tree is a wide, shallow balanced tree. It keeps rows ordered on disk so a lookup touches only a few pages. A hash index answers exact-match lookups.</td></tr><tr><td>Browsers and editors</td><td>Stacks</td><td>Undo and redo are two stacks. The browser back button is a stack of pages. Bracket matching in an editor uses one too.</td></tr><tr><td>Operating system schedulers</td><td>Heaps and queues</td><td>Tasks wait in queues. A priority queue picks the most urgent one next.</td></tr><tr><td>Maps and navigation</td><td>Graphs, Dijkstra and relatives</td><td>Roads are edges, junctions are nodes, travel time is the weight.</td></tr><tr><td>Spell check and autocomplete</td><td>Tries</td><td>Walk the letters typed so far and list the words below that node.</td></tr><tr><td>Git</td><td>A directed acyclic graph (DAG)</td><td>Each commit points to its parents. Branches are labels on nodes. Finding a common ancestor is a graph walk.</td></tr><tr><td>Caches</td><td>Hash map plus linked list</td><td>An LRU cache keeps the most recently used items and drops the one used longest ago.</td></tr><tr><td>Compilers</td><td>Trees, stacks, hash maps</td><td>Source code becomes a syntax tree; a symbol table (hash map) remembers names.</td></tr><tr><td>Search engines</td><td>Inverted index (hash map of word to documents)</td><td>Look up each word and combine the lists.</td></tr><tr><td>Social networks</td><td>Graphs and union-find</td><td>Friends are edges; finding groups or shortest connections is BFS.</td></tr></table>
+
+<h3>Example: an LRU cache</h3>
+<p>LRU stands for <em>least recently used</em>. A cache is a small, fast store in front of something slow. When it is full and a new item arrives, it throws out the item that has gone unused the longest. To do that in <code>O(1)</code> you need two things: a hash map for fast lookup, and a list that remembers the usage order. Java and Kotlin's <code>LinkedHashMap</code> is exactly that pair in one class. With <code>accessOrder = true</code>, every <code>get</code> moves the entry to the back, and the oldest entry is at the front.</p>
+<div class="try demo"><h3>Run it: an LRU cache in a few lines</h3>
+<p>Run it and follow the order of the keys. The leftmost key is the next to be evicted.</p>
+<pre><code>class LruCache&lt;K, V&gt;(private val capacity: Int) :
+    LinkedHashMap&lt;K, V&gt;(16, 0.75f, true) {          // true = order by access
+
+    // Called after every put. Returning true removes the oldest entry.
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry&lt;K, V&gt;?): Boolean {
+        return size &gt; capacity
+    }
+}
+
+fun main() {
+    val cache = LruCache&lt;String, Int&gt;(3)
+    cache["a"] = 1
+    cache["b"] = 2
+    cache["c"] = 3
+    println("start:        ${cache.keys}")      // [a, b, c]
+
+    cache["a"]                                  // read a: it becomes the newest
+    println("after get a: ${cache.keys}")      // [b, c, a]
+
+    cache["d"] = 4                              // full, so the oldest (b) is evicted
+    println("after put d: ${cache.keys}")      // [c, a, d]
+    println("b present? ${cache.containsKey("b")}")
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-lru">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-lru">class LruCache<K, V>(private val capacity: Int) :
+    LinkedHashMap<K, V>(16, 0.75f, true) {          // true = order by access
+
+    // Called after every put. Returning true removes the oldest entry.
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<K, V>?): Boolean {
+        return size > capacity
+    }
+}
+
+fun main() {
+    val cache = LruCache<String, Int>(3)
+    cache["a"] = 1
+    cache["b"] = 2
+    cache["c"] = 3
+    println("start:        ${cache.keys}")      // [a, b, c]
+
+    cache["a"]                                  // read a: it becomes the newest
+    println("after get a: ${cache.keys}")      // [b, c, a]
+
+    cache["d"] = 4                              // full, so the oldest (b) is evicted
+    println("after put d: ${cache.keys}")      // [c, a, d]
+    println("b present? ${cache.containsKey("b")}")
+}
+</script></div>
+<div class="note"><p><strong>Under the hood.</strong> The hash map gives <code>O(1)</code> lookup. Each entry also sits in a doubly linked list, so moving it to the back and removing the front are both <code>O(1)</code>. You will build this idea by hand in the exercise below.</p></div>
+<p>Your turn.</p>
+<div class="try"><h3>Try it: build an LRU cache</h3>
+<p>Write <code>LRUCache</code> with <code>get(key)</code> (returns -1 if missing and marks the key as most recently used) and <code>put(key, value)</code> (inserts or updates, then evicts the least recently used key if the size goes over <code>capacity</code>). Use a plain <code>LinkedHashMap</code> and remember that it keeps insertion order. Open the starter in the Kotlin Playground, press <strong>Run</strong>, edit the code, and run again until every line says <code>PASS</code>.</p>
+<pre><code>class LRUCache(private val capacity: Int) {
+    private val map = LinkedHashMap&lt;Int, Int&gt;()
+
+    fun get(key: Int): Int {
+        TODO("return -1 if missing, otherwise move the key to the end and return the value")
+    }
+
+    fun put(key: Int, value: Int) {
+        TODO("insert or update as most recent; evict the first key when over capacity")
+    }
+}</code></pre>
+<a class="pg-btn" href="https://play.kotlinlang.org/" target="_blank" rel="noopener" data-src="pg-p9-lru-class">Open in Kotlin Playground &#8599;</a>
+<script type="text/plain" id="pg-p9-lru-class">fun test(name: String, block: () -> Unit) {
+    try { block(); println("PASS  $name") }
+    catch (e: Throwable) { println("FAIL  $name -> ${e.message ?: e::class.simpleName}") }
+}
+
+fun <T> eq(actual: T, expected: T) {
+    if (actual != expected) error("expected $expected but got $actual")
+}
+
+class LRUCache(private val capacity: Int) {
+    private val map = LinkedHashMap<Int, Int>()
+
+    fun get(key: Int): Int {
+        TODO("return -1 if missing, otherwise move the key to the end and return the value")
+    }
+
+    fun put(key: Int, value: Int) {
+        TODO("insert or update as most recent; evict the first key when over capacity")
+    }
+}
+
+fun main() {
+    test("get on empty") { eq(LRUCache(2).get(1), -1) }
+    test("put then get") {
+        val c = LRUCache(2)
+        c.put(1, 10)
+        eq(c.get(1), 10)
+    }
+    test("evicts the least recently used") {
+        val c = LRUCache(2)
+        c.put(1, 1); c.put(2, 2)
+        c.put(3, 3)
+        eq(c.get(1), -1)
+        eq(c.get(2), 2)
+        eq(c.get(3), 3)
+    }
+    test("get refreshes a key") {
+        val c = LRUCache(2)
+        c.put(1, 1); c.put(2, 2)
+        c.get(1)
+        c.put(3, 3)
+        eq(c.get(2), -1)
+        eq(c.get(1), 1)
+    }
+    test("update keeps size and refreshes") {
+        val c = LRUCache(2)
+        c.put(1, 1); c.put(2, 2)
+        c.put(1, 100)
+        c.put(3, 3)
+        eq(c.get(2), -1)
+        eq(c.get(1), 100)
+    }
+    test("capacity one") {
+        val c = LRUCache(1)
+        c.put(1, 1); c.put(2, 2)
+        eq(c.get(1), -1)
+        eq(c.get(2), 2)
+    }
+}
+</script>
+<p class="try-hint"><strong>Hint:</strong> Removing a key and putting it back moves it to the end. The oldest key is <code>map.keys.first()</code>.</p>
+<details><summary>Show a solution</summary>
+<pre><code>class LRUCache(private val capacity: Int) {
+    private val map = LinkedHashMap&lt;Int, Int&gt;()
+
+    fun get(key: Int): Int {
+        val value = map.remove(key) ?: return -1
+        map[key] = value
+        return value
+    }
+
+    fun put(key: Int, value: Int) {
+        map.remove(key)
+        map[key] = value
+        if (map.size &gt; capacity) {
+            val oldest = map.keys.first()
+            map.remove(oldest)
+        }
+    }
+}</code></pre>
+</details></div>
+<h2 id="capstone">9. Capstone mini-projects</h2>
+
+<p>The best way to make all of this yours is to build something. Each project below is small, uses one or two structures, and can be finished in a weekend. Pick one, write a few tests first, and use the randomized comparison trick from earlier where you can.</p>
+<table><tr><th>Project</th><th>Spec</th><th>What you practise</th></tr><tr><td>Autocomplete with a trie</td><td>Load a list of words. Given a prefix, return up to 5 matching words, in alphabetical order. Bonus: remember how often each word was chosen and sort suggestions by that.</td><td><a href="dsa-part-4-trees-heaps-tries.html">Tries</a>, recursion or a stack, sorting, hash maps.</td></tr><tr><td>A tiny search engine</td><td>Take 10 to 20 short text documents. Build an index mapping each word to the set of documents that contain it. Answer queries such as "cat AND dog" by intersecting sets. Bonus: rank by how many times the words appear.</td><td><a href="dsa-part-2-arrays-strings-hashing.html">Hash maps and sets</a>, string splitting, sorting.</td></tr><tr><td>A route finder with Dijkstra</td><td>Represent a small map as a weighted graph (about 10 cities). Given a start and an end, print the cheapest route and its cost. Bonus: also show the route with the fewest stops, using BFS.</td><td><a href="dsa-part-5-graphs.html">Graphs</a>, priority queue, reconstructing a path.</td></tr><tr><td>A task scheduler with a priority queue</td><td>Tasks have a name, a priority and a duration. Always run the highest-priority ready task next and print a timeline. Bonus: add deadlines and report which tasks were late.</td><td><a href="dsa-part-4-trees-heaps-tries.html">Heaps</a>, comparators, simulation loops.</td></tr><tr><td>A text diff with LCS</td><td>Given two lists of lines, compute their longest common subsequence with DP and print lines as unchanged, added (<code>+</code>) or removed (<code>-</code>), like a small version of <code>git diff</code>.</td><td><a href="dsa-part-7-recursion-backtracking-dp.html">Dynamic programming</a>, walking a table backwards.</td></tr><tr><td>An LRU cache you write by hand</td><td>Replace <code>LinkedHashMap</code> with your own doubly linked list plus a hash map. Both operations must be <code>O(1)</code>.</td><td><a href="dsa-part-3-stacks-queues-linked-lists.html">Linked lists</a>, pointer care, invariants.</td></tr></table>
+
+<p>For each project, write down before you start: what the input is, what the output is, which structure fits each need (use the table in section 3) and what the cost should be. Afterwards, compare your plan with what you built.</p>
+<h2 id="reading">10. Further reading</h2>
+
+<p>These are well-known books and tools. Several have free versions or free course material; search for the title to find the official source.</p>
+<ul>
+<li><strong>Introduction to Algorithms</strong> by Cormen, Leiserson, Rivest and Stein. The standard university textbook. Thorough and mathematical; read it slowly, one chapter at a time.</li>
+<li><strong>The Algorithm Design Manual</strong> by Steven Skiena. Friendly and practical, with a catalogue of problems and the structure that fits each.</li>
+<li><strong>Algorithms</strong> by Robert Sedgewick and Kevin Wayne. Clear explanations with pictures; the companion website has code and slides.</li>
+<li><strong>Grokking Algorithms</strong> by Aditya Bhargava. A very gentle, illustrated introduction. Good as a second look at Parts 1 to 5.</li>
+<li><strong>Algorithms</strong> by Dasgupta, Papadimitriou and Vazirani. A short, well-written book with a free draft available from its authors.</li>
+<li><strong>visualgo.net</strong>. Animated visualisations of sorting, trees, heaps, graphs and more. Step through an algorithm and watch the data change.</li>
+<li><strong>The Kotlin documentation</strong> at kotlinlang.org. Look at the pages on collections, especially the lists, sets, maps and sequences, so you know what the standard library already gives you.</li>
+<li><strong>The source of your language's standard collections.</strong> Reading how <code>ArrayList</code>, <code>HashMap</code> and <code>PriorityQueue</code> are written is a great second pass once you know the basics.</li>
+</ul>
+<div class="callout"><strong>What to do next</strong><p>Pick one capstone project, put the cheat sheet beside you, and start with the smallest working version. When it works, write the tests, then make it faster. That loop of build, test, improve is the whole craft.</p></div>
+
+    <h2 id="takeaways">11. Takeaways</h2>
+    <ul><li>Pick the structure from the operation, then check the cost in the table.</li><li>Brute force is the answer key for your fast solution.</li><li>Seeded random tests find bugs your hand-written tests miss, and can be repeated.</li><li>Practise a little, often, and rewrite code from memory.</li><li>Real systems use the same structures you have just built: trees, heaps, tries, graphs and hash maps.</li><li>Keep building. A small project teaches more than another chapter.</li></ul>
+<table class="gloss"><tr><th>Term</th><th>In plain words</th></tr><tr><td>Amortised cost</td><td>The average cost per operation over a long run of operations.</td></tr><tr><td>Invariant</td><td>A statement that stays true at the start of every loop step.</td></tr><tr><td>Property-style test</td><td>A test that checks a rule on many generated inputs, such as "fast equals brute force".</td></tr><tr><td>Seed</td><td>The starting value of a random generator; the same seed gives the same numbers.</td></tr><tr><td>LRU</td><td>Least recently used: an eviction rule that drops the item untouched for the longest time.</td></tr><tr><td>DAG</td><td>Directed acyclic graph: arrows between nodes with no way to loop back.</td></tr><tr><td>Spaced repetition</td><td>Reviewing material at growing gaps so it stays in memory.</td></tr></table>
+
+    <div class="pager">
+      <a class="prev" href="dsa-part-8-problem-solving-patterns.html"><small>&larr; Previous &middot; Part 8</small>Programming patterns for solving problems</a>
+    </div>
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+
+<script>
+  /* Build "Open in Kotlin Playground" links from the programs on this page */
+  document.querySelectorAll('.pg-btn').forEach(function (a) {
+    var code = document.getElementById(a.dataset.src).textContent;
+    var json = JSON.stringify({ version: '2.1.21', platform: 'java', args: '', noneMarkers: true, themeId: 'idea', code: code });
+    a.href = 'https://play.kotlinlang.org/#' + btoa(unescape(encodeURIComponent(json)));
+  });
+</script>
+</body>
+</html>
