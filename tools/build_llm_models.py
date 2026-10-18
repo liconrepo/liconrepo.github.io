@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build llm-models.json (and llm-models.js): a de-duplicated directory of large language models.
+"""Build data/llm-map/llm-models.json (and llm-models.js): a de-duplicated directory of large language models.
 
 Sources (all public, no API keys):
   * models.dev        https://models.dev/api.json   models, prices, context sizes, release dates
@@ -22,8 +22,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "llm-models.json"
-OUT_JS = ROOT / "llm-models.js"      # same data as a script, so the page also works when opened straight from disk
+OUT = ROOT / "data" / "llm-map" / "llm-models.json"
+OUT_JS = ROOT / "data" / "llm-map" / "llm-models.js"      # same data as a script, so the page also works when opened straight from disk
 SITE = "https://liconrepo.github.io/"
 UA = {"User-Agent": "Mozilla/5.0 (llm-directory-builder; +https://liconrepo.github.io/)"}
 

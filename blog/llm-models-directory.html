@@ -248,7 +248,7 @@
         <li><strong>Every day at 02:23 UTC</strong>, a <em>GitHub Action</em> (a job that GitHub runs on a timer) starts a short Python script.</li>
         <li>The script <strong>downloads two public sources</strong>: <a href="https://models.dev/" target="_blank" rel="noopener">models.dev</a>, an open-source database of model specifications and prices from company APIs and more than 200 hosting providers, and <a href="https://huggingface.co/models" target="_blank" rel="noopener">Hugging Face</a>, for the most downloaded and trending open-weight models.</li>
         <li>It <strong>cleans the data</strong>: the same model sold by many hosts becomes one row, the cheapest listed price is kept, and image-only, audio-only and embedding models are left out.</li>
-        <li>It <strong>saves the result</strong> as <code>llm-models.json</code> and <code>llm-models.js</code> in the website&rsquo;s repository, and commits only if something changed.</li>
+        <li>It <strong>saves the result</strong> as <code>data/llm-map/llm-models.json</code> and <code>data/llm-map/llm-models.js</code> in the website&rsquo;s repository, and commits only if something changed.</li>
         <li>GitHub Pages <strong>publishes the new files</strong> within a minute or two. When you open this page, it loads them and draws the table in your browser.</li>
       </ol>
       <p>The <strong>country</strong> on the map is where the company is headquartered. The sources do not provide it, so it comes from a table kept by hand. Individuals, community groups and companies whose base is unclear are shown as &ldquo;unknown or independent&rdquo; instead of being guessed.</p>
@@ -287,21 +287,21 @@
         <span id="lmCount"></span>
         <span class="lm-live"><i></i><span>Updated <b id="lmUpdated">&hellip;</b></span></span>
         <button type="button" class="lm-pill" id="lmCountryPill" hidden></button>
-        <a href="../llm-models.json">Raw JSON</a>
+        <a href="../data/llm-map/llm-models.json">Raw JSON</a>
       </div>
 
       <div class="lm-wrap"><table class="lm-table" id="lmTable"></table><div class="lm-empty" id="lmEmpty" hidden>No models match. Try fewer filters.</div></div>
-      <noscript><p class="lm-empty">The directory needs JavaScript. The same data is available as <a href="../llm-models.json">raw JSON</a>.</p></noscript>
+      <noscript><p class="lm-empty">The directory needs JavaScript. The same data is available as <a href="../data/llm-map/llm-models.json">raw JSON</a>.</p></noscript>
       <button type="button" class="lm-more" id="lmMore" hidden>Show more</button>
     </section>
 </main>
 
 <footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
 
-<script src="../llm-models.js"></script>
-<script src="../llm-map.js"></script>
+<script src="../data/llm-map/llm-models.js"></script>
+<script src="../data/llm-map/llm-map.js"></script>
 <script>
-/* LLM models directory: reads ../llm-models.json (rebuilt daily by a GitHub Action) */
+/* LLM models directory: reads ../data/llm-map/llm-models.json (rebuilt daily by a GitHub Action) */
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var state = { tab: 'api', q: '', company: '', country: '', sort: 'new', f: {}, shown: 50, data: null };
@@ -612,7 +612,7 @@
   }
 
   if (window.LLM_MODELS) start(window.LLM_MODELS);          // loaded from llm-models.js (also works when the file is opened from disk)
-  else fetch('../llm-models.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(start).catch(fail);
+  else fetch('../data/llm-map/llm-models.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(start).catch(fail);
 })();
 </script>
 </body>

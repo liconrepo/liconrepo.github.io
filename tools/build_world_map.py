@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Build llm-map.js: country outlines for the world map on the LLM models page.
+"""Build data/llm-map/llm-map.js: country outlines for the world map on the LLM models page.
 
 This is a ONE-TIME step (the outlines never change), not part of the daily refresh.
 Source: Natural Earth via the "world-atlas" package (public domain), 110m countries.
 
     python3 tools/build_world_map.py
 
-Writes llm-map.js, which defines window.LLM_MAP = {w, h, countries: [{name, d, cx, cy}, ...]}.
+Writes data/llm-map/llm-map.js, which defines window.LLM_MAP = {w, h, countries: [{name, d, cx, cy}, ...]}.
 Projection: Natural Earth (Savric 2015). Python standard library only.
 """
 import json
@@ -136,7 +136,7 @@ def main():
         countries.append({"name": name, "d": "", "cx": cx, "cy": cy})
 
     doc = {"w": WIDTH, "h": height, "countries": countries}
-    out = ROOT / "llm-map.js"
+    out = ROOT / "data" / "llm-map" / "llm-map.js"
     out.write_text("window.LLM_MAP=" + json.dumps(doc, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     print(f"Wrote {out.name}: {len(countries)} countries, {out.stat().st_size / 1024:.0f} KB, viewBox 0 0 {WIDTH:g} {height}")
 
