@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Build Your Own Android Studio Plugin: Architecture, Templates and a Firebase Distribution Example — Khairul Alam</title>
+  <meta name="description" content="A conceptual guide to writing a JetBrains and Android Studio plugin: architecture, project template, extension points, the development loop, and a worked example that triggers a build and distributes it through Firebase App Distribution. With diagrams and code sketches." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android tooling &middot; IDE plugins</p>
+    <h1>Build Your Own Android Studio Plugin: Architecture, Templates and a Firebase Distribution Example</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~18 min read</span></div>
+    <div class="tags"><span class="tag">Android Studio</span><span class="tag">IntelliJ Platform</span><span class="tag">Plugins</span><span class="tag">Kotlin</span><span class="tag">Firebase</span></div>
+
+    <p class="lede">Every team has a chore that happens inside the IDE but is not part of it: send a build to testers, open the right dashboard, run a checklist. An IDE plugin turns that chore into a menu item. This article explains how plugins for Android Studio and other JetBrains IDEs are structured, shows the template you start from, and walks through one example in concept: a button that builds the app and distributes it to testers with Firebase App Distribution.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li><strong>Android Studio is the IntelliJ Platform plus the Android plugin.</strong> A plugin written for the platform runs in both, and Android-specific features need a dependency on the Android plugin.</li>
+        <li>A plugin is a <strong>JAR with a <code>plugin.xml</code></strong> that declares what it adds: actions, tool windows, settings pages, services, notifications.</li>
+        <li>Start from the <strong>IntelliJ Platform Plugin Template</strong> and the <strong>IntelliJ Platform Gradle Plugin</strong>. <code>./gradlew runIde</code> starts a sandbox IDE with your plugin loaded.</li>
+        <li>Rules that matter: <strong>never block the UI thread</strong>, keep secrets in the password store, and declare the IDE versions you support.</li>
+        <li>Example: a <em>Distribute to Firebase</em> action runs Gradle in the background, uploads the build through App Distribution, then shows a notification with the result.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#what">What a plugin is, and where Android Studio fits</a></li>
+        <li><a href="#arch">Architecture at a glance</a></li>
+        <li><a href="#template">The project template</a></li>
+        <li><a href="#points">What you can add: extension points</a></li>
+        <li><a href="#loop">The development loop</a></li>
+        <li><a href="#example">Example: distribute a build to Firebase</a></li>
+        <li><a href="#where">Where should the build run?</a></li>
+        <li><a href="#code">Code sketches</a></li>
+        <li><a href="#rules">Threading, security and UX rules</a></li>
+        <li><a href="#ship">Compatibility, testing and publishing</a></li>
+        <li><a href="#wrap">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="what">1. What a plugin is, and where Android Studio fits</h2>
+    <p>Almost all of an IDE&rsquo;s own features are plugins too: the editor, Git, Gradle, the terminal. The <strong>IntelliJ Platform</strong> provides the shared foundation (windows, editors, file model, threading, settings, a plugin loader). Products such as IntelliJ IDEA, PyCharm and <strong>Android Studio</strong> are built on top of it. Android Studio adds the Android plugin: layout editor, emulator manager, Logcat, Android Gradle Plugin support.</p>
+    <p>That gives two kinds of plugins:</p>
+    <ul>
+      <li><strong>Platform plugins</strong> use only the common platform. They run in every JetBrains IDE, including Android Studio.</li>
+      <li><strong>Android plugins</strong> also depend on the Android plugin (<code>org.jetbrains.android</code>) to use Android-specific APIs. They run in Android Studio only.</li>
+    </ul>
+    <p>Our example only needs to run Gradle, so it could be a platform plugin. We will depend on the Android plugin anyway, to show how it is done.</p>
+
+    <h2 id="arch">2. Architecture at a glance</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 318" role="img" aria-label="Layers of an IDE plugin. Your plugin contains actions, a tool window, a settings page, services, notifications and background tasks. It is loaded by the IntelliJ Platform, with Android Studio adding the Android plugin. The plugin talks to external tools such as Gradle, Firebase and Git.">
+        <rect class="boxb" x="8" y="6" width="624" height="132" rx="12"/>
+        <text class="b c" x="320" y="28">Your plugin (a JAR, described by plugin.xml)</text>
+        <rect class="box" x="24"  y="42" width="188" height="40" rx="9"/><text class="b c" x="118" y="60">Actions</text><text class="sub c" x="118" y="75">menu and toolbar entries</text>
+        <rect class="box" x="226" y="42" width="188" height="40" rx="9"/><text class="b c" x="320" y="60">Tool window</text><text class="sub c" x="320" y="75">panel with output</text>
+        <rect class="box" x="428" y="42" width="188" height="40" rx="9"/><text class="b c" x="522" y="60">Settings page</text><text class="sub c" x="522" y="75">app id, groups</text>
+        <rect class="boxg" x="24"  y="92" width="188" height="38" rx="9"/><text class="b c" x="118" y="109">Services</text><text class="sub c" x="118" y="123">logic and saved state</text>
+        <rect class="boxg" x="226" y="92" width="188" height="38" rx="9"/><text class="b c" x="320" y="109">Background tasks</text><text class="sub c" x="320" y="123">progress, cancel</text>
+        <rect class="boxg" x="428" y="92" width="188" height="38" rx="9"/><text class="b c" x="522" y="109">Notifications</text><text class="sub c" x="522" y="123">balloons with links</text>
+        <path class="arrow" d="M320,140 L320,160"/><text class="sub" x="332" y="154">plugin.xml: extension points</text>
+        <rect class="boxp" x="8" y="162" width="624" height="62" rx="12"/>
+        <text class="b c" x="320" y="184">IntelliJ Platform (+ the Android plugin in Android Studio)</text>
+        <text class="sub c" x="320" y="204">extension points &middot; services &middot; project model &middot; UI toolkit &middot; threading rules</text>
+        <path class="arrow" d="M118,226 L118,252"/><path class="arrow" d="M320,226 L320,252"/><path class="arrow" d="M522,226 L522,252"/>
+        <rect class="box"  x="24"  y="254" width="188" height="48" rx="10"/><text class="b c" x="118" y="276">Gradle, ADB, shell</text><text class="sub c" x="118" y="292">run as child processes</text>
+        <rect class="boxo" x="226" y="254" width="188" height="48" rx="10"/><text class="b c" x="320" y="276">Firebase</text><text class="sub c" x="320" y="292">App Distribution</text>
+        <rect class="box"  x="428" y="254" width="188" height="48" rx="10"/><text class="b c" x="522" y="276">Git, web APIs</text><text class="sub c" x="522" y="292">notes, CI triggers</text>
+      </svg>
+      <figcaption>The plugin never owns the IDE. It declares extensions, and the platform calls them at the right moment.</figcaption>
+    </figure>
+    <p>Three ideas explain most of the design:</p>
+    <ul>
+      <li><strong>Declare, don&rsquo;t hook.</strong> You list your pieces in <code>plugin.xml</code>. The platform creates and calls them. Classes load only when first needed, so a plugin costs little at startup.</li>
+      <li><strong>Services hold logic.</strong> Application services live for the whole IDE session, project services live per open project. Actions and UI stay thin and call a service.</li>
+      <li><strong>One UI thread.</strong> The event dispatch thread draws the interface. Slow work goes to background tasks, and results come back to the UI thread.</li>
+    </ul>
+
+    <h2 id="template">3. The project template</h2>
+    <p>You do not start from an empty folder. JetBrains publishes the <a href="https://github.com/JetBrains/intellij-platform-plugin-template" target="_blank" rel="noopener">IntelliJ Platform Plugin Template</a>, a ready-made Gradle project with a build file, CI workflows, a changelog and a sample plugin. Use it with the <a href="https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html" target="_blank" rel="noopener">IntelliJ Platform Gradle Plugin</a>, which downloads the target IDE, runs a sandbox copy, and packages, verifies and signs your plugin.</p>
+<pre><code>firebase-distribute/
+  build.gradle.kts               # plugins, target IDE, dependencies, signing
+  gradle.properties              # plugin id, version, since/until build
+  src/main/
+    kotlin/com/example/
+      DistributeAction.kt        # menu entry
+      DistributeService.kt       # does the work
+      DistributeSettings.kt      # saved state + settings page
+      DistributeToolWindow.kt    # log panel
+    resources/
+      META-INF/plugin.xml        # declares everything above
+      messages/Bundle.properties # UI text
+      icons/
+  src/test/kotlin/               # tests</code></pre>
+    <p>The build file names the IDE you build against. For an Android Studio plugin that means selecting Android Studio and adding the bundled Android plugin as a dependency:</p>
+<pre><code>plugins {
+    kotlin("jvm") version "&lt;kotlin-version&gt;"
+    id("org.jetbrains.intellij.platform") version "&lt;gradle-plugin-version&gt;"
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform { defaultRepositories() }
+}
+
+dependencies {
+    intellijPlatform {
+        androidStudio("&lt;android-studio-version&gt;")
+        bundledPlugin("org.jetbrains.android")
+        pluginVerifier()
+        zipSigner()
+    }
+}</code></pre>
+    <p>Version numbers change often, so the placeholders are intentional. Copy current values from the template and the <a href="https://plugins.jetbrains.com/docs/intellij/android-studio.html" target="_blank" rel="noopener">Android Studio plugin guide</a>.</p>
+
+    <h2 id="points">4. What you can add: extension points</h2>
+    <table>
+      <tr><th>You want to add&hellip;</th><th>Use</th><th>Declared as</th></tr>
+      <tr><td>A menu or toolbar command</td><td>An <strong>action</strong> (<code>AnAction</code>)</td><td><code>&lt;action&gt;</code> inside a menu group</td></tr>
+      <tr><td>A panel (logs, a list, a dashboard)</td><td>A <strong>tool window</strong></td><td><code>&lt;toolWindow&gt;</code></td></tr>
+      <tr><td>Options the user can change</td><td>A <strong>settings page</strong> (<code>Configurable</code>) and saved state</td><td><code>&lt;applicationConfigurable&gt;</code></td></tr>
+      <tr><td>Shared logic and data</td><td>A <strong>service</strong></td><td><code>@Service</code> or <code>&lt;applicationService&gt;</code></td></tr>
+      <tr><td>A message after a task</td><td>A <strong>notification</strong></td><td><code>&lt;notificationGroup&gt;</code></td></tr>
+      <tr><td>Reacting to events (project opened, build finished)</td><td>A <strong>listener</strong></td><td><code>&lt;projectListeners&gt;</code></td></tr>
+      <tr><td>Code help (warnings, quick fixes)</td><td><strong>Inspections</strong> and intentions</td><td><code>&lt;localInspection&gt;</code></td></tr>
+      <tr><td>A new way to run things</td><td>A <strong>run configuration</strong> type</td><td><code>&lt;configurationType&gt;</code></td></tr>
+    </table>
+    <p>The <a href="https://plugins.jetbrains.com/docs/intellij/welcome.html" target="_blank" rel="noopener">IntelliJ Platform Plugin SDK documentation</a> lists every extension point and has a topic for each.</p>
+
+    <h2 id="loop">5. The development loop</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 182" role="img" aria-label="Plugin development loop: write code, run in a sandbox IDE with runIde, test and verify, package with buildPlugin, sign, publish. The first three steps repeat.">
+        <rect class="boxb" x="8"   y="44" width="94" height="62" rx="10"/><text class="b c" x="55"  y="70">Code</text><text class="sub c" x="55"  y="88">Kotlin, XML</text>
+        <rect class="boxg" x="114" y="44" width="94" height="62" rx="10"/><text class="b c" x="161" y="70">Run</text><text class="sub c" x="161" y="88">runIde</text>
+        <rect class="boxg" x="220" y="44" width="94" height="62" rx="10"/><text class="b c" x="267" y="70">Test</text><text class="sub c" x="267" y="88">test, verifier</text>
+        <rect class="box"  x="326" y="44" width="94" height="62" rx="10"/><text class="b c" x="373" y="70">Package</text><text class="sub c" x="373" y="88">buildPlugin</text>
+        <rect class="box"  x="432" y="44" width="94" height="62" rx="10"/><text class="b c" x="479" y="70">Sign</text><text class="sub c" x="479" y="88">signPlugin</text>
+        <rect class="boxo" x="538" y="44" width="94" height="62" rx="10"/><text class="b c" x="585" y="70">Publish</text><text class="sub c" x="585" y="88">Marketplace</text>
+        <path class="arrow" d="M104,75 L112,75"/><path class="arrow" d="M210,75 L218,75"/><path class="arrow" d="M316,75 L324,75"/><path class="arrow" d="M422,75 L430,75"/><path class="arrow" d="M528,75 L536,75"/>
+        <path class="arrow" d="M267,108 L267,138 L55,138 L55,108" style="stroke-dasharray:5 4"/>
+        <text class="sub c" x="161" y="156">repeat until it works</text>
+        <text class="sub c" x="479" y="140">release steps</text>
+      </svg>
+      <figcaption>The sandbox IDE has its own settings and config folder, so your experiments never touch your real IDE.</figcaption>
+    </figure>
+    <ul>
+      <li><code>./gradlew runIde</code> starts a sandbox IDE with the plugin installed. Add breakpoints in your own IDE and debug the run.</li>
+      <li><code>./gradlew buildPlugin</code> produces a ZIP. Teammates can install it with Settings &rarr; Plugins &rarr; gear icon &rarr; <em>Install Plugin from Disk</em>, without publishing anywhere.</li>
+    </ul>
+
+    <h2 id="example">6. Example: distribute a build to Firebase</h2>
+    <p><strong>Goal:</strong> a developer chooses <em>Build &rarr; Distribute to Firebase&hellip;</em>, and a few minutes later testers receive the new build. The plugin builds the app, uploads it through <a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">Firebase App Distribution</a>, and reports back. For how App Distribution itself works, see <a href="firebase-app-distribution-overview.html">Firebase App Distribution: get test builds to testers fast</a>.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 338" role="img" aria-label="Sequence: the developer chooses Distribute to Firebase; the plugin validates settings, then starts Gradle in the background; Gradle assembles the build and uploads it to Firebase App Distribution; Firebase returns the release link; Gradle returns the result to the plugin; the plugin shows a notification with the link; Firebase notifies the testers.">
+        <rect class="boxb" x="14"  y="8" width="112" height="34" rx="9"/><text class="b c" x="70"  y="30">Developer</text>
+        <rect class="boxg" x="164" y="8" width="112" height="34" rx="9"/><text class="b c" x="220" y="30">Plugin</text>
+        <rect class="box"  x="324" y="8" width="112" height="34" rx="9"/><text class="b c" x="380" y="30">Gradle</text>
+        <rect class="boxo" x="484" y="8" width="112" height="34" rx="9"/><text class="b c" x="540" y="30">Firebase</text>
+        <g stroke="var(--border-h)" stroke-width="1.4" stroke-dasharray="5 5"><path d="M70,44 L70,326"/><path d="M220,44 L220,326"/><path d="M380,44 L380,326"/><path d="M540,44 L540,326"/></g>
+        <path class="arrow" d="M72,72 L218,72"/><text class="sub c" x="145" y="66">Build &gt; Distribute</text>
+        <text class="sub" x="232" y="100">validate settings</text>
+        <path class="arrow" d="M222,128 L378,128"/><text class="sub c" x="300" y="122">run in background</text><text class="sub c" x="300" y="142">assemble + upload</text>
+        <path class="arrow" d="M382,170 L538,170"/><text class="sub c" x="460" y="164">upload build</text>
+        <path class="arrow" d="M538,198 L382,198" style="stroke-dasharray:5 4"/><text class="sub c" x="460" y="192">release link</text>
+        <path class="arrow" d="M378,228 L222,228" style="stroke-dasharray:5 4"/><text class="sub c" x="300" y="222">exit code + log</text>
+        <path class="arrow" d="M218,266 L72,266" style="stroke-dasharray:5 4"/><text class="sub c" x="145" y="260">notification</text>
+        <text class="sub" x="86" y="284">success: release link</text><text class="sub" x="86" y="300">failure: log link</text>
+        <text class="sub" x="552" y="244" style="text-anchor:start">testers get</text><text class="sub" x="552" y="260" style="text-anchor:start">an email or</text><text class="sub" x="552" y="276" style="text-anchor:start">app invite</text>
+      </svg>
+      <figcaption>The developer waits on a progress bar in the corner of the IDE, not on a frozen window.</figcaption>
+    </figure>
+    <h3>Pieces the plugin needs</h3>
+    <table>
+      <tr><th>Piece</th><th>Job</th></tr>
+      <tr><td><strong>Action</strong></td><td>The menu entry. Opens the settings if they are missing, otherwise starts the service</td></tr>
+      <tr><td><strong>Settings page</strong></td><td>Firebase app id, tester groups, build variant, where the service-account file is. Saved per user</td></tr>
+      <tr><td><strong>Service</strong></td><td>Builds the command, runs it in a background task, reads the result</td></tr>
+      <tr><td><strong>Tool window</strong></td><td>Shows the live Gradle output and a history of uploads</td></tr>
+      <tr><td><strong>Notification</strong></td><td>Success or failure, with a link to the release in the Firebase console, or to the log</td></tr>
+    </table>
+    <p>The project itself also needs the <a href="https://firebase.google.com/docs/app-distribution/android/distribute-gradle" target="_blank" rel="noopener">Firebase App Distribution Gradle plugin</a>, which adds upload tasks such as <code>appDistributionUploadRelease</code>. Release notes and groups can come from the plugin&rsquo;s settings (for example the last Git commit messages).</p>
+
+    <h2 id="where">7. Where should the build run?</h2>
+    <p>The key design choice is where the heavy work happens. The plugin is the same remote control in each case.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 238" role="img" aria-label="Three options. Local Gradle: the plugin runs the build on the developer's machine; simple, but it uses the laptop. Trigger CI: the plugin calls the CI system, which builds and uploads; reproducible and secrets stay in CI. Direct upload: the plugin uploads an existing build with the Firebase CLI; fast when the build is already made.">
+        <rect class="boxb" x="8" y="8" width="200" height="222" rx="14"/>
+        <text class="b c" x="108" y="34">A. Local Gradle</text>
+        <text class="sub c" x="108" y="60">plugin runs ./gradlew</text><text class="sub c" x="108" y="78">on the dev machine</text>
+        <text class="b c" x="108" y="112" style="fill:#047857">+ simple, works offline</text><text class="b c" x="108" y="134" style="fill:#047857">+ uses local signing</text>
+        <text class="b c" x="108" y="168" style="fill:#b91c1c">&minus; ties up the laptop</text><text class="b c" x="108" y="190" style="fill:#b91c1c">&minus; &ldquo;works on my machine&rdquo;</text>
+        <rect class="boxg" x="220" y="8" width="200" height="222" rx="14"/>
+        <text class="b c" x="320" y="34">B. Trigger CI</text>
+        <text class="sub c" x="320" y="60">plugin calls the CI API,</text><text class="sub c" x="320" y="78">CI builds and uploads</text>
+        <text class="b c" x="320" y="112" style="fill:#047857">+ same build every time</text><text class="b c" x="320" y="134" style="fill:#047857">+ secrets stay in CI</text>
+        <text class="b c" x="320" y="168" style="fill:#b91c1c">&minus; needs CI access</text><text class="b c" x="320" y="190" style="fill:#b91c1c">&minus; slower feedback</text>
+        <rect class="boxo" x="432" y="8" width="200" height="222" rx="14"/>
+        <text class="b c" x="532" y="34">C. Direct upload</text>
+        <text class="sub c" x="532" y="60">plugin uploads a build</text><text class="sub c" x="532" y="78">that already exists</text>
+        <text class="b c" x="532" y="112" style="fill:#047857">+ fastest</text><text class="b c" x="532" y="134" style="fill:#047857">+ tiny plugin</text>
+        <text class="b c" x="532" y="168" style="fill:#b91c1c">&minus; you must build first</text><text class="b c" x="532" y="190" style="fill:#b91c1c">&minus; easy to send a stale file</text>
+      </svg>
+      <figcaption>Small teams start with A. Teams with a CI system usually settle on B.</figcaption>
+    </figure>
+
+    <h2 id="code">8. Code sketches</h2>
+    <p>These sketches show the shape of each piece. Treat them as a starting point, and check the SDK documentation for the current API of the IDE version you target.</p>
+    <h3>plugin.xml</h3>
+<pre><code>&lt;idea-plugin&gt;
+  &lt;id&gt;com.example.firebase.distribute&lt;/id&gt;
+  &lt;name&gt;Firebase Distribute&lt;/name&gt;
+  &lt;vendor&gt;Example Inc.&lt;/vendor&gt;
+
+  &lt;depends&gt;com.intellij.modules.platform&lt;/depends&gt;
+  &lt;depends&gt;org.jetbrains.android&lt;/depends&gt;
+
+  &lt;extensions defaultExtensionNs="com.intellij"&gt;
+    &lt;notificationGroup id="Firebase Distribute" displayType="BALLOON"/&gt;
+    &lt;applicationConfigurable parentId="tools" id="firebase.distribute"
+        instance="com.example.DistributeConfigurable" displayName="Firebase Distribute"/&gt;
+    &lt;toolWindow id="Distribution" anchor="bottom" factoryClass="com.example.DistributeToolWindow"/&gt;
+  &lt;/extensions&gt;
+
+  &lt;actions&gt;
+    &lt;action id="Firebase.Distribute" class="com.example.DistributeAction"
+            text="Distribute to Firebase..."&gt;
+      &lt;add-to-group group-id="BuildMenu" anchor="last"/&gt;
+    &lt;/action&gt;
+  &lt;/actions&gt;
+&lt;/idea-plugin&gt;</code></pre>
+    <h3>The action: thin, it only delegates</h3>
+<pre><code>class DistributeAction : AnAction() {
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+    override fun update(e: AnActionEvent) {
+        e.presentation.isEnabledAndVisible = e.project != null
+    }
+
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
+        val state = DistributeSettings.getInstance().state
+        if (state.appId.isBlank()) {
+            ShowSettingsUtil.getInstance()
+                .showSettingsDialog(project, DistributeConfigurable::class.java)
+            return
+        }
+        project.service&lt;DistributeService&gt;().distribute(state)
+    }
+}</code></pre>
+    <h3>The service: background work and the result</h3>
+<pre><code>@Service(Service.Level.PROJECT)
+class DistributeService(private val project: Project) {
+
+    fun distribute(s: DistributeState) {
+        object : Task.Backgroundable(project, "Distributing to Firebase", true) {
+            override fun run(indicator: ProgressIndicator) {
+                val cmd = GeneralCommandLine(gradlew(project), "assembleRelease", "appDistributionUploadRelease")
+                    .withWorkDirectory(project.basePath)
+                    .withEnvironment("GOOGLE_APPLICATION_CREDENTIALS", s.credentialsPath)
+                val out = CapturingProcessHandler(cmd).runProcessWithProgressIndicator(indicator)
+                report(out.exitCode == 0, out.stdout + out.stderr)
+            }
+        }.queue()
+    }
+
+    private fun report(ok: Boolean, log: String) {
+        val type = if (ok) NotificationType.INFORMATION else NotificationType.ERROR
+        NotificationGroupManager.getInstance().getNotificationGroup("Firebase Distribute")
+            .createNotification(if (ok) "Build distributed to testers" else "Distribution failed", type)
+            .notify(project)
+        // also append `log` to the tool window
+    }
+}</code></pre>
+    <h3>Settings: saved state</h3>
+<pre><code>data class DistributeState(
+    var appId: String = "",
+    var groups: String = "qa",
+    var credentialsPath: String = ""      // path to the service-account file, not its contents
+)
+
+@State(name = "DistributeSettings", storages = [Storage("firebase-distribute.xml")])
+@Service
+class DistributeSettings : PersistentStateComponent&lt;DistributeState&gt; {
+    private var state = DistributeState()
+    override fun getState() = state
+    override fun loadState(s: DistributeState) { state = s }
+    companion object { fun getInstance() = service&lt;DistributeSettings&gt;() }
+}</code></pre>
+
+    <h2 id="rules">9. Threading, security and UX rules</h2>
+    <table>
+      <tr><th>Area</th><th>Rule</th></tr>
+      <tr><td><strong>Threading</strong></td><td>Never run builds, network calls or file scans on the UI thread. Use a background task with a progress indicator, support cancel, and return to the UI thread only to update the screen. Read project data inside a read action</td></tr>
+      <tr><td><strong>Secrets</strong></td><td>Store tokens in the IDE&rsquo;s <code>PasswordSafe</code>, not in the XML settings file. Keep only a <em>path</em> to a service-account file. Never log credentials or print them in notifications</td></tr>
+      <tr><td><strong>External processes</strong></td><td>Build the command from separate arguments (never one concatenated string), set the working directory, and use <code>gradlew.bat</code> on Windows. Destroy the process if the user cancels</td></tr>
+      <tr><td><strong>Safety</strong></td><td>Confirm before uploading, show which variant and which groups will be used, and make a production build impossible to send by accident</td></tr>
+      <tr><td><strong>UX</strong></td><td>Put the action where people look for it (Build menu or toolbar), keep text short, link to details instead of dumping logs in a balloon, and keep a history in the tool window</td></tr>
+      <tr><td><strong>Cleanup</strong></td><td>Dispose listeners and processes when the project closes, so the plugin can be unloaded without a restart</td></tr>
+    </table>
+
+    <h2 id="ship">10. Compatibility, testing and publishing</h2>
+    <ul>
+      <li><strong>Compatibility.</strong> Each plugin declares the IDE builds it supports (<code>sinceBuild</code> and <code>untilBuild</code>). Android Studio releases follow the IntelliJ platform builds, so check which platform build your target Studio uses. The <strong>Plugin Verifier</strong> checks your plugin against several IDE versions for API breaks.</li>
+      <li><strong>Testing.</strong> Unit-test the service with the platform&rsquo;s test fixtures, and fake the process runner so tests never start a real build. Do a manual pass in the sandbox IDE for the UI.</li>
+      <li><strong>Distribution.</strong> Share the ZIP inside your company, host an internal plugin repository, or publish to the <a href="https://plugins.jetbrains.com/" target="_blank" rel="noopener">JetBrains Marketplace</a>. Publishing requires a signed plugin and a review. See <a href="https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html" target="_blank" rel="noopener">Publishing a plugin</a>.</li>
+      <li><strong>Maintenance.</strong> Plan on updating for new IDE versions every few months. Small plugins with few dependencies are cheap to keep current.</li>
+    </ul>
+
+    <h2 id="wrap">11. Takeaways and glossary</h2>
+    <ul>
+      <li>Android Studio is the IntelliJ Platform plus the Android plugin, so one plugin model serves all JetBrains IDEs.</li>
+      <li>Declare pieces in <code>plugin.xml</code>; keep actions thin and put logic in services.</li>
+      <li>Start from the official template, iterate with <code>runIde</code>, and package with Gradle.</li>
+      <li>For &ldquo;build and distribute&rdquo;: run Gradle in a background task, report with a notification, keep secrets in the password store, and choose where the build runs on purpose.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>IntelliJ Platform</td><td>The shared base of JetBrains IDEs and of Android Studio.</td></tr>
+      <tr><td>Extension point</td><td>A named slot in the IDE where a plugin can add something.</td></tr>
+      <tr><td>Action</td><td>A command with a menu or toolbar entry.</td></tr>
+      <tr><td>Service</td><td>A long-lived object that holds logic or state, per IDE or per project.</td></tr>
+      <tr><td>Tool window</td><td>A dockable panel such as Logcat or Gradle.</td></tr>
+      <tr><td>Sandbox IDE</td><td>A separate IDE instance started by <code>runIde</code> to test the plugin safely.</td></tr>
+      <tr><td>EDT</td><td>The event dispatch thread that draws the UI and must never be blocked.</td></tr>
+      <tr><td>Plugin Verifier</td><td>A tool that checks a plugin against other IDE versions.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://plugins.jetbrains.com/docs/intellij/welcome.html" target="_blank" rel="noopener">IntelliJ Platform Plugin SDK</a> &middot; <a href="https://plugins.jetbrains.com/docs/intellij/android-studio.html" target="_blank" rel="noopener">Developing plugins for Android Studio</a> &middot; <a href="https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html" target="_blank" rel="noopener">IntelliJ Platform Gradle Plugin</a></li>
+      <li><a href="https://github.com/JetBrains/intellij-platform-plugin-template" target="_blank" rel="noopener">IntelliJ Platform Plugin Template</a> &middot; <a href="https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html" target="_blank" rel="noopener">Publishing a plugin</a> &middot; <a href="https://plugins.jetbrains.com/" target="_blank" rel="noopener">JetBrains Marketplace</a></li>
+      <li><a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">Firebase App Distribution</a> &middot; <a href="https://firebase.google.com/docs/app-distribution/android/distribute-gradle" target="_blank" rel="noopener">Distribute with Gradle</a> &middot; <a href="https://firebase.google.com/docs/app-distribution/android/distribute-cli" target="_blank" rel="noopener">Distribute with the Firebase CLI</a></li>
+      <li>On this site: <a href="firebase-app-distribution-overview.html">Firebase App Distribution overview</a> &middot; <a href="android-testing-guide.html">Testing Android apps</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+</body>
+</html>

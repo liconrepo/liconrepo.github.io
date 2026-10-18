@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Make Your Own Font: Design a TTF File from Sketch to Install — Khairul Alam</title>
+  <meta name="description" content="A friendly, illustrated guide to designing and building your own TrueType (TTF) font: what is inside a font file, letter anatomy, drawing outlines, spacing and kerning, tools, building a tiny font from code, testing, and licensing." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+      /* Cartoon touches for this article */
+    svg.toon [class^="box"] { stroke-width: 2.4; }
+    svg.toon .arrow { stroke-width: 2.2; }
+    .say { display: flex; gap: 16px; align-items: flex-start; margin: 24px 0; }
+    .say > svg { flex: none; width: 64px; height: 64px; }
+    .say .bubble { position: relative; background: var(--card); border: 2px solid color-mix(in srgb, var(--text) 70%, transparent); border-radius: 16px; padding: 10px 16px; box-shadow: 3px 3px 0 color-mix(in srgb, var(--text) 18%, transparent); }
+    .say .bubble::before { content: ""; position: absolute; left: -9px; top: 24px; width: 14px; height: 14px; background: var(--card); border-left: 2px solid color-mix(in srgb, var(--text) 70%, transparent); border-bottom: 2px solid color-mix(in srgb, var(--text) 70%, transparent); transform: rotate(45deg); }
+    .say .bubble p { margin: 4px 0; }
+    .sticker { display: inline-block; transform: rotate(-2deg); background: #fde68a; color: #1c1c20; border: 2px solid #1c1c20; border-radius: 8px; padding: 1px 10px; font-weight: 700; font-size: .78em; letter-spacing: .3px; vertical-align: middle; margin-left: 6px; }
+    @font-face { font-family: "Tiny Blocks"; src: url("../data/fonts/TinyBlocks-Regular.ttf") format("truetype"); font-display: swap; }
+    .specimen { font-family: "Tiny Blocks", monospace; font-size: calc(54px * var(--fs, 1)); line-height: 1.25; text-align: center; background: var(--card); border: 2px dashed var(--border-h); border-radius: 16px; padding: 18px 12px; margin: 18px 0 6px; word-break: break-word; }
+    .specimen small { display: block; font-family: "Inter", system-ui, sans-serif; font-size: calc(12px * var(--fs, 1)); color: var(--muted); margin-top: 6px; }
+    @media (max-width: 600px) { .say { gap: 10px; } .say > svg { width: 48px; height: 48px; } }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+  <symbol id="emmy" viewBox="0 0 60 60"><rect x="4" y="6" width="52" height="50" rx="14" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="3"/><circle cx="21" cy="26" r="5" fill="#fff" stroke="#1c1c20" stroke-width="2"/><circle cx="22" cy="27" r="2.2" fill="#1c1c20"/><circle cx="39" cy="26" r="5" fill="#fff" stroke="#1c1c20" stroke-width="2"/><circle cx="40" cy="27" r="2.2" fill="#1c1c20"/><path d="M20 39 Q30 50 40 39" fill="none" stroke="#1c1c20" stroke-width="3" stroke-linecap="round"/><circle cx="13" cy="37" r="3.6" fill="#fda4af"/><circle cx="47" cy="37" r="3.6" fill="#fda4af"/></symbol>
+  <symbol id="emmy-oops" viewBox="0 0 60 60"><rect x="4" y="6" width="52" height="50" rx="14" fill="#fecaca" stroke="#b91c1c" stroke-width="3"/><path d="M16 21 L26 31 M26 21 L16 31 M34 21 L44 31 M44 21 L34 31" stroke="#1c1c20" stroke-width="3" stroke-linecap="round"/><path d="M19 45 Q24.5 38 30 45 T41 45" fill="none" stroke="#1c1c20" stroke-width="3" stroke-linecap="round"/></symbol>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Typography &middot; Do it yourself</p>
+    <h1>Make Your Own Font: Design a TTF File from Sketch to Install</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~20 min read</span></div>
+    <div class="tags"><span class="tag">Fonts</span><span class="tag">TrueType</span><span class="tag">Typography</span><span class="tag">FontForge</span><span class="tag">fontTools</span><span class="tag">Adobe Illustrator</span></div>
+
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 220" role="img" aria-label="A friendly square character says: Let us make a font. Below, four steps: a sketch, vector outlines, a TTF file and the finished Aa installed.">
+        <use href="#emmy" x="14" y="14" width="96" height="96"/>
+        <path d="M128,30 Q128,14 146,14 L372,14 Q390,14 390,30 L390,72 Q390,88 372,88 L168,88 L140,106 L146,88 Q128,88 128,72 Z" style="fill:var(--bg);stroke:var(--text);stroke-width:2.4"/>
+        <text class="b" x="148" y="44" style="font-size:19px">Let&rsquo;s make a font!</text>
+        <text class="sub" x="148" y="68">From a doodle to a real .ttf file.</text>
+        <rect class="boxo" x="28"  y="140" width="120" height="58" rx="14"/><text class="b c" x="88"  y="165">Sketch</text><text class="sub c" x="88"  y="184">paper or tablet</text>
+        <rect class="boxb" x="184" y="140" width="120" height="58" rx="14"/><text class="b c" x="244" y="165">Outlines</text><text class="sub c" x="244" y="184">vector shapes</text>
+        <rect class="boxp" x="340" y="140" width="120" height="58" rx="14"/><text class="b c" x="400" y="165">.ttf file</text><text class="sub c" x="400" y="184">the real thing</text>
+        <rect class="boxg" x="496" y="140" width="120" height="58" rx="14"/><text class="b c" x="556" y="172" style="font-size:24px">Aa</text><text class="sub c" x="556" y="190">installed!</text>
+        <path class="arrow" d="M150,169 L182,169"/><path class="arrow" d="M306,169 L338,169"/><path class="arrow" d="M462,169 L494,169"/>
+      </svg>
+      <figcaption>The whole journey in four boxes.</figcaption>
+    </figure>
+
+    <p class="lede">A font is just a small database that says &ldquo;when someone types this letter, draw these curves&rdquo;. You can make one with a drawing tool and patience, or with ten lines of Python. This guide covers both: the ideas first, then the tools, then a real tiny font you can download and try.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>A <strong>TTF</strong> (TrueType) file is a box of <strong>tables</strong>: which glyph belongs to which character, the outlines, the widths, the names.</li>
+        <li>Every letter lives on a grid called the <strong>em square</strong> (often 1000 or 2048 units tall) with guide lines: baseline, x-height, cap height.</li>
+        <li>The work is: <strong>draw, space, kern, set metrics, test, export, validate</strong>.</li>
+        <li>Free tools: <strong>FontForge</strong> and <strong>BirdFont</strong> (drawing), <strong>fontTools</strong> (code). Paid favourites: Glyphs, FontLab, RoboFont. <strong>Adobe Illustrator</strong> can draw the shapes, with a plugin such as Fontself Maker or a font editor to build the file.</li>
+        <li>Spacing makes a font look good more than clever shapes do.</li>
+        <li>Pick a licence (the SIL Open Font License is common) and never copy someone else&rsquo;s outlines.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#inside">What is inside a font file</a></li>
+        <li><a href="#route">The route map</a></li>
+        <li><a href="#anatomy">Meet the letter</a></li>
+        <li><a href="#tools">Pick your tools</a></li>
+        <li><a href="#draw">Draw clean outlines</a></li>
+        <li><a href="#space">Spacing and kerning</a></li>
+        <li><a href="#metrics">Vertical metrics</a></li>
+        <li><a href="#code">Build a tiny font from code</a></li>
+        <li><a href="#ship">Export, check, test</a></li>
+        <li><a href="#licence">Names and licence</a></li>
+        <li><a href="#wrap">Checklist and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="inside">1. What is inside a font file</h2>
+    <p>Open a <code>.ttf</code> file and you find a lunch box. Each compartment is a <strong>table</strong>, and each table has one job. The format is called <strong>sfnt</strong>, and it is shared by TrueType (<code>.ttf</code>) and OpenType (<code>.otf</code>) fonts.</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 308" role="img" aria-label="A TTF font file drawn as a lunch box with nine compartments: cmap maps characters to glyphs, glyf holds the outlines, loca finds each outline, hmtx holds the widths, head holds the grid size, hhea holds the vertical metrics, OS/2 holds weights and metrics, name holds the family name, post holds glyph names. Kerning in GPOS is optional.">
+        <text class="b c" x="320" y="24" style="font-size:16px">A .ttf file = a box of tables</text>
+        <rect class="boxo" x="24" y="38" width="592" height="262" rx="22"/>
+        <use href="#emmy" x="548" y="2" width="56" height="56"/>
+        <rect class="boxb" x="48"  y="62"  width="170" height="58" rx="12"/><text class="b c" x="133" y="87">cmap</text><text class="sub c" x="133" y="106">character &rarr; glyph</text>
+        <rect class="boxg" x="235" y="62"  width="170" height="58" rx="12"/><text class="b c" x="320" y="87">glyf + loca</text><text class="sub c" x="320" y="106">the outlines</text>
+        <rect class="boxg" x="422" y="62"  width="170" height="58" rx="12"/><text class="b c" x="507" y="87">hmtx</text><text class="sub c" x="507" y="106">advance widths</text>
+        <rect class="box"  x="48"  y="132" width="170" height="58" rx="12"/><text class="b c" x="133" y="157">head + maxp</text><text class="sub c" x="133" y="176">grid size, counts</text>
+        <rect class="box"  x="235" y="132" width="170" height="58" rx="12"/><text class="b c" x="320" y="157">hhea + OS/2</text><text class="sub c" x="320" y="176">line height, weight</text>
+        <rect class="box"  x="422" y="132" width="170" height="58" rx="12"/><text class="b c" x="507" y="157">name + post</text><text class="sub c" x="507" y="176">names, glyph names</text>
+        <rect class="boxp" x="48"  y="202" width="544" height="76" rx="12" stroke-dasharray="6 5"/><text class="b c" x="320" y="230">GPOS / kern (optional extras)</text><text class="sub c" x="320" y="250">kerning pairs, ligatures, alternates, hinting instructions</text>
+      </svg>
+      <figcaption>The six solid chips are the minimum for a working TrueType font (plus OS/2 for Windows). The dashed box is what makes a font polished.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>TTF</strong> stores outlines as <em>quadratic</em> curves. <strong>OTF</strong> with CFF outlines uses <em>cubic</em> curves, which design tools prefer. Tools convert between them when they export.</li>
+      <li><strong>WOFF2</strong> is a compressed wrapper for web use. Variable fonts add tables that let one file hold many weights.</li>
+    </ul>
+    <p>For the exact rules, the references are the <a href="https://learn.microsoft.com/en-us/typography/opentype/spec/" target="_blank" rel="noopener">OpenType specification</a> (Microsoft) and Apple&rsquo;s <a href="https://developer.apple.com/fonts/TrueType-Reference-Manual/" target="_blank" rel="noopener">TrueType Reference Manual</a>.</p>
+
+    <h2 id="route">2. The route map</h2>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 268" role="img" aria-label="Eight stops: 1 sketch the letters, 2 draw the outlines, 3 space and kern, 4 set metrics, 5 test words, 6 export the TTF, 7 validate, 8 name and licence it.">
+        <rect class="boxo" x="8"   y="14" width="138" height="72" rx="14"/><circle class="boxb" cx="26" cy="14" r="13"/><text class="b c" x="26" y="19" style="font-size:13px">1</text><text class="b c" x="77" y="46">Sketch</text><text class="sub c" x="77" y="66">find the personality</text>
+        <rect class="boxb" x="170" y="14" width="138" height="72" rx="14"/><circle class="boxb" cx="188" cy="14" r="13"/><text class="b c" x="188" y="19" style="font-size:13px">2</text><text class="b c" x="239" y="46">Draw</text><text class="sub c" x="239" y="66">clean outlines</text>
+        <rect class="boxg" x="332" y="14" width="138" height="72" rx="14"/><circle class="boxb" cx="350" cy="14" r="13"/><text class="b c" x="350" y="19" style="font-size:13px">3</text><text class="b c" x="401" y="46">Space, kern</text><text class="sub c" x="401" y="66">the secret sauce</text>
+        <rect class="boxp" x="494" y="14" width="138" height="72" rx="14"/><circle class="boxb" cx="512" cy="14" r="13"/><text class="b c" x="512" y="19" style="font-size:13px">4</text><text class="b c" x="563" y="46">Metrics</text><text class="sub c" x="563" y="66">ascent, descent</text>
+        <path class="arrow" d="M148,50 L168,50"/><path class="arrow" d="M310,50 L330,50"/><path class="arrow" d="M472,50 L492,50"/>
+        <path class="arrow" d="M563,88 L563,108 L77,108 L77,126"/>
+        <rect class="boxo" x="8"   y="128" width="138" height="72" rx="14"/><circle class="boxb" cx="26" cy="128" r="13"/><text class="b c" x="26" y="133" style="font-size:13px">5</text><text class="b c" x="77" y="160">Test</text><text class="sub c" x="77" y="180">real words, real sizes</text>
+        <rect class="boxb" x="170" y="128" width="138" height="72" rx="14"/><circle class="boxb" cx="188" cy="128" r="13"/><text class="b c" x="188" y="133" style="font-size:13px">6</text><text class="b c" x="239" y="160">Export</text><text class="sub c" x="239" y="180">generate the .ttf</text>
+        <rect class="boxg" x="332" y="128" width="138" height="72" rx="14"/><circle class="boxb" cx="350" cy="128" r="13"/><text class="b c" x="350" y="133" style="font-size:13px">7</text><text class="b c" x="401" y="160">Validate</text><text class="sub c" x="401" y="180">catch the gremlins</text>
+        <rect class="boxp" x="494" y="128" width="138" height="72" rx="14"/><circle class="boxb" cx="512" cy="128" r="13"/><text class="b c" x="512" y="133" style="font-size:13px">8</text><text class="b c" x="563" y="160">Name, licence</text><text class="sub c" x="563" y="180">then share it</text>
+        <path class="arrow" d="M148,164 L168,164"/><path class="arrow" d="M310,164 L330,164"/><path class="arrow" d="M472,164 L492,164"/>
+        <use href="#emmy" x="8" y="208" width="52" height="52"/>
+        <text class="sub" x="70" y="238">Eight stops. Steps 5 to 7 loop back to 2 as often as needed. That is normal!</text>
+      </svg>
+      <figcaption>Real projects loop between draw, space and test many times.</figcaption>
+    </figure>
+
+    <h2 id="anatomy">3. Meet the letter</h2>
+    <p>Every glyph is drawn on an <strong>em square</strong>: a grid whose height is the font size. Designers split it into units. <strong>1000</strong> is traditional for PostScript-style fonts and <strong>2048</strong> is common for TrueType, but any value from 16 to 16384 is allowed. Along the grid run horizontal guide lines that every letter respects.</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 306" role="img" aria-label="The letters H, x and g drawn on guide lines: ascender, cap height, x-height, baseline and descender. Under the H, the left side bearing, right side bearing and advance width are marked.">
+        <g stroke="var(--border-h)" stroke-width="1.4" stroke-dasharray="6 5">
+          <path d="M20,40 L440,40"/><path d="M20,62 L440,62"/><path d="M20,112 L440,112"/><path d="M20,170 L440,170" style="stroke:#ef4444;stroke-dasharray:none;stroke-width:2"/><path d="M20,226 L440,226"/>
+        </g>
+        <text class="sub" x="452" y="44">ascender</text><text class="sub" x="452" y="66">cap height</text><text class="sub" x="452" y="116">x-height</text><text class="sub b" x="452" y="174" style="fill:#ef4444">baseline</text><text class="sub" x="452" y="230">descender</text>
+        <g fill="none" stroke="#1d4ed8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M70,62 L70,170"/><path d="M130,62 L130,170"/><path d="M70,116 L130,116"/>
+          <path d="M176,112 L226,170"/><path d="M226,112 L176,170"/>
+          <circle cx="288" cy="141" r="29"/><path d="M317,112 L317,204 Q317,226 290,226 Q270,226 260,214"/>
+        </g>
+        <circle cx="90" cy="86" r="4.5" style="fill:var(--text)"/><circle cx="110" cy="86" r="4.5" style="fill:var(--text)"/><path d="M90,98 Q100,107 110,98" fill="none" style="stroke:var(--text)" stroke-width="2.5" stroke-linecap="round"/>
+        <g stroke="#10b981" stroke-width="2" fill="none"><path d="M40,176 L40,262"/><path d="M62,176 L62,244"/><path d="M138,176 L138,244"/><path d="M160,176 L160,262"/></g>
+        <path class="arrow" d="M40,236 L60,236" style="stroke:#10b981"/><path class="arrow" d="M160,236 L140,236" style="stroke:#10b981"/>
+        <text class="sub c" x="51" y="254" style="fill:#047857">LSB</text><text class="sub c" x="149" y="254" style="fill:#047857">RSB</text>
+        <path d="M40,274 L160,274" stroke="#10b981" stroke-width="2"/><path d="M40,268 L40,280 M160,268 L160,280" stroke="#10b981" stroke-width="2"/>
+        <text class="sub c b" x="100" y="296" style="fill:#047857">advance width</text>
+        <use href="#emmy" x="540" y="236" width="64" height="64"/>
+      </svg>
+      <figcaption>The red line is the baseline. Letters sit on it; round letters overshoot it a little so they look the same size as flat ones.</figcaption>
+    </figure>
+    <table class="gloss">
+      <tr><th>Word</th><th>What it means</th></tr>
+      <tr><td>Baseline</td><td>The line most letters stand on. Vertical position 0.</td></tr>
+      <tr><td>x-height / cap height</td><td>Height of lowercase letters like x, and of capitals like H. A tall x-height reads well on small screens.</td></tr>
+      <tr><td>Ascender / descender</td><td>Parts that rise above the x-height (b, d) or drop below the baseline (g, p).</td></tr>
+      <tr><td>Side bearings (LSB, RSB)</td><td>Empty space left and right of the shape. They decide how letters sit next to each other.</td></tr>
+      <tr><td>Advance width</td><td>How far the cursor moves after the letter: left bearing + shape + right bearing.</td></tr>
+    </table>
+
+    <h2 id="tools">4. Pick your tools</h2>
+    <div class="say">
+      <svg viewBox="0 0 60 60" aria-hidden="true"><use href="#emmy"/></svg>
+      <div class="bubble"><p><strong>Tip:</strong> start with a free tool. You can always move your outlines to a paid one later, because they are just shapes.</p></div>
+    </div>
+    <table>
+      <tr><th>Tool</th><th>Type</th><th>Good for</th></tr>
+      <tr><td><a href="https://fontforge.org/" target="_blank" rel="noopener"><strong>FontForge</strong></a></td><td>Free, open source</td><td>A full font editor on Windows, macOS and Linux. Used in this guide</td></tr>
+      <tr><td><a href="https://birdfont.org/" target="_blank" rel="noopener"><strong>BirdFont</strong></a></td><td>Free, open source</td><td>A simpler, friendly drawing interface</td></tr>
+      <tr><td><a href="https://glyphsapp.com/" target="_blank" rel="noopener"><strong>Glyphs</strong></a></td><td>Paid, macOS</td><td>A favourite of working type designers</td></tr>
+      <tr><td><a href="https://www.fontlab.com/" target="_blank" rel="noopener"><strong>FontLab</strong></a></td><td>Paid</td><td>Professional editor with strong production tools</td></tr>
+      <tr><td><a href="https://robofont.com/" target="_blank" rel="noopener"><strong>RoboFont</strong></a></td><td>Paid, macOS</td><td>Scriptable with Python, built around the UFO format</td></tr>
+      <tr><td><a href="https://www.calligraphr.com/" target="_blank" rel="noopener"><strong>Calligraphr</strong></a></td><td>Web service</td><td>Turn a scanned page of your handwriting into a font</td></tr>
+      <tr><td><a href="https://www.adobe.com/products/illustrator.html" target="_blank" rel="noopener"><strong>Adobe Illustrator</strong></a> (and <a href="https://www.adobe.com/products/photoshop.html" target="_blank" rel="noopener">Photoshop</a>)</td><td>Paid subscription</td><td>Drawing the shapes. It does not save a font by itself, so pair it with a plugin or a font editor (see below)</td></tr>
+      <tr><td><a href="https://www.fontself.com/" target="_blank" rel="noopener"><strong>Fontself Maker</strong></a></td><td>Paid plugin</td><td>Turns Illustrator or Photoshop artwork into an installable font file</td></tr>
+      <tr><td><a href="https://fonttools.readthedocs.io/" target="_blank" rel="noopener"><strong>fontTools</strong></a></td><td>Free Python library</td><td>Build, inspect and fix fonts in code (used in section 8)</td></tr>
+    </table>
+    <p>Prices and licences change, so check each site. Related tools worth knowing: <a href="https://github.com/googlefonts/fontmake" target="_blank" rel="noopener">fontmake</a> compiles source files (UFO, Glyphs) into font binaries, and the <a href="https://unifiedfontobject.org/" target="_blank" rel="noopener">UFO format</a> is an open, folder-based way to store a font design.</p>
+
+    <h3 id="adobe">Drawing in Adobe Illustrator</h3>
+    <p>Many people already draw letters in <strong>Adobe Illustrator</strong>, and that works well. One thing to know: <strong>Illustrator and Photoshop have no &ldquo;save as font&rdquo; command</strong>. They make the shapes, and something else builds the font file. There are two common routes:</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 232" role="img" aria-label="Two routes from Adobe Illustrator to a TTF file. Top route: the Fontself Maker plugin builds the font directly. Bottom route: export SVG shapes, open them in a font editor such as FontForge or Glyphs, then generate the TTF.">
+        <rect class="boxo" x="8" y="62" width="124" height="108" rx="14"/><text class="b c" x="70" y="96">Adobe</text><text class="b c" x="70" y="114">Illustrator</text><text class="sub c" x="70" y="138">draw on guides</text><text class="sub c" x="70" y="154">filled shapes</text>
+        <rect class="boxb" x="196" y="22" width="150" height="58" rx="14"/><text class="b c" x="271" y="48">Fontself Maker</text><text class="sub c" x="271" y="66">plugin, drag in glyphs</text>
+        <rect class="boxp" x="410" y="22" width="150" height="58" rx="14"/><text class="b c" x="485" y="48">.ttf / .otf</text><text class="sub c" x="485" y="66">quick route</text>
+        <rect class="box"  x="196" y="146" width="116" height="58" rx="14"/><text class="b c" x="254" y="172">Export SVG</text><text class="sub c" x="254" y="190">one per glyph</text>
+        <rect class="boxg" x="348" y="146" width="150" height="58" rx="14"/><text class="b c" x="423" y="172">Font editor</text><text class="sub c" x="423" y="190">FontForge, Glyphs</text>
+        <rect class="boxp" x="538" y="146" width="94" height="58" rx="14"/><text class="b c" x="585" y="172">.ttf</text><text class="sub c" x="585" y="190">full control</text>
+        <path class="arrow" d="M134,100 L194,56"/><path class="arrow" d="M348,51 L408,51"/>
+        <path class="arrow" d="M134,134 L194,172"/><path class="arrow" d="M314,175 L346,175"/><path class="arrow" d="M500,175 L536,175"/>
+        <use href="#emmy" x="578" y="14" width="52" height="52"/>
+        <text class="sub c" x="320" y="226">Adobe draws the shapes. A plugin or a font editor builds the font file.</text>
+      </svg>
+      <figcaption>The plugin route is faster; the editor route gives you kerning classes, metrics checks and validation.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Route 1: Fontself Maker.</strong> It adds a panel inside Illustrator (and Photoshop). You drag each finished shape into a letter slot, set spacing, and export a font file. Check the current version for the formats it exports (OpenType, TrueType and others).</li>
+      <li><strong>Route 2: SVG into a font editor.</strong> Export each glyph as SVG, import it into FontForge, Glyphs or FontLab, then space, kern and generate the TTF there.</li>
+      <li><strong>From a photo.</strong> <a href="https://www.adobe.com/products/capture.html" target="_blank" rel="noopener">Adobe Capture</a> can turn a photo of hand lettering into vector shapes that you can bring into Illustrator.</li>
+    </ul>
+    <h3>Prepare the artwork in Illustrator</h3>
+    <ul>
+      <li>Work at one scale for every glyph. Draw guides for the baseline, x-height, cap height, ascender and descender, and keep each letter on them.</li>
+      <li>Use <strong>filled shapes only</strong>. Convert live text with Type &rarr; Create Outlines, turn strokes into shapes with Object &rarr; Path &rarr; Outline Stroke, and remove gradients, effects and placed images.</li>
+      <li>Merge overlapping pieces with the Pathfinder panel&rsquo;s <strong>Unite</strong>, and keep holes (like the inside of an O) as a compound path: Object &rarr; Compound Path &rarr; Make.</li>
+      <li>Keep points at the extremes of curves and avoid extra points. Zoom in and tidy before you export.</li>
+    </ul>
+    <p>Menu names can change between Illustrator versions, so check the current Adobe Help if one has moved.</p>
+
+    <h2 id="draw">5. Draw clean outlines</h2>
+    <p>A glyph is made of <strong>contours</strong> (closed shapes). The letter O has two: the outer ring and the inner hole. Each contour is a chain of <strong>points</strong>: <em>on-curve</em> points the line passes through, and <em>off-curve</em> points (handles) that bend it.</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 250" role="img" aria-label="Two circles. Left, a clean circle built from four on-curve points at the top, right, bottom and left, with handles, and a happy face. Right, a bumpy circle made of many points, with a dizzy face.">
+        <text class="b c" x="150" y="24">Happy outline</text>
+        <circle cx="150" cy="130" r="62" fill="none" stroke="#1d4ed8" stroke-width="5"/>
+        <g stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 3"><path d="M117,68 L183,68"/><path d="M212,97 L212,163"/><path d="M117,192 L183,192"/><path d="M88,97 L88,163"/></g>
+        <g fill="var(--bg)" stroke="var(--muted)" stroke-width="1.6"><circle cx="117" cy="68" r="4"/><circle cx="183" cy="68" r="4"/><circle cx="212" cy="97" r="4"/><circle cx="212" cy="163" r="4"/><circle cx="183" cy="192" r="4"/><circle cx="117" cy="192" r="4"/><circle cx="88" cy="163" r="4"/><circle cx="88" cy="97" r="4"/></g>
+        <g fill="#1d4ed8"><rect x="145" y="63" width="10" height="10"/><rect x="207" y="125" width="10" height="10"/><rect x="145" y="187" width="10" height="10"/><rect x="83" y="125" width="10" height="10"/></g>
+        <use href="#emmy" x="122" y="104" width="56" height="56"/>
+        <text class="sub c" x="150" y="222">4 points, one at each extreme</text>
+        <text class="sub c" x="150" y="240">handles stay level or upright</text>
+
+        <text class="b c" x="490" y="24">Dizzy outline</text>
+        <path d="M490,66 L508,70 L528,62 L546,80 L558,76 L552,104 L562,128 L552,152 L558,184 L538,178 L520,196 L498,188 L476,196 L458,180 L440,184 L444,152 L430,128 L444,104 L438,76 L456,80 L470,62 Z" fill="none" stroke="#b91c1c" stroke-width="4" stroke-linejoin="round"/>
+        <g fill="var(--bg)" stroke="#b91c1c" stroke-width="1.8"><circle cx="490" cy="66" r="3.6"/><circle cx="508" cy="70" r="3.6"/><circle cx="528" cy="62" r="3.6"/><circle cx="546" cy="80" r="3.6"/><circle cx="558" cy="76" r="3.6"/><circle cx="552" cy="104" r="3.6"/><circle cx="562" cy="128" r="3.6"/><circle cx="552" cy="152" r="3.6"/><circle cx="558" cy="184" r="3.6"/><circle cx="538" cy="178" r="3.6"/><circle cx="520" cy="196" r="3.6"/><circle cx="498" cy="188" r="3.6"/><circle cx="476" cy="196" r="3.6"/><circle cx="458" cy="180" r="3.6"/><circle cx="440" cy="184" r="3.6"/><circle cx="444" cy="152" r="3.6"/><circle cx="430" cy="128" r="3.6"/><circle cx="444" cy="104" r="3.6"/><circle cx="438" cy="76" r="3.6"/><circle cx="456" cy="80" r="3.6"/><circle cx="470" cy="62" r="3.6"/></g>
+        <use href="#emmy-oops" x="462" y="104" width="56" height="56"/>
+        <text class="sub c" x="490" y="222">too many points, lumpy curves</text>
+        <text class="sub c" x="490" y="240">they blur at small sizes</text>
+      </svg>
+      <figcaption>Fewer, well-placed points give smoother curves and smaller files. Design tools draw cubic curves; TrueType stores quadratic ones and the exporter converts them.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Put points at the extremes</strong> (top, bottom, left, right of a curve). In FontForge: Element &rarr; Add Extrema.</li>
+      <li><strong>Merge overlaps</strong> so each letter is clean shapes, not stacked pieces (Element &rarr; Remove Overlap).</li>
+      <li><strong>Mind the direction.</strong> TrueType outer contours run clockwise and holes run counter-clockwise (Element &rarr; Correct Direction).</li>
+      <li><strong>Be consistent.</strong> Same stroke thickness, same round-letter overshoot, same x-height across the whole alphabet.</li>
+      <li><strong>Start small.</strong> Draw H, O, n, o first. Many other letters reuse their shapes and proportions.</li>
+    </ul>
+    <p>Menu names can differ slightly between FontForge versions. The idea is the same in every editor.</p>
+
+    <h2 id="space">6. Spacing and kerning</h2>
+    <p>Spacing is how much empty room sits beside each letter (the side bearings). Kerning is a correction for <em>particular pairs</em> whose shapes leave an awkward hole, like AV, To or Ty. Bad spacing is the number-one reason a homemade font looks homemade.</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 262" role="img" aria-label="Before kerning: the letters A and V have a large gap between them and a sad face. After kerning: the V is moved left so the pair looks even, and a happy face.">
+        <text class="b" x="8" y="20">Before</text>
+        <g fill="none" stroke="#1d4ed8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M60,120 L90,44 L120,120"/><path d="M72,96 L108,96"/><path d="M160,44 L190,120 L220,44"/></g>
+        <ellipse cx="140" cy="76" rx="26" ry="38" fill="none" stroke="#ef4444" stroke-width="2.4" stroke-dasharray="5 4"/>
+        <text class="sub" x="250" y="62">A and V: a big hole</text><text class="sub" x="250" y="82">between the feet and the arms</text>
+        <use href="#emmy-oops" x="470" y="40" width="68" height="68"/>
+
+        <text class="b" x="8" y="148">After (kern A+V = &minus;60)</text>
+        <g fill="none" stroke="#1d4ed8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M60,236 L90,160 L120,236"/><path d="M72,212 L108,212"/><path d="M128,160 L158,236 L188,160"/></g>
+        <path d="M116,250 L196,250" stroke="#10b981" stroke-width="2.4"/><path class="arrow" d="M230,228 L206,228" style="stroke:#10b981"/>
+        <text class="sub" x="250" y="178">The V tucks in under the A&rsquo;s arm</text><text class="sub" x="250" y="198">and the pair reads as one word</text>
+        <use href="#emmy" x="470" y="160" width="68" height="68"/>
+      </svg>
+      <figcaption>Kerning values are small numbers in font units. Negative means closer together.</figcaption>
+    </figure>
+    <div class="say">
+      <svg viewBox="0 0 60 60" aria-hidden="true"><use href="#emmy"/></svg>
+      <div class="bubble"><p><strong>How designers space:</strong> set round letters first (o, n), then fit the rest to match. Test with real words such as <em>hamburgefonstiv</em> or <em>Handgloves</em>, and squint: the texture should look even, with no dark clumps or bright holes.</p></div>
+    </div>
+
+    <h2 id="metrics">7. Vertical metrics</h2>
+    <p>Vertical metrics decide the height of a line of text: how much room the font asks for above and below the baseline. The catch is that operating systems read different tables (<code>hhea</code>, <code>OS/2</code> typo values, <code>OS/2</code> win values). If they disagree, the same font can look differently spaced on Windows and macOS.</p>
+    <ul>
+      <li>Choose an <strong>ascent</strong> that clears your tallest glyph and a <strong>descent</strong> that clears your deepest, plus a line gap if you want airier lines.</li>
+      <li>Set the three sets of values <strong>consistently</strong> and turn on the &ldquo;use typo metrics&rdquo; flag, as the Google Fonts guide recommends.</li>
+      <li>Test a multi-line paragraph in a browser and in a word processor before shipping.</li>
+    </ul>
+    <p>The <a href="https://googlefonts.github.io/gf-guide/" target="_blank" rel="noopener">Google Fonts Guide</a> has a clear chapter on this.</p>
+
+    <h2 id="code">8. Build a tiny font from code <span class="sticker">Try it!</span></h2>
+    <p>Here is a fun way to see the tables in action: build a real font with a few lines of Python. <strong>Tiny Blocks</strong> has six letters (<code>H E L O T I</code>), each a polygon of straight lines. The sample below is drawn with the font itself, loaded from the file you can download.</p>
+    <div class="specimen" aria-label="Sample text in the Tiny Blocks font">HOTEL TILE<br>HELLO<small>If you see ordinary letters, your browser did not load the font file (for instance when the page is opened straight from disk).</small></div>
+    <p><a href="../data/fonts/TinyBlocks-Regular.ttf" download>Download TinyBlocks-Regular.ttf</a> (about 1 KB) &middot; <a href="../data/fonts/make_tiny_blocks.py" download>make_tiny_blocks.py</a></p>
+    <p>The script follows the same map as the lunch box in section 1:</p>
+<pre><code>from fontTools.fontBuilder import FontBuilder
+from fontTools.pens.ttGlyphPen import TTGlyphPen
+
+def glyph(*contours):                      # a glyph = closed shapes
+    pen = TTGlyphPen(None)
+    for pts in contours:
+        pen.moveTo(pts[0])
+        for p in pts[1:]:
+            pen.lineTo(p)
+        pen.closePath()
+    return pen.glyph()
+
+# an L on a 1000-unit grid, drawn clockwise
+L = glyph([(80, 0), (80, 700), (220, 700), (220, 140), (520, 140), (520, 0)])
+
+fb = FontBuilder(1000, isTTF=True)         # 1000 units per em
+fb.setupGlyphOrder([".notdef", "L"])       # .notdef must come first
+fb.setupCharacterMap({ord("L"): "L"})      # cmap: character -&gt; glyph
+fb.setupGlyf({".notdef": glyph(), "L": L}) # glyf: the outlines
+fb.setupHorizontalMetrics({".notdef": (500, 0), "L": (600, 80)})   # (advance, left bearing)
+fb.setupHorizontalHeader(ascent=800, descent=-200)                 # hhea
+fb.setupNameTable({"familyName": "Tiny Blocks", "styleName": "Regular"})
+fb.setupOS2(sTypoAscender=800, sTypoDescender=-200, usWinAscent=800, usWinDescent=200)
+fb.setupPost()
+fb.save("TinyBlocks-Regular.ttf")</code></pre>
+    <p>Install it with <code>pip install fonttools</code>. Then double-click the generated file to install it on your computer, or use it on the web with the CSS in the next section. Try changing a coordinate and rebuilding: the letter changes right away.</p>
+
+    <h2 id="ship">9. Export, check, test</h2>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 214" role="img" aria-label="Pipeline: source file, compile or generate, the TTF file, check with validators, then ship by installing or converting to WOFF2. An optional ttfautohint step sits under the TTF.">
+        <rect class="boxo" x="8"   y="60" width="108" height="64" rx="14"/><text class="b c" x="62"  y="86">Source</text><text class="sub c" x="62"  y="106">.sfd .ufo .glyphs</text>
+        <rect class="boxb" x="140" y="60" width="108" height="64" rx="14"/><text class="b c" x="194" y="86">Generate</text><text class="sub c" x="194" y="106">editor, fontmake</text>
+        <rect class="boxp" x="272" y="60" width="108" height="64" rx="14"/><text class="b c" x="326" y="86">TTF</text><text class="sub c" x="326" y="106">the font file</text>
+        <rect class="boxg" x="404" y="60" width="108" height="64" rx="14"/><text class="b c" x="458" y="86">Check</text><text class="sub c" x="458" y="106">validators</text>
+        <rect class="boxo" x="536" y="60" width="96"  height="64" rx="14"/><text class="b c" x="584" y="86">Ship</text><text class="sub c" x="584" y="106">install, WOFF2</text>
+        <path class="arrow" d="M118,92 L138,92"/><path class="arrow" d="M250,92 L270,92"/><path class="arrow" d="M382,92 L402,92"/><path class="arrow" d="M514,92 L534,92"/>
+        <use href="#emmy" x="298" y="2" width="56" height="56"/>
+        <rect class="box" x="272" y="148" width="108" height="48" rx="12" stroke-dasharray="6 5"/><text class="b c" x="326" y="170">ttfautohint</text><text class="sub c" x="326" y="187">optional hinting</text>
+        <path class="arrow" d="M326,126 L326,146" style="stroke-dasharray:4 3"/>
+      </svg>
+      <figcaption>Hinting is optional. Modern screens render most fonts well without it.</figcaption>
+    </figure>
+    <h3>In FontForge</h3>
+    <ol>
+      <li>Element &rarr; <strong>Validate</strong> &rarr; Validate. Fix open contours, wrong directions and missing extrema it reports.</li>
+      <li>File &rarr; <strong>Generate Fonts</strong>, then choose TrueType as the format.</li>
+      <li>Install the file (double-click it on macOS and Windows) and open a text editor to see your letters.</li>
+    </ol>
+    <h3>Check it properly</h3>
+    <table>
+      <tr><th>Check</th><th>How</th></tr>
+      <tr><td>Looks right at all sizes</td><td>Type real paragraphs at 10 px, 16 px and 72 px. Squint for uneven spacing</td></tr>
+      <tr><td>Works in apps and browsers</td><td>Try a word processor, a code editor, Chrome, Firefox and Safari</td></tr>
+      <tr><td>Passes automated checks</td><td><a href="https://fontbakery.readthedocs.io/" target="_blank" rel="noopener">Font Bakery</a> runs hundreds of checks (it is the tool Google Fonts uses)</td></tr>
+      <tr><td>Inspect the tables</td><td>fontTools: <code>ttx -l MyFont.ttf</code> lists the tables, and <code>ttx</code> can dump them as XML</td></tr>
+    </table>
+    <h3>Use it on a website</h3>
+<pre><code>@font-face {
+  font-family: "My Font";
+  src: url("myfont.woff2") format("woff2"),
+       url("myfont.ttf") format("truetype");
+  font-display: swap;
+}
+h1 { font-family: "My Font", sans-serif; }</code></pre>
+    <p>Convert to WOFF2 for smaller downloads (fontTools can do it, see the <a href="https://www.w3.org/TR/WOFF2/" target="_blank" rel="noopener">WOFF2 specification</a>). The <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="_blank" rel="noopener">MDN <code>@font-face</code> page</a> explains every option.</p>
+
+    <h2 id="licence">10. Names and licence</h2>
+    <ul>
+      <li><strong>Name it.</strong> Fill in the family name, style, designer, copyright and licence text in the <code>name</code> table. Avoid names that clash with famous fonts.</li>
+      <li><strong>Pick a licence.</strong> The <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL Open Font License</a> is the most common one for free fonts. It lets people use, study, change and share the font under clear rules. Or keep it all-rights-reserved if you sell it.</li>
+      <li><strong>Start from your own shapes.</strong> Do not trace or copy another designer&rsquo;s font. Rules vary by country, and a font&rsquo;s licence may forbid modification even where copying outlines might be legal.</li>
+      <li><strong>Check the characters.</strong> Look up the code points you cover in the <a href="https://www.unicode.org/charts/" target="_blank" rel="noopener">Unicode charts</a>, and add the ones people expect (digits, punctuation, accented letters).</li>
+    </ul>
+    <p>This is general information, not legal advice.</p>
+
+    <h2 id="wrap">11. Checklist and glossary</h2>
+    <div class="good">
+      <strong>Before you call it done</strong>
+      <ul>
+        <li>Every letter sits on the baseline and shares the x-height and cap height.</li>
+        <li>Curves have points at the extremes, with no stray or overlapping points.</li>
+        <li>Spacing looks even in real words, and the worst pairs are kerned.</li>
+        <li><code>.notdef</code>, the space glyph and the digits exist.</li>
+        <li>Vertical metrics are consistent, and a paragraph looks right on two systems.</li>
+        <li>Validation is clean, the names and licence are filled in.</li>
+      </ul>
+    </div>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Glyph</td><td>One drawn shape in the font: a letter, digit, symbol or mark.</td></tr>
+      <tr><td>Em square / units per em</td><td>The grid every glyph is drawn on. 1000 or 2048 units are typical.</td></tr>
+      <tr><td>Contour</td><td>One closed shape. An O has two.</td></tr>
+      <tr><td>On-curve / off-curve point</td><td>A point the outline passes through / a handle that bends it.</td></tr>
+      <tr><td>Side bearing</td><td>Empty space beside a glyph.</td></tr>
+      <tr><td>Kerning</td><td>A spacing correction for one pair of letters.</td></tr>
+      <tr><td>cmap</td><td>The table that maps characters to glyphs.</td></tr>
+      <tr><td>Hinting</td><td>Instructions that help glyphs snap to pixels at small sizes.</td></tr>
+      <tr><td>TTF / OTF / WOFF2</td><td>TrueType outlines / OpenType (often cubic CFF outlines) / compressed font for the web.</td></tr>
+      <tr><td>Variable font</td><td>One file that holds a range of weights or widths.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://learn.microsoft.com/en-us/typography/opentype/spec/" target="_blank" rel="noopener">OpenType specification</a> &middot; <a href="https://developer.apple.com/fonts/TrueType-Reference-Manual/" target="_blank" rel="noopener">Apple TrueType Reference Manual</a> &middot; <a href="https://www.w3.org/TR/WOFF2/" target="_blank" rel="noopener">WOFF2</a></li>
+      <li><a href="https://fontforge.org/" target="_blank" rel="noopener">FontForge</a> &middot; <a href="https://birdfont.org/" target="_blank" rel="noopener">BirdFont</a> &middot; <a href="https://glyphsapp.com/" target="_blank" rel="noopener">Glyphs</a> &middot; <a href="https://www.fontlab.com/" target="_blank" rel="noopener">FontLab</a> &middot; <a href="https://robofont.com/" target="_blank" rel="noopener">RoboFont</a> &middot; <a href="https://www.calligraphr.com/" target="_blank" rel="noopener">Calligraphr</a> &middot; <a href="https://www.adobe.com/products/illustrator.html" target="_blank" rel="noopener">Adobe Illustrator</a> &middot; <a href="https://www.fontself.com/" target="_blank" rel="noopener">Fontself</a> &middot; <a href="https://www.adobe.com/products/capture.html" target="_blank" rel="noopener">Adobe Capture</a></li>
+      <li><a href="https://fonttools.readthedocs.io/" target="_blank" rel="noopener">fontTools</a> &middot; <a href="https://github.com/googlefonts/fontmake" target="_blank" rel="noopener">fontmake</a> &middot; <a href="https://unifiedfontobject.org/" target="_blank" rel="noopener">UFO format</a> &middot; <a href="https://fontbakery.readthedocs.io/" target="_blank" rel="noopener">Font Bakery</a> &middot; <a href="https://freetype.org/ttfautohint/" target="_blank" rel="noopener">ttfautohint</a></li>
+      <li><a href="https://googlefonts.github.io/gf-guide/" target="_blank" rel="noopener">Google Fonts Guide</a> &middot; <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL Open Font License</a> &middot; <a href="https://www.unicode.org/charts/" target="_blank" rel="noopener">Unicode charts</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="_blank" rel="noopener">MDN: @font-face</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+</body>
+</html>

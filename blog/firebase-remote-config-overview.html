@@ -176,11 +176,11 @@
     <p class="lede">Remote Config lets you change how your app looks and behaves from a console, without publishing a new version. It is a key-value store in the cloud that your app downloads and reads. This post is the overview; Google&rsquo;s guide covers the exact setup.</p>
     <div class="callout">
       <strong>In 60 seconds</strong>
-      <ul><li><strong>What:</strong> cloud key-value settings your app fetches.</li><li><strong>Use for:</strong> feature flags, kill switches, copy, limits, gradual rollouts.</li><li><strong>Key idea:</strong> ship defaults in the app, override them from the console.</li><li><strong>Watch out:</strong> values may arrive late. Fetch at launch and keep safe defaults.</li><li><strong>Not for:</strong> secrets or user data. Values are readable by the app user.</li></ul>
+      <ul><li><strong>What:</strong> cloud key-value settings your app fetches.</li><li><strong>Use for:</strong> feature flags, kill switches, copy, limits, gradual rollouts.</li><li><strong>Key idea:</strong> ship defaults in the app, override them from the console.</li><li><strong>Watch out:</strong> values may arrive late. Fetch at launch and keep safe defaults.</li><li><strong>Develop in:</strong> a separate sandbox Firebase project, then promote tested values.</li><li><strong>Not for:</strong> secrets or user data. Values are readable by the app user.</li></ul>
     </div>
     <details class="toc">
       <summary><strong>Contents</strong></summary>
-      <ol><li><a href="#what">What it is</a></li><li><a href="#flow">How it works</a></li><li><a href="#timing">Timing: values are not instant</a></li><li><a href="#cond">Conditions and rollouts</a></li><li><a href="#use">Common uses</a></li><li><a href="#code">A tiny example</a></li><li><a href="#limits">Limits and good habits</a></li></ol>
+      <ol><li><a href="#what">What it is</a></li><li><a href="#flow">How it works</a></li><li><a href="#timing">Timing: values are not instant</a></li><li><a href="#cond">Conditions and rollouts</a></li><li><a href="#use">Common uses</a></li><li><a href="#sandbox">Use a sandbox while developing</a></li><li><a href="#code">A tiny example</a></li><li><a href="#limits">Limits and good habits</a></li></ol>
     </details>
 
     <h2 id="what">1. What it is</h2>
@@ -338,7 +338,33 @@ fun showCheckout() {
       <tr><td>Content and copy</td><td>Seasonal banner text or promo colours.</td></tr>
       <tr><td>Tuning</td><td>Timeouts, page sizes, retry counts.</td></tr>
     </table>
-    <h2 id="code">6. A tiny example</h2>
+    <h2 id="sandbox">6. Use a sandbox while developing</h2>
+    <p>Do not test new parameters on the project your real users read from. Keep a <strong>sandbox</strong> for development: a separate Firebase project (for example <code>myapp-dev</code>) whose Remote Config nobody depends on. Remote Config has no special &ldquo;sandbox switch&rdquo;, so a separate project is the clean way to get one.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="Two Firebase projects. The sandbox project is used by debug builds and testers: publish freely, fetch interval zero. The production project is used by release builds and real users: staged rollouts and monitoring. Tested values are promoted from the sandbox to production.">
+        <rect class="boxg" x="8" y="12" width="236" height="150" rx="12"/>
+        <text class="b c" x="126" y="38">Sandbox project</text><text class="sub c" x="126" y="56">myapp-dev</text>
+        <text class="sub c" x="126" y="84">debug build, own config file</text><text class="sub c" x="126" y="104">publish and break things freely</text><text class="sub c" x="126" y="124">fetch interval 0 for instant tests</text><text class="sub c" x="126" y="144">testers use it via App Distribution</text>
+        <rect class="boxo" x="396" y="12" width="236" height="150" rx="12"/>
+        <text class="b c" x="514" y="38">Production project</text><text class="sub c" x="514" y="56">myapp</text>
+        <text class="sub c" x="514" y="84">release build, real users</text><text class="sub c" x="514" y="104">staged rollouts (5%, 50%, 100%)</text><text class="sub c" x="514" y="124">watch Crashlytics and Analytics</text><text class="sub c" x="514" y="144">default fetch interval</text>
+        <path class="arrow" d="M248,86 L392,86"/>
+        <text class="b c" x="320" y="72" style="font-size:13px">promote</text><text class="sub c" x="320" y="108">tested values only</text>
+        <text class="sub c" x="320" y="198">Same parameter keys and defaults in the code. Only the project behind the build changes.</text>
+      </svg>
+      <figcaption>Experiment on the left, publish deliberately on the right.</figcaption>
+    </figure>
+    <h3>How to set it up</h3>
+    <ul>
+      <li><strong>Two Firebase projects, two config files.</strong> Use build flavors or build types so the debug build packages the sandbox <code>google-services.json</code> (or <code>GoogleService-Info.plist</code>) and the release build packages the production one. A different application id for debug, such as <code>.debug</code>, keeps both apps installable side by side.</li>
+      <li><strong>Mirror the parameters.</strong> Create the same keys in both projects. Try new keys and conditions in the sandbox first, then copy the ones that worked. The Firebase CLI can deploy a Remote Config template file if you prefer to keep it in version control; check Google&rsquo;s documentation for the commands.</li>
+      <li><strong>Fetch fast in debug builds only.</strong> Set the minimum fetch interval to 0 (the setting appears in the code in section 3) so a published change shows up on the next fetch. Never ship that setting in release builds, because fetches are rate-limited.</li>
+      <li><strong>Share the sandbox with testers.</strong> Send debug builds through <a href="firebase-app-distribution-overview.html">App Distribution</a> so QA can see sandbox values on real devices.</li>
+    </ul>
+    <div class="note"><p><strong>Only one project?</strong> You can still separate environments with a <strong>condition on the app</strong>: give the debug build its own application id, register it as a second app in the project, and apply the experimental values only when the app matches. It is simpler, but a mistake in a condition can still reach real users, so a separate project is safer.</p></div>
+    <p>Two habits make the sandbox safe to rely on. Edits stay as an unpublished draft until you press <em>Publish changes</em>, so review the diff first. And every publish creates a version you can roll back from the console if something goes wrong.</p>
+
+    <h2 id="code">7. A tiny example</h2>
     <p>The shape of the Android code, after you have added the SDK as Google describes:</p>
 <pre><code>val rc = Firebase.remoteConfig
 rc.setDefaultsAsync(mapOf("promo_banner_enabled" to false))
@@ -346,11 +372,12 @@ rc.fetchAndActivate().addOnCompleteListener {
     val show = rc.getBoolean("promo_banner_enabled")
     banner.isVisible = show
 }</code></pre>
-    <h2 id="limits">7. Limits and good habits</h2>
+    <h2 id="limits">8. Limits and good habits</h2>
     <ul>
       <li>Never put secrets in it. Anyone can inspect the values.</li>
       <li>Always set sensible defaults so the app works offline and on first launch.</li>
       <li>Fetches are rate-limited; use a short interval only in debug builds.</li>
+      <li>Develop and test in a sandbox project, and promote only tested values to production (section 6).</li>
       <li>Never assume the fetch has finished. Read values with a safe default and see section 3.</li>
       <li>Name keys clearly and delete flags once a rollout is finished.</li>
       <li>Make code safe if a value is missing or unexpected.</li>
