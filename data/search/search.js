@@ -157,6 +157,41 @@
     });
   }
 
+  /* ---------- voice search (Web Speech API: Chrome, Edge, Safari, Android and iOS browsers; hidden where unsupported) ---------- */
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, listening = false, mic = null, idleHint = input.placeholder;
+  if (SR) {
+    mic = document.createElement('button'); mic.type = 'button'; mic.className = 'sp-mic'; mic.setAttribute('aria-label', 'Search by voice'); mic.setAttribute('aria-pressed', 'false'); mic.title = 'Search by voice';
+    mic.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+    ov.querySelector('.sp-input').appendChild(mic);
+    mic.addEventListener('click', function (e) { e.preventDefault(); listening ? stopVoice() : startVoice(); });
+  }
+  function setListening(on) {
+    listening = on;
+    if (!mic) return;
+    mic.classList.toggle('on', on); mic.setAttribute('aria-pressed', String(on));
+    mic.setAttribute('aria-label', on ? 'Stop listening' : 'Search by voice');
+    input.placeholder = on ? 'Listening…' : idleHint;
+  }
+  function voiceNote(msg) { res.hidden = false; res.innerHTML = '<div class="search-empty">' + esc(msg) + '</div>'; hits = []; }
+  function startVoice() {
+    try {
+      rec = new SR();
+      rec.lang = document.documentElement.lang || navigator.language || 'en-US';
+      rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+      rec.onresult = function (ev) {
+        var t = ''; for (var i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
+        input.value = t.replace(/[.?!,]+$/, '').trim(); run(input.value);                 // searches while you speak
+      };
+      rec.onerror = function (ev) {
+        var m = { 'not-allowed': 'The microphone is blocked. Allow it for this site in your browser settings, then try again.', 'service-not-allowed': 'Voice input is not allowed here. Try again on an https:// page.', 'no-speech': 'I did not hear anything. Tap the microphone and try again.', 'audio-capture': 'No microphone was found.', 'network': 'Voice search needs an internet connection.' }[ev.error];
+        if (m && !input.value.trim()) voiceNote(m);
+      };
+      rec.onend = function () { setListening(false); rec = null; input.focus(); };
+      rec.start(); setListening(true);
+    } catch (err) { setListening(false); voiceNote('Voice search could not start in this browser.'); }
+  }
+  function stopVoice() { if (rec) { try { rec.stop(); } catch (e) {} } setListening(false); }
+
   /* ---------- opening and closing ---------- */
   function openSearch() {
     load();
@@ -168,10 +203,11 @@
     input.value = ''; run('');
     input.focus();
   }
-  function closeSearch() { ov.classList.remove('open'); document.documentElement.classList.remove('search-lock'); }
+  function closeSearch() { stopVoice(); ov.classList.remove('open'); document.documentElement.classList.remove('search-lock'); }
   window.openSearch = openSearch; window.closeSearch = closeSearch;
 
   input.addEventListener('input', function () { run(input.value); });
+  input.addEventListener('keydown', function (e) { if (listening && e.key !== 'Enter') stopVoice(); });
   res.addEventListener('mouseover', function (e) {                   // the row under the pointer replaces any keyboard highlight
     var b = e.target.closest('.search-item'); if (!b || +b.dataset.i === active) return;
     active = +b.dataset.i;
