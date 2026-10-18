@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Version Control, Git and Branching Strategies: Which Workflow Fits Which Team — Khairul Alam</title>
+  <meta name="description" content="A practical guide to version control: what a VCS is, how Git works, the alternatives (Subversion, Perforce, Mercurial, Fossil, Jujutsu), which branching strategy fits which situation, and the best tools for Git, with diagrams." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Version control &middot; Git &middot; Workflow</p>
+    <h1>Version Control, Git and Branching Strategies: Which Workflow Fits Which Team</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~30 min read</span></div>
+    <div class="tags"><span class="tag">Git</span><span class="tag">Version control</span><span class="tag">Branching</span><span class="tag">Git Flow</span><span class="tag">Trunk-based</span><span class="tag">Tools</span></div>
+
+    <p class="lede">Every team that writes code needs to answer three questions: where does the history live, how do we work on things in parallel, and how does finished work reach users? Version control answers the first, Git is the tool most teams pick, and a branching strategy answers the other two. This article covers all three, with diagrams, and ends with the tools you can use to drive Git every day.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>A <strong>version control system (VCS)</strong> records every change to your files, who made it and why, so you can go back, compare and work in parallel.</li>
+        <li>There are three generations: <strong>local</strong>, <strong>centralized</strong> (Subversion, Perforce) and <strong>distributed</strong> (Git, Mercurial). Git is the default today.</li>
+        <li>Git stores <strong>snapshots</strong>, not diffs, and moves work through three areas: working directory, staging area, repository.</li>
+        <li>Alternatives exist and some are better for special cases: <strong>Perforce</strong> or <strong>Unity Version Control</strong> for huge binary assets, <strong>Fossil</strong> for tiny self-contained projects, <strong>Jujutsu</strong> as a friendlier front end to Git.</li>
+        <li>There is no single best branching strategy. Pick by <strong>how you release</strong>: <strong>GitHub Flow</strong> or <strong>trunk-based</strong> for continuous delivery, <strong>Git Flow</strong> or release branches for versioned software, <strong>fork and pull request</strong> for open source.</li>
+        <li>Whatever you choose: short-lived branches, small pull requests, a protected main branch, and automated tests on every change.</li>
+        <li>Tools: the <strong>command line</strong> is the foundation; add a <strong>GUI</strong> or your <strong>IDE</strong> for the visual parts, and a <strong>hosting service</strong> for sharing and review.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#vcs">Version control overview</a></li>
+        <li><a href="#git">Git: how it works</a></li>
+        <li><a href="#cmds">The commands you use every day</a></li>
+        <li><a href="#alt">Alternatives to Git</a></li>
+        <li><a href="#branch">Branching and merging basics</a></li>
+        <li><a href="#strategies">Branching strategies</a></li>
+        <li><a href="#situations">Choosing a strategy for your situation</a></li>
+        <li><a href="#tools">Software for Git operations</a></li>
+        <li><a href="#habits">Habits that work with any strategy</a></li>
+        <li><a href="#mistakes">Common mistakes</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="vcs">1. Version control overview</h2>
+    <p>Without version control, a project folder fills up with <code>report_final.docx</code>, <code>report_final_v2.docx</code> and <code>report_REALLY_final.docx</code>. With two people editing, someone overwrites someone else. With a bug in production, nobody can say which change caused it.</p>
+    <p>A <strong>version control system</strong> fixes this by keeping a complete, searchable history of a project. Each saved state is a <strong>commit</strong> with an author, a time and a message. The system lets you:</p>
+    <ul>
+      <li><strong>Go back.</strong> Restore any file, or the whole project, to how it was last Tuesday.</li>
+      <li><strong>Compare.</strong> See exactly which lines changed between two versions, and who changed them.</li>
+      <li><strong>Work in parallel.</strong> Two people (or one person with two ideas) change the same project at once, then <strong>merge</strong> the results.</li>
+      <li><strong>Find bugs.</strong> Ask which commit introduced a problem, and read why it was made.</li>
+      <li><strong>Release with confidence.</strong> Tag the exact code that shipped as version 2.4.</li>
+    </ul>
+    <div class="analogy">
+      <p><strong>Analogy.</strong> Think of the edit history in a shared document, but for a whole folder of files, with the power to take a copy, try something risky in it, and then fold the good parts back in.</p>
+    </div>
+
+    <h3>Three generations of version control</h3>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Three kinds of version control. Local: one computer holds files and a version database. Centralized: many clients talk to one central server. Distributed: each client has a full copy of the history and they share through a remote.">
+        <text class="b c" x="105" y="22">1. Local</text>
+        <text class="b c" x="320" y="22">2. Centralized</text>
+        <text class="b c" x="535" y="22">3. Distributed</text>
+        <path class="rule" d="M214,12 L214,215"/><path class="rule" d="M427,12 L427,215"/>
+
+        <rect class="box" x="20" y="44" width="170" height="130" rx="12"/>
+        <text class="sub c" x="105" y="64">One computer</text>
+        <rect class="boxb" x="36" y="76" width="138" height="38" rx="8"/><text class="b c" x="105" y="100">Working files</text>
+        <rect class="boxg" x="36" y="124" width="138" height="38" rx="8"/><text class="b c" x="105" y="148">Version database</text>
+        <text class="sub c" x="105" y="200">RCS, SCCS</text>
+
+        <rect class="boxo" x="262" y="40" width="116" height="44" rx="10"/><text class="b c" x="320" y="60">Central server</text><text class="sub c" x="320" y="76">the only history</text>
+        <rect class="boxb" x="232" y="140" width="56" height="34" rx="8"/><text class="b c" x="260" y="162">Dev A</text>
+        <rect class="boxb" x="292" y="140" width="56" height="34" rx="8"/><text class="b c" x="320" y="162">Dev B</text>
+        <rect class="boxb" x="352" y="140" width="56" height="34" rx="8"/><text class="b c" x="380" y="162">Dev C</text>
+        <path class="rule" d="M320,86 L260,138"/><path class="rule" d="M320,86 L320,138"/><path class="rule" d="M320,86 L380,138"/>
+        <text class="sub c" x="320" y="200">CVS, Subversion, Perforce</text>
+
+        <rect class="boxo" x="480" y="40" width="110" height="40" rx="10"/><text class="b c" x="535" y="64">Shared remote</text>
+        <rect class="boxg" x="446" y="124" width="84" height="50" rx="10"/><text class="b c" x="488" y="146">Dev A</text><text class="sub c" x="488" y="163">full history</text>
+        <rect class="boxg" x="540" y="124" width="84" height="50" rx="10"/><text class="b c" x="582" y="146">Dev B</text><text class="sub c" x="582" y="163">full history</text>
+        <path class="rule" d="M520,82 L496,122"/><path class="rule" d="M550,82 L574,122"/>
+        <text class="sub c" x="535" y="200">Git, Mercurial, Fossil</text>
+      </svg>
+      <figcaption>In the first two kinds the history lives in one place. In a distributed system every clone is a complete backup and can work offline.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Kind</th><th>How it works</th><th>Strength</th><th>Weakness</th></tr>
+      <tr><td><strong>Local</strong></td><td>Versions are stored in a database on your machine.</td><td>Simple; no server.</td><td>No team work; one disk failure loses everything.</td></tr>
+      <tr><td><strong>Centralized</strong></td><td>One server holds the history. You check out files, edit and commit back.</td><td>Easy to understand; fine-grained access control; file locking.</td><td>Needs the network to commit or view history; the server is a single point of failure.</td></tr>
+      <tr><td><strong>Distributed</strong></td><td>Every clone holds the full history. You commit locally, then share with push and pull.</td><td>Fast, offline, cheap branching, many backups.</td><td>More concepts to learn; large binary files and huge monorepos need extra care.</td></tr>
+    </table>
+
+    <h3>Words you will meet in every VCS</h3>
+    <table class="gloss">
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td>Repository</td><td>The project plus its whole history.</td></tr>
+      <tr><td>Commit</td><td>A saved state of the project, with a message.</td></tr>
+      <tr><td>Branch</td><td>A line of development that can move on independently.</td></tr>
+      <tr><td>Merge</td><td>Combining the changes of one branch into another.</td></tr>
+      <tr><td>Clone</td><td>A full copy of a repository on your machine.</td></tr>
+      <tr><td>Tag</td><td>A permanent name for one commit, such as <code>v2.4.0</code>.</td></tr>
+    </table>
+
+    <h2 id="git">2. Git: how it works</h2>
+    <p><a href="https://git-scm.com/" target="_blank" rel="noopener">Git</a> (official site: git-scm.com) was written in 2005 by Linus Torvalds to manage the Linux kernel, after the tool the kernel team had been using became unavailable to them. It was designed to be fast, to handle thousands of parallel branches, and to need no central server. It is now the default choice, used by most open source projects and most companies.</p>
+
+    <h3>Snapshots, not differences</h3>
+    <p>Older systems stored each version as a list of changes to a file. Git thinks differently: every commit is a <strong>snapshot</strong> of the whole project at that moment (files that did not change are stored once and shared). A commit points to its parent, so the history is a chain, and a merge is a commit with two parents. Each commit has a unique ID, a hash such as <code>9fceb02</code>. Because the ID is computed from the content and the parent, history cannot be changed silently.</p>
+
+    <h3>The four places your work lives</h3>
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Git moves changes from the working directory to the staging area with git add, to the local repository with git commit, and to the remote with git push. git fetch and git pull bring changes back from the remote.">
+        <rect class="boxb" x="8"   y="30" width="126" height="64" rx="12"/><text class="b c" x="71"  y="58">Working</text><text class="b c" x="71"  y="76">directory</text>
+        <rect class="boxo" x="170" y="30" width="126" height="64" rx="12"/><text class="b c" x="233" y="58">Staging area</text><text class="sub c" x="233" y="76">the index</text>
+        <rect class="boxg" x="332" y="30" width="126" height="64" rx="12"/><text class="b c" x="395" y="58">Local</text><text class="b c" x="395" y="76">repository</text>
+        <rect class="boxp" x="494" y="30" width="138" height="64" rx="12"/><text class="b c" x="563" y="58">Remote</text><text class="sub c" x="563" y="76">origin on GitHub etc.</text>
+        <path class="arrow" d="M136,62 L166,62"/><path class="arrow" d="M298,62 L328,62"/><path class="arrow" d="M460,62 L490,62"/>
+        <text class="sub c" x="151" y="22">add</text><text class="sub c" x="313" y="22">commit</text><text class="sub c" x="475" y="22">push</text>
+        <path class="arrow" d="M563,96 L563,150 L71,150 L71,98"/>
+        <text class="sub c" x="320" y="142">pull = fetch + merge into your branch</text>
+        <text class="sub c" x="320" y="176">fetch only downloads. checkout / switch / restore refresh the working directory from the repository.</text>
+      </svg>
+      <figcaption>Work moves left to right when you save and share it, and right to left when you update.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Working directory:</strong> the files you see and edit.</li>
+      <li><strong>Staging area (index):</strong> a draft of your next commit. You choose exactly what goes in, so one commit can hold one idea even if you changed five things.</li>
+      <li><strong>Local repository:</strong> the <code>.git</code> folder with all commits. Committing is instant and needs no network.</li>
+      <li><strong>Remote:</strong> a copy on a server (GitHub, GitLab and so on) that the team shares.</li>
+    </ul>
+
+    <h3>A branch is only a label</h3>
+    <p>In Git a branch is a small pointer to a commit. Creating one costs almost nothing, which is why Git encourages branching for every task. <code>HEAD</code> says which branch you are on.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="A commit graph. The main branch has commits A, B, C, then a merge commit M and D. A feature branch starts at B with commits F1 and F2 and merges back into main at M.">
+        <path class="rule" d="M50,60 L560,60"/>
+        <path class="rule" d="M140,60 L220,130"/><path class="rule" d="M220,130 L340,130"/><path class="rule" d="M340,130 L420,60"/>
+        <circle class="boxg" cx="50"  cy="60" r="14"/><text class="b c" x="50"  y="65">A</text>
+        <circle class="boxg" cx="140" cy="60" r="14"/><text class="b c" x="140" y="65">B</text>
+        <circle class="boxg" cx="280" cy="60" r="14"/><text class="b c" x="280" y="65">C</text>
+        <circle class="boxo" cx="420" cy="60" r="14"/><text class="b c" x="420" y="65">M</text>
+        <circle class="boxg" cx="520" cy="60" r="14"/><text class="b c" x="520" y="65">D</text>
+        <circle class="boxb" cx="220" cy="130" r="14"/><text class="b c" x="220" y="135">F1</text>
+        <circle class="boxb" cx="340" cy="130" r="14"/><text class="b c" x="340" y="135">F2</text>
+        <text class="sub c" x="520" y="36">main</text>
+        <text class="sub c" x="280" y="168">feature/login</text>
+        <text class="sub c" x="420" y="92">merge commit (two parents)</text>
+        <text class="sub c" x="320" y="16">time &rarr;</text>
+      </svg>
+      <figcaption>The feature branch started at B. Meanwhile main moved on to C. The merge commit M joins both lines of work.</figcaption>
+    </figure>
+
+    <h2 id="cmds">3. The commands you use every day</h2>
+<pre><code># start
+git clone https://github.com/you/project.git
+git switch -c feature/login          # create and move to a new branch
+
+# save work
+git status                           # what changed?
+git add src/Login.kt                 # stage one file (or: git add -p to pick pieces)
+git commit -m "Add login form validation"
+
+# share and update
+git fetch                            # download new commits, change nothing
+git pull --rebase                    # update your branch on top of the remote
+git push -u origin feature/login     # publish the branch
+
+# combine
+git switch main
+git merge --no-ff feature/login      # or merge through a pull request
+
+# look around
+git log --oneline --graph --all
+git diff                             # unstaged changes
+git blame src/Login.kt               # who changed each line, and in which commit</code></pre>
+    <h3>Undoing things safely</h3>
+    <table>
+      <tr><th>Situation</th><th>Command</th><th>Safe on shared history?</th></tr>
+      <tr><td>Discard edits in a file</td><td><code>git restore file</code></td><td>Yes (but the edits are gone)</td></tr>
+      <tr><td>Unstage a file</td><td><code>git restore --staged file</code></td><td>Yes</td></tr>
+      <tr><td>Fix the last commit message or add a forgotten file</td><td><code>git commit --amend</code></td><td>Only before you push</td></tr>
+      <tr><td>Undo a pushed commit</td><td><code>git revert &lt;commit&gt;</code> (adds a new opposite commit)</td><td><strong>Yes</strong></td></tr>
+      <tr><td>Move the branch back and drop commits</td><td><code>git reset --hard &lt;commit&gt;</code></td><td><strong>No</strong>, not after pushing</td></tr>
+      <tr><td>Set work aside for a moment</td><td><code>git stash</code> and <code>git stash pop</code></td><td>Yes (local only)</td></tr>
+      <tr><td>Copy one commit to another branch</td><td><code>git cherry-pick &lt;commit&gt;</code></td><td>Yes</td></tr>
+      <tr><td>Find the commit that broke something</td><td><code>git bisect</code></td><td>Yes (read only)</td></tr>
+      <tr><td>&ldquo;I lost a commit!&rdquo;</td><td><code>git reflog</code>, then <code>git switch -c rescue &lt;id&gt;</code></td><td>Yes</td></tr>
+    </table>
+    <div class="note"><p>Git rarely destroys committed work. <code>git reflog</code> remembers where your branches were for a few months, so most &ldquo;disasters&rdquo; are recoverable if you have committed.</p></div>
+    <p>Two files belong in every repository. A <code>.gitignore</code> lists what Git must not track (build output, <code>node_modules</code>, IDE settings, and above all <strong>secrets</strong> such as <code>.env</code>). A <code>README.md</code> tells a newcomer what the project is and how to run it. If a secret is ever committed, treat it as leaked and rotate it; deleting it in a later commit does not remove it from history.</p>
+
+    <h2 id="alt">4. Alternatives to Git</h2>
+    <p>Git is the right default, but it is not the only option, and knowing the others helps you understand Git&rsquo;s design and spot the cases where it is a poor fit.</p>
+    <table>
+      <tr><th>System</th><th>Type</th><th>Best known for</th><th>Consider it when</th></tr>
+      <tr><td><strong><a href="https://subversion.apache.org/" target="_blank" rel="noopener">Subversion (SVN)</a></strong></td><td>Centralized</td><td>Simple model, one revision number for the whole repo, path-based permissions.</td><td>You maintain an existing SVN project, or non-programmers need a simple &ldquo;check out, edit, commit&rdquo; flow.</td></tr>
+      <tr><td><strong><a href="https://www.perforce.com/products/helix-core" target="_blank" rel="noopener">Perforce Helix Core (P4)</a></strong></td><td>Centralized</td><td>Huge repositories, large binary files, exclusive file locking, fine-grained control.</td><td>Game studios and hardware teams with gigabytes of art, models and builds.</td></tr>
+      <tr><td><strong><a href="https://unity.com/products/unity-version-control" target="_blank" rel="noopener">Unity Version Control</a></strong> (formerly Plastic SCM)</td><td>Distributed and centralized</td><td>Handles big binaries, has a visual branch explorer and locking, friendly to artists.</td><td>Unity projects, mixed teams of artists and programmers.</td></tr>
+      <tr><td><strong><a href="https://www.mercurial-scm.org/" target="_blank" rel="noopener">Mercurial (hg)</a></strong></td><td>Distributed</td><td>Similar power to Git with a more consistent, simpler command set.</td><td>You inherit a Mercurial repository. New projects rarely choose it, as most hosts now focus on Git.</td></tr>
+      <tr><td><strong><a href="https://sapling-scm.com/" target="_blank" rel="noopener">Sapling</a></strong></td><td>Distributed</td><td>Built at Meta for very large monorepos; stacked commits; can work with Git repositories.</td><td>You want to try stacked-commit workflows against a Git host.</td></tr>
+      <tr><td><strong><a href="https://github.com/jj-vcs/jj" target="_blank" rel="noopener">Jujutsu (jj)</a></strong></td><td>Distributed</td><td>Stores data in a Git repository, but treats your working copy as a commit and makes rewriting history and resolving conflicts gentler.</td><td>You like Git&rsquo;s ecosystem but find its commands and the staging area awkward. Teammates can keep using plain Git.</td></tr>
+      <tr><td><strong><a href="https://fossil-scm.org/" target="_blank" rel="noopener">Fossil</a></strong></td><td>Distributed</td><td>One small program and one file per repository that also includes a wiki, bug tracker and web UI. Made for SQLite.</td><td>A small, self-contained project with no need for GitHub-style hosting.</td></tr>
+      <tr><td><strong><a href="https://pijul.org/" target="_blank" rel="noopener">Pijul</a></strong></td><td>Distributed</td><td>A research-driven design based on patches rather than snapshots, with a different approach to merging.</td><td>You are curious about alternatives to the snapshot model. It has a small community.</td></tr>
+    </table>
+    <p>Older systems you may still meet in legacy code bases: <strong>CVS</strong>, <strong>Visual SourceSafe</strong> (retired) and <strong>TFVC</strong>, the centralized option in Azure DevOps (Microsoft recommends Git for new projects).</p>
+
+    <div class="good">
+      <strong>Why Git won</strong>
+      <ul>
+        <li>Fast and offline: nearly every action is local.</li>
+        <li>Cheap branches make the pull request workflow natural.</li>
+        <li>A huge ecosystem: hosting, CI services, IDE support, tutorials and people who already know it.</li>
+        <li>Free and open source, with no vendor tied to the data.</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <strong>Where Git struggles</strong>
+      <ul>
+        <li><strong>Large binary files</strong> (video, textures, builds): every version is stored in history. Use <strong>Git LFS</strong>, or a tool like Perforce.</li>
+        <li><strong>Exclusive locks:</strong> two people cannot merge a binary scene file. Git LFS has locking, but it is not as smooth as Perforce.</li>
+        <li><strong>Gigantic monorepos:</strong> clones become slow. Partial clone, sparse checkout and tools like Scalar help.</li>
+        <li><strong>Learning curve:</strong> the commands are many and the names are not always intuitive.</li>
+      </ul>
+    </div>
+
+    <h2 id="branch">5. Branching and merging basics</h2>
+    <p>A branching strategy is a team agreement about which branches exist, what each is for, and how work flows between them. To compare strategies you first need the three ways to bring a branch back, and a few guard rails.</p>
+    <h3>Three ways to integrate a branch</h3>
+    <table>
+      <tr><th>Method</th><th>What happens</th><th>History looks like</th><th>Use it when</th></tr>
+      <tr><td><strong>Merge commit</strong></td><td>Adds a commit that joins two histories.</td><td>Branches and joins are visible. Nothing is rewritten.</td><td>You want a faithful record, or the branch is shared by several people.</td></tr>
+      <tr><td><strong>Squash merge</strong></td><td>All commits of the branch become one commit on the target.</td><td>One commit per pull request on main. Easy to read and to revert.</td><td>Branch commits are messy (&ldquo;wip&rdquo;, &ldquo;fix typo&rdquo;). The most common choice for small PRs.</td></tr>
+      <tr><td><strong>Rebase</strong></td><td>Replays your commits on top of the latest target, giving them new IDs.</td><td>A straight line, no merge commits.</td><td>Tidying <em>your own</em> branch before review. Never rebase commits others already pulled.</td></tr>
+    </table>
+    <h3>Guard rails</h3>
+    <ul>
+      <li><strong>Protect the main branch.</strong> Require a pull request, at least one review and passing CI. Block force-pushes.</li>
+      <li><strong>Name branches so they explain themselves:</strong> <code>feature/login-form</code>, <code>fix/crash-on-rotate</code>, <code>release/2.4</code>, <code>hotfix/payment-timeout</code>. Many teams add a ticket number.</li>
+      <li><strong>Write good commit messages:</strong> a short summary line in the imperative (&ldquo;Add retry to upload&rdquo;), then a body that explains <em>why</em>.</li>
+      <li><strong>Tag releases</strong> with <a href="https://semver.org/" target="_blank" rel="noopener">semantic versions</a>: <code>v2.4.1</code>.</li>
+    </ul>
+
+    <h2 id="strategies">6. Branching strategies</h2>
+    <p>Three strategies cover most teams. Each is a different answer to one question: <strong>how long may work stay off the main line?</strong> The shorter the answer, the simpler the process and the easier the merges, but the more you rely on tests and feature flags.</p>
+
+    <h3>A. GitHub Flow: one main branch, short feature branches</h3>
+    <p>Everything on <code>main</code> is deployable. For each task you branch from main, commit, open a pull request, get review and passing tests, merge, and deploy.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="GitHub Flow. A single main line. Short feature branches leave it and return through pull requests, and each merge is deployed.">
+        <path class="rule" d="M30,95 L615,95"/>
+        <path class="rule" d="M80,95 L120,40"/><path class="rule" d="M120,40 L190,40"/><path class="rule" d="M190,40 L230,95"/>
+        <path class="rule" d="M230,95 L270,150"/><path class="rule" d="M270,150 L350,150"/><path class="rule" d="M350,150 L390,95"/>
+        <path class="rule" d="M390,95 L430,40"/><path class="rule" d="M430,40 L490,40"/><path class="rule" d="M490,40 L530,95"/>
+        <circle class="boxg" cx="80"  cy="95" r="9"/><circle class="boxo" cx="230" cy="95" r="9"/><circle class="boxo" cx="390" cy="95" r="9"/><circle class="boxo" cx="530" cy="95" r="9"/>
+        <circle class="boxb" cx="120" cy="40" r="7"/><circle class="boxb" cx="190" cy="40" r="7"/>
+        <circle class="boxb" cx="270" cy="150" r="7"/><circle class="boxb" cx="350" cy="150" r="7"/>
+        <circle class="boxb" cx="430" cy="40" r="7"/><circle class="boxb" cx="490" cy="40" r="7"/>
+        <text class="sub c" x="155" y="26">feature/search</text>
+        <text class="sub c" x="310" y="176">fix/null-crash</text>
+        <text class="sub c" x="460" y="26">feature/profile</text>
+        <text class="b" x="12" y="124">main</text>
+        <text class="sub c" x="230" y="122">PR merged</text><text class="sub c" x="390" y="122">PR merged</text><text class="sub c" x="530" y="122">PR merged</text>
+        <text class="sub" x="620" y="178" style="text-anchor:end">each merge is deployed</text>
+      </svg>
+      <figcaption>Branches live for hours or a few days. Every merge goes through review and CI, and main is always releasable.</figcaption>
+    </figure>
+    <div class="good"><strong>Good for</strong><ul><li>Web apps and services with one live version, deployed continuously.</li><li>Small and mid-sized teams, and anyone new to branching.</li></ul></div>
+    <div class="bad"><strong>Weak at</strong><ul><li>Supporting several released versions at once.</li><li>Code that cannot reach users the moment it merges (app stores, scheduled releases) unless you add release tags or branches.</li></ul></div>
+
+    <h3>B. Git Flow: structured branches for versioned releases</h3>
+    <p>Introduced by Vincent Driessen in 2010, Git Flow uses long-lived <code>main</code> (only released code, tagged) and <code>develop</code> (the next release being assembled). Short <code>feature/*</code> branches come off develop, <code>release/*</code> branches stabilise a version, and <code>hotfix/*</code> branches patch production directly.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 300" role="img" aria-label="Git Flow. Lanes for main, hotfix, release, develop and feature. A feature branches from develop and merges back. A hotfix branches from main and merges into main and develop. A release branches from develop and merges into main and develop.">
+        <text class="b" x="8" y="44">main</text><text class="b" x="8" y="94">hotfix</text><text class="b" x="8" y="144">release</text><text class="b" x="8" y="194">develop</text><text class="b" x="8" y="254">feature</text>
+        <path class="rule" d="M80,40 L620,40"/><path class="rule" d="M80,190 L620,190"/>
+        <path class="rule" d="M130,40 L170,90"/><path class="rule" d="M170,90 L270,90"/><path class="rule" d="M270,90 L330,40"/><path class="rule" d="M270,90 L330,190"/>
+        <path class="rule" d="M200,190 L240,250"/><path class="rule" d="M240,250 L310,250"/><path class="rule" d="M310,250 L380,190"/>
+        <path class="rule" d="M420,190 L460,140"/><path class="rule" d="M460,140 L520,140"/><path class="rule" d="M520,140 L580,40"/><path class="rule" d="M520,140 L580,190"/>
+        <circle class="boxg" cx="130" cy="40" r="9"/><text class="sub c" x="130" y="26">v1.0</text>
+        <circle class="boxg" cx="330" cy="40" r="9"/><text class="sub c" x="330" y="26">v1.0.1</text>
+        <circle class="boxg" cx="580" cy="40" r="9"/><text class="sub c" x="580" y="26">v2.0</text>
+        <circle class="boxr" cx="170" cy="90" r="7"/><circle class="boxr" cx="270" cy="90" r="7"/>
+        <circle class="boxp" cx="460" cy="140" r="7"/><circle class="boxp" cx="520" cy="140" r="7"/>
+        <circle class="boxo" cx="130" cy="190" r="7"/><circle class="boxo" cx="200" cy="190" r="7"/><circle class="boxo" cx="330" cy="190" r="7"/><circle class="boxo" cx="380" cy="190" r="7"/><circle class="boxo" cx="420" cy="190" r="7"/><circle class="boxo" cx="580" cy="190" r="7"/>
+        <circle class="boxb" cx="240" cy="250" r="7"/><circle class="boxb" cx="310" cy="250" r="7"/>
+        <text class="sub c" x="220" y="76">urgent fix</text>
+        <text class="sub c" x="490" y="126">stabilise 2.0</text>
+        <text class="sub c" x="275" y="278">feature work</text>
+        <text class="sub c" x="400" y="226">merged when done</text>
+      </svg>
+      <figcaption>Two permanent branches (main and develop) and three kinds of temporary ones. Releases and hotfixes are merged into both permanent branches so nothing is lost.</figcaption>
+    </figure>
+    <div class="good"><strong>Good for</strong><ul><li>Software shipped as numbered versions: desktop apps, libraries, firmware, on-premise products.</li><li>Teams that must maintain more than one released version, or run a formal QA phase.</li></ul></div>
+    <div class="bad"><strong>Weak at</strong><ul><li>Continuous delivery: develop and main drift apart, and long feature branches make painful merges.</li><li>Ceremony. For a web app that deploys daily it is usually too much; its author has said as much himself.</li></ul></div>
+
+    <h3>C. Trunk-based development: everyone integrates into one trunk</h3>
+    <p>Developers commit to <code>main</code> (the trunk) at least daily, either directly or through very short-lived branches that last hours. Unfinished features are hidden behind <strong>feature flags</strong> so incomplete code can be merged and still stay off for users. When a release is needed you tag the trunk, or cut a short <code>release/*</code> branch that receives only bug fixes cherry-picked from the trunk.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Trunk-based development. A long trunk with many small commits and very short branches. A release branch is cut from the trunk and receives a cherry-picked fix.">
+        <path class="rule" d="M30,70 L615,70"/>
+        <circle class="boxg" cx="50" cy="70" r="6"/><circle class="boxg" cx="90" cy="70" r="6"/><circle class="boxg" cx="130" cy="70" r="6"/><circle class="boxg" cx="170" cy="70" r="6"/><circle class="boxg" cx="210" cy="70" r="6"/><circle class="boxg" cx="250" cy="70" r="6"/><circle class="boxg" cx="290" cy="70" r="6"/><circle class="boxg" cx="330" cy="70" r="6"/><circle class="boxg" cx="370" cy="70" r="6"/><circle class="boxg" cx="410" cy="70" r="6"/><circle class="boxg" cx="450" cy="70" r="6"/><circle class="boxg" cx="490" cy="70" r="6"/><circle class="boxg" cx="530" cy="70" r="6"/><circle class="boxg" cx="570" cy="70" r="6"/>
+        <path class="rule" d="M130,70 L150,36"/><path class="rule" d="M150,36 L190,36"/><path class="rule" d="M190,36 L210,70"/>
+        <path class="rule" d="M290,70 L310,36"/><path class="rule" d="M310,36 L350,36"/><path class="rule" d="M350,36 L370,70"/>
+        <path class="rule" d="M490,70 L510,36"/><path class="rule" d="M510,36 L550,36"/><path class="rule" d="M550,36 L570,70"/>
+        <text class="sub c" x="170" y="26">hours, not weeks</text>
+        <text class="b" x="12" y="104">trunk</text>
+        <path class="rule" d="M250,70 L290,140"/><path class="rule" d="M290,140 L520,140"/>
+        <circle class="boxp" cx="290" cy="140" r="7"/><circle class="boxp" cx="400" cy="140" r="7"/><circle class="boxp" cx="520" cy="140" r="7"/>
+        <text class="sub" x="300" y="164">release/2.3 (only fixes, then tag)</text>
+        <path class="arrow" d="M372,78 L398,130"/>
+        <text class="sub" x="420" y="118">cherry-pick fix</text>
+        <text class="sub c" x="320" y="190">Unfinished work is merged but switched off with a feature flag.</text>
+      </svg>
+      <figcaption>The trunk is the only long-lived branch. Release branches, when needed, are short-lived and only receive fixes.</figcaption>
+    </figure>
+    <div class="good"><strong>Good for</strong><ul><li>Teams with strong automated tests and CI who want to release often.</li><li>Large organisations and monorepos: it avoids merge debt across many teams.</li><li>It is the practice most associated with high-performing delivery teams in the DORA research.</li></ul></div>
+    <div class="bad"><strong>Weak at</strong><ul><li>Teams without reliable tests or fast CI: a bad commit hurts everyone at once.</li><li>Needs discipline with feature flags, which must be cleaned up later.</li></ul></div>
+
+    <h3>Other patterns worth knowing</h3>
+    <ul>
+      <li><strong><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks" target="_blank" rel="noopener">Fork and pull request</a>.</strong> Contributors copy (fork) the project, work in their copy, and propose changes by pull request. The standard for open source, where you cannot give everyone write access.</li>
+      <li><strong><a href="https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/" target="_blank" rel="noopener">GitLab Flow</a>.</strong> GitHub Flow plus <em>environment branches</em> (<code>main</code> &rarr; <code>staging</code> &rarr; <code>production</code>) or <em>release branches</em>. A middle path when you cannot deploy straight from main.</li>
+      <li><strong><a href="https://trunkbaseddevelopment.com/branch-for-release/" target="_blank" rel="noopener">Release branches per supported version</a></strong> (<code>release/1.x</code>, <code>release/2.x</code>) with fixes cherry-picked back. This is how the Linux kernel, language runtimes and most libraries keep long-term support.</li>
+    </ul>
+
+    <h2 id="situations">7. Choosing a strategy for your situation</h2>
+    <p>Start from how your software reaches users, not from what is popular.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 330" role="img" aria-label="Decision tree. Deploying continuously with one live version leads to GitHub Flow or trunk-based. Shipping numbered versions and supporting old ones leads to Git Flow or release branches. App store review delays lead to trunk plus release branches and hotfixes. Open source with outside contributors leads to fork and pull request.">
+        <rect class="boxb" x="190" y="8" width="260" height="42" rx="10"/><text class="b c" x="320" y="26">How does your software</text><text class="b c" x="320" y="42">reach users?</text>
+        <path class="rule" d="M320,50 L320,70"/><path class="rule" d="M78,70 L562,70"/>
+        <path class="rule" d="M78,70 L78,92"/><path class="rule" d="M241,70 L241,92"/><path class="rule" d="M399,70 L399,92"/><path class="rule" d="M562,70 L562,92"/>
+        <rect class="box" x="8" y="92" width="140" height="92" rx="10"/>
+        <text class="b c" x="78" y="112">Deployed often</text><text class="sub c" x="78" y="132">website, API, SaaS</text><text class="sub c" x="78" y="148">one live version,</text><text class="sub c" x="78" y="164">no review wait</text>
+        <rect class="box" x="171" y="92" width="140" height="92" rx="10"/>
+        <text class="b c" x="241" y="112">Numbered versions</text><text class="sub c" x="241" y="132">library, desktop,</text><text class="sub c" x="241" y="148">firmware, on-prem,</text><text class="sub c" x="241" y="164">old versions supported</text>
+        <rect class="box" x="329" y="92" width="140" height="92" rx="10"/>
+        <text class="b c" x="399" y="112">Store review delay</text><text class="sub c" x="399" y="132">iOS, Android,</text><text class="sub c" x="399" y="148">staged rollouts,</text><text class="sub c" x="399" y="164">fixes need a new build</text>
+        <rect class="box" x="492" y="92" width="140" height="92" rx="10"/>
+        <text class="b c" x="562" y="112">Outside contributors</text><text class="sub c" x="562" y="132">open source,</text><text class="sub c" x="562" y="148">no write access</text><text class="sub c" x="562" y="164">for most people</text>
+        <path class="arrow" d="M78,186 L78,216"/><path class="arrow" d="M241,186 L241,216"/><path class="arrow" d="M399,186 L399,216"/><path class="arrow" d="M562,186 L562,216"/>
+        <rect class="boxg" x="8" y="218" width="140" height="92" rx="10"/>
+        <text class="b c" x="78" y="242">GitHub Flow</text><text class="sub c" x="78" y="262">or trunk-based</text><text class="sub c" x="78" y="282">with feature flags</text>
+        <rect class="boxo" x="171" y="218" width="140" height="92" rx="10"/>
+        <text class="b c" x="241" y="242">Git Flow</text><text class="sub c" x="241" y="262">or a release branch</text><text class="sub c" x="241" y="282">per supported version</text>
+        <rect class="boxp" x="329" y="218" width="140" height="92" rx="10"/>
+        <text class="b c" x="399" y="242">Trunk + release</text><text class="sub c" x="399" y="262">branch cut per build,</text><text class="sub c" x="399" y="282">hotfix off the release</text>
+        <rect class="boxb" x="492" y="218" width="140" height="92" rx="10"/>
+        <text class="b c" x="562" y="242">Fork + pull</text><text class="sub c" x="562" y="262">request, maintainers</text><text class="sub c" x="562" y="282">review and merge</text>
+      </svg>
+      <figcaption>Start with the way you release. Team size and test quality then decide how strict to be.</figcaption>
+    </figure>
+
+    <h3>Situation by situation</h3>
+    <table>
+      <tr><th>Situation</th><th>Recommended approach</th><th>Why, and what to watch</th></tr>
+      <tr><td><strong>Solo project or learning</strong></td><td><code>main</code> plus a short branch per idea. Tag the versions you finish.</td><td>Branching is free and lets you throw away experiments. No ceremony needed.</td></tr>
+      <tr><td><strong>Small team, web app, deploy daily</strong></td><td>GitHub Flow with squash merge, CI required, auto-deploy on merge.</td><td>Keep PRs small (under a few hundred lines). Use feature flags for risky work.</td></tr>
+      <tr><td><strong>Mature team with solid CI, many deploys a day</strong></td><td>Trunk-based development with feature flags.</td><td>Needs fast tests, flag clean-up and a rule that a broken trunk is fixed first.</td></tr>
+      <tr><td><strong>Mobile app (store review)</strong></td><td>Trunk-based or GitHub Flow, plus a <code>release/x.y</code> branch cut for each store build. Fix bugs in main, cherry-pick to the release branch.</td><td>The live app is weeks old, so you must be able to patch exactly that version. Remote config and flags help.</td></tr>
+      <tr><td><strong>Library or SDK with several supported versions</strong></td><td>Trunk or develop for the next version, plus maintenance branches <code>release/1.x</code>, <code>release/2.x</code>. Tag every release.</td><td>Back-port security fixes with cherry-pick. Document which versions are supported.</td></tr>
+      <tr><td><strong>Scheduled releases with a QA phase</strong></td><td>Git Flow, or GitHub Flow with a release branch frozen for testing.</td><td>Keep the freeze short. Merge fixes back to main right away.</td></tr>
+      <tr><td><strong>Production is on fire</strong></td><td>Branch <code>hotfix/*</code> from the exact production tag, fix, test, release, then merge into main too.</td><td>Forgetting the merge back is how the same bug returns in the next release.</td></tr>
+      <tr><td><strong>Open source</strong></td><td>Fork and pull request; maintainers merge. Protect main; use labels and a <code>CONTRIBUTING.md</code>.</td><td>Ask contributors to rebase on the latest main. Use squash merge to keep history clean.</td></tr>
+      <tr><td><strong>Large refactor or migration that takes weeks</strong></td><td>Prefer <em>branch by abstraction</em>: hide the new path behind a flag and merge in small steps. If you must use a long branch, merge main into it every day.</td><td>The longer a branch lives, the more painful the final merge. Time-box it.</td></tr>
+      <tr><td><strong>Several teams in one monorepo</strong></td><td>Trunk-based, with code owners, path-based CI and sparse checkout.</td><td>Long-lived team branches turn into integration crises.</td></tr>
+      <tr><td><strong>Regulated industry (audit, sign-off)</strong></td><td>GitHub Flow or GitLab Flow with protected branches, required reviewers, signed commits and linked tickets.</td><td>The Git history becomes the audit trail. Never force-push to shared branches.</td></tr>
+      <tr><td><strong>Several environments (dev, staging, production)</strong></td><td>One build promoted through environments. Avoid separate code per environment.</td><td>Environment branches that drift apart cause &ldquo;works on staging&rdquo; bugs. Prefer config over code differences.</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>A sensible default</strong>
+      <p>If you are unsure, begin with <strong>GitHub Flow</strong>: protected <code>main</code>, short branches, small pull requests, squash merge, CI on every PR, tags for releases. Add a <code>release/*</code> branch only when you need to patch an old version, and move toward trunk-based development as your tests and feature flags mature.</p>
+    </div>
+
+    <h2 id="tools">8. Software for Git operations</h2>
+    <p>Git itself is a command-line program that keeps data in a <code>.git</code> folder. Everything else is a layer on top of it. Pick one tool from each layer that you enjoy; they all work on the same repository, so you can mix them.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 290" role="img" aria-label="Layers of Git software. The top layer is hosting services such as GitHub, GitLab, Bitbucket and Gitea. The middle layer is clients: command line, desktop GUIs, IDE integration and terminal UIs. The bottom layer is the Git engine and the local .git repository.">
+        <text class="b" x="8" y="18">Hosting and collaboration</text>
+        <rect class="boxp" x="8"   y="28" width="146" height="44" rx="10"/><text class="b c" x="81"  y="55">GitHub</text>
+        <rect class="boxp" x="170" y="28" width="146" height="44" rx="10"/><text class="b c" x="243" y="55">GitLab</text>
+        <rect class="boxp" x="332" y="28" width="146" height="44" rx="10"/><text class="b c" x="405" y="55">Bitbucket</text>
+        <rect class="boxp" x="494" y="28" width="138" height="44" rx="10"/><text class="b c" x="563" y="55">Gitea / Forgejo</text>
+        <path class="arrow" d="M320,150 L320,78"/><text class="sub" x="332" y="116">push, pull, pull requests (HTTPS or SSH)</text>
+        <text class="b" x="8" y="146">Clients: how you give commands</text>
+        <rect class="boxb" x="8"   y="156" width="146" height="44" rx="10"/><text class="b c" x="81"  y="176">Command line</text><text class="sub c" x="81" y="192">git, gh, glab</text>
+        <rect class="boxb" x="170" y="156" width="146" height="44" rx="10"/><text class="b c" x="243" y="176">Desktop GUIs</text><text class="sub c" x="243" y="192">Fork, GitKraken, Tower</text>
+        <rect class="boxb" x="332" y="156" width="146" height="44" rx="10"/><text class="b c" x="405" y="176">IDE built-in</text><text class="sub c" x="405" y="192">VS Code, JetBrains</text>
+        <rect class="boxb" x="494" y="156" width="138" height="44" rx="10"/><text class="b c" x="563" y="176">Terminal UIs</text><text class="sub c" x="563" y="192">lazygit, gitui</text>
+        <path class="arrow" d="M320,206 L320,226"/>
+        <rect class="boxg" x="8" y="228" width="624" height="48" rx="10"/><text class="b c" x="320" y="250">Git engine and the .git folder on your disk</text><text class="sub c" x="320" y="267">history, branches, staging area, hooks, plus Git LFS for large files</text>
+      </svg>
+      <figcaption>Clients all talk to the same Git engine. Hosting services are where the team shares, reviews and automates.</figcaption>
+    </figure>
+
+    <h3>Clients</h3>
+    <table>
+      <tr><th>Tool</th><th>Kind</th><th>Platforms</th><th>Good for</th></tr>
+      <tr><td><strong>git</strong> (command line)</td><td>CLI, the reference</td><td>All</td><td>Everything. Needed for scripts, servers and fixing odd states. Learn it first.</td></tr>
+      <tr><td><strong>GitHub CLI (<code>gh</code>)</strong>, <strong>GitLab CLI (<code>glab</code>)</strong></td><td>CLI for the host</td><td>All</td><td>Create pull requests, review, check CI and manage issues without leaving the terminal.</td></tr>
+      <tr><td><strong>VS Code Source Control</strong></td><td>Editor built-in</td><td>All</td><td>Stage by line, inline diffs and conflict editor. Extensions such as GitLens add blame and history.</td></tr>
+      <tr><td><strong>JetBrains IDEs</strong> (IntelliJ, Android Studio, PyCharm)</td><td>IDE built-in</td><td>All</td><td>Excellent diff and three-way merge, local history, shelve changes, per-line history.</td></tr>
+      <tr><td><strong>Xcode, Visual Studio</strong></td><td>IDE built-in</td><td>macOS, Windows</td><td>Everyday commit and branch work inside the platform IDE.</td></tr>
+      <tr><td><strong>GitHub Desktop</strong></td><td>GUI, free</td><td>macOS, Windows</td><td>The easiest start for beginners using GitHub.</td></tr>
+      <tr><td><strong>Sourcetree</strong></td><td>GUI, free</td><td>macOS, Windows</td><td>Visual branch graph; works with any host.</td></tr>
+      <tr><td><strong>Fork</strong></td><td>GUI, paid licence</td><td>macOS, Windows</td><td>Fast, clean interface, interactive rebase and conflict tools.</td></tr>
+      <tr><td><strong>GitKraken</strong></td><td>GUI, free tier and paid</td><td>All</td><td>Polished commit graph, integrations with hosts and issue trackers.</td></tr>
+      <tr><td><strong>Tower</strong></td><td>GUI, paid</td><td>macOS, Windows</td><td>Strong undo and guidance for less experienced users.</td></tr>
+      <tr><td><strong>SmartGit</strong></td><td>GUI, free for non-commercial use</td><td>All</td><td>Feature-rich, includes SVN support.</td></tr>
+      <tr><td><strong>TortoiseGit, Git Extensions</strong></td><td>GUI, free</td><td>Windows</td><td>Explorer integration for Windows users.</td></tr>
+      <tr><td><strong>lazygit, gitui</strong></td><td>Terminal UI, free</td><td>All</td><td>Keyboard-driven staging, rebase and branch work over SSH or in a terminal you already live in.</td></tr>
+    </table>
+
+    <h3>Hosting services</h3>
+    <table>
+      <tr><th>Service</th><th>Notes</th></tr>
+      <tr><td><strong>GitHub</strong></td><td>The largest community; pull requests, Actions CI, Pages, code search. Default for open source.</td></tr>
+      <tr><td><strong>GitLab</strong></td><td>All-in-one DevOps platform with built-in CI/CD and issue boards. Can be self-hosted.</td></tr>
+      <tr><td><strong>Bitbucket</strong></td><td>Atlassian product; tight integration with Jira and Pipelines.</td></tr>
+      <tr><td><strong>Azure DevOps Repos</strong></td><td>Part of Microsoft&rsquo;s suite with boards and pipelines; common in Microsoft-centred companies.</td></tr>
+      <tr><td><strong>Gitea, Forgejo</strong></td><td>Lightweight, self-hosted, open source. Codeberg runs on Forgejo.</td></tr>
+      <tr><td><strong>AWS CodeCommit</strong></td><td>Closed to new customers in 2024, so choose another host for new work.</td></tr>
+    </table>
+
+    <h3>Helpers worth adding</h3>
+    <ul>
+      <li><strong>Git LFS</strong> stores large files outside normal history and keeps lightweight pointers in Git.</li>
+      <li><strong>Hooks</strong> run scripts at key moments. Tools like <strong>pre-commit</strong> or <strong>Husky</strong> run linters and tests before a commit or push.</li>
+      <li><strong><code>git worktree</code></strong> checks out a second branch in another folder, handy for a hotfix while your feature is half done.</li>
+      <li><strong>SSH keys or a credential manager</strong> (Git Credential Manager) so you do not type passwords. Sign commits with an SSH or GPG key if your team requires it.</li>
+      <li><strong>Diff and merge tools</strong> such as <code>delta</code>, Meld, Beyond Compare or the IDE&rsquo;s three-way merge make conflicts less scary.</li>
+      <li><strong>CI services</strong> (GitHub Actions, GitLab CI, Jenkins, CircleCI) run your tests on every push, which every branching strategy above depends on.</li>
+    </ul>
+    <div class="callout">
+      <strong>Which should I install?</strong>
+      <p>Install <code>git</code> and learn the ten commands in section 3. Add the GUI or IDE integration you find most comfortable for diffs and conflicts, plus <code>gh</code> or <code>glab</code> if you live in the terminal. When a GUI does something unexpected, the command line is how you see what really happened.</p>
+    </div>
+
+    <h2 id="habits">9. Habits that work with any strategy</h2>
+    <ul>
+      <li><strong>Keep branches short-lived.</strong> Merge within days. The cost of merging grows faster than the age of the branch.</li>
+      <li><strong>Make small pull requests</strong> that do one thing. They get reviewed faster and are easier to revert.</li>
+      <li><strong>Pull or rebase often</strong> from main so conflicts show up while they are small.</li>
+      <li><strong>Automate checks:</strong> build, tests, lint and security scan on every PR. A branching strategy without CI is only a convention.</li>
+      <li><strong>Commit often, publish clean.</strong> Commit as you go locally, then tidy with an interactive rebase or squash before sharing.</li>
+      <li><strong>Never force-push a shared branch.</strong> If you must, use <code>--force-with-lease</code> on your own branch only.</li>
+      <li><strong>Back up by pushing.</strong> Unpushed local commits exist on one disk only.</li>
+      <li><strong>Keep secrets and large generated files out of the repository.</strong></li>
+    </ul>
+
+    <h2 id="mistakes">10. Common mistakes</h2>
+    <ul>
+      <li><strong>Long-lived feature branches.</strong> Weeks of drift lead to a &ldquo;merge hell&rdquo; day. Merge in slices, use flags.</li>
+      <li><strong>Choosing Git Flow because it looks professional.</strong> If you deploy continuously, it adds work for no gain.</li>
+      <li><strong>Committing everything with <code>git add .</code></strong> without checking <code>git status</code>, and catching build files or secrets.</li>
+      <li><strong>Vague commit messages</strong> (&ldquo;fix&rdquo;, &ldquo;update&rdquo;, &ldquo;wip&rdquo;) that make history useless for finding bugs.</li>
+      <li><strong>Rebasing or resetting shared history,</strong> which breaks teammates&rsquo; clones.</li>
+      <li><strong>Environment branches with different code,</strong> so what you tested is not what you ship.</li>
+      <li><strong>Forgetting to merge a hotfix back,</strong> so the bug returns in the next release.</li>
+      <li><strong>Putting big binaries in plain Git,</strong> bloating every clone forever.</li>
+      <li><strong>Resolving conflicts without understanding them.</strong> Read both sides, run the tests, and ask the author if unsure.</li>
+    </ul>
+
+    <h2 id="takeaways">11. Takeaways and glossary</h2>
+    <ul>
+      <li>Version control is the safety net and the collaboration tool of every software project.</li>
+      <li>Git is distributed and snapshot-based: three local areas plus a remote, with branches as cheap labels.</li>
+      <li>Alternatives win in special cases: huge binaries (Perforce, Unity Version Control), tiny self-hosted projects (Fossil), nicer ergonomics on Git (Jujutsu).</li>
+      <li>Pick a branching strategy by how you release: GitHub Flow or trunk-based for continuous delivery, Git Flow or release branches for versioned software, fork and PR for open source.</li>
+      <li>Short branches, small PRs, protected main and automated tests matter more than the name of the strategy.</li>
+      <li>Learn the command line, then use GUIs and IDE tools for convenience.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>VCS</td><td>Software that records the history of changes to files.</td></tr>
+      <tr><td>Staging area</td><td>Where you assemble the next commit before saving it.</td></tr>
+      <tr><td>HEAD</td><td>The commit or branch you are currently on.</td></tr>
+      <tr><td>origin</td><td>The usual name of the remote you cloned from.</td></tr>
+      <tr><td>Pull request (PR)</td><td>A request to merge a branch, with review and checks. GitLab calls it a merge request.</td></tr>
+      <tr><td>Fast-forward</td><td>A merge where the target simply moves ahead because it has no new commits of its own.</td></tr>
+      <tr><td>Rebase</td><td>Replaying your commits on a new base, creating new commits.</td></tr>
+      <tr><td>Cherry-pick</td><td>Copying a single commit onto another branch.</td></tr>
+      <tr><td>Feature flag</td><td>A switch that turns unfinished code on or off without a new deploy.</td></tr>
+      <tr><td>Trunk</td><td>The main line of development that everyone integrates into.</td></tr>
+      <tr><td>Hotfix</td><td>An urgent fix to the code that is live in production.</td></tr>
+      <tr><td>Monorepo</td><td>One repository that holds many projects.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="git-cheat-sheet.html">Git cheat sheet</a> (companion one-page reference)</li>
+      <li><a href="https://git-scm.com/book/en/v2" target="_blank" rel="noopener">Pro Git</a> (free book) &middot; <a href="https://git-scm.com/docs" target="_blank" rel="noopener">Git reference</a> &middot; <a href="https://learngitbranching.js.org/" target="_blank" rel="noopener">Learn Git Branching</a> (interactive)</li>
+      <li><a href="https://docs.github.com/en/get-started/using-github/github-flow" target="_blank" rel="noopener">GitHub Flow</a> &middot; <a href="https://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="noopener">A successful Git branching model (Git Flow)</a> &middot; <a href="https://trunkbaseddevelopment.com/" target="_blank" rel="noopener">trunkbaseddevelopment.com</a></li>
+      <li><a href="https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/" target="_blank" rel="noopener">GitLab Flow</a> &middot; <a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning</a> &middot; <a href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a></li>
+      <li><a href="https://subversion.apache.org/" target="_blank" rel="noopener">Subversion</a> &middot; <a href="https://www.perforce.com/products/helix-core" target="_blank" rel="noopener">Perforce Helix Core</a> &middot; <a href="https://www.mercurial-scm.org/" target="_blank" rel="noopener">Mercurial</a> &middot; <a href="https://fossil-scm.org/" target="_blank" rel="noopener">Fossil</a> &middot; <a href="https://github.com/jj-vcs/jj" target="_blank" rel="noopener">Jujutsu</a> &middot; <a href="https://sapling-scm.com/" target="_blank" rel="noopener">Sapling</a> &middot; <a href="https://pijul.org/" target="_blank" rel="noopener">Pijul</a></li>
+      <li><a href="https://desktop.github.com/" target="_blank" rel="noopener">GitHub Desktop</a> &middot; <a href="https://git-fork.com/" target="_blank" rel="noopener">Fork</a> &middot; <a href="https://www.gitkraken.com/" target="_blank" rel="noopener">GitKraken</a> &middot; <a href="https://www.git-tower.com/" target="_blank" rel="noopener">Tower</a> &middot; <a href="https://github.com/jesseduffield/lazygit" target="_blank" rel="noopener">lazygit</a> &middot; <a href="https://cli.github.com/" target="_blank" rel="noopener">GitHub CLI</a> &middot; <a href="https://git-lfs.com/" target="_blank" rel="noopener">Git LFS</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

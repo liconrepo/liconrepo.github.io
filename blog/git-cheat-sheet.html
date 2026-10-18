@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Git Cheat Sheet: Commands, Undo Recipes and Branching on One Page — Khairul Alam</title>
+  <meta name="description" content="A one-page Git cheat sheet: setup, daily commands, branching, merging and rebasing, remotes, undoing mistakes, stash, tags, debugging and a quick branching strategy guide." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Cheat sheet &middot; Git</p>
+    <h1>Git Cheat Sheet: Commands, Undo Recipes and Branching on One Page</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~8 min skim</span></div>
+    <div class="tags"><span class="tag">Git</span><span class="tag">Cheat sheet</span><span class="tag">Branching</span></div>
+    <p class="lede">The commands you reach for most, grouped by task. For the ideas behind them, and how to choose a branching strategy, read the full guide: <a href="git-vcs-branching-guide.html">Version Control, Git and Branching Strategies</a>. Official docs: <a href="https://git-scm.com/docs" target="_blank" rel="noopener">git-scm.com/docs</a>.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Git areas: working directory, staging area, local repository and remote, with the commands that move work between them.">
+        <rect class="boxb" x="8"   y="30" width="126" height="64" rx="12"/><text class="b c" x="71"  y="58">Working</text><text class="b c" x="71"  y="76">directory</text>
+        <rect class="boxo" x="170" y="30" width="126" height="64" rx="12"/><text class="b c" x="233" y="58">Staging area</text><text class="sub c" x="233" y="76">the index</text>
+        <rect class="boxg" x="332" y="30" width="126" height="64" rx="12"/><text class="b c" x="395" y="58">Local</text><text class="b c" x="395" y="76">repository</text>
+        <rect class="boxp" x="494" y="30" width="138" height="64" rx="12"/><text class="b c" x="563" y="58">Remote</text><text class="sub c" x="563" y="76">origin</text>
+        <path class="arrow" d="M136,62 L166,62"/><path class="arrow" d="M298,62 L328,62"/><path class="arrow" d="M460,62 L490,62"/>
+        <text class="sub c" x="151" y="22">add</text><text class="sub c" x="313" y="22">commit</text><text class="sub c" x="475" y="22">push</text>
+        <path class="arrow" d="M563,96 L563,130 L71,130 L71,98"/>
+        <text class="sub c" x="320" y="122">pull = fetch + merge (or rebase)</text>
+        <text class="sub c" x="320" y="160">restore: staging &rarr; working &nbsp;&middot;&nbsp; reset: repository &rarr; staging &nbsp;&middot;&nbsp; fetch: remote &rarr; local repository</text>
+      </svg>
+      <figcaption>Where each command moves your work.</figcaption>
+    </figure>
+
+    <h2>Setup</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git config --global user.name "Name"</code></td><td>Set the name on your commits</td></tr><tr><td><code>git config --global user.email "me@x.com"</code></td><td>Set the email on your commits</td></tr><tr><td><code>git config --global init.defaultBranch main</code></td><td>Name new repositories' first branch <code>main</code></td></tr><tr><td><code>git config --global pull.rebase true</code></td><td>Make <code>git pull</code> rebase instead of merge</td></tr><tr><td><code>git config --list --show-origin</code></td><td>Show every setting and where it comes from</td></tr></table>
+    <h2>Start a repository</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git init</code></td><td>Turn the current folder into a repository</td></tr><tr><td><code>git clone &lt;url&gt;</code></td><td>Copy a remote repository with all its history</td></tr><tr><td><code>git clone --depth 1 &lt;url&gt;</code></td><td>Shallow clone: latest snapshot only, much faster</td></tr><tr><td><code>git remote -v</code></td><td>List the remotes</td></tr></table>
+    <h2>Save work</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git status -sb</code></td><td>Short status with branch info</td></tr><tr><td><code>git add &lt;file&gt;</code></td><td>Stage a file</td></tr><tr><td><code>git add -p</code></td><td>Stage piece by piece (hunks)</td></tr><tr><td><code>git commit -m "msg"</code></td><td>Commit what is staged</td></tr><tr><td><code>git commit -am "msg"</code></td><td>Stage tracked files and commit (not new files)</td></tr><tr><td><code>git commit --amend</code></td><td>Change the last commit (before pushing only)</td></tr><tr><td><code>git rm &lt;file&gt; / git mv &lt;a&gt; &lt;b&gt;</code></td><td>Delete or rename a file and stage it</td></tr></table>
+    <h2>Branches</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git branch -vv</code></td><td>List local branches with their upstream</td></tr><tr><td><code>git switch -c &lt;name&gt;</code></td><td>Create a branch and move to it</td></tr><tr><td><code>git switch &lt;name&gt;</code></td><td>Move to an existing branch</td></tr><tr><td><code>git switch -</code></td><td>Go back to the previous branch</td></tr><tr><td><code>git branch -d &lt;name&gt;</code></td><td>Delete a merged branch (<code>-D</code> to force)</td></tr><tr><td><code>git branch -m &lt;new&gt;</code></td><td>Rename the current branch</td></tr><tr><td><code>git push origin --delete &lt;name&gt;</code></td><td>Delete a remote branch</td></tr></table>
+    <h2>Merge and rebase</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git merge &lt;branch&gt;</code></td><td>Merge a branch into the current one</td></tr><tr><td><code>git merge --no-ff &lt;branch&gt;</code></td><td>Always create a merge commit</td></tr><tr><td><code>git merge --squash &lt;branch&gt;</code></td><td>Combine the branch into one staged change</td></tr><tr><td><code>git merge --abort</code></td><td>Cancel a merge that has conflicts</td></tr><tr><td><code>git rebase main</code></td><td>Replay your commits on top of main</td></tr><tr><td><code>git rebase -i HEAD~3</code></td><td>Reorder, squash or reword the last 3 commits</td></tr><tr><td><code>git rebase --continue / --abort</code></td><td>Carry on or cancel after a conflict</td></tr><tr><td><code>git cherry-pick &lt;commit&gt;</code></td><td>Copy one commit onto the current branch</td></tr></table>
+    <h2>Remotes</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git fetch --prune</code></td><td>Download updates and drop deleted remote branches</td></tr><tr><td><code>git pull</code></td><td>Fetch and integrate (merge or rebase)</td></tr><tr><td><code>git push -u origin &lt;branch&gt;</code></td><td>Publish a branch and set its upstream</td></tr><tr><td><code>git push</code></td><td>Push the current branch</td></tr><tr><td><code>git push --force-with-lease</code></td><td>Safer force push for your own branch only</td></tr><tr><td><code>git remote add upstream &lt;url&gt;</code></td><td>Add the original repo when working from a fork</td></tr></table>
+    <h2>Look around</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git log --oneline --graph --all</code></td><td>Compact history graph of all branches</td></tr><tr><td><code>git log -p &lt;file&gt;</code></td><td>History of a file with the changes</td></tr><tr><td><code>git log -S"text"</code></td><td>Commits that added or removed this text</td></tr><tr><td><code>git diff / git diff --staged</code></td><td>Unstaged / staged changes</td></tr><tr><td><code>git diff main...feature</code></td><td>What the feature branch adds since it split</td></tr><tr><td><code>git show &lt;commit&gt;</code></td><td>One commit in full</td></tr><tr><td><code>git blame &lt;file&gt;</code></td><td>Who last changed each line</td></tr><tr><td><code>git shortlog -sn</code></td><td>Commit count per author</td></tr></table>
+    <h2>Undo and recover</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git restore &lt;file&gt;</code></td><td>Discard edits in a file (gone for good)</td></tr><tr><td><code>git restore --staged &lt;file&gt;</code></td><td>Unstage but keep the edits</td></tr><tr><td><code>git revert &lt;commit&gt;</code></td><td>New commit that undoes an old one. Safe when shared</td></tr><tr><td><code>git reset --soft HEAD~1</code></td><td>Undo last commit, keep changes staged</td></tr><tr><td><code>git reset --mixed HEAD~1</code></td><td>Undo last commit, keep changes unstaged</td></tr><tr><td><code>git reset --hard &lt;commit&gt;</code></td><td>Move the branch and throw away changes. Danger</td></tr><tr><td><code>git clean -fd</code></td><td>Delete untracked files and folders. Use <code>-n</code> first</td></tr><tr><td><code>git reflog</code></td><td>List where HEAD has been, to find lost commits</td></tr><tr><td><code>git switch -c rescue &lt;id&gt;</code></td><td>Bring a lost commit back on a new branch</td></tr></table>
+    <h2>Stash, tags and worktrees</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git stash push -u -m "wip"</code></td><td>Shelve changes, including untracked files</td></tr><tr><td><code>git stash list / pop / apply</code></td><td>See, restore and drop / restore and keep</td></tr><tr><td><code>git tag -a v1.2.0 -m "msg"</code></td><td>Create an annotated release tag</td></tr><tr><td><code>git push origin --tags</code></td><td>Publish tags</td></tr><tr><td><code>git worktree add ../fix hotfix/x</code></td><td>Check out another branch in a second folder</td></tr></table>
+    <h2>Debugging</h2>
+    <table class="cs"><tr><th>Command</th><th>What it does</th></tr><tr><td><code>git bisect start / bad / good</code></td><td>Binary-search for the commit that broke something</td></tr><tr><td><code>git bisect run &lt;test&gt;</code></td><td>Let a script do the bisecting</td></tr><tr><td><code>git bisect reset</code></td><td>Finish and return to your branch</td></tr><tr><td><code>git grep "text"</code></td><td>Search tracked files quickly</td></tr></table>
+
+    <h2>.gitignore patterns</h2>
+    <table class="cs"><tr><th>Pattern</th><th>Meaning</th></tr>
+      <tr><td><code>*.log</code></td><td>Ignore all files ending in .log</td></tr>
+      <tr><td><code>build/</code></td><td>Ignore a folder named build anywhere</td></tr>
+      <tr><td><code>/secret.txt</code></td><td>Ignore only in the repository root</td></tr>
+      <tr><td><code>!keep.log</code></td><td>Do not ignore this file, even if a rule above matches</td></tr>
+      <tr><td><code>git rm --cached &lt;file&gt;</code></td><td>Stop tracking a file that is already committed</td></tr>
+    </table>
+    <div class="note"><p>Never commit secrets (<code>.env</code>, keys, tokens). If one slips in, treat it as leaked and rotate it.</p></div>
+
+    <h2>Which branching strategy?</h2>
+    <table class="cs"><tr><th>Situation</th><th>Use</th></tr>
+      <tr><td>Web app or API, deploy often</td><td>GitHub Flow, or trunk-based with feature flags</td></tr>
+      <tr><td>Numbered versions, old versions supported</td><td>Git Flow, or <code>release/x.y</code> branches</td></tr>
+      <tr><td>Mobile app with store review</td><td>Trunk + a release branch per store build, hotfix off the release</td></tr>
+      <tr><td>Open source</td><td>Fork and pull request</td></tr>
+      <tr><td>Production fire</td><td><code>hotfix/*</code> from the production tag, then merge back to main</td></tr>
+    </table>
+
+    <h2>Rules of thumb</h2>
+    <ul>
+      <li>Short branches, small pull requests, CI on every PR, protected <code>main</code>.</li>
+      <li>Never rebase, reset or force-push commits that others have pulled. Use <code>revert</code> instead.</li>
+      <li>Run <code>git status</code> before <code>git add .</code> and before every commit.</li>
+      <li>Committed work is almost always recoverable with <code>git reflog</code>. Uncommitted edits are not.</li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

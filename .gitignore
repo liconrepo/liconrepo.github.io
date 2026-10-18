@@ -1,0 +1,58 @@
+# JetBrains IDEs
+.idea/
+*.iml
+
+# VS Code (keep shared settings if you add them)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Other editors
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# macOS / Windows / Linux
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.directory
+
+# Secrets and local config (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node tooling (if you add a build step)
+node_modules/
+.npm/
+.cache/
+.parcel-cache/
+.eslintcache
+
+# Build output (if you add a build step)
+dist/
+build/
+.tmp/
+tmp/
+
+# Python (tools/*.py)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Local server and test output
+.sass-cache/
+coverage/
