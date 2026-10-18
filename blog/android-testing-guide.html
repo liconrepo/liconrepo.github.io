@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Testing Android Apps: The Test Pyramid, JUnit, UI Automation and TDD — Khairul Alam</title>
+  <meta name="description" content="A practical guide to testing Android apps: the test pyramid, JUnit 4 and 5, a map of the testing libraries, instrumentation and UI tests, Espresso, Compose tests, Appium, flaky-test fixes and the pros and cons of TDD." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    svg .bar-g { fill: #10b981; } svg .bar-b { fill: #3b82f6; } svg .bar-o { fill: #f59e0b; } svg .bar-m { fill: var(--border-h); }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Android &middot; Testing</p>
+    <h1>Testing Android Apps: The Test Pyramid, JUnit, UI Automation and TDD</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~35 min read</span></div>
+    <div class="tags"><span class="tag">Testing</span><span class="tag">JUnit</span><span class="tag">Espresso</span><span class="tag">Appium</span><span class="tag">TDD</span><span class="tag">Android</span></div>
+
+    <p class="lede">Every Android team says it wants tests. Fewer can say which tests to write, where they should run, and which of the many libraries to pick. This guide walks the whole map in order: the test pyramid, JUnit 4 and 5, the libraries that sit around JUnit, instrumentation and UI tests, Appium and other UI automation tools, how to keep UI tests from being flaky, and what test-driven development (TDD) really gives you. Every idea has a small Kotlin example.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>Write <strong>many fast unit tests</strong>, <strong>some integration tests</strong> and <strong>few end-to-end UI tests</strong>. That shape is the test pyramid.</li>
+        <li>Unit tests run on your computer&rsquo;s JVM (<code>src/test</code>). Instrumented tests run on a device or emulator (<code>src/androidTest</code>).</li>
+        <li><strong>JUnit</strong> is the base. Around it you add an assertion library, a mocking library, coroutine and Flow helpers, and (when needed) Robolectric.</li>
+        <li><strong>Espresso</strong> and <strong>Compose tests</strong> drive your own app&rsquo;s UI. <strong>UI Automator</strong> and <strong>Appium</strong> drive the whole device, from the outside.</li>
+        <li>UI tests get flaky from animations, timing, shared state and real networks. Each cause has a known fix.</li>
+        <li><strong>TDD</strong> (red, green, refactor) pushes you toward small, decoupled code. It costs time at first and does not suit every kind of work.</li>
+        <li>A starter stack and a four-step path are at the end.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#why">Why test at all</a></li>
+        <li><a href="#pyramid">The test pyramid</a></li>
+        <li><a href="#where">Where Android tests live: local and instrumented</a></li>
+        <li><a href="#junit">Unit tests with JUnit 4 and 5</a></li>
+        <li><a href="#libs">The library map around JUnit</a></li>
+        <li><a href="#doubles">Fakes, stubs and mocks</a></li>
+        <li><a href="#async">Testing coroutines, Flow and ViewModels</a></li>
+        <li><a href="#instrumented">Instrumentation tests: Espresso, Compose and UI Automator</a></li>
+        <li><a href="#appium">UI automation and Appium</a></li>
+        <li><a href="#reliable">Keeping UI tests reliable</a></li>
+        <li><a href="#tdd">TDD: red, green, refactor</a></li>
+        <li><a href="#strategy">A practical test strategy</a></li>
+        <li><a href="#mistakes">Common mistakes</a></li>
+        <li><a href="#takeaways">Takeaways, a starter path and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="why">1. Why test at all</h2>
+    <p>A test is a small program that checks your program. You run it, it either passes or fails, and nobody has to look at the screen. That one property is why tests are worth the effort: they turn &ldquo;I think this still works&rdquo; into &ldquo;I know this still works&rdquo;, in seconds, every time you change something.</p>
+    <p>Good tests give you four things. They <strong>catch regressions</strong>, which are bugs in behaviour that used to work. They let you <strong>refactor with confidence</strong>, because a red test tells you immediately when a cleanup broke something. They act as <strong>executable documentation</strong> of what the code is meant to do. And they shorten <strong>code review</strong>, because a reviewer can read the tests to see the intent.</p>
+    <div class="analogy">
+      <p><strong>Analogy.</strong> Tests are the safety net under a trapeze artist. The artist does not perform better because of the net. They perform <em>bolder</em>, because a fall is no longer a disaster. Teams with good tests change old code that other teams are afraid to touch.</p>
+    </div>
+    <p>Tests are also code, and code has a cost. A slow, brittle test suite is worse than none, because people stop trusting it and start ignoring red builds. The goal is never &ldquo;100% coverage&rdquo;. The goal is the most <em>confidence per minute</em> of writing, running and maintaining.</p>
+
+    <h2 id="pyramid">2. The test pyramid</h2>
+    <p>The test pyramid is a picture of how many tests to write at each level. Small, fast tests that check one thing go at the bottom, and there should be many of them. Big, slow tests that drive the whole app go at the top, and there should be few.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 296" role="img" aria-label="A three-layer pyramid. Top: UI and end-to-end tests, few, slow and costly. Middle: integration tests, some, medium speed. Bottom: unit tests, many, fast and cheap.">
+        <polygon class="boxr" points="200,16 262.3,106 137.7,106"/>
+        <polygon class="boxo" points="137.7,106 262.3,106 324.6,196 75.4,196"/>
+        <polygon class="boxg" points="75.4,196 324.6,196 380,276 20,276"/>
+        <text class="b c" x="200" y="86" style="font-size:13px">UI / E2E</text>
+        <text class="b c" x="200" y="156">Integration</text>
+        <text class="b c" x="200" y="241">Unit tests</text>
+        <text class="b" x="404" y="52">Few &middot; slow &middot; costly</text>
+        <text class="sub" x="404" y="70">Appium, Espresso, Compose full flows</text>
+        <text class="b" x="404" y="142">Some &middot; medium</text>
+        <text class="sub" x="404" y="160">Room, MockWebServer, Hilt, Robolectric</text>
+        <text class="b" x="404" y="232">Many &middot; fast &middot; cheap</text>
+        <text class="sub" x="404" y="250">JUnit, MockK, Truth, Turbine</text>
+        <path class="rule" d="M396,20 L396,276"/>
+      </svg>
+      <figcaption>The shape is a guide: push every check down to the lowest layer that can still catch the bug.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Layer</th><th>What it checks</th><th>Speed</th><th>Cost to maintain</th><th>Flaky?</th></tr>
+      <tr><td><strong>Unit</strong></td><td>One class or function, with its collaborators replaced by fakes</td><td>Milliseconds</td><td>Low</td><td>Almost never</td></tr>
+      <tr><td><strong>Integration</strong></td><td>Several real pieces together: a repository with a real database, a service with a fake server</td><td>Seconds</td><td>Medium</td><td>Sometimes</td></tr>
+      <tr><td><strong>UI / end-to-end</strong></td><td>The app on a device, driven like a user, from tap to result</td><td>Tens of seconds to minutes</td><td>High</td><td>Often, unless managed</td></tr>
+    </table>
+    <h3>Why a pyramid and not a rectangle</h3>
+    <ul>
+      <li><strong>Feedback time.</strong> A thousand unit tests can finish before you let go of the save shortcut. A thousand UI tests take hours, so people run them rarely, and bugs live longer.</li>
+      <li><strong>Pinpointing.</strong> When a unit test fails, it names the class. When an end-to-end test fails, the cause could be the UI, the network, the emulator, the test data or the test itself.</li>
+      <li><strong>Cost.</strong> High-level tests break whenever a button moves. Low-level tests break only when the behaviour they describe changes.</li>
+      <li><strong>Combinations.</strong> A form with five fields and three states per field has 243 combinations. Testing each one through the UI is absurd. Testing the validation logic with unit tests is trivial.</li>
+    </ul>
+    <p>A common rule of thumb, often credited to Google&rsquo;s testing guidance, is roughly <strong>70% small, 20% medium and 10% large</strong> tests. Treat it as a starting point, not a quota.</p>
+    <div class="analogy">
+      <p><strong>Analogy.</strong> Building a car: you bench-test each part first (unit), then check that the engine and gearbox work together (integration), and only then take it for a test drive (end to end). If the engine cannot be bench-tested, every fault turns into a long drive with a mechanic.</p>
+    </div>
+    <h3>The shapes to avoid and the other shapes</h3>
+    <ul>
+      <li><strong>The ice-cream cone.</strong> The pyramid upside down: lots of manual and UI testing, a few unit tests. It is slow, expensive and fragile. Many teams end up here by accident because UI tests are the easiest to start with.</li>
+      <li><strong>The testing trophy</strong> (popular in web teams) puts the most value on integration tests. <strong>The honeycomb</strong> (popular for microservices) does the same. Both share the idea that the right shape depends on your system. For Android apps with lots of logic in ViewModels and use cases, the pyramid still fits well.</li>
+    </ul>
+
+    <h2 id="where">3. Where Android tests live: local and instrumented</h2>
+    <p>Android splits tests into two homes, and picking the right one is the first real decision.</p>
+    <table>
+      <tr><th></th><th>Local tests</th><th>Instrumented tests</th></tr>
+      <tr><td><strong>Folder</strong></td><td><code>src/test</code></td><td><code>src/androidTest</code></td></tr>
+      <tr><td><strong>Runs on</strong></td><td>The JVM on your computer or CI machine</td><td>A real device or an emulator</td></tr>
+      <tr><td><strong>Speed</strong></td><td>Very fast, no install step</td><td>Slow: build, install, boot or connect a device</td></tr>
+      <tr><td><strong>Android framework</strong></td><td>Not real. Calls hit stubs (or Robolectric supplies a simulation)</td><td>The real framework, real UI, real database</td></tr>
+      <tr><td><strong>Runner</strong></td><td>JUnit</td><td><code>AndroidJUnitRunner</code></td></tr>
+      <tr><td><strong>Gradle task</strong></td><td><code>./gradlew testDebugUnitTest</code></td><td><code>./gradlew connectedDebugAndroidTest</code></td></tr>
+      <tr><td><strong>Best for</strong></td><td>Business logic, ViewModels, mappers, validators, repositories with fakes</td><td>UI, navigation, database, permissions, anything that needs the real OS</td></tr>
+    </table>
+    <p>Google also names tests by size: <strong>small</strong> (one class, no I/O, runs anywhere), <strong>medium</strong> (a few components together) and <strong>large</strong> (the whole app, end to end). The annotations <code>@SmallTest</code>, <code>@MediumTest</code> and <code>@LargeTest</code> from <code>androidx.test.filters</code> let you run a size on its own. They are the pyramid&rsquo;s three layers with different names.</p>
+    <h3>The &ldquo;not mocked&rdquo; error</h3>
+    <p>Local tests compile against a stripped <code>android.jar</code> whose methods throw. If your logic calls <code>Log.d(...)</code> or <code>TextUtils.isEmpty(...)</code>, the test fails with <em>&ldquo;Method ... not mocked&rdquo;</em>. You have three ways out:</p>
+    <ol>
+      <li><strong>Keep Android out of your logic.</strong> This is the best fix: use plain Kotlin types in ViewModels, use cases and mappers, and wrap the framework behind an interface.</li>
+      <li><strong>Use Robolectric</strong>, which supplies a working simulation of the framework on the JVM.</li>
+      <li><strong>Move the test to <code>androidTest</code></strong> and run it on a device.</li>
+    </ol>
+    <div class="note"><p>The shortcut <code>testOptions { unitTests.isReturnDefaultValues = true }</code> makes the stubs return zero or null instead of throwing. It hides the problem rather than fixing it, so use it only as a stop-gap.</p></div>
+
+    <h2 id="junit">4. Unit tests with JUnit 4 and 5</h2>
+    <p><strong>JUnit</strong> is the standard test framework for Java and Kotlin. It finds methods marked <code>@Test</code>, runs each one, and reports pass or fail. Every other tool in this post builds on it or plugs into it.</p>
+    <h3>The anatomy of a test: Arrange, Act, Assert</h3>
+    <p>Every good unit test has three steps. <strong>Arrange</strong> the objects and inputs. <strong>Act</strong> by calling the one thing under test. <strong>Assert</strong> that the result is what you expected. The same idea is called <em>Given, When, Then</em> in behaviour-driven development.</p>
+    <p>Our running example is a small price rule: orders of 5,000 or more get 10% off.</p>
+<pre><code>class DiscountCalculator {
+    fun priceAfterDiscount(price: Int): Int {
+        require(price &gt;= 0) { "price must not be negative" }
+        return if (price &gt;= 5_000) price - price / 10 else price
+    }
+}</code></pre>
+    <h3>JUnit 4</h3>
+    <p>JUnit 4 (current release 4.13.2) is the default on Android and the base for AndroidX Test.</p>
+<pre><code>// build.gradle.kts
+dependencies {
+    testImplementation("junit:junit:4.13.2")
+}
+
+// src/test/.../DiscountCalculatorTest.kt
+class DiscountCalculatorTest {
+
+    private lateinit var calculator: DiscountCalculator
+
+    @Before
+    fun setUp() {
+        calculator = DiscountCalculator()          // Arrange (runs before every test)
+    }
+
+    @Test
+    fun `no discount below the threshold`() {
+        assertEquals(4_000, calculator.priceAfterDiscount(4_000))
+    }
+
+    @Test
+    fun `10 percent off at 5000 or more`() {
+        assertEquals(9_000, calculator.priceAfterDiscount(10_000))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `negative price is rejected`() {
+        calculator.priceAfterDiscount(-1)
+    }
+}</code></pre>
+    <div class="note"><p>Kotlin lets you name a test with spaces by using backticks, which makes failure reports read like sentences. This works well in local tests. Older Android versions cannot load method names with spaces in instrumented tests, so use camelCase there.</p></div>
+    <table>
+      <tr><th>JUnit 4 annotation</th><th>When it runs or what it does</th></tr>
+      <tr><td><code>@Test</code></td><td>Marks a test method. <code>expected =</code> and <code>timeout =</code> are options.</td></tr>
+      <tr><td><code>@Before</code> / <code>@After</code></td><td>Before and after <em>every</em> test. Use for setup and cleanup.</td></tr>
+      <tr><td><code>@BeforeClass</code> / <code>@AfterClass</code></td><td>Once for the whole class (static, so <code>@JvmStatic</code> in Kotlin).</td></tr>
+      <tr><td><code>@Ignore</code></td><td>Skips a test. Leave a reason, and do not let skipped tests pile up.</td></tr>
+      <tr><td><code>@Rule</code></td><td>Reusable setup and teardown: <code>TemporaryFolder</code>, <code>TestWatcher</code>, <code>InstantTaskExecutorRule</code>, <code>ActivityScenarioRule</code>.</td></tr>
+      <tr><td><code>@RunWith</code></td><td>Chooses a different runner: <code>AndroidJUnit4</code>, <code>Parameterized</code>, <code>Suite</code>.</td></tr>
+      <tr><td><code>@Category</code></td><td>Groups tests so you can run a subset.</td></tr>
+    </table>
+    <h3>JUnit 5 (Jupiter)</h3>
+    <p>JUnit 5 is a rewrite with a cleaner API and a more flexible extension model. Its pieces are <strong>Jupiter</strong> (the new API and engine), <strong>Vintage</strong> (runs old JUnit 3 and 4 tests on the new platform) and the <strong>Platform</strong> itself. Local tests can use it directly with one Gradle line.</p>
+<pre><code>// build.gradle.kts
+android {
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }     // run local tests on JUnit 5
+    }
+}
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:&lt;version&gt;")
+    // Optional: keep old JUnit 4 tests running in the same module
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:&lt;version&gt;")
+}
+
+// src/test/.../DiscountCalculatorTest.kt
+class DiscountCalculatorTest {
+
+    private val calculator = DiscountCalculator()   // a new instance is created for every test
+
+    @Test
+    @DisplayName("10% off at 5,000 or more")
+    fun tenPercentOff() {
+        assertEquals(9_000, calculator.priceAfterDiscount(10_000))
+    }
+
+    @ParameterizedTest(name = "{0} becomes {1}")
+    @CsvSource("0,0", "4999,4999", "5000,4500", "10000,9000")
+    fun `discount table`(price: Int, expected: Int) {
+        assertEquals(expected, calculator.priceAfterDiscount(price))
+    }
+
+    @Test
+    fun `negative price is rejected`() {
+        assertThrows&lt;IllegalArgumentException&gt; { calculator.priceAfterDiscount(-1) }
+    }
+}</code></pre>
+    <p>The <code>&lt;version&gt;</code> placeholder stands for the latest release shown on the project&rsquo;s page (each library is linked from the tables in section 5). Library versions change often, so take them from the source rather than from a blog post.</p>
+    <table>
+      <tr><th></th><th>JUnit 4</th><th>JUnit 5 (Jupiter)</th></tr>
+      <tr><td><strong>Setup / teardown</strong></td><td><code>@Before</code>, <code>@After</code></td><td><code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@BeforeAll</code>, <code>@AfterAll</code></td></tr>
+      <tr><td><strong>Extending</strong></td><td>Runners and rules</td><td>One model: <code>@ExtendWith</code></td></tr>
+      <tr><td><strong>Parameterised tests</strong></td><td>Separate <code>Parameterized</code> runner</td><td>Built in: <code>@ParameterizedTest</code> with <code>@ValueSource</code>, <code>@CsvSource</code>, <code>@MethodSource</code></td></tr>
+      <tr><td><strong>Grouping</strong></td><td><code>@Category</code></td><td><code>@Tag</code>, plus <code>@Nested</code> classes</td></tr>
+      <tr><td><strong>Other features</strong></td><td>Basic</td><td><code>@DisplayName</code>, <code>@RepeatedTest</code>, <code>@TestFactory</code> (dynamic tests), <code>assertAll</code>, <code>assertTimeout</code></td></tr>
+      <tr><td><strong>Local tests on Android</strong></td><td>Works out of the box</td><td>Works with <code>useJUnitPlatform()</code></td></tr>
+      <tr><td><strong>Instrumented tests on Android</strong></td><td>Native: AndroidX Test is built on JUnit 4</td><td>Needs a community plugin, <code>android-junit5</code> (by mannodermaus)</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Which should you pick?</strong>
+      <p>Most Android projects use <strong>JUnit 4</strong> because every AndroidX Test tool is built on it. Pure-JVM modules (domain and data layers) are a natural place for <strong>JUnit 5</strong>. Using both in one project is fine: Vintage runs the old tests, Jupiter runs the new ones. Do not switch an existing project over for its own sake.</p>
+    </div>
+    <h3>Assertions</h3>
+    <p>JUnit ships with basic assertions: <code>assertEquals</code>, <code>assertTrue</code>, <code>assertFalse</code>, <code>assertNull</code>, <code>assertNotNull</code>, <code>assertSame</code>, <code>assertArrayEquals</code> and <code>assertThrows</code>. They are enough to start. Dedicated assertion libraries (next section) give you more readable failure messages and richer checks on lists, maps and objects.</p>
+
+    <h2 id="libs">5. The library map around JUnit</h2>
+    <p>JUnit runs tests. Everything else (comparing values nicely, replacing collaborators, handling coroutines, simulating Android, driving the UI) comes from libraries around it. This is the map, grouped by job. Pick <em>one</em> from most groups; you do not need them all. <strong>Every library name below links to its official page</strong>, which is also where you will find the current version.</p>
+
+    <h3>A. Test frameworks and runners</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact or plugin</th><th>What it is</th></tr>
+      <tr><td><a href="https://junit.org/junit4/" target="_blank" rel="noopener">JUnit 4</a></td><td><code>junit:junit</code></td><td>The default on Android. Rules, runners, the base for AndroidX Test.</td></tr>
+      <tr><td><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank" rel="noopener">JUnit 5 Jupiter</a></td><td><code>org.junit.jupiter:junit-jupiter</code></td><td>New API and engine. Add <code>junit-jupiter-params</code> for parameterised tests (the aggregate artifact includes it).</td></tr>
+      <tr><td><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank" rel="noopener">JUnit Vintage</a></td><td><code>org.junit.vintage:junit-vintage-engine</code></td><td>Runs JUnit 3 and 4 tests on the JUnit 5 platform.</td></tr>
+      <tr><td><a href="https://github.com/mannodermaus/android-junit5" target="_blank" rel="noopener">android-junit5</a></td><td>Gradle plugin <code>de.mannodermaus.android-junit5</code></td><td>JUnit 5 for <em>instrumented</em> tests.</td></tr>
+      <tr><td><a href="https://kotest.io/" target="_blank" rel="noopener">Kotest</a></td><td><code>io.kotest:kotest-runner-junit5</code></td><td>A Kotlin-first framework with many test styles (describe/it, should, behaviour spec), data-driven tests, its own assertions and property testing.</td></tr>
+      <tr><td><a href="https://kotlinlang.org/api/latest/kotlin.test/" target="_blank" rel="noopener">kotlin.test</a></td><td><code>org.jetbrains.kotlin:kotlin-test</code></td><td>Kotlin&rsquo;s own small assertion API (<code>assertEquals</code>, <code>assertFailsWith</code>) that works on top of JUnit and is also used in multiplatform code.</td></tr>
+      <tr><td><a href="https://testng.org/" target="_blank" rel="noopener">TestNG</a></td><td><code>org.testng:testng</code></td><td>An older alternative to JUnit. Rare on Android.</td></tr>
+    </table>
+
+    <h3>B. Assertion libraries</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact</th><th>Style</th></tr>
+      <tr><td><a href="https://truth.dev/" target="_blank" rel="noopener">Google Truth</a></td><td><code>com.google.truth:truth</code></td><td><code>assertThat(list).containsExactly("a", "b")</code>. Very readable failure messages. The usual choice in Google and AndroidX code.</td></tr>
+      <tr><td><a href="https://assertj.github.io/doc/" target="_blank" rel="noopener">AssertJ</a></td><td><code>org.assertj:assertj-core</code></td><td>Fluent <code>assertThat(x).isEqualTo(y)</code> with a huge set of checks.</td></tr>
+      <tr><td><a href="https://hamcrest.org/" target="_blank" rel="noopener">Hamcrest</a></td><td><code>org.hamcrest:hamcrest</code></td><td>Matchers: <code>assertThat(x, equalTo(y))</code>. Used by Espresso&rsquo;s view matchers.</td></tr>
+      <tr><td><a href="https://github.com/MarkusAmshove/Kluent" target="_blank" rel="noopener">Kluent</a></td><td><code>org.amshove.kluent:kluent</code></td><td>Kotlin infix style: <code>x shouldBeEqualTo y</code>.</td></tr>
+      <tr><td><a href="https://strikt.io/" target="_blank" rel="noopener">Strikt</a></td><td><code>io.strikt:strikt-core</code></td><td>Kotlin assertions: <code>expectThat(x).isEqualTo(y)</code>, with chained property checks.</td></tr>
+      <tr><td><a href="https://kotest.io/docs/assertions/assertions.html" target="_blank" rel="noopener">Kotest assertions</a></td><td><code>io.kotest:kotest-assertions-core</code></td><td><code>x shouldBe y</code>, usable without the Kotest runner.</td></tr>
+    </table>
+
+    <h3>C. Mocking and test doubles</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact</th><th>Notes</th></tr>
+      <tr><td><a href="https://mockk.io/" target="_blank" rel="noopener">MockK</a></td><td><code>io.mockk:mockk</code> and <code>mockk-android</code></td><td>Mocking written for Kotlin. Handles final classes, <code>suspend</code> functions (<code>coEvery</code>, <code>coVerify</code>), objects and extension functions. The usual choice for Kotlin projects.</td></tr>
+      <tr><td><a href="https://site.mockito.org/" target="_blank" rel="noopener">Mockito</a></td><td><code>org.mockito:mockito-core</code> and <code>mockito-android</code></td><td>The long-standing Java standard. From Mockito 5 the inline mock maker is the default, so Kotlin&rsquo;s final classes can be mocked.</td></tr>
+      <tr><td><a href="https://github.com/mockito/mockito-kotlin" target="_blank" rel="noopener">mockito-kotlin</a></td><td><code>org.mockito.kotlin:mockito-kotlin</code></td><td>Kotlin-friendly helpers on top of Mockito (<code>mock&lt;T&gt;()</code>, <code>whenever</code>, <code>argumentCaptor</code>).</td></tr>
+      <tr><td><a href="https://github.com/powermock/powermock" target="_blank" rel="noopener">PowerMock</a></td><td>&mdash;</td><td>Legacy way to mock statics and finals. Avoid it in new code; MockK and Mockito 5 cover the need.</td></tr>
+      <tr><td>Hand-written fakes</td><td>none</td><td>A small in-memory class that implements your interface. Often the best double (see section 6).</td></tr>
+    </table>
+
+    <h3>D. Coroutines, Flow and architecture components</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact</th><th>Use</th></tr>
+      <tr><td><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/" target="_blank" rel="noopener">kotlinx-coroutines-test</a></td><td><code>org.jetbrains.kotlinx:kotlinx-coroutines-test</code></td><td><code>runTest</code>, <code>TestScope</code>, <code>StandardTestDispatcher</code>, <code>UnconfinedTestDispatcher</code>, <code>Dispatchers.setMain</code>. Delays run in virtual time, so a 10-second wait costs nothing.</td></tr>
+      <tr><td><a href="https://github.com/cashapp/turbine" target="_blank" rel="noopener">Turbine</a></td><td><code>app.cash.turbine:turbine</code></td><td>Test a <code>Flow</code> by awaiting its items one at a time: <code>flow.test { awaitItem() }</code>.</td></tr>
+      <tr><td><a href="https://developer.android.com/jetpack/androidx/releases/arch-core" target="_blank" rel="noopener">Arch core testing</a></td><td><code>androidx.arch.core:core-testing</code></td><td><code>InstantTaskExecutorRule</code> makes LiveData run immediately in tests.</td></tr>
+      <tr><td><a href="https://developer.android.com/jetpack/androidx/releases/lifecycle" target="_blank" rel="noopener">Lifecycle testing</a></td><td><code>androidx.lifecycle:lifecycle-runtime-testing</code></td><td><code>TestLifecycleOwner</code> to move a lifecycle through its states.</td></tr>
+      <tr><td><a href="https://developer.android.com/topic/libraries/architecture/workmanager/how-to/testing-worker-impl" target="_blank" rel="noopener">WorkManager testing</a></td><td><code>androidx.work:work-testing</code></td><td>Run workers synchronously and control constraints.</td></tr>
+      <tr><td><a href="https://developer.android.com/guide/navigation/testing" target="_blank" rel="noopener">Navigation testing</a></td><td><code>androidx.navigation:navigation-testing</code></td><td><code>TestNavHostController</code> to check destinations.</td></tr>
+    </table>
+
+    <h3>E. Android on the JVM</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact</th><th>Use</th></tr>
+      <tr><td><a href="https://robolectric.org/" target="_blank" rel="noopener">Robolectric</a></td><td><code>org.robolectric:robolectric</code></td><td>Runs the Android framework on the JVM, so activities, views, resources and many system services work in a fast local test. Also runs Compose UI tests.</td></tr>
+      <tr><td><a href="https://developer.android.com/training/testing/instrumented-tests/androidx-test-libraries/test-setup" target="_blank" rel="noopener">AndroidX Test core</a></td><td><code>androidx.test:core</code>, <code>androidx.test.ext:junit</code></td><td><code>ApplicationProvider</code>, <code>ActivityScenario</code>, <code>AndroidJUnit4</code>. The <em>same</em> test can run on Robolectric or on a device.</td></tr>
+    </table>
+
+    <h3>F. Network, database and dependency injection</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact</th><th>Use</th></tr>
+      <tr><td><a href="https://github.com/square/okhttp/tree/master/mockwebserver" target="_blank" rel="noopener">MockWebServer</a></td><td><code>com.squareup.okhttp3:mockwebserver</code></td><td>A real local HTTP server that returns scripted responses. Tests your real Retrofit or OkHttp stack end to end, including errors and timeouts.</td></tr>
+      <tr><td><a href="https://github.com/square/retrofit/tree/trunk/retrofit-mock" target="_blank" rel="noopener">Retrofit Mock</a></td><td><code>com.squareup.retrofit2:retrofit-mock</code></td><td>Fake Retrofit services with simulated delay and failure.</td></tr>
+      <tr><td><a href="https://ktor.io/docs/client-testing.html" target="_blank" rel="noopener">Ktor MockEngine</a></td><td><code>io.ktor:ktor-client-mock</code></td><td>The same idea for Ktor clients.</td></tr>
+      <tr><td><a href="https://wiremock.org/" target="_blank" rel="noopener">WireMock</a></td><td><code>org.wiremock:wiremock</code></td><td>A heavier, more featureful HTTP stub server.</td></tr>
+      <tr><td><a href="https://developer.android.com/training/data-storage/room/testing-db" target="_blank" rel="noopener">Room testing</a></td><td><code>androidx.room:room-testing</code></td><td>Migration testing, plus in-memory databases for DAO tests.</td></tr>
+      <tr><td><a href="https://developer.android.com/training/dependency-injection/hilt-testing" target="_blank" rel="noopener">Hilt testing</a></td><td><code>com.google.dagger:hilt-android-testing</code></td><td><code>@HiltAndroidTest</code>, <code>@TestInstallIn</code> to swap real modules for fakes.</td></tr>
+      <tr><td><a href="https://insert-koin.io/docs/reference/koin-test/testing/" target="_blank" rel="noopener">Koin test</a></td><td><code>io.insert-koin:koin-test</code> (and the <code>-junit4</code> / <code>-junit5</code> modules)</td><td>Check your module graph and swap definitions.</td></tr>
+    </table>
+
+    <h3>G. UI and instrumented testing</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact</th><th>Use</th></tr>
+      <tr><td><a href="https://developer.android.com/training/testing/espresso" target="_blank" rel="noopener">Espresso</a></td><td><code>androidx.test.espresso:espresso-core</code></td><td>Drives your own app&rsquo;s View UI. Add <code>espresso-contrib</code> (RecyclerView, drawers), <code>espresso-intents</code> (intent checks), <code>espresso-idling-resource</code>, <code>espresso-web</code>.</td></tr>
+      <tr><td><a href="https://developer.android.com/jetpack/compose/testing" target="_blank" rel="noopener">Compose UI test</a></td><td><code>androidx.compose.ui:ui-test-junit4</code> and <code>ui-test-manifest</code></td><td>Finds and drives Compose nodes through the semantics tree.</td></tr>
+      <tr><td><a href="https://developer.android.com/training/testing/other-components/ui-automator" target="_blank" rel="noopener">UI Automator</a></td><td><code>androidx.test.uiautomator:uiautomator</code></td><td>Drives the whole device, including other apps and system UI.</td></tr>
+      <tr><td><a href="https://developer.android.com/training/testing/instrumented-tests/androidx-test-libraries/runner" target="_blank" rel="noopener">AndroidX Test runner and rules</a></td><td><code>androidx.test:runner</code>, <code>androidx.test:rules</code></td><td><code>AndroidJUnitRunner</code>, <code>GrantPermissionRule</code>, <code>ServiceTestRule</code>.</td></tr>
+      <tr><td><a href="https://developer.android.com/training/testing/instrumented-tests/androidx-test-libraries/runner" target="_blank" rel="noopener">Test Orchestrator</a></td><td><code>androidx.test:orchestrator</code></td><td>Runs each test in its own process so one crash or leaked state cannot spoil the next.</td></tr>
+      <tr><td><a href="https://developer.android.com/guide/fragments/test" target="_blank" rel="noopener">Fragment testing</a></td><td><code>androidx.fragment:fragment-testing</code></td><td><code>launchFragmentInContainer</code> to test a fragment on its own.</td></tr>
+      <tr><td><a href="https://github.com/AdevintaSpain/Barista" target="_blank" rel="noopener">Barista</a>, <a href="https://github.com/KakaoCup/Kakao" target="_blank" rel="noopener">Kakao</a>, <a href="https://github.com/KasperskyLab/Kaspresso" target="_blank" rel="noopener">Kaspresso</a></td><td>community libraries</td><td>Friendlier DSLs on top of Espresso. Kaspresso (from Kaspersky) also adds retries, logging and screenshots.</td></tr>
+      <tr><td><a href="https://developer.android.com/guide/topics/ui/accessibility/testing" target="_blank" rel="noopener">Accessibility checks</a></td><td>Espresso <code>AccessibilityChecks</code>, Compose accessibility checks</td><td>Fail the test when a touch target is too small or a label is missing.</td></tr>
+    </table>
+
+    <h3>H. Screenshot (snapshot) testing</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Plugin or artifact</th><th>Notes</th></tr>
+      <tr><td><a href="https://github.com/cashapp/paparazzi" target="_blank" rel="noopener">Paparazzi</a></td><td><code>app.cash.paparazzi</code></td><td>Renders views and composables on the JVM without a device, then compares to saved images. Fast.</td></tr>
+      <tr><td><a href="https://github.com/takahirom/roborazzi" target="_blank" rel="noopener">Roborazzi</a></td><td><code>io.github.takahirom.roborazzi</code></td><td>Screenshot tests on Robolectric.</td></tr>
+      <tr><td><a href="https://github.com/pedrovgs/Shot" target="_blank" rel="noopener">Shot</a></td><td><code>com.karumi.shot</code></td><td>Screenshot tests on a device, with a Gradle workflow to record and verify.</td></tr>
+      <tr><td><a href="https://developer.android.com/studio/preview/compose-screenshot-testing" target="_blank" rel="noopener">Compose Preview Screenshot Testing</a></td><td>Android Gradle plugin tooling</td><td>Google&rsquo;s own approach, which turns <code>@Preview</code> composables into screenshot tests. Still evolving, so check the current docs.</td></tr>
+    </table>
+
+    <h3>I. Coverage, property tests, BDD and contracts</h3>
+    <table class="lib">
+      <tr><th>Library</th><th>Artifact or plugin</th><th>Use</th></tr>
+      <tr><td><a href="https://www.jacoco.org/jacoco/" target="_blank" rel="noopener">JaCoCo</a></td><td>Gradle <code>jacoco</code> plugin</td><td>Coverage reports for JVM and Android code.</td></tr>
+      <tr><td><a href="https://github.com/Kotlin/kotlinx-kover" target="_blank" rel="noopener">Kover</a></td><td><code>org.jetbrains.kotlinx.kover</code></td><td>JetBrains&rsquo; Kotlin-aware coverage tool.</td></tr>
+      <tr><td><a href="https://jqwik.net/" target="_blank" rel="noopener">jqwik</a>, <a href="https://kotest.io/docs/proptest/property-based-testing.html" target="_blank" rel="noopener">Kotest property</a></td><td><code>net.jqwik:jqwik</code>, <code>kotest-property</code></td><td>Property-based testing: state a rule, and the library tries hundreds of generated inputs.</td></tr>
+      <tr><td><a href="https://pitest.org/" target="_blank" rel="noopener">PIT (Pitest)</a></td><td>Gradle PIT plugin</td><td>Mutation testing: it changes your code on purpose and checks that a test fails.</td></tr>
+      <tr><td><a href="https://github.com/cucumber/cucumber-android" target="_blank" rel="noopener">Cucumber Android</a></td><td><code>io.cucumber:cucumber-android</code></td><td>Behaviour-driven tests written in plain-language Gherkin.</td></tr>
+      <tr><td><a href="https://docs.pact.io/" target="_blank" rel="noopener">Pact</a></td><td><code>au.com.dius.pact</code></td><td>Contract tests between the app and its backend.</td></tr>
+    </table>
+
+    <h3>J. Devices and clouds</h3>
+    <table class="lib">
+      <tr><th>Option</th><th>What it gives you</th></tr>
+      <tr><td><a href="https://developer.android.com/studio/test/gradle-managed-devices" target="_blank" rel="noopener">Android Emulator and Gradle managed devices</a></td><td>Emulators created and torn down by Gradle itself, so the setup is the same on every machine.</td></tr>
+      <tr><td><a href="https://firebase.google.com/docs/test-lab" target="_blank" rel="noopener">Firebase Test Lab</a></td><td>Real and virtual devices in Google&rsquo;s data centres, with videos and logs.</td></tr>
+      <tr><td><a href="https://aws.amazon.com/device-farm/" target="_blank" rel="noopener">AWS Device Farm</a>, <a href="https://www.browserstack.com/" target="_blank" rel="noopener">BrowserStack</a>, <a href="https://saucelabs.com/" target="_blank" rel="noopener">Sauce Labs</a></td><td>Large pools of real devices you can run Espresso or Appium tests on.</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>A sensible starter stack</strong>
+      <ul>
+        <li><strong>Local:</strong> JUnit 4 (or 5 for pure modules), MockK, Truth (or Kluent), <code>kotlinx-coroutines-test</code>, Turbine.</li>
+        <li><strong>Integration:</strong> MockWebServer, an in-memory Room database, Hilt testing. Add Robolectric only when you need the framework on the JVM.</li>
+        <li><strong>UI:</strong> Compose UI test or Espresso for your own screens, a few flows.</li>
+        <li><strong>Visual:</strong> Paparazzi or Roborazzi for screenshots.</li>
+        <li><strong>Quality:</strong> Kover or JaCoCo for coverage.</li>
+      </ul>
+    </div>
+
+    <h2 id="doubles">6. Fakes, stubs and mocks</h2>
+    <p>A unit test should check one class, so everything that class depends on (a database, a server, the clock) is replaced with a stand-in. The stand-ins are called <strong>test doubles</strong>, and there are five kinds.</p>
+    <table class="gloss">
+      <tr><th>Double</th><th>What it does</th></tr>
+      <tr><td>Dummy</td><td>Fills a parameter that the test never uses.</td></tr>
+      <tr><td>Stub</td><td>Returns fixed answers: &ldquo;when asked for user 7, return Ana&rdquo;.</td></tr>
+      <tr><td>Fake</td><td>A working but simple implementation, such as a repository backed by a list in memory.</td></tr>
+      <tr><td>Spy</td><td>Wraps a real object and records how it was called.</td></tr>
+      <tr><td>Mock</td><td>Records calls and lets you <em>verify</em> them: &ldquo;the repository was asked to save exactly once&rdquo;.</td></tr>
+    </table>
+    <p>Here is the same login test written both ways. The service under test is the interface <code>UserRepository</code>.</p>
+<pre><code>interface UserRepository {
+    suspend fun login(email: String, password: String): Result&lt;User&gt;
+}
+
+// 1) A fake: a tiny real implementation. Reusable across many tests.
+class FakeUserRepository : UserRepository {
+    var failWith: Throwable? = null
+    override suspend fun login(email: String, password: String): Result&lt;User&gt; =
+        failWith?.let { Result.failure(it) } ?: Result.success(User(email))
+}
+
+// 2) A mock: a recorded stand-in, scripted per test.
+val repo = mockk&lt;UserRepository&gt;()
+coEvery { repo.login("a@b.com", "bad") } returns Result.failure(IllegalArgumentException())
+// ... run the code ...
+coVerify(exactly = 1) { repo.login("a@b.com", "bad") }</code></pre>
+    <div class="good">
+      <strong>Habits that keep doubles healthy</strong>
+      <ul>
+        <li><strong>Prefer fakes for things with state</strong> (repositories, data sources). They survive refactors because they test <em>behaviour</em>, not call order.</li>
+        <li><strong>Use mocks at the edges</strong>, when the interaction itself is the thing you care about (an analytics event was sent).</li>
+        <li><strong>Do not mock what you do not own.</strong> Wrap the third-party class behind your own interface, and double that.</li>
+        <li><strong>Do not mock simple data classes.</strong> Create real ones.</li>
+        <li><strong>Inject dependencies</strong> through the constructor. A class that builds its own collaborators cannot be tested in isolation.</li>
+      </ul>
+    </div>
+
+    <h2 id="async">7. Testing coroutines, Flow and ViewModels</h2>
+    <p>Most Android logic is asynchronous, and asynchronous tests are where beginners get stuck. The fix is to control time and threads. <code>kotlinx-coroutines-test</code> gives you <code>runTest</code>, which runs a coroutine on a virtual clock: a <code>delay(5_000)</code> completes instantly, and the test is deterministic.</p>
+    <h3>Replace the Main dispatcher</h3>
+    <p>A <code>ViewModel</code> launches work on <code>Dispatchers.Main</code>, which does not exist in a local test. Replace it with a test dispatcher using a rule you write once:</p>
+<pre><code>class MainDispatcherRule(
+    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
+) : TestWatcher() {
+    override fun starting(description: Description) = Dispatchers.setMain(dispatcher)
+    override fun finished(description: Description) = Dispatchers.resetMain()
+}</code></pre>
+    <h3>A ViewModel test</h3>
+<pre><code>data class LoginState(
+    val loading: Boolean = false,
+    val loggedIn: Boolean = false,
+    val error: String? = null
+)
+
+class LoginViewModel(private val repo: UserRepository) : ViewModel() {
+    private val _state = MutableStateFlow(LoginState())
+    val state: StateFlow&lt;LoginState&gt; = _state.asStateFlow()
+
+    fun onLoginClicked(email: String, password: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(loading = true, error = null) }
+            repo.login(email, password)
+                .onSuccess { _state.update { s -&gt; s.copy(loading = false, loggedIn = true) } }
+                .onFailure { _state.update { s -&gt; s.copy(loading = false, error = "Wrong email or password") } }
+        }
+    }
+}
+
+class LoginViewModelTest {
+
+    @get:Rule val mainRule = MainDispatcherRule()
+
+    private val repo = FakeUserRepository()
+
+    @Test
+    fun `wrong password shows an error and stops loading`() = runTest {
+        repo.failWith = IllegalArgumentException()
+        val viewModel = LoginViewModel(repo)
+
+        viewModel.onLoginClicked("a@b.com", "bad")
+
+        val state = viewModel.state.value
+        assertEquals("Wrong email or password", state.error)
+        assertFalse(state.loading)
+        assertFalse(state.loggedIn)
+    }
+}</code></pre>
+    <h3>Testing a Flow with Turbine</h3>
+    <p>A <code>Flow</code> emits several values over time. Turbine collects them into a queue and lets you read them in order, with a timeout so a test cannot hang forever.</p>
+<pre><code>@Test
+fun `emits loading, then the result, then completes`() = runTest {
+    val flow = flow { emit("loading"); delay(100); emit("done") }
+
+    flow.test {
+        assertEquals("loading", awaitItem())
+        assertEquals("done", awaitItem())
+        awaitComplete()
+    }
+}</code></pre>
+    <div class="note">
+      <p><strong>Two traps.</strong> A <code>StateFlow</code> is <em>conflated</em>: if it changes twice before you collect, you see only the last value, so check the final state or use an unconfined dispatcher when you need every step. And LiveData needs <code>InstantTaskExecutorRule</code> in local tests, otherwise it throws because it expects the Android main looper.</p>
+    </div>
+    <p>Pass the dispatcher into your classes (<code>class Repo(private val io: CoroutineDispatcher)</code>) rather than hard-coding <code>Dispatchers.IO</code>. A test can then supply its own and run everything on one thread.</p>
+
+    <h2 id="instrumented">8. Instrumentation tests: Espresso, Compose and UI Automator</h2>
+    <p>An <strong>instrumentation test</strong> runs on a real device or emulator. Gradle builds your app and a second &ldquo;test APK&rdquo;, installs both, and starts <code>AndroidJUnitRunner</code>. The test process runs in the <em>same process</em> as your app, so it can reach into your code, start activities and read the live UI.</p>
+<pre><code>// build.gradle.kts
+android {
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"   // wipe app data between tests (with the orchestrator)
+    }
+    testOptions {
+        animationsDisabled = true                          // no animations while testing
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"           // each test in a fresh process
+    }
+}
+dependencies {
+    androidTestImplementation("androidx.test.ext:junit:&lt;version&gt;")
+    androidTestImplementation("androidx.test.espresso:espresso-core:&lt;version&gt;")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:&lt;version&gt;")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:&lt;version&gt;")
+    androidTestUtil("androidx.test:orchestrator:&lt;version&gt;")
+}</code></pre>
+    <h3>Espresso (Views)</h3>
+    <p>Espresso&rsquo;s trick is built-in synchronisation. Before each action it waits until the main thread is idle and background work it knows about (AsyncTask, its own idling resources) is finished. That is why Espresso tests are far more stable than tests that sleep. A test has three parts: <strong>find</strong> a view (<code>onView(withId(...))</code>), <strong>act</strong> on it (<code>perform(click())</code>), <strong>assert</strong> (<code>check(matches(isDisplayed()))</code>).</p>
+<pre><code>@RunWith(AndroidJUnit4::class)
+class LoginScreenTest {
+
+    @get:Rule val rule = ActivityScenarioRule(LoginActivity::class.java)
+
+    @Test
+    fun wrongPasswordShowsError() {
+        onView(withId(R.id.email)).perform(typeText("a@b.com"), closeSoftKeyboard())
+        onView(withId(R.id.password)).perform(typeText("bad"), closeSoftKeyboard())
+        onView(withId(R.id.loginButton)).perform(click())
+
+        onView(withText("Wrong email or password")).check(matches(isDisplayed()))
+    }
+}</code></pre>
+    <ul>
+      <li><strong>Lists:</strong> use <code>RecyclerViewActions</code> from <code>espresso-contrib</code> to scroll to or click an item.</li>
+      <li><strong>Intents:</strong> <code>espresso-intents</code> lets you check <code>intended(hasComponent(...))</code> and stub the result of another app.</li>
+      <li><strong>Background work:</strong> register an <code>IdlingResource</code> so Espresso waits for your custom thread pool or network client.</li>
+    </ul>
+    <h3>Compose UI tests</h3>
+    <p>Compose has no Views, so tests use the <strong>semantics tree</strong>: the description of the UI that accessibility services also read. You find nodes, perform actions and make assertions. Compose&rsquo;s test framework synchronises with recomposition automatically.</p>
+<pre><code>class LoginScreenComposeTest {
+
+    @get:Rule val rule = createAndroidComposeRule&lt;MainActivity&gt;()
+
+    @Test
+    fun wrongPasswordShowsError() {
+        rule.onNodeWithTag("email").performTextInput("a@b.com")
+        rule.onNodeWithTag("password").performTextInput("bad")
+        rule.onNodeWithText("Log in").performClick()
+
+        rule.onNodeWithText("Wrong email or password").assertIsDisplayed()
+    }
+}</code></pre>
+    <p>To test one composable on its own, use <code>createComposeRule()</code> and call <code>rule.setContent { LoginScreen(...) }</code>. That is faster than launching the whole activity, and it can run on Robolectric as well. Add <code>Modifier.testTag("email")</code> to nodes that have no unique visible text. For waits that are not tied to recomposition, use <code>rule.waitUntil { ... }</code>.</p>
+    <h3>UI Automator</h3>
+    <p>Espresso and Compose tests can see only <em>your</em> app. <strong>UI Automator</strong> sees the whole screen, so it can press Home, open the notification shade, grant a system permission dialog, or switch between apps.</p>
+<pre><code>val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+device.openNotification()
+device.wait(Until.hasObject(By.text("Order shipped")), 5_000)
+device.findObject(By.text("Order shipped")).click()</code></pre>
+    <h3>Choosing between them</h3>
+    <table>
+      <tr><th>Tool</th><th>Sees</th><th>Runs</th><th>Best for</th></tr>
+      <tr><td><strong>Espresso</strong></td><td>Your app&rsquo;s Views</td><td>Device or emulator (or Robolectric)</td><td>Screens and flows in a View-based app</td></tr>
+      <tr><td><strong>Compose UI test</strong></td><td>Your app&rsquo;s composables</td><td>Device, emulator or Robolectric</td><td>Screens and flows in a Compose app</td></tr>
+      <tr><td><strong>UI Automator</strong></td><td>Any app and the system UI</td><td>Device or emulator</td><td>Permissions, notifications, deep links, multi-app flows</td></tr>
+      <tr><td><strong>Robolectric</strong></td><td>Your app, simulated</td><td>JVM, no device</td><td>Fast UI and framework tests where full fidelity is not needed</td></tr>
+    </table>
+    <p>These tools combine well: a Compose test for the screen, UI Automator for the permission dialog that appears on first launch.</p>
+
+    <h2 id="appium">9. UI automation and Appium</h2>
+    <p><strong>UI automation</strong> means a program drives the app&rsquo;s user interface the way a person would: tap, type, scroll, read the screen. Espresso is UI automation from the <em>inside</em>. <strong><a href="https://appium.io/" target="_blank" rel="noopener">Appium</a></strong> is UI automation from the <em>outside</em>.</p>
+    <p>Appium is an open-source tool that exposes a standard web-automation protocol (the <a href="https://www.w3.org/TR/webdriver/" target="_blank" rel="noopener">W3C WebDriver</a> protocol, the same one <a href="https://www.selenium.dev/" target="_blank" rel="noopener">Selenium</a> uses) for mobile apps. You write a script in almost any language, Appium translates each command into a call to a platform driver, and the driver operates the device. It sees the app as a black box, with no access to your source code.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="A test script in Kotlin, Java, Python or JavaScript sends WebDriver commands over HTTP to the Appium server. The server calls the UiAutomator2 driver, which operates the device or emulator and the app under test.">
+        <rect class="boxb" x="8"   y="50" width="128" height="62" rx="12"/><text class="b c" x="72"  y="76">Test script</text><text class="sub c" x="72"  y="94">Kotlin, Java, Python</text>
+        <rect class="boxo" x="176" y="50" width="130" height="62" rx="12"/><text class="b c" x="241" y="76">Appium server</text><text class="sub c" x="241" y="94">Node.js, port 4723</text>
+        <rect class="boxp" x="346" y="50" width="130" height="62" rx="12"/><text class="b c" x="411" y="76">Driver</text><text class="sub c" x="411" y="94">UiAutomator2</text>
+        <rect class="boxg" x="516" y="50" width="118" height="62" rx="12"/><text class="b c" x="575" y="76">Device</text><text class="sub c" x="575" y="94">app under test</text>
+        <path class="arrow" d="M138,81 L172,81"/><path class="arrow" d="M308,81 L342,81"/><path class="arrow" d="M478,81 L512,81"/>
+        <text class="sub c" x="155" y="42">HTTP</text><text class="sub c" x="325" y="42">command</text><text class="sub c" x="495" y="42">ADB</text>
+        <text class="sub c" x="320" y="146">One protocol on the left, a different driver on the right for each platform.</text>
+      </svg>
+      <figcaption>Appium separates what you write (a script) from how it is carried out (a driver). Swap the driver and the same ideas work on iOS.</figcaption>
+    </figure>
+    <h3>What makes Appium different</h3>
+    <ul>
+      <li><strong>Cross-platform.</strong> The <a href="https://github.com/appium/appium-uiautomator2-driver" target="_blank" rel="noopener">UiAutomator2 driver</a> covers Android and the XCUITest driver covers iOS, with the same client API. There are also Espresso, Flutter and other drivers, and Appium 2 installs drivers as plugins.</li>
+      <li><strong>Any language.</strong> Official clients exist for Java (usable from Kotlin), Python, JavaScript, Ruby and C#.</li>
+      <li><strong>Black-box.</strong> You test the installed APK, even a release build, the way a customer would. You cannot reach into the app&rsquo;s internals.</li>
+      <li><strong>Real devices and clouds.</strong> Device farms like BrowserStack, Sauce Labs and AWS Device Farm speak Appium natively.</li>
+      <li><strong><a href="https://github.com/appium/appium-inspector" target="_blank" rel="noopener">Appium Inspector</a>.</strong> A desktop app where you click an element on a live screen and see its locators.</li>
+    </ul>
+    <h3>Set it up</h3>
+<pre><code># You need Node.js, a JDK and the Android SDK (ANDROID_HOME set)
+npm install -g appium
+appium driver install uiautomator2
+appium driver list --installed
+appium                       # starts the server at http://127.0.0.1:4723</code></pre>
+    <h3>Write a test (Kotlin, JUnit and the <a href="https://github.com/appium/java-client" target="_blank" rel="noopener">Java client</a>)</h3>
+<pre><code>dependencies {
+    testImplementation("io.appium:java-client:&lt;version&gt;")
+    testImplementation("org.seleniumhq.selenium:selenium-java:&lt;version&gt;")
+}
+
+class LoginAppiumTest {
+
+    private lateinit var driver: AndroidDriver
+
+    @Before
+    fun start() {
+        val options = UiAutomator2Options()
+            .setDeviceName("Android Emulator")
+            .setApp("/path/to/app-debug.apk")
+        driver = AndroidDriver(URI("http://127.0.0.1:4723").toURL(), options)
+    }
+
+    @Test
+    fun wrongPasswordShowsError() {
+        driver.findElement(AppiumBy.accessibilityId("email")).sendKeys("a@b.com")
+        driver.findElement(AppiumBy.accessibilityId("password")).sendKeys("bad")
+        driver.findElement(AppiumBy.accessibilityId("loginButton")).click()
+
+        val error = WebDriverWait(driver, Duration.ofSeconds(5)).until(
+            ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("error"))
+        )
+        assertEquals("Wrong email or password", error.text)
+    }
+
+    @After
+    fun stop() = driver.quit()
+}</code></pre>
+    <h3>Locators: how Appium finds an element</h3>
+    <table>
+      <tr><th>Locator</th><th>Example</th><th>Verdict</th></tr>
+      <tr><td><strong>Accessibility id</strong></td><td><code>AppiumBy.accessibilityId("loginButton")</code></td><td>Best. Uses the content description, so it also improves accessibility, and it works across platforms.</td></tr>
+      <tr><td><strong>Resource id</strong></td><td><code>AppiumBy.id("com.example:id/email")</code></td><td>Good for Views. Stable as long as ids are not renamed.</td></tr>
+      <tr><td><strong>UiSelector</strong></td><td><code>AppiumBy.androidUIAutomator("new UiSelector().text(\"Log in\")")</code></td><td>Powerful, Android-only. Text-based selectors break when copy or language changes.</td></tr>
+      <tr><td><strong>XPath</strong></td><td><code>AppiumBy.xpath("//*[@text='Log in']")</code></td><td>Last resort. Slow and brittle.</td></tr>
+    </table>
+    <div class="note">
+      <p><strong>Compose tip.</strong> By default, Appium cannot see a composable&rsquo;s <code>testTag</code>. Turn it into a resource id once, near the root of your UI, and <code>AppiumBy.id("email")</code> will find <code>Modifier.testTag("email")</code>:</p>
+<pre><code>@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun AppRoot() {
+    Box(Modifier.semantics { testTagsAsResourceId = true }) {
+        // your screens
+    }
+}</code></pre>
+    </div>
+    <h3>Appium or Espresso?</h3>
+    <table>
+      <tr><th></th><th>Espresso / Compose test</th><th>Appium</th></tr>
+      <tr><td><strong>Position</strong></td><td>Inside the app process</td><td>Outside, over the network</td></tr>
+      <tr><td><strong>Speed and stability</strong></td><td>Faster. Automatic synchronisation with the UI thread</td><td>Slower. You write explicit waits</td></tr>
+      <tr><td><strong>Language</strong></td><td>Kotlin or Java only</td><td>Almost any</td></tr>
+      <tr><td><strong>Platforms</strong></td><td>Android only</td><td>Android, iOS and more, with shared test code</td></tr>
+      <tr><td><strong>Access to app code</strong></td><td>Yes: fakes, DI, internal state</td><td>No: only what the user sees</td></tr>
+      <tr><td><strong>Who writes it</strong></td><td>Developers</td><td>Developers or a separate QA team</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Many screen-level tests that run on every pull request</td><td>A small set of release-level journeys, or one test suite for two platforms</td></tr>
+    </table>
+    <p>Neither replaces the other. A common split is Espresso or Compose tests for most UI checks, and a short Appium suite for the handful of flows the business cannot afford to break (sign-up, purchase, login).</p>
+    <h3>Other UI automation tools</h3>
+    <table class="lib">
+      <tr><th>Tool</th><th>Notes</th></tr>
+      <tr><td><a href="https://maestro.mobile.dev/" target="_blank" rel="noopener">Maestro</a></td><td>Flows written in simple YAML, with built-in waiting. Android, iOS and web. Very quick to start. Example below.</td></tr>
+      <tr><td><a href="https://wix.github.io/Detox/" target="_blank" rel="noopener">Detox</a></td><td>Gray-box end-to-end testing for React Native.</td></tr>
+      <tr><td><a href="https://github.com/KasperskyLab/Kaspresso" target="_blank" rel="noopener">Kaspresso</a>, <a href="https://github.com/KakaoCup/Kakao" target="_blank" rel="noopener">Kakao</a>, <a href="https://github.com/AdevintaSpain/Barista" target="_blank" rel="noopener">Barista</a></td><td>Wrappers that make Espresso code shorter and add retries or screenshots.</td></tr>
+      <tr><td><a href="https://katalon.com/" target="_blank" rel="noopener">Katalon</a>, <a href="https://smartbear.com/product/testcomplete/" target="_blank" rel="noopener">TestComplete</a> and similar</td><td>Commercial suites with record-and-replay and reporting.</td></tr>
+      <tr><td><a href="https://github.com/RobotiumTech/robotium" target="_blank" rel="noopener">Robotium</a>, <a href="https://github.com/calabash/calabash-android" target="_blank" rel="noopener">Calabash</a>, <a href="https://github.com/selendroid/selendroid" target="_blank" rel="noopener">Selendroid</a></td><td>Older tools. Largely replaced by Espresso, UI Automator and Appium.</td></tr>
+    </table>
+<pre><code># login.yaml  (run with: maestro test login.yaml)
+appId: com.example.app
+---
+- launchApp
+- tapOn: "Email"
+- inputText: "a@b.com"
+- tapOn: "Password"
+- inputText: "bad"
+- tapOn: "Log in"
+- assertVisible: "Wrong email or password"</code></pre>
+
+    <h2 id="reliable">10. Keeping UI tests reliable</h2>
+    <p>A <strong>flaky</strong> test passes and fails on the same code. Flaky tests are poison: a red build that people rerun until it turns green teaches them to ignore red. Almost every flaky UI test comes from one of a few causes.</p>
+    <table>
+      <tr><th>Cause</th><th>Fix</th></tr>
+      <tr><td>Animations and transitions</td><td>Turn them off for tests: <code>testOptions.animationsDisabled = true</code>, or set the three developer-option animation scales to 0 on CI devices.</td></tr>
+      <tr><td>Timing: acting before the UI is ready</td><td>Use the framework&rsquo;s sync (Espresso, Compose), an <code>IdlingResource</code> for custom async work, or an explicit wait in Appium. <strong>Never use <code>Thread.sleep</code>.</strong></td></tr>
+      <tr><td>Shared state between tests</td><td>Use Test Orchestrator with <code>clearPackageData</code>, create fresh data per test, and never let one test depend on another.</td></tr>
+      <tr><td>Real network and real backends</td><td>Point the app at MockWebServer or a staging stub so responses are the same every run.</td></tr>
+      <tr><td>Test data and accounts</td><td>Create the data you need inside the test (an API call or a database insert), not by hand beforehand.</td></tr>
+      <tr><td>Slow or unhealthy emulators</td><td>Use managed devices or a fixed image, enough RAM, hardware acceleration, and a cold start per job.</td></tr>
+      <tr><td>Screen size and OS differences</td><td>Pick locators that do not depend on position. Run on a small matrix, not on every device.</td></tr>
+    </table>
+    <h3>The robot pattern</h3>
+    <p>If the test file knows every id and tag, one UI change breaks fifty tests. Put those details in a small helper class (a <em>robot</em> or <em>page object</em>) so tests read like the story and a UI change is fixed in one place.</p>
+<pre><code>class LoginRobot(private val rule: ComposeTestRule) {
+    fun typeEmail(value: String) = apply { rule.onNodeWithTag("email").performTextInput(value) }
+    fun typePassword(value: String) = apply { rule.onNodeWithTag("password").performTextInput(value) }
+    fun tapLogin() = apply { rule.onNodeWithText("Log in").performClick() }
+    fun assertError(message: String) = apply { rule.onNodeWithText(message).assertIsDisplayed() }
+}
+
+@Test
+fun wrongPasswordShowsError() {
+    LoginRobot(rule)
+        .typeEmail("a@b.com")
+        .typePassword("bad")
+        .tapLogin()
+        .assertError("Wrong email or password")
+}</code></pre>
+    <h3>Run them in continuous integration</h3>
+    <p>UI tests that no one runs are decoration. Run unit tests on every pull request, because they take seconds. Run a small UI suite on every pull request too if it stays under about ten minutes, and the full suite nightly or before release.</p>
+<pre><code># .github/workflows/ui-tests.yml (excerpt)
+- uses: reactivecircus/android-emulator-runner@v2
+  with:
+    api-level: 34
+    arch: x86_64
+    script: ./gradlew connectedDebugAndroidTest</code></pre>
+    <p>The snippet uses the <a href="https://github.com/ReactiveCircus/android-emulator-runner" target="_blank" rel="noopener">android-emulator-runner</a> action. On Linux runners the emulator needs hardware acceleration (KVM) to be usable. Keep a rule for flaky tests: quarantine them quickly so they stop blocking others, fix them within a set time, and track how many reruns the pipeline performs. One automatic retry is a reasonable safety net. Three retries hide a real problem.</p>
+
+    <h2 id="tdd">11. TDD: red, green, refactor</h2>
+    <p><strong>Test-driven development</strong> turns the usual order around. You write a failing test <em>first</em>, then write just enough code to make it pass, then clean up. You repeat this in very small steps, each a minute or two long.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 160" role="img" aria-label="The TDD cycle: Red, write a failing test; Green, make it pass with the simplest code; Refactor, clean up while the tests stay green; then back to Red.">
+        <rect class="boxr" x="24"  y="30" width="172" height="62" rx="14"/><text class="b c" x="110" y="56">1. Red</text><text class="sub c" x="110" y="76">Write a failing test</text>
+        <rect class="boxg" x="234" y="30" width="172" height="62" rx="14"/><text class="b c" x="320" y="56">2. Green</text><text class="sub c" x="320" y="76">Make it pass, simply</text>
+        <rect class="boxb" x="444" y="30" width="172" height="62" rx="14"/><text class="b c" x="530" y="56">3. Refactor</text><text class="sub c" x="530" y="76">Clean up, stay green</text>
+        <path class="arrow" d="M198,61 L230,61"/><path class="arrow" d="M408,61 L440,61"/>
+        <path class="rule" d="M530,94 L530,128 L110,128 L110,96" style="marker-end:url(#arr)"/>
+        <text class="sub c" x="320" y="148">Repeat. Each lap adds one small behaviour.</text>
+      </svg>
+      <figcaption>The loop is short on purpose. If a step takes more than a few minutes, the step was too big.</figcaption>
+    </figure>
+    <p>Robert C. Martin (&ldquo;Uncle Bob&rdquo;) states it as three rules: do not write production code until you have a failing test; do not write more of a test than is enough to fail (a compile error counts); do not write more production code than is enough to pass the failing test.</p>
+    <h3>A walk-through</h3>
+    <p>We want the discount rule from section 4. We build it in three laps.</p>
+    <p><strong>Lap 1, Red.</strong> Write the first test. It does not even compile, because <code>DiscountCalculator</code> does not exist yet. Create it with a body that fails.</p>
+<pre><code>@Test fun `10 percent off at 5000 or more`() {
+    assertEquals(9_000, DiscountCalculator().priceAfterDiscount(10_000))
+}
+
+class DiscountCalculator {
+    fun priceAfterDiscount(price: Int): Int = TODO()      // test is red
+}</code></pre>
+    <p><strong>Lap 1, Green.</strong> Write the simplest code that passes. Not the final code, just the simplest.</p>
+<pre><code>fun priceAfterDiscount(price: Int): Int = price - price / 10      // green</code></pre>
+    <p><strong>Lap 2, Red.</strong> Add the next rule as a new test. Small orders must not get a discount.</p>
+<pre><code>@Test fun `no discount below the threshold`() {
+    assertEquals(4_000, DiscountCalculator().priceAfterDiscount(4_000))   // red: returns 3,600
+}</code></pre>
+    <p><strong>Lap 2, Green.</strong> The failing test forces the condition into existence.</p>
+<pre><code>fun priceAfterDiscount(price: Int): Int =
+    if (price &gt;= 5_000) price - price / 10 else price                    // green</code></pre>
+    <p><strong>Lap 3, Red and Green.</strong> Add a test for negative prices that expects <code>IllegalArgumentException</code>, then add <code>require(price &gt;= 0)</code>.</p>
+    <p><strong>Refactor.</strong> With three green tests as a net, tidy the code: name the magic numbers and keep the tests passing.</p>
+<pre><code>class DiscountCalculator {
+    private companion object {
+        const val THRESHOLD = 5_000
+        const val PERCENT_OFF = 10
+    }
+
+    fun priceAfterDiscount(price: Int): Int {
+        require(price &gt;= 0) { "price must not be negative" }
+        return if (price &gt;= THRESHOLD) price - price * PERCENT_OFF / 100 else price
+    }
+}</code></pre>
+
+    <h3>The benefits of TDD</h3>
+    <table>
+      <tr><th>Benefit</th><th>Why it happens</th></tr>
+      <tr><td>Better design</td><td>Code that is hard to test is hard to use. Writing the test first forces small classes, clear interfaces and injected dependencies.</td></tr>
+      <tr><td>Fewer bugs reach later stages</td><td>Every behaviour has a test before it exists, so gaps show up while you are still in the code.</td></tr>
+      <tr><td>A safety net for change</td><td>You can refactor freely, because a broken behaviour turns a test red within seconds.</td></tr>
+      <tr><td>Tests as documentation</td><td>Test names describe what the code does, and they cannot go out of date without failing.</td></tr>
+      <tr><td>Less over-building</td><td>You write only what the next failing test needs, which keeps unused features out.</td></tr>
+      <tr><td>Less time in the debugger</td><td>Steps are tiny, so when something breaks, the cause is in the last few lines.</td></tr>
+      <tr><td>Useful coverage by default</td><td>Every line exists because a test asked for it.</td></tr>
+      <tr><td>Confidence and focus</td><td>One small goal at a time lowers the stress of big changes.</td></tr>
+      <tr><td>Easier reviews and onboarding</td><td>A new teammate can read the tests to learn what the code promises.</td></tr>
+    </table>
+    <h3>The costs, honestly</h3>
+    <ul>
+      <li><strong>It is slower at first.</strong> Expect a dip in speed while the habit forms. An often-cited study of four industrial teams reported 40% to 90% fewer defects with 15% to 35% more initial effort. Other studies found smaller or mixed effects, so treat TDD as a good bet, not a guarantee.</li>
+      <li><strong>It has a learning curve.</strong> Writing a good first test needs you to understand the requirement and the design in advance.</li>
+      <li><strong>Bad tests give false confidence.</strong> A test suite that checks implementation details breaks on every refactor and slows you down.</li>
+      <li><strong>Over-mocking couples tests to code.</strong> If a test mirrors the production code line by line, it protects nothing.</li>
+      <li><strong>It suits some work more than other work.</strong> Logic with clear rules is a great fit. Exploratory work, quick prototypes and pixel-level UI are not.</li>
+      <li><strong>Tests need upkeep.</strong> They are code you now own.</li>
+    </ul>
+    <h3>Where TDD works best on Android</h3>
+    <ul>
+      <li><strong>Great fit:</strong> use cases, validators, mappers, reducers, ViewModels, repositories with fakes, parsers, anything with rules and edge cases.</li>
+      <li><strong>Good fit with care:</strong> network and database layers, using MockWebServer and in-memory Room.</li>
+      <li><strong>Poor fit:</strong> the visual design of a screen. Build it, then add a screenshot test or a short UI test after.</li>
+      <li><strong>Make it possible:</strong> keep the Android framework at the edges. Put logic in plain Kotlin classes behind interfaces and let Activities and Fragments stay thin (the &ldquo;humble object&rdquo; idea).</li>
+    </ul>
+    <h3>Cousins of TDD</h3>
+    <table class="gloss">
+      <tr><th>Name</th><th>What it adds</th></tr>
+      <tr><td>ATDD</td><td>Acceptance-test-driven development. The first failing test is a high-level acceptance test agreed with the product owner, and unit-level TDD fills in the details.</td></tr>
+      <tr><td>BDD</td><td>Behaviour-driven development. Tests are written as <em>Given, When, Then</em> sentences in the language of the business, often with Cucumber or Kotest specs.</td></tr>
+      <tr><td>Test-after</td><td>Write the code, then the test. It is better than no tests, but the design pressure is lost.</td></tr>
+      <tr><td>Classic vs mockist TDD</td><td>The &ldquo;Chicago&rdquo; school uses real collaborators and fakes. The &ldquo;London&rdquo; school mocks each collaborator and verifies interactions. Most Android teams lean classic.</td></tr>
+    </table>
+    <div class="note"><p>For how testing fits into architecture (why MVVM and clean layers make tests cheap), see <a href="android-arch-part-8-testing-and-proof.html">Android architecture, part 8: testing and proof</a>.</p></div>
+
+    <h2 id="strategy">12. A practical test strategy</h2>
+    <p>Put each kind of check at the lowest layer that can catch it. A good first draft for a typical app looks like this:</p>
+    <table>
+      <tr><th>What you are testing</th><th>Test type</th><th>Typical tools</th></tr>
+      <tr><td>Business rules, validators, mappers</td><td>Local unit</td><td>JUnit, Truth or Kluent</td></tr>
+      <tr><td>ViewModels, use cases, reducers</td><td>Local unit</td><td>JUnit, MockK or fakes, coroutines-test, Turbine</td></tr>
+      <tr><td>Repository with its data sources</td><td>Local integration</td><td>Fakes, MockWebServer, in-memory Room (Robolectric if needed)</td></tr>
+      <tr><td>DAO queries and migrations</td><td>Instrumented or Robolectric</td><td>Room testing, <code>MigrationTestHelper</code></td></tr>
+      <tr><td>One screen&rsquo;s behaviour</td><td>UI test with a fake backend</td><td>Compose UI test or Espresso, Hilt test modules</td></tr>
+      <tr><td>How a screen looks, in light and dark, large font</td><td>Screenshot test</td><td>Paparazzi, Roborazzi or Shot</td></tr>
+      <tr><td>Permissions, notifications, other apps</td><td>Instrumented</td><td>UI Automator</td></tr>
+      <tr><td>The 5 to 10 flows that must never break</td><td>End to end</td><td>Appium or Maestro on release builds or a device cloud</td></tr>
+    </table>
+    <h3>Folder layout and naming</h3>
+<pre><code>app/
+  src/
+    main/            production code
+    test/            local tests (JVM)       &lt;- most of your tests
+    androidTest/     instrumented tests      &lt;- fewer, slower
+    debug/           test-only helpers such as the Compose test manifest</code></pre>
+    <ul>
+      <li>Name the test class after what it tests: <code>LoginViewModelTest</code>.</li>
+      <li>Name the test after the behaviour, not the method: <code>wrong password shows an error</code>, not <code>testLogin2</code>.</li>
+      <li>Follow <strong>F.I.R.S.T</strong>: tests should be <strong>F</strong>ast, <strong>I</strong>ndependent, <strong>R</strong>epeatable, <strong>S</strong>elf-validating and <strong>T</strong>imely.</li>
+    </ul>
+    <h3>What to do with coverage</h3>
+    <p>Coverage tools (JaCoCo, Kover) tell you which lines your tests <em>ran</em>, not whether they <em>checked</em> anything. Use the report to find untested code, especially on risky branches. Do not set &ldquo;90% or the build fails&rdquo; as a goal for everyone, because people then write assertion-free tests to hit the number. A better pairing is a modest coverage floor plus occasional mutation testing with PIT, which proves your tests actually fail when the code is wrong.</p>
+    <h3>Other kinds of test worth knowing</h3>
+    <ul>
+      <li><strong>Performance:</strong> Jetpack <a href="https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview" target="_blank" rel="noopener">Macrobenchmark</a> (startup, scrolling) and <a href="https://developer.android.com/topic/performance/benchmarking/microbenchmark-overview" target="_blank" rel="noopener">Microbenchmark</a> (hot code).</li>
+      <li><strong>Accessibility:</strong> automated checks in Espresso and Compose, plus a manual TalkBack pass.</li>
+      <li><strong>Contract:</strong> <a href="https://docs.pact.io/" target="_blank" rel="noopener">Pact</a>, so the app and its API agree on the shape of data.</li>
+      <li><strong>Exploratory and manual:</strong> a person looking for what nobody thought to automate. It is still valuable, just not as a regression plan.</li>
+    </ul>
+
+    <h2 id="mistakes">13. Common mistakes</h2>
+    <table>
+      <tr><th>Mistake</th><th>Better</th></tr>
+      <tr><td>The ice-cream cone: lots of UI tests, few unit tests</td><td>Move checks down. Test logic in ViewModels and use cases, and keep UI tests for flows.</td></tr>
+      <tr><td>Testing implementation, not behaviour</td><td>Assert what the user or caller can observe. Do not verify private calls and call order unless they matter.</td></tr>
+      <tr><td>Mocking everything</td><td>Use real simple objects and fakes. Mock only the boundary.</td></tr>
+      <tr><td><code>Thread.sleep</code> in UI tests</td><td>Use idling resources, Compose sync, or explicit waits on a condition.</td></tr>
+      <tr><td>Tests that depend on each other or on order</td><td>Make each test set up and clean up its own state.</td></tr>
+      <tr><td>One giant test with twenty assertions</td><td>One behaviour per test, so a failure points to a cause.</td></tr>
+      <tr><td>Ignoring or skipping failing tests</td><td>Fix or delete. A permanently skipped test is a lie in the suite.</td></tr>
+      <tr><td>Chasing a coverage number</td><td>Measure risk covered, not lines touched.</td></tr>
+      <tr><td>Testing the framework</td><td>Do not test that <code>TextView.setText</code> works. Test your own logic.</td></tr>
+      <tr><td>Production code that reads time, randomness or singletons directly</td><td>Inject a clock, a random source and dependencies so tests control them.</td></tr>
+      <tr><td>Assertion-free tests</td><td>A test that cannot fail proves nothing. Make it red once on purpose to check it can.</td></tr>
+    </table>
+
+    <h2 id="takeaways">14. Takeaways, a starter path and glossary</h2>
+    <ul>
+      <li>Shape the suite like a pyramid: many unit tests, some integration tests, few end-to-end tests.</li>
+      <li>Keep logic in plain Kotlin so it runs as a fast local test. Reserve the device for what truly needs it.</li>
+      <li>JUnit is the base. Add one assertion library, one mocking library and the coroutine helpers.</li>
+      <li>Espresso and Compose tests drive your own app. UI Automator and Appium drive the device from outside.</li>
+      <li>Fix flakiness at the cause: animations, timing, shared state and real networks.</li>
+      <li>TDD improves design and gives a safety net, at the cost of early speed. Use it where rules are clear.</li>
+    </ul>
+    <h3>A four-step path to start</h3>
+    <ol>
+      <li><strong>This week:</strong> write five JUnit tests for one plain Kotlin class, such as a validator or a mapper. Run them from Gradle.</li>
+      <li><strong>Next:</strong> test one ViewModel with a fake repository, <code>runTest</code> and a main dispatcher rule.</li>
+      <li><strong>Then:</strong> add one Compose or Espresso test for your app&rsquo;s most important happy path, with a fake backend.</li>
+      <li><strong>Finally:</strong> run the unit tests on every pull request in CI, and the UI test on a schedule. Once that is steady, add screenshot tests and a short Appium or Maestro flow if you need them.</li>
+    </ol>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Unit test</td><td>A fast test of one small piece of code in isolation.</td></tr>
+      <tr><td>Integration test</td><td>A test of several real pieces working together.</td></tr>
+      <tr><td>End-to-end (E2E) test</td><td>A test that drives the whole app from the user&rsquo;s point of view.</td></tr>
+      <tr><td>Instrumented test</td><td>A test that runs on a device or emulator, in the app&rsquo;s process.</td></tr>
+      <tr><td>Test double</td><td>Any stand-in used in place of a real dependency in a test.</td></tr>
+      <tr><td>Fake</td><td>A simple working implementation, such as an in-memory repository.</td></tr>
+      <tr><td>Mock</td><td>A stand-in that records calls so you can verify them.</td></tr>
+      <tr><td>Flaky test</td><td>A test that sometimes passes and sometimes fails on the same code.</td></tr>
+      <tr><td>Idling resource</td><td>A signal that tells Espresso the app is still busy and it should wait.</td></tr>
+      <tr><td>Semantics tree</td><td>The description of a Compose UI used by tests and accessibility services.</td></tr>
+      <tr><td>Robot / page object</td><td>A helper class that hides locators so tests read like a story.</td></tr>
+      <tr><td>WebDriver</td><td>The standard protocol for driving a UI from outside, used by Selenium and Appium.</td></tr>
+      <tr><td>TDD</td><td>Test-driven development: write a failing test, make it pass, then refactor.</td></tr>
+      <tr><td>Regression</td><td>A bug in something that used to work.</td></tr>
+      <tr><td>Coverage</td><td>The share of code that tests ran. It does not prove the tests check anything.</td></tr>
+      <tr><td>Mutation testing</td><td>Changing the code on purpose to see whether a test notices.</td></tr>
+      <tr><td>Snapshot / screenshot test</td><td>A test that compares a rendered screen to a saved image.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://developer.android.com/training/testing" target="_blank" rel="noopener">Android Developers: Test your app</a></li>
+      <li><a href="https://developer.android.com/training/testing/fundamentals" target="_blank" rel="noopener">Fundamentals of testing Android apps</a></li>
+      <li><a href="https://developer.android.com/training/testing/local-tests" target="_blank" rel="noopener">Local tests</a> &middot; <a href="https://developer.android.com/training/testing/instrumented-tests" target="_blank" rel="noopener">Instrumented tests</a></li>
+      <li><a href="https://developer.android.com/training/testing/espresso" target="_blank" rel="noopener">Espresso</a> &middot; <a href="https://developer.android.com/jetpack/compose/testing" target="_blank" rel="noopener">Testing your Compose layout</a> &middot; <a href="https://developer.android.com/training/testing/other-components/ui-automator" target="_blank" rel="noopener">UI Automator</a></li>
+      <li><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank" rel="noopener">JUnit 5 user guide</a> &middot; <a href="https://junit.org/junit4/" target="_blank" rel="noopener">JUnit 4</a> &middot; <a href="https://github.com/mannodermaus/android-junit5" target="_blank" rel="noopener">android-junit5</a></li>
+      <li><a href="https://mockk.io/" target="_blank" rel="noopener">MockK</a> &middot; <a href="https://site.mockito.org/" target="_blank" rel="noopener">Mockito</a> &middot; <a href="https://truth.dev/" target="_blank" rel="noopener">Truth</a> &middot; <a href="https://github.com/cashapp/turbine" target="_blank" rel="noopener">Turbine</a> &middot; <a href="https://kotest.io/" target="_blank" rel="noopener">Kotest</a></li>
+      <li><a href="https://robolectric.org/" target="_blank" rel="noopener">Robolectric</a> &middot; <a href="https://github.com/cashapp/paparazzi" target="_blank" rel="noopener">Paparazzi</a> &middot; <a href="https://github.com/Kotlin/kotlinx-kover" target="_blank" rel="noopener">Kover</a> &middot; <a href="https://www.jacoco.org/jacoco/" target="_blank" rel="noopener">JaCoCo</a></li>
+      <li><a href="https://appium.io/docs/en/latest/" target="_blank" rel="noopener">Appium documentation</a> &middot; <a href="https://maestro.mobile.dev/" target="_blank" rel="noopener">Maestro</a> &middot; <a href="https://firebase.google.com/docs/test-lab" target="_blank" rel="noopener">Firebase Test Lab</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+</body>
+</html>

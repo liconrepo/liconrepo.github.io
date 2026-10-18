@@ -832,7 +832,7 @@
     </div>
     <div id="searchHome" hidden></div>
     <div class="search-results" id="searchResults" hidden></div>
-    <div class="search-hint">↑ ↓ to navigate · Enter to open · ⌘Enter to locate on page · Esc to close</div>
+    <div class="search-hint">↑ ↓ to navigate · Enter to open · ⌘Enter to locate on page · searches every article · Esc to close</div>
   </div>
 </div>
 
@@ -1061,8 +1061,15 @@
   <div class="container">
     <p class="section-label">Technical Writing</p>
 
-    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">4 posts</span></p>
+    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">5 posts</span></p>
     <div class="blog-grid new-grid">
+      <a href="blog/android-testing-guide.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Testing Android Apps: The Test Pyramid, JUnit, UI Automation and TDD</div>
+        <div class="blog-summary">The test pyramid, JUnit 4 and 5, a map of the testing libraries, instrumentation and UI tests with Espresso and Compose, Appium, fixing flaky tests, and the pros and cons of TDD, with Kotlin examples.</div>
+        <div class="blog-tags"><span class="blog-tag">Testing</span><span class="blog-tag">JUnit</span><span class="blog-tag">Espresso</span><span class="blog-tag">Appium</span><span class="blog-tag">TDD</span></div>
+        <div class="blog-footer"><span class="views-badge">~35 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
       <a href="blog/design-docs-guide.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
         <div class="blog-title">Write It Before You Build It: A Practical Guide to Design Docs</div>
@@ -1680,6 +1687,36 @@
     searchIndex.push({ el, title, section: src.section, link: src.link ? el : null, text, hay: (title + ' ' + text + ' ' + extra + ' ' + src.section).toLowerCase() });
   }));
 
+  /* Full text of every article (search-index.json, built by tools/build_search_index.py), loaded the first time search opens */
+  let articles = null, articlesLoading = null;
+  function loadArticles() {
+    if (articles || articlesLoading) return;
+    articlesLoading = fetch('search-index.json')
+      .then(r => r.ok ? r.json() : [])
+      .catch(() => [])
+      .then(list => {
+        articles = list.map(a => {
+          const series = /series/i.test(a.k || '') ? 'Series \u00b7 ' + a.k.split('\u00b7').pop().trim() : 'Article';
+          return { u: a.u, t: a.t, label: series, s: a.s, tl: a.t.toLowerCase(), hay: (a.t + ' ' + a.k + ' ' + a.s.map(g => g.h + ' ' + g.x).join(' ')).toLowerCase() };
+        });
+        if (sOverlay.classList.contains('open') && sInput.value.trim()) runSearch(sInput.value);
+      });
+  }
+  const count = (hay, t) => hay.split(t).length - 1;
+  function articleHits(terms) {
+    if (!articles) return [];
+    return articles.filter(a => terms.every(t => a.hay.includes(t))).map(a => {
+      let best = null, bs = -1;
+      a.s.forEach(g => {                                   // the section that matches the most words
+        const h = g.h.toLowerCase(), x = (g.h + ' ' + g.x).toLowerCase();
+        const sc = terms.filter(t => x.includes(t)).length * 3 + terms.filter(t => h.includes(t)).length * 2;
+        if (sc > bs) { bs = sc; best = g; }
+      });
+      const rank = terms.filter(t => a.tl.includes(t)).length * 100 + bs * 10 + Math.min(count(a.hay, terms[0]), 30);
+      return { article: true, title: a.t, section: a.label, href: a.u + (best && best.id ? '#' + best.id : ''), u: a.u, heading: best ? best.h : '', text: best ? best.x : '', rank };
+    }).sort((x, y) => y.rank - x.rank);
+  }
+
   const sOverlay = document.getElementById('searchOverlay');
   const sInput   = document.getElementById('searchInput');
   const sResults = document.getElementById('searchResults');
@@ -1693,26 +1730,34 @@
     return out;
   }
   function snippet(text, terms) {
-    const i = Math.max(0, text.toLowerCase().indexOf(terms[0]));
+    const low = text.toLowerCase(), found = terms.map(t => low.indexOf(t)).filter(i => i >= 0);
+    const i = found.length ? Math.min(...found) : 0;
     const start = Math.max(0, i - 40);
     return (start ? '…' : '') + text.slice(start, start + 120) + (text.length > start + 120 ? '…' : '');
   }
   function runSearch(q) {
     const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
-    sHits = !terms.length ? [] : searchIndex
+    const art = terms.length ? articleHits(terms) : [];
+    const artUrls = new Set(art.map(x => x.u));
+    const page = !terms.length ? [] : searchIndex
       .filter(it => terms.every(t => it.hay.includes(t)))
+      .filter(it => !(it.link && artUrls.has(it.link.getAttribute('href'))))      // the article result below already covers this card
       .map(it => ({ it, score: (it.title.toLowerCase().includes(terms[0]) ? 0 : 1) + (it.el.matches('.tag') ? 0 : 0.5) }))
-      .sort((a, b) => a.score - b.score).slice(0, 30).map(x => x.it);
+      .sort((a, b) => a.score - b.score).slice(0, 12).map(x => x.it);
+    sHits = page.concat(art.slice(0, 30 - page.length));
     sActive = 0;
     sHome.hidden = true;
     sResults.hidden = !terms.length;
     if (!terms.length) return;
-    if (!sHits.length) { sResults.innerHTML = '<div class="search-empty">No results for “' + esc(q) + '”.</div>'; return; }
+    const waiting = !articles && articlesLoading ? '<div class="search-empty">Searching articles\u2026</div>' : '';
+    if (!sHits.length) { sResults.innerHTML = waiting || '<div class="search-empty">No results for \u201c' + esc(q) + '\u201d.</div>'; return; }
     sResults.innerHTML = sHits.map((it, i) =>
       '<button class="search-item' + (i ? '' : ' active') + '" data-i="' + i + '">' +
       '<div class="si-top"><span class="si-title">' + mark(it.title.slice(0, 90), terms) + '</span><span class="si-sec">' + it.section + '</span></div>' +
-      (it.text !== it.title ? '<div class="si-snip">' + mark(snippet(it.text, terms), terms) + '</div>' : '') +
-      '</button>').join('');
+      (it.article
+        ? '<div class="si-snip">' + (it.heading ? '<strong>' + esc(it.heading.slice(0, 60)) + '</strong> \u00b7 ' : '') + mark(snippet(it.text, terms), terms) + '</div>'
+        : (it.text !== it.title ? '<div class="si-snip">' + mark(snippet(it.text, terms), terms) + '</div>' : '')) +
+      '</button>').join('') + waiting;
   }
   function setActive(n) {
     const items = sResults.querySelectorAll('.search-item');
@@ -1722,6 +1767,7 @@
     items[sActive].scrollIntoView({ block: 'nearest' });
   }
   function openSearch() {
+    loadArticles();
     sOverlay.classList.add('open');
     sInput.value = ''; runSearch('');
     sInput.focus();
@@ -1783,6 +1829,7 @@
     const b = e.target.closest('.search-item');
     if (!b) return;
     const it = sHits[+b.dataset.i];
+    if (it.article) { location.href = it.href; return; }
     if (it.link && !(e.metaKey || e.ctrlKey)) openItem(it); else goTo(it);
   });
   sOverlay.addEventListener('click', e => { if (e.target === sOverlay) closeSearch(); });
@@ -1797,6 +1844,7 @@
     else if (e.key === 'Enter' && sHits[sActive]) {
       e.preventDefault();
       const it = sHits[sActive];
+      if (it.article) { location.href = it.href; return; }
       if (it.link && !(e.metaKey || e.ctrlKey)) openItem(it); else goTo(it);
     }
   });

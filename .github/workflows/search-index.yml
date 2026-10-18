@@ -1,0 +1,41 @@
+name: Rebuild search index
+
+# Keeps search-index.json in step with the articles in blog/.
+# It runs when an article (or the build script) changes on main, rebuilds the
+# index, and commits it back only if the result is different.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "blog/**"
+      - "tools/build_search_index.py"
+  workflow_dispatch:        # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write           # needed to commit search-index.json
+
+concurrency:
+  group: search-index
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the index
+        run: python3 tools/build_search_index.py
+
+      - name: Commit the index if it changed
+        run: |
+          if [ -z "$(git status --porcelain search-index.json)" ]; then
+            echo "search-index.json is already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add search-index.json
+          git commit -m "Rebuild search index [skip ci]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
