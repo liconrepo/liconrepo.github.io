@@ -481,9 +481,9 @@
     .tag .si { width: 14px; height: 14px; flex-shrink: 0; opacity: .65; filter: invert(1); }
 
     /* ────────────────── BLOG ────────────────── */
-    .topic-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
-    .topic-chip { font: inherit; font-size: calc(13px * var(--fs, 1)); color: var(--text); background: transparent; border: 1px solid var(--border-h); border-radius: 999px; padding: 6px 14px; cursor: pointer; display: inline-flex; align-items: baseline; gap: 8px; transition: background .2s, border-color .2s; }
-    .topic-chip .tc-n { font-size: .92em; color: var(--muted); }
+    .topic-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 22px; }
+    .topic-chip { --w: 0; font: inherit; font-size: calc((12px + 9px * var(--w)) * var(--fs, 1)); font-weight: calc(400 + 250 * var(--w)); line-height: 1.2; color: var(--text); background: transparent; border: 1px solid var(--border-h); border-radius: 999px; padding: calc(5px + 5px * var(--w)) calc(12px + 8px * var(--w)); cursor: pointer; display: inline-flex; align-items: baseline; gap: 8px; transition: background .2s, border-color .2s; }
+    .topic-chip .tc-n { font-size: .8em; font-weight: 500; color: var(--muted); }
     .topic-chip:hover { background: var(--card-h); }
     .topic-chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
     .topic-chip[aria-pressed="true"] .tc-n { color: inherit; opacity: .7; }
@@ -2146,8 +2146,9 @@
       });
       out.append(head, ul); out.hidden = false;
     }
+    const lo = Math.log(Math.min(...topics.map(t => t.list.length))), hi = Math.log(Math.max(...topics.map(t => t.list.length)));
     topics.forEach(t => {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'topic-chip'; b.dataset.topic = t.name; b.setAttribute('aria-pressed', 'false');
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'topic-chip'; b.dataset.topic = t.name; b.style.setProperty('--w', hi > lo ? ((Math.log(t.list.length) - lo) / (hi - lo)).toFixed(2) : 0); b.setAttribute('aria-pressed', 'false');
       b.innerHTML = '<span></span><span class="tc-n"></span>'; b.firstChild.textContent = t.name; b.lastChild.textContent = t.list.length;
       b.addEventListener('click', () => { active = active === t.name ? null : t.name; render(); });
       chips.appendChild(b);
