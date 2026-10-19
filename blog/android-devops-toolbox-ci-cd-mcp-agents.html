@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Android DevOps Toolbox: CI/CD, Distribution, Install Guides and the Setup Behind AI Agents (MCP) — Khairul Alam</title>
+  <meta name="description" content="A senior DevOps view of the tools an Android engineer should know: GitHub Actions, CircleCI, Bitrise, Jenkins, fastlane, Gradle, Firebase App Distribution, DeployGate, Google Play, signing and secrets, with install steps, config sketches, official links, and the setup for MCP and AI agents." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">DevOps &middot; Android &middot; CI/CD &middot; AI agents</p>
+    <h1>The Android DevOps Toolbox: CI/CD, Distribution, Install Guides and the Setup Behind AI Agents (MCP)</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~22 min read</span></div>
+    <div class="tags"><span class="tag">DevOps</span><span class="tag">CI/CD</span><span class="tag">GitHub Actions</span><span class="tag">CircleCI</span><span class="tag">Bitrise</span><span class="tag">Jenkins</span><span class="tag">fastlane</span><span class="tag">MCP</span></div>
+
+    <p class="lede">Every Android team eventually discovers that the hardest part of shipping is not the code. It is the machinery around it: the server that builds the app the same way every time, the key that signs it, the pipe that carries it to testers and then to Google Play, and now the AI agents that want access to all of it. I have set this machinery up and kept it alive for years. This is the toolbox I would hand a new engineer: what each tool is, when to choose it, how to install it, and where the official docs live.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li><strong>Android engineers are software engineers, and software includes how it ships.</strong> If you cannot read a CI log, rotate a signing secret or explain how your build reaches Play, you depend on someone else for your own release.</li>
+        <li>The pipeline has six stations: <strong>source &rarr; build and test &rarr; quality &rarr; distribute &rarr; store &rarr; observe</strong>. Every tool fits one of them.</li>
+        <li><strong>CI servers</strong> run your build: GitHub Actions, CircleCI, Bitrise (hosted), Jenkins (self-hosted). <strong>Build tools</strong> (Gradle, fastlane) do the work inside them. <strong>Distribution</strong> (Firebase App Distribution, DeployGate, Play tracks) delivers builds to humans.</li>
+        <li>Pick the CI that is closest to where your code already lives, and keep the real logic in Gradle or fastlane so you can move CI later.</li>
+        <li><strong>MCP</strong> (Model Context Protocol) is the plug that lets AI tools use your GitHub, Firebase and tickets. Treat it as production access: least privilege, read-only first, secrets in environment variables, a human approves writes.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#why">Why Android engineers need DevOps</a></li>
+        <li><a href="#map">The map: where each tool sits</a></li>
+        <li><a href="#ci">CI servers: GitHub Actions, CircleCI, Bitrise, Jenkins</a></li>
+        <li><a href="#pick">Which CI should you pick?</a></li>
+        <li><a href="#build">Build tooling: Gradle, fastlane, Gradle Play Publisher</a></li>
+        <li><a href="#dist">Distribution: Firebase App Distribution and DeployGate</a></li>
+        <li><a href="#play">Google Play, the API and signing</a></li>
+        <li><a href="#quality">Quality gates, observability, Docker and secrets</a></li>
+        <li><a href="#mcp">The AI era, part 1: MCP setup</a></li>
+        <li><a href="#agents">The AI era, part 2: agents in your pipeline</a></li>
+        <li><a href="#day1">Day-1 checklist for a new Android repo</a></li>
+        <li><a href="#pitfalls">Pitfalls I have paid for</a></li>
+        <li><a href="#wrap">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="why">1. Why Android engineers need DevOps</h2>
+    <p>I hear &ldquo;that is the DevOps team&rsquo;s job&rdquo; less often than I used to, and I am glad. Here is why I push every Android engineer to learn the basics:</p>
+    <ul>
+      <li><strong>Faster feedback.</strong> A pull request that fails lint, tests or a size budget in six minutes is cheaper than a bug found by a tester on Friday.</li>
+      <li><strong>Reproducible builds.</strong> &ldquo;Works on my machine&rdquo; ends when a clean machine builds the app from a commit. If it cannot, you have hidden state (a local file, a cached key, a different JDK).</li>
+      <li><strong>You own the release.</strong> The person who knows why a build failed is usually the person who wrote the code. Waiting for another team to read a Gradle error costs hours.</li>
+      <li><strong>Signing and secrets are your responsibility.</strong> A leaked keystore or Play service account is a security incident, not a build problem.</li>
+      <li><strong>Release day involves you.</strong> Someone watches crash rates and the staged rollout. See <a href="android-release-validation-strategy.html">the release validation strategy</a> for what to watch, and <a href="android-release-lifecycle-dev-to-play-store.html">the release lifecycle story</a> for the human side.</li>
+      <li><strong>Your career.</strong> Engineers who can design the pipeline, not just use it, become the people who lead release quality. It is also the same skill set you need to supervise AI agents, which touch the same systems.</li>
+    </ul>
+    <div class="analogy">
+      <p><strong>Analogy:</strong> a restaurant cook who never looks at the kitchen layout, the fridge temperature or how plates reach the table can cook well and still make people ill. DevOps is the kitchen. You do not have to run it alone, but you should be able to walk through it.</p>
+    </div>
+
+    <h2 id="map">2. The map: where each tool sits</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="Pipeline of six stations with example tools. Source: GitHub, GitLab, Bitbucket, branch rules. Build and test: GitHub Actions, CircleCI, Bitrise, Jenkins, Gradle. Quality: Android Lint, ktlint, detekt, SonarQube. Distribute: Firebase App Distribution, DeployGate. Store: Play Console, Play API, Gradle Play Publisher, fastlane. Observe: Crashlytics, Android vitals, alerts. Across all stations: keystore, secrets, caches and build images.">
+        <rect class="boxb" x="8"   y="14" width="94" height="170" rx="10"/><text class="b c" x="55"  y="38">Source</text>
+        <text class="sub c" x="55" y="64">GitHub</text><text class="sub c" x="55" y="82">GitLab</text><text class="sub c" x="55" y="100">Bitbucket</text><text class="sub c" x="55" y="124">branch rules</text><text class="sub c" x="55" y="142">PR checks</text>
+        <rect class="boxg" x="114" y="14" width="94" height="170" rx="10"/><text class="b c" x="161" y="38">Build</text>
+        <text class="sub c" x="161" y="64">GitHub Actions</text><text class="sub c" x="161" y="82">CircleCI</text><text class="sub c" x="161" y="100">Bitrise</text><text class="sub c" x="161" y="118">Jenkins</text><text class="sub c" x="161" y="142">Gradle</text><text class="sub c" x="161" y="160">unit tests</text>
+        <rect class="boxo" x="220" y="14" width="94" height="170" rx="10"/><text class="b c" x="267" y="38">Quality</text>
+        <text class="sub c" x="267" y="64">Android Lint</text><text class="sub c" x="267" y="82">ktlint</text><text class="sub c" x="267" y="100">detekt</text><text class="sub c" x="267" y="118">SonarQube</text><text class="sub c" x="267" y="142">size budget</text>
+        <rect class="boxp" x="326" y="14" width="94" height="170" rx="10"/><text class="b c" x="373" y="38">Distribute</text>
+        <text class="sub c" x="373" y="64">Firebase App</text><text class="sub c" x="373" y="82">Distribution</text><text class="sub c" x="373" y="106">DeployGate</text><text class="sub c" x="373" y="130">fastlane</text><text class="sub c" x="373" y="148">Firebase CLI</text>
+        <rect class="boxb" x="432" y="14" width="94" height="170" rx="10"/><text class="b c" x="479" y="38">Store</text>
+        <text class="sub c" x="479" y="64">Play Console</text><text class="sub c" x="479" y="82">Play tracks</text><text class="sub c" x="479" y="106">Play API</text><text class="sub c" x="479" y="130">Gradle Play</text><text class="sub c" x="479" y="148">Publisher</text>
+        <rect class="boxg" x="538" y="14" width="94" height="170" rx="10"/><text class="b c" x="585" y="38">Observe</text>
+        <text class="sub c" x="585" y="64">Crashlytics</text><text class="sub c" x="585" y="82">Android vitals</text><text class="sub c" x="585" y="106">Play reports</text><text class="sub c" x="585" y="130">Slack alerts</text>
+        <path class="arrow" d="M103,99 L112,99"/><path class="arrow" d="M209,99 L218,99"/><path class="arrow" d="M315,99 L324,99"/><path class="arrow" d="M421,99 L430,99"/><path class="arrow" d="M527,99 L536,99"/>
+        <rect class="boxr" x="8" y="200" width="624" height="48" rx="10"/><text class="b c" x="320" y="222">Across every station</text><text class="sub c" x="320" y="240">keystore &middot; secrets &middot; caches &middot; build images &middot; permissions</text>
+      </svg>
+      <figcaption>Find the station first, then pick the tool. Most &ldquo;which tool?&rdquo; debates are really about two neighbouring stations.</figcaption>
+    </figure>
+
+    <h2 id="ci">3. CI servers: GitHub Actions, CircleCI, Bitrise, Jenkins</h2>
+    <p>A CI server watches your repository, starts a clean machine for each change, runs your commands and reports the result. All four tools below do that. They differ in where they run, how you pay, and how much you maintain.</p>
+
+    <h3>3.1 GitHub Actions</h3>
+    <p><strong>What:</strong> CI built into GitHub. Workflows are YAML files in <code>.github/workflows/</code>. <strong>Pick it when</strong> your code is already on GitHub and you want the shortest path. <strong>Install:</strong> nothing to install for hosted runners. Commit a workflow file, then add secrets in <em>Settings &rarr; Secrets and variables &rarr; Actions</em>. For self-hosted runners, follow the &ldquo;Add runner&rdquo; page in the repository settings, which gives you a download and a registration token.</p>
+<pre><code>name: android-ci
+on:
+  pull_request:
+  push:
+    branches: [main, "release/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17            # match what your Android Gradle Plugin requires
+      - uses: gradle/actions/setup-gradle@v4   # caches Gradle for you
+      - name: Lint and unit tests
+        run: ./gradlew lintDebug testDebugUnitTest
+      - name: Build release bundle
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d &gt; "$RUNNER_TEMP/release.jks"
+          ./gradlew bundleRelease -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.jks" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: app/build/outputs/bundle/release/*.aab</code></pre>
+    <p>Check the Marketplace for the current major version of each action before you copy this. Useful habits: <code>concurrency</code> cancels stale runs, an <em>environment</em> with required reviewers protects the job that publishes, and <code>permissions:</code> at the top of the file keeps the default token read-only.</p>
+    <p><strong>Official docs:</strong> <a href="https://docs.github.com/actions" target="_blank" rel="noopener">docs.github.com/actions</a></p>
+
+    <h3>3.2 CircleCI</h3>
+    <p><strong>What:</strong> a hosted CI service (self-hosted runners also exist) configured in <code>.circleci/config.yml</code>. <strong>Pick it when</strong> you want strong caching, parallelism and test splitting, or already use it elsewhere in the company. <strong>Install:</strong> sign in with GitHub or Bitbucket, choose <em>Projects &rarr; Set Up Project</em>, and CircleCI adds a deploy key and a webhook. Put shared secrets in an organization <strong>context</strong> so only chosen jobs can read them.</p>
+<pre><code>version: 2.1
+
+orbs:
+  android: circleci/android@&lt;version&gt;     # check the orb registry for current version and names
+
+jobs:
+  build:
+    executor:
+      name: android/android_docker
+      tag: &lt;image-tag&gt;                     # a cimg/android tag
+    steps:
+      - checkout
+      - android/restore_gradle_cache
+      - run: ./gradlew lintDebug testDebugUnitTest bundleRelease
+      - android/save_gradle_cache
+      - store_artifacts:
+          path: app/build/outputs/bundle/release
+
+workflows:
+  ci:
+    jobs:
+      - build:
+          context: android-release          # secrets live here, not in the file</code></pre>
+    <p>The convenience images live under <code>cimg/android</code> on Docker Hub. The orb&rsquo;s command and executor names change over time, so copy them from the registry page rather than from memory (including mine). <strong>Official docs:</strong> <a href="https://circleci.com/docs/" target="_blank" rel="noopener">circleci.com/docs</a></p>
+
+    <h3>3.3 Bitrise</h3>
+    <p><strong>What:</strong> a hosted CI/CD service built for mobile. You compose a <em>workflow</em> from <em>steps</em> in a web editor or in <code>bitrise.yml</code>. <strong>Pick it when</strong> the team wants mobile-aware defaults and does not want to write much YAML: Android SDK images, code signing handling and a large step library are built in. <strong>Install:</strong> sign in, <em>Add new app</em>, connect the repository, choose the stack (a Linux Android image), and let Bitrise scan the project. It proposes a starting workflow. Store secrets under <em>Secrets</em> in the workflow editor, and upload the keystore to <em>Code signing</em>.</p>
+<pre><code>format_version: "&lt;version&gt;"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+
+workflows:
+  primary:
+    steps:
+      - git-clone@&lt;version&gt;: {}
+      - android-unit-test@&lt;version&gt;:
+          inputs:
+            - variant: debug
+      - android-build@&lt;version&gt;:
+          inputs:
+            - module: app
+            - variant: release
+            - build_type: aab
+      - deploy-to-bitrise-io@&lt;version&gt;: {}</code></pre>
+    <p>Bitrise also publishes steps for Firebase App Distribution, Google Play and Slack; search the Step Library for the current step ids and inputs. <strong>Official docs:</strong> <a href="https://devcenter.bitrise.io/" target="_blank" rel="noopener">devcenter.bitrise.io</a></p>
+
+    <h3>3.4 Jenkins</h3>
+    <p><strong>What:</strong> the long-standing open-source automation server you run yourself. <strong>Pick it when</strong> you need full control, builds must stay inside your network, or a large plugin ecosystem and existing company infrastructure matter more than convenience. The cost is operations: upgrades, plugin security, agents and disk are yours.</p>
+    <p><strong>Install</strong> (pick one; follow the official page for your OS):</p>
+<pre><code># Docker, the quickest way to try it (LTS image)
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk17
+
+# macOS with Homebrew
+brew install jenkins-lts &amp;&amp; brew services start jenkins-lts
+
+# then open http://localhost:8080 and unlock with the initial admin password
+# (printed in the container log, or in the file shown on the unlock page)</code></pre>
+    <p>Run builds on <strong>agents</strong>, not on the controller. An Android agent needs a JDK, the Android command-line tools (<code>sdkmanager</code> to install platforms and build-tools), <code>ANDROID_HOME</code> set, and accepted SDK licenses. Baking all of that into a Docker image makes agents disposable.</p>
+<pre><code>// Jenkinsfile (declarative)
+pipeline {
+  agent { label 'android' }
+  environment { ANDROID_HOME = '/opt/android-sdk' }
+  stages {
+    stage('Test')  { steps { sh './gradlew lintDebug testDebugUnitTest' } }
+    stage('Build') {
+      steps {
+        withCredentials([file(credentialsId: 'release-keystore', variable: 'KS')]) {
+          sh './gradlew bundleRelease -Pandroid.injected.signing.store.file=$KS'
+        }
+      }
+    }
+  }
+  post { always { archiveArtifacts artifacts: 'app/build/outputs/**/*.aab', allowEmptyArchive: true } }
+}</code></pre>
+    <p><strong>Official docs:</strong> <a href="https://www.jenkins.io/doc/" target="_blank" rel="noopener">jenkins.io/doc</a></p>
+
+    <h2 id="pick">4. Which CI should you pick?</h2>
+    <table>
+      <tr><th>Tool</th><th>Hosting</th><th>Cost model</th><th>Strengths</th><th>Android fit</th></tr>
+      <tr><td><strong>GitHub Actions</strong></td><td>Hosted, self-hosted runners optional</td><td>Free minutes then per minute; larger runners cost more</td><td>Lives next to the code, huge action ecosystem, easy PR checks</td><td>Good. Linux runners suit most builds; emulator tests need care</td></tr>
+      <tr><td><strong>CircleCI</strong></td><td>Hosted, self-hosted runners optional</td><td>Credits by machine size and time</td><td>Fast caching, test splitting, flexible executors</td><td>Good. Android images and orb are first class</td></tr>
+      <tr><td><strong>Bitrise</strong></td><td>Hosted (self-hosted possible on some plans)</td><td>Plans by build credits and concurrency</td><td>Mobile-focused, step library, signing handling, UI editor</td><td>Very good. Least YAML to start</td></tr>
+      <tr><td><strong>Jenkins</strong></td><td>Self-hosted</td><td>Free software; you pay for servers and people</td><td>Total control, plugins, runs inside your network</td><td>Good if you maintain agents. More upkeep</td></tr>
+    </table>
+    <p>Prices and free tiers change, so check each vendor before you decide. My rules of thumb:</p>
+    <ul>
+      <li><strong>Small team, code on GitHub:</strong> GitHub Actions. Start there unless you have a reason not to.</li>
+      <li><strong>Mobile-only team without a DevOps person:</strong> Bitrise. You trade some price for less setup.</li>
+      <li><strong>Large builds that need heavy parallelism:</strong> CircleCI or larger GitHub runners. Measure queue time, not just run time.</li>
+      <li><strong>Regulated company, builds must stay on-prem:</strong> Jenkins (or self-hosted runners for one of the others).</li>
+      <li><strong>Whatever you choose:</strong> keep the real logic in Gradle tasks and fastlane lanes. A CI file should be thin glue. Then moving CI later is a day of work, not a quarter.</li>
+    </ul>
+
+    <h2 id="build">5. Build tooling: Gradle, fastlane, Gradle Play Publisher</h2>
+    <h3>Gradle</h3>
+    <p>Gradle is the build tool Android already uses, so make CI call it directly. Always run <code>./gradlew</code> (the wrapper), which pins the Gradle version in the repository, instead of a Gradle installed on the machine. Turn on the build cache and configuration cache where your plugins support them, and use the CI vendor&rsquo;s Gradle caching so repeated runs skip work. <strong>Docs:</strong> <a href="https://developer.android.com/studio/build" target="_blank" rel="noopener">developer.android.com/studio/build</a></p>
+    <h3>fastlane</h3>
+    <p>fastlane is a Ruby toolkit that scripts mobile release tasks as <em>lanes</em>: build, sign, upload to Play, upload to Firebase, post to Slack. It is CI-agnostic, which is exactly why I like it.</p>
+<pre><code># install (either one)
+brew install fastlane
+# or, pinned per project (recommended): add `gem "fastlane"` to a Gemfile, then
+bundle install &amp;&amp; bundle exec fastlane init   # choose manual setup for Android
+
+# fastlane/Fastfile
+default_platform(:android)
+
+platform :android do
+  desc "Build the release bundle and push it to Play internal testing"
+  lane :internal do
+    gradle(task: "bundle", build_type: "Release")
+    upload_to_play_store(
+      track: "internal",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      json_key: ENV["PLAY_JSON_KEY_PATH"]
+    )
+  end
+
+  desc "Send an APK to testers through Firebase App Distribution"
+  lane :beta do
+    gradle(task: "assemble", build_type: "Release")
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      groups: "qa",
+      release_notes: "Build from CI"
+    )   # needs: fastlane add_plugin firebase_app_distribution
+  end
+end</code></pre>
+    <p>The Play upload action is called <code>upload_to_play_store</code> (also known as <em>supply</em>). <strong>Docs:</strong> <a href="https://docs.fastlane.tools/" target="_blank" rel="noopener">docs.fastlane.tools</a></p>
+    <h3>Gradle Play Publisher</h3>
+    <p>If you would rather avoid Ruby, the <a href="https://github.com/Triple-T/gradle-play-publisher" target="_blank" rel="noopener">Gradle Play Publisher</a> plugin adds Play upload tasks to Gradle itself.</p>
+<pre><code>plugins {
+    id("com.github.triplet.play") version "&lt;version&gt;"
+}
+
+play {
+    serviceAccountCredentials.set(file(System.getenv("PLAY_JSON_KEY_PATH") ?: "play.json"))
+    track.set("internal")
+}
+// then: ./gradlew publishReleaseBundle</code></pre>
+    <div class="note"><p>fastlane or Gradle Play Publisher? I choose fastlane when the team also needs Firebase, Slack and screenshots in one place, and the plugin when the project is Gradle-only and I want zero extra runtimes on CI.</p></div>
+
+    <h2 id="dist">6. Distribution: Firebase App Distribution and DeployGate</h2>
+    <p>Distribution tools put a build in front of testers <em>before</em> the store. They are faster than Play review and need no store listing.</p>
+    <h3>Firebase App Distribution</h3>
+    <p>Part of Firebase, free to use, with groups, release notes and tester feedback. Choose it when you already use Firebase, or want one place for builds and crashes. For concepts see <a href="firebase-app-distribution-overview.html">the App Distribution overview</a>. Three ways to use it from CI: the Gradle plugin, the Firebase CLI, or fastlane.</p>
+<pre><code># install the Firebase CLI (needs Node.js)
+npm install -g firebase-tools
+# or the standalone binary from the official install page
+
+# in CI, authenticate with a service account instead of your own login
+export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
+
+firebase appdistribution:distribute app/build/outputs/apk/release/app-release.apk \
+  --app "$FIREBASE_APP_ID" \
+  --groups "qa" \
+  --release-notes "Build $GITHUB_RUN_NUMBER from $GITHUB_REF_NAME"</code></pre>
+    <p>Give the service account only the App Distribution role it needs. <strong>Docs:</strong> <a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">firebase.google.com/docs/app-distribution</a>. Prefer to trigger uploads from the IDE? See <a href="android-studio-plugin-firebase-distribution.html">the Android Studio plugin article</a>.</p>
+    <h3>DeployGate</h3>
+    <p>DeployGate is a distribution service popular in Japan and across Asia. Testers install through its app or a link, and it shows per-build install status and device information. Choose it when your organization or clients already use it, or you need its team management features. It has a web API, a command-line tool, a Gradle plugin and a fastlane plugin; pick the one that matches your pipeline. The API route is the most universal:</p>
+<pre><code># upload an APK with the DeployGate API (token comes from your account settings, kept as a CI secret)
+curl -F "token=$DEPLOYGATE_API_TOKEN" \
+     -F "file=@app/build/outputs/apk/release/app-release.apk" \
+     -F "message=Build $BUILD_NUMBER" \
+     "https://deploygate.com/api/users/&lt;owner&gt;/apps"</code></pre>
+    <p>Check the docs for current parameters (distribution pages, release notes, groups). <strong>Docs:</strong> <a href="https://docs.deploygate.com/" target="_blank" rel="noopener">docs.deploygate.com</a></p>
+    <table>
+      <tr><th>Channel</th><th>Best for</th><th>Review wait</th><th>Notes</th></tr>
+      <tr><td>Firebase App Distribution</td><td>Daily QA, dogfooding, UAT builds</td><td>None</td><td>Integrates with Crashlytics and Gradle</td></tr>
+      <tr><td>DeployGate</td><td>Teams and clients that use it already</td><td>None</td><td>Own app and install tracking</td></tr>
+      <tr><td>Play internal testing</td><td>The exact bundle that will ship</td><td>Minutes</td><td>Same signing and install path as production</td></tr>
+      <tr><td>Play closed and open testing</td><td>Wider beta</td><td>Can need review</td><td>Real Play Store experience</td></tr>
+    </table>
+
+    <h2 id="play">7. Google Play, the API and signing</h2>
+    <h3>Play Console and the Publisher API</h3>
+    <p>The Play Console is the web UI. For automation you use the <a href="https://developers.google.com/android-publisher" target="_blank" rel="noopener">Google Play Developer API</a>, which fastlane and Gradle Play Publisher call for you. Setup, in order:</p>
+    <ol>
+      <li>In Google Cloud, create or pick a project, enable the <strong>Google Play Android Developer API</strong>, and create a <strong>service account</strong> with a JSON key.</li>
+      <li>In the Play Console, open <em>Users and permissions</em>, invite the service account&rsquo;s email, and grant only the app permissions it needs (for example, release to testing tracks, not to production).</li>
+      <li>Store the JSON key as a CI secret, write it to a temporary file during the job, and delete it after.</li>
+      <li>Do a first upload by hand in the console, since apps usually must exist and be set up before the API can release them.</li>
+    </ol>
+    <div class="note"><p>Console menus move around. If a step in my list does not match what you see, follow the current Play Console help pages rather than my wording.</p></div>
+    <h3>Signing</h3>
+    <p>With <strong>Play App Signing</strong>, Google holds the key that signs what users install, and you sign uploads with a separate <strong>upload key</strong>. That is the setup I recommend: if the upload key leaks, you can ask Google to reset it. Without it, a lost keystore can end the app.</p>
+<pre><code># create an upload keystore (store it in a secrets manager, not in git)
+keytool -genkeypair -v -keystore upload.jks -alias upload \
+  -keyalg RSA -keysize 2048 -validity 10000
+
+# base64 it so it can live in a CI secret
+base64 -i upload.jks | pbcopy        # macOS; use `base64 -w0 upload.jks` on Linux</code></pre>
+    <p><strong>Docs:</strong> <a href="https://developer.android.com/studio/publish/app-signing" target="_blank" rel="noopener">developer.android.com/studio/publish/app-signing</a></p>
+
+    <h2 id="quality">8. Quality gates, observability, Docker and secrets</h2>
+    <h3>Quality gates</h3>
+    <table class="lib">
+      <tr><th>Tool</th><th>What it checks</th><th>How you run it</th></tr>
+      <tr><td><strong>Android Lint</strong></td><td>Android-specific problems: API misuse, unused resources, accessibility, security hints</td><td>Built in: <code>./gradlew lintDebug</code>. <a href="https://developer.android.com/studio/write/lint" target="_blank" rel="noopener">Docs</a></td></tr>
+      <tr><td><strong>ktlint</strong></td><td>Kotlin code style</td><td>CLI or a Gradle plugin. <a href="https://pinterest.github.io/ktlint/" target="_blank" rel="noopener">Docs</a></td></tr>
+      <tr><td><strong>detekt</strong></td><td>Kotlin code smells and complexity</td><td>Gradle plugin with a baseline file for legacy code. <a href="https://detekt.dev/" target="_blank" rel="noopener">Docs</a></td></tr>
+      <tr><td><strong>SonarQube</strong></td><td>Bugs, vulnerabilities, coverage trends, quality gate on pull requests</td><td>Server (self-hosted or cloud) plus a Gradle scanner step. <a href="https://docs.sonarsource.com/" target="_blank" rel="noopener">Docs</a></td></tr>
+      <tr><td><strong>Size and startup budgets</strong></td><td>APK or AAB size, cold start</td><td>A CI step that fails when a number crosses its limit</td></tr>
+    </table>
+    <p>Introduce these with a baseline: freeze today&rsquo;s warnings, then fail only on <em>new</em> ones. Otherwise the first pipeline run is red forever and people stop caring.</p>
+    <h3>Observability after the release</h3>
+    <p><a href="https://firebase.google.com/docs/crashlytics" target="_blank" rel="noopener">Crashlytics</a> and <strong>Android vitals</strong> in Play Console tell you crash and ANR rates per version. Wire a Slack or chat notification into the pipeline: build result, version name, a link to the release, and a link to the crash dashboard. See <a href="firebase-crashlytics-overview.html">the Crashlytics overview</a>.</p>
+    <h3>Docker for build images</h3>
+    <p>If builds differ between machines, put the toolchain in an image: JDK, Android command-line tools, SDK platforms and build-tools, Node for the Firebase CLI. Start from the CI vendor&rsquo;s image (<code>cimg/android</code> for CircleCI) or a maintained community image, and pin the tag. Build your own only when you need something unusual. Install Docker from <a href="https://docs.docker.com/get-started/get-docker/" target="_blank" rel="noopener">docs.docker.com</a>.</p>
+    <h3>Secrets</h3>
+    <table>
+      <tr><th>Where</th><th>Use it for</th><th>Watch out</th></tr>
+      <tr><td>CI secrets (GitHub secrets and environments, CircleCI contexts, Bitrise secrets, Jenkins credentials)</td><td>Keystore, passwords, Play and Firebase service accounts, API tokens</td><td>Scope them per environment. Secrets are masked in logs only if printed exactly as stored</td></tr>
+      <tr><td>A secrets manager (Vault, a cloud secret manager, a password-manager CLI)</td><td>Many teams, rotation, audit</td><td>Adds a dependency; use short-lived credentials where possible</td></tr>
+      <tr><td>The repository</td><td>Never. Not even &ldquo;private&rdquo; repositories</td><td>Add secret scanning and a pre-commit hook</td></tr>
+    </table>
+
+    <h2 id="mcp">9. The AI era, part 1: MCP setup</h2>
+    <p>The <strong>Model Context Protocol</strong> is an open standard for connecting AI applications to tools and data. Instead of every AI tool writing its own GitHub or Firebase integration, a tool exposes an <strong>MCP server</strong> once and any MCP-capable app can use it. For a DevOps engineer, that makes it the new &ldquo;API access&rdquo; question: <em>who is allowed to do what, through which agent?</em></p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="MCP architecture. A host application such as Claude Code or an IDE contains one MCP client per server. Each client connects to a server. The GitHub server is remote over HTTP. The Firebase server and filesystem server are local processes over stdio. Messages are JSON-RPC.">
+        <rect class="boxb" x="8" y="14" width="236" height="206" rx="12"/><text class="b c" x="126" y="38">Host (the AI app)</text><text class="sub c" x="126" y="56">Claude Code, an IDE, a chat app</text>
+        <rect class="box" x="26" y="72"  width="200" height="40" rx="9"/><text class="b c" x="126" y="98">MCP client 1</text>
+        <rect class="box" x="26" y="122" width="200" height="40" rx="9"/><text class="b c" x="126" y="148">MCP client 2</text>
+        <rect class="box" x="26" y="172" width="200" height="40" rx="9"/><text class="b c" x="126" y="198">MCP client 3</text>
+        <path class="arrow" d="M228,92 L412,92"/><text class="sub c" x="320" y="84">HTTP + token</text>
+        <path class="arrow" d="M228,142 L412,142"/><text class="sub c" x="320" y="134">stdio</text>
+        <path class="arrow" d="M228,192 L412,192"/><text class="sub c" x="320" y="184">stdio</text>
+        <rect class="boxg" x="414" y="68"  width="218" height="48" rx="9"/><text class="b c" x="523" y="90">GitHub server</text><text class="sub c" x="523" y="108">remote &middot; issues, PRs, code</text>
+        <rect class="boxo" x="414" y="118" width="218" height="48" rx="9"/><text class="b c" x="523" y="140">Firebase server</text><text class="sub c" x="523" y="158">local &middot; via Firebase CLI</text>
+        <rect class="boxp" x="414" y="168" width="218" height="48" rx="9"/><text class="b c" x="523" y="190">Filesystem server</text><text class="sub c" x="523" y="208">local &middot; folders you allow</text>
+        <text class="sub c" x="320" y="246">messages are JSON-RPC; servers offer tools, resources and prompts</text>
+      </svg>
+      <figcaption>The host decides which servers it talks to. A server only does what its tools allow, and only with the credentials you gave it.</figcaption>
+    </figure>
+    <h3>What you need on the machine</h3>
+    <table class="lib">
+      <tr><th>Need</th><th>Why</th><th>Install</th></tr>
+      <tr><td><strong>Node.js</strong></td><td>Many servers start with <code>npx</code></td><td>From <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> or a version manager</td></tr>
+      <tr><td><strong>Python with uv</strong></td><td>Python servers start with <code>uvx</code></td><td><a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">docs.astral.sh/uv</a></td></tr>
+      <tr><td><strong>Docker</strong></td><td>Some servers ship as images, which also isolates them</td><td><a href="https://docs.docker.com/get-started/get-docker/" target="_blank" rel="noopener">docs.docker.com</a></td></tr>
+      <tr><td><strong>Tokens and keys</strong></td><td>A GitHub token, a Firebase login or service account, a Jira token</td><td>Create them with the smallest scope that works</td></tr>
+      <tr><td><strong>An MCP host</strong></td><td>Claude Code, an IDE, or another MCP-capable client</td><td>See <a href="claude-md-part-1-setup.html">the Claude Code setup</a></td></tr>
+    </table>
+    <h3>Adding servers to Claude Code</h3>
+<pre><code># local server over stdio (everything after -- is the command that starts it)
+claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allowed/dir
+
+# remote server over HTTP
+claude mcp add --transport http github https://api.githubcopilot.com/mcp/ \
+  --header "Authorization: Bearer $GITHUB_PAT"
+
+# see what is configured, and check status inside Claude Code with /mcp
+claude mcp list</code></pre>
+    <p>Scopes decide who gets the server: local to you, shared with the team in a project file, or for all your projects. The shared project file is <code>.mcp.json</code> at the repository root, so the whole team starts with the same servers. Keep tokens out of it by referencing environment variables:</p>
+<pre><code>{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": "Bearer ${GITHUB_PAT}" }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./docs"]
+    }
+  }
+}</code></pre>
+    <p>Other MCP hosts use a very similar shape: a name, a command with arguments (stdio) or a URL (HTTP), and environment variables. Options and flags change between releases, so confirm them with <code>claude mcp --help</code> and the <a href="https://docs.claude.com/en/docs/claude-code/mcp" target="_blank" rel="noopener">Claude Code MCP documentation</a>.</p>
+    <h3>Servers that earn their place in an Android and DevOps team</h3>
+    <p>These are examples to evaluate, not an endorsement list. Check each project&rsquo;s own page for the current install command and permissions.</p>
+    <table class="lib">
+      <tr><th>Example</th><th>Use</th><th>Where to look</th></tr>
+      <tr><td><strong>GitHub MCP server</strong></td><td>Read issues and PRs, review diffs, check workflow runs</td><td><a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener">github/github-mcp-server</a></td></tr>
+      <tr><td><strong>Firebase MCP server</strong></td><td>Inspect projects, apps, Crashlytics and Remote Config from the agent. It is started through the Firebase CLI</td><td><a href="https://firebase.google.com/docs/ai-assistance/mcp-server" target="_blank" rel="noopener">Firebase docs</a></td></tr>
+      <tr><td><strong>Filesystem server</strong></td><td>Read and write inside folders you list, nowhere else</td><td><a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">modelcontextprotocol/servers</a></td></tr>
+      <tr><td><strong>Issue tracker server</strong> (Jira and Confluence via Atlassian&rsquo;s offering, or your tracker&rsquo;s)</td><td>Turn tickets into context for a fix</td><td>The vendor&rsquo;s documentation</td></tr>
+    </table>
+    <p>The full catalogue and the specification are at <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">modelcontextprotocol.io</a>.</p>
+    <h3>Security, because an MCP server is an access path</h3>
+    <div class="bad">
+      <strong>How this goes wrong</strong>
+      <ul>
+        <li>A personal token with full repository rights pasted into a shared config file.</li>
+        <li>A server installed from an unknown package that runs on your laptop with your permissions.</li>
+        <li><strong>Prompt injection:</strong> a ticket, web page or code comment contains instructions, and the agent follows them with the tools you gave it.</li>
+        <li>An agent allowed to write to production systems with no human in the loop.</li>
+      </ul>
+    </div>
+    <div class="good">
+      <strong>What I require</strong>
+      <ul>
+        <li><strong>Least privilege.</strong> Fine-grained, short-lived tokens limited to the repositories and actions needed. Read-only first; add writes one at a time.</li>
+        <li><strong>Secrets in the environment.</strong> Reference <code>${VARIABLES}</code> in config; never commit values.</li>
+        <li><strong>Trusted servers only.</strong> Official or reviewed code, pinned versions, and run untrusted ones in a container.</li>
+        <li><strong>Approvals.</strong> Keep the host&rsquo;s permission prompts on for anything that writes, deletes, publishes or spends money.</li>
+        <li><strong>Treat all fetched text as untrusted input</strong>, especially content from tickets, web pages and third-party code.</li>
+        <li><strong>Audit.</strong> Know who connected what, and keep logs of tool calls where the host supports it.</li>
+      </ul>
+    </div>
+
+    <h2 id="agents">10. The AI era, part 2: agents in your pipeline</h2>
+    <p>Once an agent can read a ticket, edit code and run tests, the natural next step is to run it from CI: a label on a ticket or a crash threshold starts a job that opens a pull request. The thinking is in <a href="ai-jira-to-pull-request-agent.html">the Jira to pull request agent article</a> and the team-level setup in <a href="claude-md-part-7-automation-and-teams.html">automation and teams</a>. The DevOps view is about the box the agent runs in.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="Agent in CI: a trigger such as a label or schedule starts a sandboxed runner with a scoped token; the agent edits code and runs tests; output is a pull request, never a push to main; a human review with required approval merges it. Guardrails across all steps: time limit, cost cap, tool allowlist, audit log.">
+        <rect class="boxb" x="9"   y="20" width="114" height="92" rx="10"/><text class="b c" x="66"  y="46">Trigger</text><text class="sub c" x="66"  y="70">label, schedule,</text><text class="sub c" x="66"  y="88">or alert</text>
+        <rect class="boxg" x="136" y="20" width="114" height="92" rx="10"/><text class="b c" x="193" y="46">Runner</text><text class="sub c" x="193" y="70">clean sandbox,</text><text class="sub c" x="193" y="88">no prod access</text>
+        <rect class="boxp" x="263" y="20" width="114" height="92" rx="10"/><text class="b c" x="320" y="46">Agent</text><text class="sub c" x="320" y="70">scoped token,</text><text class="sub c" x="320" y="88">runs the tests</text>
+        <rect class="boxo" x="390" y="20" width="114" height="92" rx="10"/><text class="b c" x="447" y="46">Pull request</text><text class="sub c" x="447" y="70">never a push</text><text class="sub c" x="447" y="88">to main</text>
+        <rect class="boxg" x="517" y="20" width="114" height="92" rx="10"/><text class="b c" x="574" y="46">Human</text><text class="sub c" x="574" y="70">required review,</text><text class="sub c" x="574" y="88">then merge</text>
+        <path class="arrow" d="M124,66 L134,66"/><path class="arrow" d="M251,66 L261,66"/><path class="arrow" d="M378,66 L388,66"/><path class="arrow" d="M505,66 L515,66"/>
+        <rect class="boxr" x="9" y="136" width="622" height="64" rx="10"/><text class="b c" x="320" y="162">Guardrails across every step</text><text class="sub c" x="320" y="184">time limit &middot; cost cap &middot; tool allowlist &middot; audit log &middot; branch protection</text>
+      </svg>
+      <figcaption>The agent is a very fast junior colleague with a tight leash. The pull request and the human review are the leash.</figcaption>
+    </figure>
+    <p>What you need to set up:</p>
+    <ul>
+      <li><strong>A headless mode.</strong> Claude Code can run non-interactively with <code>claude -p "&lt;task&gt;"</code>, and there is an official GitHub Action for running it on pull requests and issues. Check the docs for current options such as allowed tools and turn limits.</li>
+      <li><strong>Secrets for the model API</strong> (for example <code>ANTHROPIC_API_KEY</code>) stored as CI secrets, available only to the job that needs them. Do not run it on pull requests from forks.</li>
+      <li><strong>A tight tool allowlist.</strong> Give the job the commands it needs (read files, run Gradle tests, open a PR), not a general shell with network and deploy rights.</li>
+      <li><strong>Branch protection.</strong> Required reviews and required status checks on <code>main</code>, so the agent&rsquo;s PR goes through the same gates as a person&rsquo;s.</li>
+      <li><strong>Limits.</strong> A job timeout, a maximum number of turns, and a spend alert on the API account. Agents loop; budgets stop them.</li>
+      <li><strong>A project memory file.</strong> A <code>CLAUDE.md</code> that tells the agent how to build, test and what never to touch. See <a href="claude-md-part-2-memory.html">the memory article</a>.</li>
+      <li><strong>Observability.</strong> Save the transcript as a job artifact so you can read why it did what it did.</li>
+    </ul>
+<pre><code># sketch: a GitHub Actions job that runs an agent on a labelled issue
+on:
+  issues:
+    types: [labeled]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  agent:
+    if: github.event.label.name == 'agent-fix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Run the agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude -p "Fix issue #${{ github.event.issue.number }}. Run ./gradlew testDebugUnitTest. Open a pull request, do not push to main." \
+            --max-turns 20</code></pre>
+    <p>Treat that as a shape, not a recipe: flags, package names and the official Action evolve, so read the current documentation before you copy anything into a repository that matters.</p>
+
+    <h2 id="day1">11. Day-1 checklist for a new Android repo</h2>
+    <table>
+      <tr><th>#</th><th>Do this</th><th>Why</th></tr>
+      <tr><td>1</td><td>Commit the Gradle wrapper and pin the JDK version</td><td>Same build everywhere</td></tr>
+      <tr><td>2</td><td>Protect <code>main</code>: required PR review and required checks</td><td>Nothing unreviewed or red gets in</td></tr>
+      <tr><td>3</td><td>Add a CI workflow: lint, unit tests, assemble</td><td>Feedback on every PR</td></tr>
+      <tr><td>4</td><td>Turn on Gradle caching in CI</td><td>Builds in minutes, not tens of minutes</td></tr>
+      <tr><td>5</td><td>Create the upload keystore; enable Play App Signing; store secrets in CI</td><td>Safe, recoverable signing</td></tr>
+      <tr><td>6</td><td>Add a lane or job that sends every merge to <code>main</code> to App Distribution or DeployGate</td><td>Testers always have the latest</td></tr>
+      <tr><td>7</td><td>Add a manual, approved job that uploads to the Play internal track</td><td>Release without a laptop</td></tr>
+      <tr><td>8</td><td>Set version code from a CI counter or tag, never by hand</td><td>No &ldquo;version code already used&rdquo; surprises</td></tr>
+      <tr><td>9</td><td>Add ktlint, detekt and a baseline</td><td>Style debates end</td></tr>
+      <tr><td>10</td><td>Notify chat with result and links; connect Crashlytics</td><td>The team sees the release</td></tr>
+      <tr><td>11</td><td>Write <code>RELEASING.md</code>: who, how, rollback, contacts</td><td>The bus factor is not one</td></tr>
+      <tr><td>12</td><td>Only then: MCP servers and agents, read-only first</td><td>Automate a working process, not a missing one</td></tr>
+    </table>
+
+    <h2 id="pitfalls">12. Pitfalls I have paid for</h2>
+    <div class="bad">
+      <strong>What goes wrong</strong>
+      <ul>
+        <li><strong>Logic hidden in the CI UI.</strong> Click-configured steps nobody can review or move. Keep logic in files in the repo.</li>
+        <li><strong>Unpinned everything.</strong> &ldquo;latest&rdquo; images and action versions change under you on a Friday.</li>
+        <li><strong>Keystore only on one laptop.</strong> Or committed to git. Both end badly.</li>
+        <li><strong>Overpowered service accounts.</strong> A CI token that can publish to production from any branch.</li>
+        <li><strong>Secrets exposed to pull requests from forks</strong> or printed into logs.</li>
+        <li><strong>No cache, no timeout.</strong> Slow builds and runaway jobs that burn minutes.</li>
+        <li><strong>Flaky emulator tests as a hard gate.</strong> People learn to re-run until green. Quarantine flakes.</li>
+        <li><strong>Jenkins snowflakes.</strong> One hand-built agent that nobody dares to restart.</li>
+        <li><strong>Giving an agent more access than a new hire would get.</strong></li>
+      </ul>
+    </div>
+    <div class="good">
+      <strong>What works</strong>
+      <ul>
+        <li>Thin CI files that call Gradle and fastlane.</li>
+        <li>Pinned versions, updated on purpose with a bot such as Dependabot or Renovate.</li>
+        <li>Separate credentials per environment, rotated on a schedule.</li>
+        <li>A release job that is boring, repeatable and approved by a human.</li>
+      </ul>
+    </div>
+
+    <h2 id="wrap">13. Takeaways and glossary</h2>
+    <ul>
+      <li>DevOps is part of software engineering for Android: it is how your code reaches people, safely and repeatedly.</li>
+      <li>Think in six stations: source, build, quality, distribute, store, observe. Choose the tool for each.</li>
+      <li>Start with the CI closest to your code, keep logic in Gradle and fastlane, and protect signing keys and service accounts first.</li>
+      <li>MCP and agents are new access paths into the same systems. Apply the old rules: least privilege, review, audit.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>CI / CD</td><td>Continuous integration builds and tests every change. Continuous delivery gets the result to testers or users.</td></tr>
+      <tr><td>Runner / agent</td><td>The machine that executes a CI job.</td></tr>
+      <tr><td>Workflow / pipeline</td><td>The ordered set of jobs that run for a change.</td></tr>
+      <tr><td>Artifact</td><td>A file a job produces, such as an AAB or APK.</td></tr>
+      <tr><td>AAB</td><td>Android App Bundle, the format you upload to Google Play.</td></tr>
+      <tr><td>Upload key</td><td>The key you sign uploads with when Play App Signing is on.</td></tr>
+      <tr><td>Service account</td><td>A non-human identity that automation uses to call an API.</td></tr>
+      <tr><td>Lane</td><td>A named fastlane task such as <code>internal</code> or <code>beta</code>.</td></tr>
+      <tr><td>MCP</td><td>Model Context Protocol, a standard way for AI apps to use tools and data.</td></tr>
+      <tr><td>stdio / HTTP transport</td><td>How an MCP client talks to a server: through a local process, or over the network.</td></tr>
+      <tr><td>Prompt injection</td><td>Hidden instructions in content an AI reads, trying to steer its actions.</td></tr>
+      <tr><td>Least privilege</td><td>Give an identity only the access it needs and nothing more.</td></tr>
+    </table>
+
+    <h2 id="links">Links and official documentation</h2>
+    <ul>
+      <li><strong>CI:</strong> <a href="https://docs.github.com/actions" target="_blank" rel="noopener">GitHub Actions</a> &middot; <a href="https://circleci.com/docs/" target="_blank" rel="noopener">CircleCI</a> &middot; <a href="https://devcenter.bitrise.io/" target="_blank" rel="noopener">Bitrise</a> &middot; <a href="https://www.jenkins.io/doc/" target="_blank" rel="noopener">Jenkins</a></li>
+      <li><strong>Build and release:</strong> <a href="https://developer.android.com/studio/build" target="_blank" rel="noopener">Android build</a> &middot; <a href="https://docs.fastlane.tools/" target="_blank" rel="noopener">fastlane</a> &middot; <a href="https://github.com/Triple-T/gradle-play-publisher" target="_blank" rel="noopener">Gradle Play Publisher</a> &middot; <a href="https://developers.google.com/android-publisher" target="_blank" rel="noopener">Google Play Developer API</a> &middot; <a href="https://developer.android.com/studio/publish/app-signing" target="_blank" rel="noopener">App signing</a></li>
+      <li><strong>Distribution and monitoring:</strong> <a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">Firebase App Distribution</a> &middot; <a href="https://docs.deploygate.com/" target="_blank" rel="noopener">DeployGate</a> &middot; <a href="https://firebase.google.com/docs/crashlytics" target="_blank" rel="noopener">Crashlytics</a></li>
+      <li><strong>Quality and containers:</strong> <a href="https://pinterest.github.io/ktlint/" target="_blank" rel="noopener">ktlint</a> &middot; <a href="https://detekt.dev/" target="_blank" rel="noopener">detekt</a> &middot; <a href="https://docs.sonarsource.com/" target="_blank" rel="noopener">SonarQube</a> &middot; <a href="https://docs.docker.com/" target="_blank" rel="noopener">Docker</a></li>
+      <li><strong>AI tooling:</strong> <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol</a> &middot; <a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">MCP servers</a> &middot; <a href="https://docs.claude.com/en/docs/claude-code/mcp" target="_blank" rel="noopener">Claude Code and MCP</a></li>
+      <li>On this site: <a href="android-release-lifecycle-dev-to-play-store.html">The Android release lifecycle</a> &middot; <a href="android-release-validation-strategy.html">Release validation strategy</a> &middot; <a href="firebase-app-distribution-overview.html">App Distribution overview</a> &middot; <a href="android-studio-plugin-firebase-distribution.html">Android Studio plugin for Firebase distribution</a> &middot; <a href="ai-jira-to-pull-request-agent.html">Jira to pull request agent</a> &middot; <a href="claude-md-part-7-automation-and-teams.html">Automation and teams</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+</body>
+</html>

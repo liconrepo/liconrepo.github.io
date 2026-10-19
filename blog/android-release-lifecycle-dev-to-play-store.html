@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>From git push to Google Play: The Full Android Release Lifecycle, Told by the Release Manager — Khairul Alam</title>
+  <meta name="description" content="A release manager's tour of the whole Android release journey: PR merge, release branch, CI build, Firebase App Distribution or DeployGate, Play internal testing, staged rollout and the announcement. Who watches what at each stage, with cartoon diagrams." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+
+    /* ── Release lifecycle: cartoon extras ── */
+    .stage { display: grid; grid-template-columns: 54px 1fr; gap: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; margin: 22px 0; }
+    .stage .num { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: calc(20px * var(--fs, 1)); color: #fff; background: #3b82f6; box-shadow: 0 3px 0 rgba(0,0,0,.18); }
+    .stage.g .num { background: #10b981; } .stage.o .num { background: #f59e0b; } .stage.p .num { background: #a855f7; } .stage.r .num { background: #ef4444; }
+    .stage h3 { margin: 2px 0 4px; } .stage p, .stage ul { margin: 8px 0; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
+    .chip { border-radius: 999px; padding: 2px 10px; font-size: calc(12px * var(--fs, 1)); font-weight: 600; border: 1px solid var(--border-h); color: var(--sub); background: var(--bg); }
+    .chip.who { border-color: #3b82f6; color: #2563eb; } .chip.tool { border-color: #10b981; color: #047857; } .chip.watch { border-color: #f59e0b; color: #b45309; }
+    [data-theme="dark"] .chip.who { color: #93c5fd; } [data-theme="dark"] .chip.tool { color: #6ee7b7; } [data-theme="dark"] .chip.watch { color: #fcd34d; }
+    .bubble { position: relative; background: var(--card); border: 2px solid var(--text); border-radius: 18px; padding: 12px 16px; margin: 22px 0 22px 14px; box-shadow: 4px 4px 0 var(--text); }
+    .bubble::before { content: ""; position: absolute; left: 22px; bottom: -14px; width: 20px; height: 20px; background: var(--card); border-right: 2px solid var(--text); border-bottom: 2px solid var(--text); transform: rotate(45deg); }
+    .bubble p { margin: 4px 0; } .bubble .who { font-weight: 700; font-size: .85em; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .oops { border: 2px dashed #ef4444; border-radius: 14px; padding: 12px 18px; margin: 20px 0; background: color-mix(in srgb, #ef4444 6%, var(--card)); }
+    .oops > strong:first-child { display: block; margin-bottom: 4px; }
+    svg .face { fill: #fde7c7; stroke: var(--text); stroke-width: 2; }
+    svg .eye { fill: #1c1c20; } svg .mouth { fill: none; stroke: #1c1c20; stroke-width: 2.2; stroke-linecap: round; }
+    svg .ink { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    svg .road { stroke: var(--border-h); stroke-width: 12; fill: none; stroke-linecap: round; stroke-dasharray: 2 14; }
+    svg .em { font-size: 22px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Release management &middot; Android &middot; DevOps</p>
+    <h1>From <code>git push</code> to Google Play: The Full Android Release Lifecycle, Told by the Release Manager 🚀</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~20 min read</span></div>
+    <div class="tags"><span class="tag">Release management</span><span class="tag">Android</span><span class="tag">CI/CD</span><span class="tag">Firebase App Distribution</span><span class="tag">DeployGate</span><span class="tag">Google Play</span></div>
+
+    <p class="lede">Writing the code is the middle of the story. Before it there is a pull request, and after it there is a release branch, a build server, a handful of testers, three Google Play tracks, a rollout slider, and a message to everyone who cares. I have been the person holding the release button for a long time, and I love it: it is the moment where weeks of work meet real people. This is the whole journey, stage by stage, with who watches what, what breaks, and how to tell the team when it is done.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>A release is a <strong>conveyor belt of gates</strong>: PR checks &rarr; merge &rarr; release branch &rarr; CI builds one signed bundle &rarr; testers (Firebase App Distribution or DeployGate) &rarr; Play internal &rarr; closed/open &rarr; <strong>staged rollout</strong> &rarr; announce.</li>
+        <li><strong>Build once, promote the same artifact.</strong> The bundle testers touched is the bundle users get.</li>
+        <li>Every stage has <strong>an owner, a signal to watch and a stop rule</strong>. Humans own decisions, robots own repetition.</li>
+        <li>Companies differ in cadence (weekly train, monthly, continuous), but the <strong>shape is the same</strong>: freeze, verify, widen, watch, tell people.</li>
+        <li>The release is not done when it is <strong>live</strong>. It is done when the <strong>numbers are healthy and everyone has been told</strong>.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#cast">The cast</a></li>
+        <li><a href="#road">The road map</a></li>
+        <li><a href="#s1">Stage 1&ndash;2: Pull request and merge</a></li>
+        <li><a href="#s3">Stage 3: Cut the release branch</a></li>
+        <li><a href="#s4">Stage 4: CI builds the release candidate</a></li>
+        <li><a href="#s5">Stage 5: Testers get the build</a></li>
+        <li><a href="#s6">Stage 6: Google Play, internal to closed</a></li>
+        <li><a href="#s7">Stage 7: Staged rollout to the market</a></li>
+        <li><a href="#s8">Stage 8: Announce, watch, close</a></li>
+        <li><a href="#watch">Who watches what</a></li>
+        <li><a href="#code">The pipeline as code</a></li>
+        <li><a href="#hotfix">When it goes wrong: the hotfix lane</a></li>
+        <li><a href="#styles">Every company is different, and yet&hellip;</a></li>
+        <li><a href="#runbook">Release-day runbook and classic oops moments</a></li>
+        <li><a href="#wrap">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="cast">1. The cast</h2>
+    <p>A release is a team sport. Here is who is on the field. Notice how many of them are <em>not</em> developers.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="The cast of a release: developer, reviewer, CI robot, QA testers, release manager and product owner."><rect x="36" y="90" width="48" height="38" rx="14" style="fill:#bfdbfe;stroke:var(--text);stroke-width:2"/><circle class="face" cx="60" cy="60" r="26"/><circle class="eye" cx="51" cy="55" r="3"/><circle class="eye" cx="69" cy="55" r="3"/><path class="mouth" d="M52,70 q8,8 16,0"/><text class="em c" x="60" y="34">💻</text><text class="b c" x="60" y="150">Dev</text><text class="sub c" x="60" y="166">writes the code</text><rect x="148" y="90" width="48" height="38" rx="14" style="fill:#ddd6fe;stroke:var(--text);stroke-width:2"/><circle class="face" cx="172" cy="60" r="26"/><circle class="eye" cx="163" cy="55" r="3"/><circle class="eye" cx="181" cy="55" r="3"/><path class="mouth" d="M164,70 q8,8 16,0"/><text class="em c" x="172" y="34">🔍</text><text class="b c" x="172" y="150">Reviewer</text><text class="sub c" x="172" y="166">guards main</text><rect x="260" y="90" width="48" height="38" rx="8" style="fill:#93c5fd;stroke:var(--text);stroke-width:2"/><path class="ink" d="M284,34 L284,24"/><circle cx="284" cy="22" r="4" style="fill:#ef4444;stroke:var(--text);stroke-width:2"/><rect x="258" y="34" width="52" height="50" rx="10" style="fill:#d4d4d8;stroke:var(--text);stroke-width:2"/><rect x="267" y="46" width="12" height="12" rx="3" class="eye"/><rect x="289" y="46" width="12" height="12" rx="3" class="eye"/><path class="mouth" d="M274,70 L294,70"/><text class="b c" x="284" y="150">CI Robot</text><text class="sub c" x="284" y="166">builds + ships</text><rect x="372" y="90" width="48" height="38" rx="14" style="fill:#bbf7d0;stroke:var(--text);stroke-width:2"/><circle class="face" cx="396" cy="60" r="26"/><circle class="eye" cx="387" cy="55" r="3"/><circle class="eye" cx="405" cy="55" r="3"/><path class="mouth" d="M392,71 a4,5 0 1 0 8,0 a4,5 0 1 0 -8,0"/><text class="em c" x="396" y="34">🧪</text><text class="b c" x="396" y="150">QA / testers</text><text class="sub c" x="396" y="166">break it nicely</text><rect x="484" y="90" width="48" height="38" rx="14" style="fill:#fde68a;stroke:var(--text);stroke-width:2"/><circle class="face" cx="508" cy="60" r="26"/><circle class="eye" cx="499" cy="55" r="3"/><circle class="eye" cx="517" cy="55" r="3"/><path class="mouth" d="M500,70 q8,8 16,0"/><text class="em c" x="508" y="34">🧭</text><text class="b c" x="508" y="150">Release Manager</text><text class="sub c" x="508" y="166">that is me</text><rect x="576" y="90" width="48" height="38" rx="14" style="fill:#fecaca;stroke:var(--text);stroke-width:2"/><circle class="face" cx="600" cy="60" r="26"/><circle class="eye" cx="591" cy="55" r="3"/><circle class="eye" cx="609" cy="55" r="3"/><path class="mouth" d="M592,70 q8,8 16,0"/><text class="em c" x="600" y="34">📣</text><text class="b c" x="600" y="150">Product</text><text class="sub c" x="600" y="166">says go</text></svg>
+      <figcaption>Six players, one goal. The robot does the boring parts so humans can make the judgment calls.</figcaption>
+    </figure>
+
+    <h2 id="road">2. The road map</h2>
+    <p>Eight stations from an idea in a branch to a happy user. Different companies rename them, merge them or skip one, but I have never seen a healthy release that had none of them.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Road map of the release journey in eight stations: code and pull request, merge to main, cut release branch, CI builds the app bundle, testers get the build, Play internal and closed testing, staged rollout, announce and watch."><path class="road" d="M70,66 L570,66 Q620,66 620,116 Q620,166 570,166 L70,166"/><circle cx="70" cy="66" r="30" class="boxb"/><text class="em c" x="70" y="74">🛠️</text><text class="b c" x="40" y="32" style="font-size:12px;text-anchor:start">1</text><text class="b c" x="70" y="118" style="font-size:13px">Code + PR</text><circle cx="230" cy="66" r="30" class="boxb"/><text class="em c" x="230" y="74">✅</text><text class="b c" x="200" y="32" style="font-size:12px;text-anchor:start">2</text><text class="b c" x="230" y="118" style="font-size:13px">Merge to main</text><circle cx="390" cy="66" r="30" class="boxg"/><text class="em c" x="390" y="74">🌿</text><text class="b c" x="360" y="32" style="font-size:12px;text-anchor:start">3</text><text class="b c" x="390" y="118" style="font-size:13px">Cut release branch</text><circle cx="550" cy="66" r="30" class="boxg"/><text class="em c" x="550" y="74">🤖</text><text class="b c" x="520" y="32" style="font-size:12px;text-anchor:start">4</text><text class="b c" x="550" y="118" style="font-size:13px">CI builds the AAB</text><circle cx="550" cy="166" r="30" class="boxo"/><text class="em c" x="550" y="174">📲</text><text class="b c" x="520" y="132" style="font-size:12px;text-anchor:start">5</text><text class="b c" x="550" y="218" style="font-size:13px">Testers get it</text><circle cx="390" cy="166" r="30" class="boxo"/><text class="em c" x="390" y="174">🧪</text><text class="b c" x="360" y="132" style="font-size:12px;text-anchor:start">6</text><text class="b c" x="390" y="218" style="font-size:13px">Play internal / closed</text><circle cx="230" cy="166" r="30" class="boxp"/><text class="em c" x="230" y="174">🚀</text><text class="b c" x="200" y="132" style="font-size:12px;text-anchor:start">7</text><text class="b c" x="230" y="218" style="font-size:13px">Staged rollout</text><circle cx="70" cy="166" r="30" class="boxp"/><text class="em c" x="70" y="174">📣</text><text class="b c" x="40" y="132" style="font-size:12px;text-anchor:start">8</text><text class="b c" x="70" y="218" style="font-size:13px">Announce + watch</text><text class="sub c" x="320" y="30">START</text><text class="sub c" x="320" y="240">FINISH: users have it, the team knows, we are watching</text></svg>
+      <figcaption>Follow the dotted road. At every station there is a check, and the build only moves forward when the check is green.</figcaption>
+    </figure>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="Pipeline of tools. Developer pushes to GitHub. A CI service (GitHub Actions, CircleCI or Bitrise) lints, tests and builds a signed AAB. The artifact is stored once. It goes to Firebase App Distribution or DeployGate for testers, and to Google Play internal testing, then closed or open testing, then production with staged rollout. Crashlytics and Android vitals feed monitoring back to the release manager.">
+        <rect class="boxb" x="6" y="20" width="104" height="58" rx="10"/><text class="b c" x="58" y="46">GitHub</text><text class="sub c" x="58" y="64">PR + branches</text>
+        <rect class="boxg" x="124" y="20" width="180" height="58" rx="10"/><text class="b c" x="214" y="44">CI service</text><text class="sub c" x="214" y="62">Actions &middot; CircleCI &middot; Bitrise</text>
+        <rect class="box" x="320" y="20" width="130" height="58" rx="10"/><text class="b c" x="385" y="44">Signed AAB</text><text class="sub c" x="385" y="62">built once</text>
+        <path class="arrow" d="M112,49 L122,49"/><path class="arrow" d="M306,49 L318,49"/>
+        <rect class="boxo" x="480" y="6" width="154" height="40" rx="10"/><text class="b c" x="557" y="22" style="font-size:13px">Firebase</text><text class="sub c" x="557" y="38">App Distribution</text>
+        <rect class="boxo" x="480" y="54" width="154" height="40" rx="10"/><text class="b c" x="557" y="78">DeployGate</text>
+        <path class="arrow" d="M452,40 L478,28"/><path class="arrow" d="M452,58 L478,74"/>
+        <text class="sub c" x="557" y="112">QA + UAT + dogfood installs</text>
+        <rect class="boxp" x="6" y="140" width="150" height="58" rx="10"/><text class="b c" x="81" y="164">Play internal</text><text class="sub c" x="81" y="182">&le;100 testers, minutes</text>
+        <rect class="boxp" x="186" y="140" width="150" height="58" rx="10"/><text class="b c" x="261" y="164">Closed / open</text><text class="sub c" x="261" y="182">beta, pre-launch report</text>
+        <rect class="boxg" x="366" y="140" width="150" height="58" rx="10"/><text class="b c" x="441" y="164">Production</text><text class="sub c" x="441" y="182">staged rollout 1&rarr;100%</text>
+        <path class="arrow" d="M158,169 L184,169"/><path class="arrow" d="M338,169 L364,169"/>
+        <path class="arrow" d="M385,80 L385,118 L81,118 L81,138" style="stroke-dasharray:5 4"/><text class="sub c" x="230" y="112">same AAB, promoted</text>
+        <rect class="boxr" x="546" y="140" width="88" height="58" rx="10"/><text class="b c" x="590" y="164">Watch</text><text class="sub c" x="590" y="182">vitals</text>
+        <path class="arrow" d="M518,169 L544,169"/>
+        <path class="arrow" d="M590,200 L590,236 L58,236 L58,82" style="stroke-dasharray:5 4"/><text class="sub c" x="320" y="254">Crashlytics + Android vitals feed back: halt, hotfix, or carry on</text>
+      </svg>
+      <figcaption>The same bundle flows left to right. The dashed line is the feedback loop that makes you brave.</figcaption>
+    </figure>
+
+    <h2 id="s1">3. Stage 1&ndash;2: Pull request and merge</h2>
+    <div class="stage">
+      <div class="num">1</div>
+      <div>
+        <h3>The PR is the first gate</h3>
+        <p>Everything starts with a small pull request. The CI robot runs <strong>lint, unit tests, a debug build</strong> and static analysis on every push. A human reviews the change. Branch protection makes both of these mandatory, so &ldquo;I forgot to run the tests&rdquo; cannot happen.</p>
+        <div class="chips"><span class="chip who">Dev + Reviewer</span><span class="chip tool">GitHub Actions / CircleCI / Bitrise</span><span class="chip watch">PR check time, flaky tests</span></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="num">2</div>
+      <div>
+        <h3>Merge to main, and keep main green</h3>
+        <p>Squash-merge so history is readable. After merge, a post-merge pipeline can build a <strong>nightly or per-merge internal build</strong> for employees to dogfood. The rule I defend loudly: <strong>main is always releasable</strong>. If main goes red, fixing it is everyone&rsquo;s first job.</p>
+        <p>Incomplete features merge <em>behind a feature flag</em>, so unfinished work never blocks a release. This one habit saves more release days than any tool.</p>
+        <div class="chips"><span class="chip who">Dev</span><span class="chip tool">Branch protection, squash merge, Remote Config flags</span><span class="chip watch">main build status</span></div>
+      </div>
+    </div>
+    <div class="bubble"><p class="who">Release manager says</p><p>If I ever have to ask &ldquo;is main OK?&rdquo; in chat, our automation has already failed. The answer should be a green badge on the repo.</p></div>
+
+    <h2 id="s3">4. Stage 3: Cut the release branch</h2>
+    <div class="stage g">
+      <div class="num">3</div>
+      <div>
+        <h3>Freeze a slice of history</h3>
+        <p>On release day minus a few, I cut <code>release/2.4.0</code> from main. From that moment the branch accepts <strong>only bug fixes</strong> that are cherry-picked from main (or fixed on the branch and merged back). Main keeps moving with the next version&rsquo;s work.</p>
+        <ul>
+          <li><strong>Bump the version.</strong> <code>versionName</code> is for humans (2.4.0). <code>versionCode</code> is a number that must go up with every upload to Play. Many teams derive it from CI&rsquo;s build number so it can never be forgotten.</li>
+          <li><strong>Write the changelog.</strong> Pull the merged PR titles since the last tag, then edit into plain language.</li>
+          <li><strong>Announce the freeze.</strong> A short message: version, branch name, date, who approves fixes.</li>
+        </ul>
+        <div class="chips"><span class="chip who">Release manager</span><span class="chip tool">git, GitHub release notes, Gradle properties</span><span class="chip watch">fix requests creeping in</span></div>
+      </div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 232" role="img" aria-label="Branch diagram. The main branch keeps moving. A release/2.4.0 branch is cut from main, receives two cherry-picked fixes and is tagged v2.4.0. A hotfix branch is cut from the tag for 2.4.1. After release, the release branch is merged back to main.">
+        <text class="b" x="8" y="26">main</text><path class="ink" d="M60,22 L630,22"/>
+        <text class="b" x="8" y="104">release/2.4.0</text>
+        <path class="ink" d="M140,22 Q150,22 160,40 L180,96"/><path class="ink" d="M180,100 L470,100"/>
+        <text class="b" x="8" y="196">hotfix/2.4.1</text><path class="ink" d="M440,100 L452,170 L560,170"/>
+        <circle cx="80" cy="22" r="7" class="boxb"/><circle cx="120" cy="22" r="7" class="boxb"/><circle cx="140" cy="22" r="9" class="boxg"/><text class="sub" x="116" y="8">cut here</text>
+        <circle cx="220" cy="22" r="7" class="boxb"/><circle cx="270" cy="22" r="7" class="boxb"/><circle cx="330" cy="22" r="7" class="boxb"/><circle cx="560" cy="22" r="7" class="boxb"/>
+        <circle cx="240" cy="100" r="7" class="boxo"/><text class="sub c" x="240" y="124">fix #1</text><circle cx="320" cy="100" r="7" class="boxo"/><text class="sub c" x="320" y="124">fix #2</text>
+        <path class="arrow" d="M270,28 Q290,60 316,92" style="stroke-dasharray:4 4"/><text class="sub" x="292" y="62">cherry-pick</text>
+        <rect x="402" y="88" width="86" height="24" rx="12" class="boxp"/><text class="b c" x="445" y="105" style="font-size:12px">tag v2.4.0 🚀</text>
+        <circle cx="520" cy="170" r="7" class="boxr"/><text class="sub c" x="520" y="194">fix</text><circle cx="560" cy="170" r="9" class="boxp"/><text class="sub" x="540" y="154">v2.4.1</text>
+        <path class="arrow" d="M488,100 Q540,100 556,30" style="stroke-dasharray:5 4"/><text class="sub" x="530" y="76">merge back</text>
+      </svg>
+      <figcaption>The release branch is a small, quiet room. Only fixes get in. After the release it is merged back so main never loses a fix.</figcaption>
+    </figure>
+
+    <h2 id="s4">5. Stage 4: CI builds the release candidate</h2>
+    <div class="stage g">
+      <div class="num">4</div>
+      <div>
+        <h3>The robot makes one signed bundle</h3>
+        <p>A push to <code>release/*</code> (or a tag) triggers the release pipeline on <strong>GitHub Actions, CircleCI or Bitrise</strong>. Nobody builds the release on a laptop. The pipeline:</p>
+        <ol>
+          <li>Checks out the exact commit and restores Gradle caches.</li>
+          <li>Runs unit tests, lint, and instrumented or managed-device tests as budget allows.</li>
+          <li>Decodes the <strong>signing keystore from encrypted secrets</strong> (or uses Play App Signing with an upload key) and builds the <strong>AAB</strong>.</li>
+          <li>Uploads the AAB and the <strong>R8 mapping file</strong> as artifacts. Without the mapping file, production stack traces are unreadable.</li>
+          <li>Posts the build number and links to the team channel.</li>
+        </ol>
+        <div class="chips"><span class="chip who">DevOps + Release manager</span><span class="chip tool">GitHub Actions &middot; CircleCI &middot; Bitrise &middot; Gradle &middot; fastlane</span><span class="chip watch">build time, signing, secrets, artifact size</span></div>
+      </div>
+    </div>
+    <div class="note"><p><strong>Why build once?</strong> If the build for testers and the build for the store are two different compilations, the QA sign-off applies to neither. Build one bundle, record its hash, and promote it.</p></div>
+
+    <h2 id="s5">6. Stage 5: Testers get the build</h2>
+    <div class="stage o">
+      <div class="num">5</div>
+      <div>
+        <h3>Firebase App Distribution or DeployGate</h3>
+        <p>The pipeline pushes the same build to an install-anywhere service so QA, product owners and employees can test without waiting for Play:</p>
+        <table>
+          <tr><th></th><th>Firebase App Distribution</th><th>DeployGate</th></tr>
+          <tr><td><strong>Good at</strong></td><td>Tight Firebase integration, groups, release notes, tester feedback, Crashlytics link</td><td>Instant install links and QR, version history, popular in Japan and for non-technical testers</td></tr>
+          <tr><td><strong>Upload from CI</strong></td><td>Gradle plugin, Firebase CLI or a CI step</td><td>REST API, CLI or a CI step</td></tr>
+          <tr><td><strong>Typical use</strong></td><td>Nightly dogfood, QA regression, UAT builds</td><td>Stakeholder demos, partner testing, device-lab installs</td></tr>
+        </table>
+        <p>This is where QA runs the regression checklist and the business runs <strong>UAT</strong>. Their feedback becomes either fixes on the release branch (back to stage 3) or a sign-off. See <a href="android-release-validation-strategy.html">the validation strategy article</a> for how I structure those gates.</p>
+        <div class="chips"><span class="chip who">QA + Product</span><span class="chip tool">Firebase App Distribution &middot; DeployGate</span><span class="chip watch">tester coverage, open blockers</span></div>
+      </div>
+    </div>
+
+    <h2 id="s6">7. Stage 6: Google Play, internal to closed</h2>
+    <div class="stage p">
+      <div class="num">6</div>
+      <div>
+        <h3>Same bundle, now in the store</h3>
+        <p>Once QA says go, the pipeline (or a human with a deliberate click) uploads the <strong>same AAB</strong> to the Play Console <strong>internal testing</strong> track. Testers receive it through the normal Play Store in minutes, which proves the thing that App Distribution cannot: <em>store install, Play signing, and update-from-previous-version</em> all work.</p>
+        <ul>
+          <li><strong>Internal track:</strong> up to 100 named testers, fastest feedback. Smoke checklist, install and upgrade checks.</li>
+          <li><strong>Closed / open testing:</strong> invited groups or anyone with the link. The Play <strong>pre-launch report</strong> runs automated robots on Google&rsquo;s devices and reports crashes, accessibility and security warnings.</li>
+          <li><strong>Store paperwork:</strong> release notes per language, screenshots if changed, the <strong>Data safety</strong> form, permission declarations, target API requirements. A forgotten declaration can block a release for days.</li>
+          <li><strong>Review:</strong> Google reviews updates. Most pass quickly, but allow buffer for the occasional slow or rejected review. Submit before you need it.</li>
+        </ul>
+        <div class="chips"><span class="chip who">Release manager</span><span class="chip tool">Play Console &middot; Play Developer API &middot; fastlane supply / Gradle Play Publisher</span><span class="chip watch">pre-launch report, policy warnings, review status</span></div>
+      </div>
+    </div>
+
+    <h2 id="s7">8. Stage 7: Staged rollout to the market</h2>
+    <div class="stage r">
+      <div class="num">7</div>
+      <div>
+        <h3>Open the tap slowly</h3>
+        <p>Promote to <strong>production at a small percentage</strong>: 1% or 5% for a canary, then 20%, 50%, 100%. At each step I wait for enough sessions to see a real difference, then compare the new version against the old on the <em>same days</em>.</p>
+        <p><strong>My stop rules are written before I press the button:</strong> crash-free users below the agreed line, ANR above the Play threshold, or a key funnel (login, checkout) down by more than a set percentage. Breach means <strong>halt the rollout</strong>, flip the kill switch flag if the feature has one, then hotfix.</p>
+        <div class="chips"><span class="chip who">Release manager + on-call engineer</span><span class="chip tool">Play staged rollout &middot; Crashlytics &middot; Android vitals &middot; analytics</span><span class="chip watch">crash-free, ANR, funnel, ratings, support tickets</span></div>
+      </div>
+    </div>
+    <div class="oops">
+      <strong>🙈 Halting does not un-install</strong>
+      <p>Halting a staged rollout stops new users from getting the version, but anyone who already updated keeps it. That is why risky features hide behind a remote flag: you can switch off the behavior without a new release.</p>
+    </div>
+
+    <h2 id="s8">9. Stage 8: Announce, watch, close</h2>
+    <div class="stage">
+      <div class="num">8</div>
+      <div>
+        <h3>The release is not done until people know</h3>
+        <p>When rollout reaches 100% and the numbers are healthy for an agreed window (I like 24 to 48 hours), I close the release:</p>
+        <ul>
+          <li><strong>Tag and merge back.</strong> Tag the commit, merge the release branch into main, archive the mapping file and the final AAB hash.</li>
+          <li><strong>Announce to the team and stakeholders.</strong> Different audiences, different messages (below).</li>
+          <li><strong>Update the tracker.</strong> Mark tickets released, link the version, close the release ticket.</li>
+          <li><strong>Retrospective if anything hurt.</strong> One paragraph and one action item beats a long meeting.</li>
+        </ul>
+        <div class="chips"><span class="chip who">Release manager</span><span class="chip tool">Slack / Teams, Jira, GitHub releases, email</span><span class="chip watch">post-release health for 24&ndash;48 h</span></div>
+      </div>
+    </div>
+    <h3>What I send, and to whom</h3>
+    <table>
+      <tr><th>Audience</th><th>Channel</th><th>What they need</th></tr>
+      <tr><td><strong>Engineering</strong></td><td>Team channel</td><td>Version, tag, what is in it, known issues, branch is unfrozen, who is on call</td></tr>
+      <tr><td><strong>QA</strong></td><td>Team channel</td><td>Version live, which areas to monitor, regression follow-ups</td></tr>
+      <tr><td><strong>Product and business</strong></td><td>Email or announcement channel</td><td>Plain-language highlights, rollout percentage and date, metrics to expect</td></tr>
+      <tr><td><strong>Support and sales</strong></td><td>Support channel</td><td>What changed for users, FAQ, known issues, how to escalate</td></tr>
+      <tr><td><strong>Leadership</strong></td><td>Short summary</td><td>Shipped on time or not, health status, any risk</td></tr>
+    </table>
+    <div class="bubble"><p class="who">Announcement template</p><p>📣 <strong>Android 2.4.0 is live (100%).</strong> Highlights: faster checkout, dark mode for settings, bug fixes. Health: crash-free 99.7%, no ANR change. Known issue: coupon banner flickers on Android 8 (fix in 2.4.1). Release notes: &lt;link&gt;. On-call: &lt;name&gt;. Thank you, everyone! 🎉</p></div>
+
+    <h2 id="watch">10. Who watches what</h2>
+    <p>The most common release failure I see is not a bug. It is <em>nobody knowing they were supposed to be watching</em>. I put this table on the wiki.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="Release health dashboard cartoon. Four dials: crash-free users 99.7 percent green, ANR rate 0.2 percent green, rating 4.6 stars green, checkout funnel minus 3 percent amber. A siren icon shows the halt rule.">
+        <rect class="boxg" x="8" y="12" width="148" height="120" rx="14"/><text class="em c" x="82" y="46">🛡️</text><text class="b c" x="82" y="76">Crash-free</text><text class="b c" x="82" y="102" style="font-size:22px;fill:#047857">99.7%</text><text class="sub c" x="82" y="122">line: &ge; 99.5</text>
+        <rect class="boxg" x="172" y="12" width="148" height="120" rx="14"/><text class="em c" x="246" y="46">🧊</text><text class="b c" x="246" y="76">ANR rate</text><text class="b c" x="246" y="102" style="font-size:22px;fill:#047857">0.2%</text><text class="sub c" x="246" y="122">under Play limit</text>
+        <rect class="boxg" x="336" y="12" width="148" height="120" rx="14"/><text class="em c" x="410" y="46">⭐</text><text class="b c" x="410" y="76">Rating</text><text class="b c" x="410" y="102" style="font-size:22px;fill:#047857">4.6</text><text class="sub c" x="410" y="122">new reviews</text>
+        <rect class="boxo" x="500" y="12" width="132" height="120" rx="14"/><text class="em c" x="566" y="46">🛒</text><text class="b c" x="566" y="76">Checkout</text><text class="b c" x="566" y="102" style="font-size:22px;fill:#b45309">&minus;3%</text><text class="sub c" x="566" y="122">limit: &minus;5%</text>
+        <rect class="boxr" x="8" y="150" width="624" height="54" rx="14"/><text class="em" x="24" y="184">🚨</text><text class="b" x="60" y="174">Stop rule, agreed in advance:</text><text class="sub" x="60" y="194">past the line &rarr; halt &rarr; kill switch &rarr; page on-call &rarr; hotfix</text>
+      </svg>
+      <figcaption>The numbers and thresholds are examples. Pick yours with product before release day, not during an incident.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Stage</th><th>Dev</th><th>QA</th><th>Release manager</th><th>DevOps</th><th>Product</th></tr>
+      <tr><td><strong>PR + merge</strong></td><td>Owns green checks</td><td>&ndash;</td><td>Glances at main health</td><td>Runner capacity, flaky infra</td><td>&ndash;</td></tr>
+      <tr><td><strong>Release branch</strong></td><td>Cherry-picks fixes</td><td>Plans regression</td><td><strong>Owns freeze and scope</strong></td><td>Branch rules</td><td>Approves scope</td></tr>
+      <tr><td><strong>CI build</strong></td><td>Fixes breakages</td><td>&ndash;</td><td>Verifies artifact and version</td><td><strong>Owns pipeline, secrets, signing</strong></td><td>&ndash;</td></tr>
+      <tr><td><strong>Tester distribution</strong></td><td>Triages bugs</td><td><strong>Owns regression</strong></td><td>Tracks blockers</td><td>Upload step works</td><td><strong>Owns UAT sign-off</strong></td></tr>
+      <tr><td><strong>Play internal/closed</strong></td><td>Standby</td><td>Smoke and upgrade</td><td><strong>Owns Console, policy, review</strong></td><td>Service account valid</td><td>Release notes</td></tr>
+      <tr><td><strong>Staged rollout</strong></td><td><strong>On-call for crashes</strong></td><td>Watches reports</td><td><strong>Owns the slider and halt call</strong></td><td>Backend and infra health</td><td>Watches funnels</td></tr>
+      <tr><td><strong>Post-release</strong></td><td>Fixes escaped bugs</td><td>Adds regression tests</td><td><strong>Announces, tags, closes</strong></td><td>Cleans artifacts</td><td>Reads metrics</td></tr>
+    </table>
+    <p>For the DevOps column, the tools and install guides are in <a href="android-devops-toolbox-ci-cd-mcp-agents.html">The Android DevOps Toolbox</a>.</p>
+
+    <h2 id="code">11. The pipeline as code</h2>
+    <p>A sketch of a GitHub Actions release workflow. CircleCI and Bitrise express the same steps in <code>config.yml</code> or <code>bitrise.yml</code>. Treat action names and versions as placeholders and copy current ones from each action&rsquo;s documentation.</p>
+<pre><code>name: release
+on:
+  push:
+    branches: ["release/**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@&lt;version&gt;
+      - uses: actions/setup-java@&lt;version&gt;
+        with: { distribution: temurin, java-version: "&lt;jdk&gt;" }
+      - uses: gradle/actions/setup-gradle@&lt;version&gt;
+
+      - name: Test
+        run: ./gradlew lintRelease testReleaseUnitTest
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d &gt; "$RUNNER_TEMP/release.jks"
+
+      - name: Build signed bundle
+        run: ./gradlew bundleRelease -PversionCode=${{ github.run_number }}
+        env:
+          KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - uses: actions/upload-artifact@&lt;version&gt;
+        with:
+          name: release-bundle
+          path: |
+            app/build/outputs/bundle/release/*.aab
+            app/build/outputs/mapping/release/mapping.txt
+
+  distribute-testers:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@&lt;version&gt;
+      # upload to Firebase App Distribution (Firebase CLI or a maintained action)
+      # or to DeployGate (its API or CLI), then post the link to the team channel
+
+  play-internal:
+    needs: distribute-testers
+    environment: play-internal        # protected environment: needs a human approval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@&lt;version&gt;
+      # upload the same .aab to the Play internal track with a service account
+      # (fastlane supply, Gradle Play Publisher or a maintained action)</code></pre>
+    <ul>
+      <li><strong>A protected environment</strong> turns &ldquo;send to Play&rdquo; into a deliberate, logged human approval.</li>
+      <li><strong>Secrets live in the CI vault</strong>, never in the repo. Rotate them when a person with access leaves.</li>
+      <li><strong>Mask logs.</strong> A keystore password printed in a build log is a security incident.</li>
+    </ul>
+
+    <h2 id="hotfix">12. When it goes wrong: the hotfix lane</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 196" role="img" aria-label="Hotfix lane. Alert from vitals or support. Halt the rollout. Decide: flip a kill switch flag, or build a hotfix. Branch from the release tag, fix, run fast checks, build, test with a short smoke, and release as a new version with a fast staged rollout. Then post an incident note.">
+        <rect class="boxr" x="6" y="62" width="100" height="62" rx="12"/><text class="em c" x="56" y="88">🚨</text><text class="b c" x="56" y="112">Alert</text>
+        <rect class="boxo" x="124" y="62" width="100" height="62" rx="12"/><text class="em c" x="174" y="88">✋</text><text class="b c" x="174" y="112">Halt rollout</text>
+        <rect class="boxp" x="242" y="14" width="116" height="52" rx="12"/><text class="b c" x="300" y="36">Kill switch?</text><text class="sub c" x="300" y="54">flip a flag</text>
+        <rect class="boxb" x="242" y="120" width="116" height="62" rx="12"/><text class="b c" x="300" y="144">Hotfix branch</text><text class="sub c" x="300" y="162">from release tag</text>
+        <rect class="boxg" x="376" y="120" width="116" height="62" rx="12"/><text class="b c" x="434" y="144">Fast pipeline</text><text class="sub c" x="434" y="162">build + smoke test</text>
+        <rect class="boxg" x="510" y="120" width="124" height="62" rx="12"/><text class="b c" x="572" y="144">Release x.y.1</text><text class="sub c" x="572" y="162">faster rollout</text>
+        <path class="arrow" d="M108,93 L122,93"/><path class="arrow" d="M226,85 L240,48"/><path class="arrow" d="M226,100 L240,140"/><path class="arrow" d="M360,151 L374,151"/><path class="arrow" d="M494,151 L508,151"/>
+        <rect class="box" x="376" y="30" width="258" height="40" rx="10"/><text class="c" x="505" y="55" style="font-size:13px">📝 incident note + prevention</text>
+        <path class="arrow" d="M572,118 L572,72" style="stroke-dasharray:5 4"/>
+      </svg>
+      <figcaption>A rehearsed hotfix lane is boring. An improvised one is a long night.</figcaption>
+    </figure>
+    <p>The lane is the same pipeline with fewer steps, never a different, unreviewed one. Keep a tested hotfix procedure written down, and practice it once a quarter in a quiet week.</p>
+
+    <h2 id="styles">13. Every company is different, and yet&hellip;</h2>
+    <p>I have seen very different cadences. They are policies layered on the same skeleton.</p>
+    <table>
+      <tr><th>Style</th><th>Cadence</th><th>How it looks</th><th>Fits</th></tr>
+      <tr><td><strong>Release train</strong></td><td>Weekly or bi-weekly on a fixed day</td><td>Branch cut on a set day. Whatever is ready rides, the rest waits for the next train</td><td>Large apps, many teams</td></tr>
+      <tr><td><strong>Monthly / scheduled</strong></td><td>Every 2&ndash;6 weeks</td><td>Longer UAT, a release approval meeting or change-advisory board, marketing coordination</td><td>Enterprise, regulated or fintech apps</td></tr>
+      <tr><td><strong>Continuous delivery</strong></td><td>Every merge or daily</td><td>Trunk-based, heavy flags and automation. Staged rollout is the main safety net</td><td>Small teams with strong tests</td></tr>
+      <tr><td><strong>Milestone / feature release</strong></td><td>When the feature is done</td><td>Big launches with a coordinated campaign and a longer beta</td><td>Consumer launches, games</td></tr>
+      <tr><td><strong>Region staged</strong></td><td>Country by country</td><td>Start in a small market, expand as health is proven</td><td>Global consumer apps</td></tr>
+    </table>
+    <div class="callout">
+      <strong>What is the same everywhere</strong>
+      <ul>
+        <li>A <strong>freeze point</strong> after which scope stops growing.</li>
+        <li>A <strong>repeatable build</strong> that nobody makes by hand.</li>
+        <li><strong>Verification</strong> by someone who did not write the code.</li>
+        <li><strong>Gradual exposure</strong> with a way to stop.</li>
+        <li><strong>Communication</strong> to everyone affected, before and after.</li>
+      </ul>
+    </div>
+
+    <h2 id="runbook">14. Release-day runbook and classic oops moments</h2>
+    <div class="good">
+      <strong>My release-day checklist</strong>
+      <ul>
+        <li>☐ Release branch is green; no open blocker bugs; scope matches the plan.</li>
+        <li>☐ <code>versionCode</code> is higher than anything already uploaded; <code>versionName</code> is right.</li>
+        <li>☐ Backend changes the app depends on are <strong>already deployed</strong> and backward compatible.</li>
+        <li>☐ Feature flags have safe defaults; the kill switch is tested.</li>
+        <li>☐ Mapping file uploaded to Crashlytics (or stored); the AAB hash recorded.</li>
+        <li>☐ UAT sign-off is written down with the build number.</li>
+        <li>☐ Play listing, release notes, Data safety and policy items are complete.</li>
+        <li>☐ On-call person is named and reachable; stop rules are posted.</li>
+        <li>☐ Announcement draft is ready.</li>
+      </ul>
+    </div>
+    <div class="oops">
+      <strong>🙈 Oops moments I have seen (or caused)</strong>
+      <ul>
+        <li>Upload rejected: <strong>versionCode already used</strong>.</li>
+        <li>Built with the <strong>debug keystore</strong>, or the wrong upload key.</li>
+        <li>The app shipped but the <strong>backend change was not deployed</strong>, so login broke.</li>
+        <li>A flag that defaults <strong>on</strong> exposed a half-built feature to 100%.</li>
+        <li>No <strong>mapping file</strong>, so every crash was unreadable.</li>
+        <li>Release scheduled for Friday evening. (Please don&rsquo;t.)</li>
+        <li>Review took longer than expected and the marketing campaign started before the app was live.</li>
+        <li>Everyone assumed someone else was watching vitals.</li>
+      </ul>
+    </div>
+
+    <h2 id="wrap">15. Takeaways and glossary</h2>
+    <ul>
+      <li>A release is a pipeline of small gates, not one heroic push.</li>
+      <li>Build once, sign once, promote the same bundle through testers, Play tracks and production.</li>
+      <li>Release branches give you a quiet room to stabilize; staged rollout gives you a brake in the market.</li>
+      <li>Assign a named owner and a stop rule to every stage; write them down.</li>
+      <li>Close the loop: tag, merge back, announce, and watch for a day or two.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>AAB</td><td>Android App Bundle, the file you upload to Play. Google builds device-specific APKs from it.</td></tr>
+      <tr><td>versionCode / versionName</td><td>A number that must increase on every upload, and the label users see.</td></tr>
+      <tr><td>Release branch</td><td>A branch frozen for stabilizing one version.</td></tr>
+      <tr><td>Cherry-pick</td><td>Copying one specific commit onto another branch.</td></tr>
+      <tr><td>Release candidate</td><td>The build that will ship if it passes every gate.</td></tr>
+      <tr><td>Track</td><td>A Play release channel: internal, closed, open or production.</td></tr>
+      <tr><td>Staged rollout</td><td>Releasing to a growing percentage of users.</td></tr>
+      <tr><td>Kill switch</td><td>A remote flag that disables a feature without a new release.</td></tr>
+      <tr><td>Mapping file</td><td>The R8 file that turns obfuscated stack traces back into readable ones.</td></tr>
+      <tr><td>Hotfix</td><td>An urgent fix released outside the normal schedule.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://support.google.com/googleplay/android-developer/answer/9845334" target="_blank" rel="noopener">Play Console: open, closed and internal tests</a> &middot; <a href="https://support.google.com/googleplay/android-developer/answer/6346149" target="_blank" rel="noopener">Staged rollouts</a> &middot; <a href="https://developer.android.com/guide/app-bundle" target="_blank" rel="noopener">Android App Bundle</a></li>
+      <li><a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">Firebase App Distribution</a> &middot; <a href="https://docs.deploygate.com/" target="_blank" rel="noopener">DeployGate docs</a> &middot; <a href="https://docs.github.com/actions" target="_blank" rel="noopener">GitHub Actions</a> &middot; <a href="https://circleci.com/docs/" target="_blank" rel="noopener">CircleCI</a> &middot; <a href="https://devcenter.bitrise.io/" target="_blank" rel="noopener">Bitrise</a></li>
+      <li>On this site: <a href="android-devops-toolbox-ci-cd-mcp-agents.html">The Android DevOps Toolbox</a> &middot; <a href="android-release-validation-strategy.html">Release validation strategy</a> &middot; <a href="git-vcs-branching-guide.html">Git branching guide</a> &middot; <a href="firebase-app-distribution-overview.html">App Distribution overview</a> &middot; <a href="firebase-crashlytics-overview.html">Crashlytics</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+</body>
+</html>
