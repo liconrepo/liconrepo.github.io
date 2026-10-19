@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shipping Android Apps Safely: A Release Validation Strategy for Testing, Rollout and Experiments — Khairul Alam</title>
+  <meta name="description" content="A senior engineering view of how to decide what to test, who owns it, and when it gates a release: automated tests, dogfooding, internal and closed testing, UAT, staged rollout, observability, feature flags and A/B experiments for Android apps." />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+      .cs { display: table; table-layout: fixed; margin: 10px 0 0; }
+    .cs th:first-child, .cs td:first-child { width: 48%; }
+    .cs td:first-child { white-space: normal; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .cs th:first-child, .cs td:first-child { width: 55%; } }
+    .cs td:first-child code { font-size: .84em; }
+    .cs td:nth-child(2) { color: var(--sub); }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Engineering leadership &middot; Android &middot; Release quality</p>
+    <h1>Shipping Android Apps Safely: A Release Validation Strategy for Testing, Rollout and Experiments</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~18 min read</span></div>
+    <div class="tags"><span class="tag">Release strategy</span><span class="tag">Android</span><span class="tag">Dogfooding</span><span class="tag">UAT</span><span class="tag">Staged rollout</span><span class="tag">A/B testing</span></div>
+
+    <p class="lede">When a team asks me &ldquo;should we A/B test this?&rdquo;, the real question is usually bigger: <em>how do we know this release is safe, and how do we know it is worth shipping?</em> Those are different questions, and no single kind of test answers both. This article is how I think about it as an engineer, architect and manager: which risks a release carries, which test is the cheapest way to retire each one, who owns it, and what the exit criteria are. A/B testing is one tool in that set, and not the first one you reach for.</p>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li><strong>Test to retire risk, not to tick boxes.</strong> Name the risk (it crashes, it is slow, it is wrong, nobody wants it), then pick the cheapest test that retires it.</li>
+        <li>Two families of question: <strong>&ldquo;is it safe and correct?&rdquo;</strong> (automated tests, dogfooding, internal and closed testing, UAT, staged rollout) and <strong>&ldquo;is it valuable?&rdquo;</strong> (A/B tests, listing experiments, fake doors).</li>
+        <li>The audience grows at every gate and the cost of a defect rises with it. <strong>Find problems as early and as cheaply as possible</strong>, and make every later gate smaller by passing the earlier ones.</li>
+        <li><strong>Architecture decides how safely you can ship.</strong> Feature flags, a kill switch, backward-compatible APIs, observability and a single release artifact do more than any extra test phase.</li>
+        <li>Every gate needs <strong>an owner, an entry condition, an exit condition and a time box</strong>. A gate without those is a meeting.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#frame">Start from risk, not from test types</a></li>
+        <li><a href="#map">The map: safe, correct, valuable</a></li>
+        <li><a href="#auto">Layer 1: automated tests the team owns</a></li>
+        <li><a href="#quality">Layer 2: the non-functional checks people forget</a></li>
+        <li><a href="#human">Layer 3: humans before the market: dogfooding, internal, closed, UAT</a></li>
+        <li><a href="#rollout">Layer 4: production safety: staged rollout and observability</a></li>
+        <li><a href="#value">Layer 5: proving value: A/B testing and other experiments</a></li>
+        <li><a href="#arch">The architecture that makes this cheap</a></li>
+        <li><a href="#tools">Tooling on Android</a></li>
+        <li><a href="#run">Running it as a team: ownership, gates, metrics</a></li>
+        <li><a href="#anti">Anti-patterns I keep seeing</a></li>
+        <li><a href="#wrap">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="frame">1. Start from risk, not from test types</h2>
+    <p>Teams often copy a process: &ldquo;we do QA, then UAT, then release.&rdquo; That treats testing as a ritual. I prefer to ask what could go wrong with <em>this</em> change, how likely it is, and how bad it would be. A copy change in a settings screen and a rewrite of the payment flow do not deserve the same process.</p>
+    <table>
+      <tr><th>Risk</th><th>Example on Android</th><th>Cheapest test that retires it</th></tr>
+      <tr><td><strong>It is broken</strong></td><td>Logic bug, crash on rotation, null from an API</td><td>Unit, integration and UI tests in CI</td></tr>
+      <tr><td><strong>It breaks on real devices</strong></td><td>OEM skin quirks, old API level, low memory</td><td>Device-lab runs, pre-launch report, closed testing</td></tr>
+      <tr><td><strong>It is slow or heavy</strong></td><td>Cold start +400 ms, jank, battery drain, APK size</td><td>Macrobenchmark, profiling, Android vitals thresholds</td></tr>
+      <tr><td><strong>It breaks existing users</strong></td><td>Database migration fails, login lost after update</td><td>Upgrade-path tests from the last N versions</td></tr>
+      <tr><td><strong>It is insecure or non-compliant</strong></td><td>Token in logs, exported component, privacy form wrong</td><td>Static analysis, security review, Play policy check</td></tr>
+      <tr><td><strong>It does the wrong thing</strong></td><td>Meets the ticket, misses the business rule</td><td>UAT with the people who own the rule</td></tr>
+      <tr><td><strong>It is unusable in practice</strong></td><td>Confusing flow, text cut off in German, no TalkBack labels</td><td>Dogfooding, usability sessions, accessibility and locale checks</td></tr>
+      <tr><td><strong>It fails only at scale</strong></td><td>Backend load, rare crash at 0.3% of sessions</td><td>Staged rollout with live monitoring</td></tr>
+      <tr><td><strong>Nobody wants it</strong></td><td>A feature that does not move retention or revenue</td><td>A/B test, fake door, listing experiment</td></tr>
+    </table>
+    <div class="note"><p>Notice that A/B testing appears in only the last row. If you reach for it to find bugs, you are using real users as your QA department.</p></div>
+
+    <h2 id="map">2. The map: safe, correct, valuable</h2>
+    <p>I group validation into five layers. Each layer has a bigger audience, more realism and less control than the one before.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 318" role="img" aria-label="Five layers of release validation, from narrow and cheap to broad and expensive. Layer 1 automated tests by the team in CI. Layer 2 non-functional checks: performance, security, accessibility, localization, upgrade. Layer 3 human testing before market: dogfooding, internal, closed beta, UAT. Layer 4 production safety: staged rollout, monitoring, kill switch. Layer 5 proving value: A/B tests and experiments. Questions answered move from is it correct, to is it safe, to is it valuable.">
+        <rect class="boxb" x="8"   y="258" width="624" height="50" rx="10"/><text class="b" x="22" y="280">1. Automated tests</text><text class="sub" x="22" y="298">unit &middot; integration &middot; UI &middot; contract, on every commit</text><text class="sub" x="618" y="280" style="text-anchor:end">audience: CI</text>
+        <rect class="boxb" x="30"  y="202" width="580" height="50" rx="10"/><text class="b" x="44" y="224">2. Non-functional checks</text><text class="sub" x="44" y="242">performance &middot; security &middot; accessibility &middot; locale &middot; upgrade path</text><text class="sub" x="596" y="224" style="text-anchor:end">audience: lab devices</text>
+        <rect class="boxg" x="52"  y="146" width="536" height="50" rx="10"/><text class="b" x="66" y="168">3. Humans before the market</text><text class="sub" x="66" y="186">dogfooding &middot; internal &middot; closed beta &middot; UAT &middot; open beta</text><text class="sub" x="574" y="168" style="text-anchor:end">audience: 10s to 1000s</text>
+        <rect class="boxo" x="74"  y="90"  width="492" height="50" rx="10"/><text class="b" x="88" y="112">4. Production safety</text><text class="sub" x="88" y="130">staged rollout &middot; crash/ANR gates &middot; kill switch &middot; monitoring</text><text class="sub" x="552" y="112" style="text-anchor:end">audience: 1% &rarr; 100%</text>
+        <rect class="boxp" x="96"  y="34"  width="448" height="50" rx="10"/><text class="b" x="110" y="56">5. Proving value</text><text class="sub" x="110" y="74">A/B tests &middot; holdouts &middot; fake doors &middot; listing experiments</text><text class="sub" x="530" y="56" style="text-anchor:end">audience: live users</text>
+        <text class="sub" x="8" y="14">more realistic, more expensive per defect &uarr;</text>
+        <text class="sub" x="632" y="14" style="text-anchor:end">&ldquo;is it correct?&rdquo; &rarr; &ldquo;is it safe?&rdquo; &rarr; &ldquo;is it valuable?&rdquo;</text>
+      </svg>
+      <figcaption>The lower layers are cheap and fast, so run them most often. The upper layers are slow and expensive, so run them only on builds that passed everything below.</figcaption>
+    </figure>
+
+    <h2 id="auto">3. Layer 1: automated tests the team owns</h2>
+    <p>This is the foundation and it belongs to the engineers who write the code, not to a separate QA phase. I keep the rules simple:</p>
+    <ul>
+      <li><strong>Many fast unit tests</strong> for business logic (use cases, view models, mappers) on the JVM. These run in seconds.</li>
+      <li><strong>Fewer integration tests</strong> around the boundaries: Room with a real in-memory database, Retrofit against a fake server, WorkManager with a test driver.</li>
+      <li><strong>A small set of UI tests</strong> for the critical journeys only: sign-in, the main purchase path, onboarding. Flaky end-to-end suites are a tax; keep them few and ruthlessly stable.</li>
+      <li><strong>Contract tests</strong> between the app and the backend. Most &ldquo;mobile bugs&rdquo; I have debugged were an API quietly changing shape.</li>
+      <li><strong>Regression test for every escaped bug.</strong> It is the best return on testing time you will get.</li>
+    </ul>
+    <p>The practical detail on frameworks, test doubles and the pyramid is in <a href="android-testing-guide.html">Testing Android apps</a>. The architecture article <a href="android-arch-part-8-testing-and-proof.html">Testing and proof</a> explains why a testable architecture makes this layer cheap.</p>
+
+    <h2 id="quality">4. Layer 2: the non-functional checks people forget</h2>
+    <p>Features that pass every functional test still hurt users. These checks are where I find most of the &ldquo;why did nobody notice?&rdquo; incidents.</p>
+    <table>
+      <tr><th>Check</th><th>What I look at</th><th>How</th></tr>
+      <tr><td><strong>Performance</strong></td><td>Cold and warm start, frame time, memory, battery, app size</td><td>Macrobenchmark and Baseline Profiles in CI, with a budget that fails the build</td></tr>
+      <tr><td><strong>Compatibility</strong></td><td>Oldest and newest supported API, small and foldable screens, low-RAM devices</td><td>Emulators for breadth, a few real devices for truth, Firebase Test Lab for the long tail</td></tr>
+      <tr><td><strong>Upgrade and migration</strong></td><td>Update from each of the last few versions with real-shaped data</td><td>Install old APK, create data, update, verify. Database migration tests</td></tr>
+      <tr><td><strong>Security and privacy</strong></td><td>Exported components, secrets in the APK, cleartext traffic, data-safety form accuracy</td><td>Lint and static analysis, dependency scanning, a threat-model review for risky features</td></tr>
+      <tr><td><strong>Accessibility</strong></td><td>TalkBack labels, touch target size, contrast, font scaling</td><td>Accessibility Test Framework checks in UI tests, a manual TalkBack pass</td></tr>
+      <tr><td><strong>Localization</strong></td><td>Long strings, right-to-left, date and currency formats</td><td>Pseudo-locales, screenshot tests in several locales</td></tr>
+      <tr><td><strong>Resilience</strong></td><td>Offline, slow network, process death, permission denied</td><td>Network throttling, &ldquo;don&rsquo;t keep activities&rdquo;, failure-injection in fakes</td></tr>
+      <tr><td><strong>Backend compatibility</strong></td><td>Old app versions still alive against the new API</td><td>Keep an N-version compatibility suite on the backend; never break a live contract</td></tr>
+    </table>
+    <p>Assign each check a threshold, not just a task: &ldquo;cold start p90 under 1.5 s&rdquo; is a gate, &ldquo;look at performance&rdquo; is a wish.</p>
+
+    <h2 id="human">5. Layer 3: humans before the market</h2>
+    <p>Automation checks what we thought of. People find what we did not. This layer is a sequence, each step with a larger and less friendly audience.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="Human testing sequence. Dogfooding by employees, internal testing of the release candidate by a named team, closed beta with invited external users, UAT sign-off by business owners, then optional open beta. Each box lists who and what question it answers.">
+        <rect class="boxb" x="6"   y="22" width="118" height="132" rx="10"/><text class="b c" x="65"  y="46">Dogfooding</text><text class="sub c" x="65"  y="70">employees,</text><text class="sub c" x="65"  y="86">daily real use</text><text class="b c" x="65" y="116">Would we use</text><text class="b c" x="65" y="132">this ourselves?</text>
+        <rect class="boxb" x="132" y="22" width="118" height="132" rx="10"/><text class="b c" x="191" y="46">Internal</text><text class="sub c" x="191" y="70">named team,</text><text class="sub c" x="191" y="86">release candidate</text><text class="b c" x="191" y="116">Can we continue</text><text class="b c" x="191" y="132">with this build?</text>
+        <rect class="boxg" x="258" y="22" width="118" height="132" rx="10"/><text class="b c" x="317" y="46">Closed beta</text><text class="sub c" x="317" y="70">invited outsiders,</text><text class="sub c" x="317" y="86">many devices</text><text class="b c" x="317" y="116">Does it survive</text><text class="b c" x="317" y="132">the real world?</text>
+        <rect class="boxo" x="384" y="22" width="118" height="132" rx="10"/><text class="b c" x="443" y="46">UAT</text><text class="sub c" x="443" y="70">business owners,</text><text class="sub c" x="443" y="86">staging data</text><text class="b c" x="443" y="116">Is it the right</text><text class="b c" x="443" y="132">thing? Sign off.</text>
+        <rect class="box" x="510" y="22" width="124" height="132" rx="10"/><text class="b c" x="572" y="46">Open beta</text><text class="sub c" x="572" y="70">anyone who joins</text><text class="sub c" x="572" y="86">(optional)</text><text class="b c" x="572" y="116">Does it hold up</text><text class="b c" x="572" y="132">at scale?</text>
+        <path class="arrow" d="M125,88 L131,88"/><path class="arrow" d="M251,88 L257,88"/><path class="arrow" d="M377,88 L383,88"/><path class="arrow" d="M503,88 L509,88"/>
+        <text class="sub c" x="320" y="184">feedback flows back as bugs, usability findings and acceptance decisions</text>
+        <path class="arrow" d="M572,156 L572,166 L65,166 L65,156" style="stroke-dasharray:5 4"/>
+      </svg>
+      <figcaption>The order can change. Many teams run UAT in parallel with closed beta. What matters is that each step has a clear question.</figcaption>
+    </figure>
+    <h3>Dogfooding</h3>
+    <p>Employees use the in-progress app for real tasks, not scripts. It finds the slow screens, confusing wording and battery drain that only long use reveals. I make it work with three things: an automatic nightly or per-merge build to everyone in the company, a one-gesture feedback button that attaches logs and device info, and a rule that a blocking issue found by dogfooders stops the release train. The caveat: employees know the product too well, so dogfooding is not a substitute for outside users.</p>
+    <h3>Internal testing</h3>
+    <p>This is the gate right after the build exists. A named team runs a short, written smoke checklist on the exact release candidate: install, update from the previous version, sign in, three critical flows, push, deep link. The Play Console internal track suits this since builds reach testers within minutes. The output is one sentence: &ldquo;build 4123 may continue&rdquo; or &ldquo;it may not, because&hellip;&rdquo;</p>
+    <h3>Closed and open beta</h3>
+    <p>Invite real outsiders: partners, power users, one customer segment. You get device and network diversity you cannot buy. Ask them targeted questions, otherwise feedback is noise. Use open beta only when you need scale and can tolerate public exposure of unfinished work.</p>
+    <h3>UAT</h3>
+    <p>User acceptance testing is not about code defects; it is a business decision. The people who asked for the capability, or who represent the customer, run scenarios in their own words against a staging environment with realistic data, and either accept, accept with known issues, or reject. I insist on four things: written scenarios agreed <em>before</em> the build is ready, a named approver, the build number being tested, and a deadline. UAT that drifts for weeks is a sign that requirements were unclear at the start, not that more testing is needed.</p>
+    <div class="callout">
+      <strong>Three questions, three owners</strong>
+      <p><strong>QA / engineering</strong> asks &ldquo;did we build it right?&rdquo; <strong>UAT / product</strong> asks &ldquo;did we build the right thing?&rdquo; <strong>Experiments / product + data</strong> ask &ldquo;of the right things, which is better for users?&rdquo;</p>
+    </div>
+
+    <h2 id="rollout">6. Layer 4: production safety: staged rollout and observability</h2>
+    <p>No pre-release test matches production. So the last pre-market gate is production itself, entered carefully. On Google Play this is a <strong>staged rollout</strong>: release to 1%, then 5%, 20%, 50%, 100%, and watch.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 214" role="img" aria-label="Staged rollout loop. Release to 1 percent. Watch crash-free users, ANR rate, key funnel and ratings for a set time. If healthy, widen to the next percentage. If a gate is breached, halt the rollout and either disable the feature with the kill switch or ship a fix.">
+        <rect class="boxp" x="8"   y="30" width="100" height="58" rx="10"/><text class="b c" x="58"  y="56">1%</text><text class="sub c" x="58"  y="74">canary</text>
+        <rect class="boxp" x="124" y="30" width="100" height="58" rx="10"/><text class="b c" x="174" y="56">5%</text><text class="sub c" x="174" y="74">early</text>
+        <rect class="boxp" x="240" y="30" width="100" height="58" rx="10"/><text class="b c" x="290" y="56">20%</text><text class="sub c" x="290" y="74">broad</text>
+        <rect class="boxp" x="356" y="30" width="100" height="58" rx="10"/><text class="b c" x="406" y="56">50%</text><text class="sub c" x="406" y="74">half</text>
+        <rect class="boxg" x="472" y="30" width="100" height="58" rx="10"/><text class="b c" x="522" y="56">100%</text><text class="sub c" x="522" y="74">done</text>
+        <path class="arrow" d="M110,59 L122,59"/><path class="arrow" d="M226,59 L238,59"/><path class="arrow" d="M342,59 L354,59"/><path class="arrow" d="M458,59 L470,59"/>
+        <rect class="box" x="124" y="108" width="316" height="58" rx="9"/><text class="b c" x="282" y="132">Gate at each step</text><text class="sub c" x="282" y="152">crash-free &middot; ANR &middot; funnel &middot; ratings</text>
+        <path class="arrow" d="M58,90 L58,137 L122,137"/>
+        <rect class="boxr" x="472" y="108" width="160" height="58" rx="9"/><text class="b c" x="552" y="132">Breach</text><text class="sub c" x="552" y="152">halt + kill switch</text>
+        <path class="arrow" d="M442,137 L470,137"/>
+        <text class="sub c" x="320" y="196">time per step is set by traffic: enough sessions to see a 0.1% crash difference</text>
+      </svg>
+      <figcaption>A rollout is only as safe as the signal you read from it. Define the gates before the first percentage.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Pre-agree the gates.</strong> For example: crash-free users must stay above 99.5%, ANR below the Play &ldquo;bad behavior&rdquo; threshold, checkout success not down by more than 1%. Whoever is on call can halt without asking.</li>
+      <li><strong>Watch the cohort, not the average.</strong> Compare the new version against the old one on the same days. Crashlytics and Android vitals both break results down by version.</li>
+      <li><strong>Make halting cheap.</strong> Halting a Play rollout stops new installs of that version, but people who already updated stay on it. That is why a <em>remote kill switch</em> (a flag that disables the new behavior) is part of the design, not an extra.</li>
+      <li><strong>Plan the rollback.</strong> You cannot truly roll back an Android release. You ship a fix forward, or flip a flag. Know which, and how long each takes.</li>
+    </ul>
+
+    <h2 id="value">7. Layer 5: proving value: A/B testing and other experiments</h2>
+    <p>Everything so far asks whether the change is safe and correct. It does not tell you whether it is <em>better</em>. That is the job of experiments, and only for changes where the answer is genuinely uncertain and the metric is measurable.</p>
+    <h3>What an A/B test is</h3>
+    <p>An <strong>A/B test</strong> shows two or more versions to randomly chosen groups of real users at the same time, then compares a pre-chosen metric. Random assignment is the whole point: it removes payday, marketing campaigns, weather and every other confounder, so a gap between groups can be credited to the change.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Users are randomly split. Group A gets the current experience and group B the changed experience, in the same period. A primary metric is compared, with guardrail metrics watched for harm. If B wins and guardrails hold, roll out; otherwise keep A and record the learning.">
+        <rect class="box" x="8" y="80" width="110" height="60" rx="12"/><text class="b c" x="63" y="106">Eligible</text><text class="b c" x="63" y="124">users</text>
+        <path class="arrow" d="M120,100 L180,56"/><path class="arrow" d="M120,120 L180,164"/><text class="sub" x="150" y="86" style="text-anchor:middle">random</text>
+        <rect class="boxb" x="182" y="22" width="170" height="68" rx="12"/><text class="b c" x="267" y="48">A: control</text><text class="sub c" x="267" y="68">current behavior</text>
+        <rect class="boxg" x="182" y="140" width="170" height="68" rx="12"/><text class="b c" x="267" y="166">B: variant</text><text class="sub c" x="267" y="186">the change</text>
+        <path class="arrow" d="M354,56 L412,98"/><path class="arrow" d="M354,174 L412,132"/>
+        <rect class="boxo" x="414" y="70" width="218" height="90" rx="12"/><text class="b c" x="523" y="96">Compare</text><text class="sub c" x="523" y="116">primary metric: did it win?</text><text class="sub c" x="523" y="134">guardrails: did it hurt anything?</text><text class="sub c" x="523" y="152">is the gap more than noise?</text>
+      </svg>
+      <figcaption>Both groups run in the same period. Metrics and duration are decided before the test starts.</figcaption>
+    </figure>
+    <h3>Why teams do it</h3>
+    <ul>
+      <li><strong>Settle disagreements with data</strong> instead of seniority or taste.</li>
+      <li><strong>Limit blast radius.</strong> A bad idea shown to 5% of users is a cheap lesson.</li>
+      <li><strong>Improve metrics in small compounding steps:</strong> onboarding completion, conversion, retention.</li>
+      <li><strong>Decouple release from rollout.</strong> Ship code dark, turn it on remotely. On Android, where a store release is slow and irreversible, this matters more than on the web.</li>
+    </ul>
+    <h3>Ways to run experiments</h3>
+    <table>
+      <tr><th>Way</th><th>What it is</th><th>Use it when</th></tr>
+      <tr><td><strong>Classic A/B</strong></td><td>One control, one variant</td><td>One clear change, one question</td></tr>
+      <tr><td><strong>A/B/n, multivariate</strong></td><td>Several variants or combinations of elements</td><td>Several candidates and plenty of traffic. Each extra arm needs more users</td></tr>
+      <tr><td><strong>A/A test</strong></td><td>Both groups see the same thing</td><td>You are validating a new experimentation setup. The result should be &ldquo;no difference&rdquo;</td></tr>
+      <tr><td><strong>Client-side</strong></td><td>App fetches config (Remote Config) and changes UI or flow</td><td>UI, copy, flows. All variants must already be in the build</td></tr>
+      <tr><td><strong>Server-side</strong></td><td>Backend picks the variant (ranking, pricing, recommendations)</td><td>Logic that should work for every app version</td></tr>
+      <tr><td><strong>Store listing experiment</strong></td><td>Play shows different icons, screenshots, text to visitors</td><td>Improving install conversion from store traffic</td></tr>
+      <tr><td><strong>Holdout</strong></td><td>A small group never receives new experiments</td><td>Measuring the long-term effect of a whole program of changes</td></tr>
+      <tr><td><strong>Multi-armed bandit</strong></td><td>Traffic shifts toward the winner during the test</td><td>Short windows where showing the worse variant is costly</td></tr>
+      <tr><td><strong>Fake door</strong></td><td>A button for a feature that does not exist, count taps</td><td>Measuring interest before building. Be honest with a &ldquo;coming soon&rdquo; screen</td></tr>
+      <tr><td><strong>Canary as experiment</strong></td><td>Gradual exposure compared with the rest, watching guardrails</td><td>Proving a technical change (new network stack) is harmless</td></tr>
+    </table>
+    <h3>When not to A/B test</h3>
+    <ul>
+      <li><strong>Too little traffic.</strong> A small app cannot detect a 1% change in reasonable time. Use usability sessions, interviews or before-and-after.</li>
+      <li><strong>Legal, security or correctness changes.</strong> You do not test whether to fix a bug.</li>
+      <li><strong>Network effects.</strong> A chat or marketplace feature affects users outside their group. Randomize by region or time instead.</li>
+      <li><strong>The decision is already made.</strong> If you will ship B whatever the result, you are performing an A/B test, not running one.</li>
+    </ul>
+    <h3>Doing it properly</h3>
+    <ol>
+      <li><strong>Hypothesis:</strong> &ldquo;If we cut sign-up to two screens, completion rises, because there is less effort.&rdquo;</li>
+      <li><strong>One primary metric</strong> plus <strong>guardrails</strong> (crash-free users, startup time, uninstall rate).</li>
+      <li><strong>Sample size and duration</strong> set up front; at least one full weekly cycle.</li>
+      <li><strong>Sticky assignment</strong> per user or installation, and log <em>exposure</em> (the user saw the variant), not only assignment.</li>
+      <li><strong>Don&rsquo;t peek.</strong> Early gaps are mostly noise.</li>
+      <li><strong>Decide, record, clean up.</strong> Remove the losing branch and the flag.</li>
+    </ol>
+
+    <h2 id="arch">8. The architecture that makes this cheap</h2>
+    <p>I judge a codebase by how safely it can ship. These design choices are what turn the process above from heroics into routine.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 262" role="img" aria-label="Enablers in the app and backend. In the app: feature flags and Remote Config, a kill switch, modular features, a single release artifact, crash and performance reporting, analytics events as a contract. In the backend: backward-compatible APIs, versioned contracts, a staging environment with realistic data, and experiment assignment service. They support the layers: tests, human testing, staged rollout, experiments.">
+        <rect class="boxb" x="8" y="8" width="304" height="206" rx="12"/><text class="b c" x="160" y="32">In the app</text>
+        <text class="c" x="160" y="62">Feature flags + Remote Config</text><text class="c" x="160" y="88">Kill switch for risky features</text><text class="c" x="160" y="114">Modular features, clean boundaries</text><text class="c" x="160" y="140">One signed artifact promoted</text><text class="c" x="160" y="166">Crash, ANR and performance telemetry</text><text class="c" x="160" y="192">Analytics events as a reviewed contract</text>
+        <rect class="boxg" x="328" y="8" width="304" height="206" rx="12"/><text class="b c" x="480" y="32">In the backend</text>
+        <text class="c" x="480" y="62">Backward-compatible APIs</text><text class="c" x="480" y="88">Versioned, tested contracts</text><text class="c" x="480" y="114">Staging with realistic data</text><text class="c" x="480" y="140">Server-side assignment and flags</text><text class="c" x="480" y="166">Per-version observability</text><text class="c" x="480" y="192">Minimum supported version policy</text>
+        <path class="arrow" d="M160,216 L160,236"/><path class="arrow" d="M480,216 L480,236"/>
+        <rect class="box" x="8" y="238" width="624" height="22" rx="8"/><text class="sub c" x="320" y="253">these make tests, human gates, staged rollout and experiments possible and cheap</text>
+      </svg>
+      <figcaption>Process cannot compensate for a design that can only be released all-or-nothing.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Promote one artifact.</strong> The AAB that passed internal testing is the one that reaches production. Rebuilding between stages invalidates every earlier gate.</li>
+      <li><strong>Flag with discipline.</strong> Every flag has an owner and an expiry date. Old flags are code you cannot reason about. Test with the flag on <em>and</em> off.</li>
+      <li><strong>Never break a live contract.</strong> Some users stay on old versions for months. Support a minimum version, then force-update below it, deliberately.</li>
+      <li><strong>Treat analytics as an API.</strong> An experiment is only as good as the events behind it. Version them, review them, and test them like code.</li>
+      <li><strong>Separate config from code.</strong> Anything you might want to change after release (thresholds, copy, endpoints) belongs in remote config with safe defaults.</li>
+    </ul>
+
+    <h2 id="tools">9. Tooling on Android</h2>
+    <table class="lib">
+      <tr><th>Need</th><th>Tool</th><th>Notes</th></tr>
+      <tr><td>Automated tests</td><td>JUnit, Espresso, Compose testing, MockK, Robolectric, Turbine</td><td>Layer 1. See <a href="android-testing-guide.html">Testing Android apps</a></td></tr>
+      <tr><td>Device coverage</td><td><a href="https://firebase.google.com/docs/test-lab" target="_blank" rel="noopener">Firebase Test Lab</a>, Gradle Managed Devices, emulators</td><td>Layer 2. Real hardware for the long tail</td></tr>
+      <tr><td>Performance</td><td>Macrobenchmark, Baseline Profiles, Android Studio Profiler</td><td>Layer 2. Put budgets in CI</td></tr>
+      <tr><td>Build distribution</td><td><a href="https://firebase.google.com/docs/app-distribution" target="_blank" rel="noopener">Firebase App Distribution</a></td><td>Dogfooding and UAT builds outside Play. See <a href="firebase-app-distribution-overview.html">overview</a></td></tr>
+      <tr><td>Test tracks</td><td><a href="https://support.google.com/googleplay/android-developer/answer/9845334" target="_blank" rel="noopener">Play Console internal, closed, open testing</a></td><td>Layer 3. Also provides the pre-launch report</td></tr>
+      <tr><td>Staged rollout</td><td><a href="https://support.google.com/googleplay/android-developer/answer/6346149" target="_blank" rel="noopener">Play Console staged rollout</a></td><td>Layer 4. Halt, resume, increase percentage</td></tr>
+      <tr><td>Stability signal</td><td><a href="https://firebase.google.com/docs/crashlytics" target="_blank" rel="noopener">Crashlytics</a>, Android vitals</td><td>Layer 4. See <a href="firebase-crashlytics-overview.html">Crashlytics</a></td></tr>
+      <tr><td>Flags and config</td><td><a href="https://firebase.google.com/docs/remote-config" target="_blank" rel="noopener">Firebase Remote Config</a>, LaunchDarkly, Statsig</td><td>Layers 4 and 5. See <a href="firebase-remote-config-overview.html">Remote Config</a></td></tr>
+      <tr><td>Experiments</td><td><a href="https://firebase.google.com/docs/ab-testing" target="_blank" rel="noopener">Firebase A/B Testing</a>, Optimizely, GrowthBook, PostHog, Amplitude Experiment, Eppo</td><td>Layer 5. Firebase is the lightest start; others add warehouse-native analysis and server-side SDKs</td></tr>
+      <tr><td>Store page</td><td><a href="https://support.google.com/googleplay/android-developer/answer/6227309" target="_blank" rel="noopener">Store listing experiments</a></td><td>Layer 5. Icon, screenshots, descriptions</td></tr>
+      <tr><td>Acceptance tracking</td><td>Jira, TestRail, Zephyr</td><td>Layer 3. Scenarios, results, sign-off</td></tr>
+    </table>
+    <p>A small Remote Config read for an experiment, with the safe default that every experiment needs:</p>
+<pre><code>class Flags(private val rc: FirebaseRemoteConfig = Firebase.remoteConfig) {
+    init {
+        rc.setDefaultsAsync(mapOf(
+            "checkout_style" to "control",   // safe fallback if fetch fails
+            "new_search_enabled" to false    // also the kill switch
+        ))
+    }
+    fun refresh() = rc.fetchAndActivate()
+    val checkoutStyle get() = rc.getString("checkout_style")
+    val newSearch get() = rc.getBoolean("new_search_enabled")
+}
+
+// Exposure is logged where the user actually sees the variant
+analytics.logEvent("checkout_viewed") { param("style", flags.checkoutStyle) }</code></pre>
+
+    <h2 id="run">10. Running it as a team: ownership, gates, metrics</h2>
+    <p>Tools are the easy part. What decides whether this works is whether people know who decides what.</p>
+    <table>
+      <tr><th>Gate</th><th>Owner</th><th>Entry</th><th>Exit</th><th>Time box</th></tr>
+      <tr><td>CI checks</td><td>Engineering</td><td>Pull request opened</td><td>Tests, lint and budgets pass</td><td>Minutes</td></tr>
+      <tr><td>Dogfood</td><td>Engineering lead</td><td>Merged to main</td><td>No open blocker from users</td><td>Continuous</td></tr>
+      <tr><td>Internal</td><td>QA / release manager</td><td>Release candidate cut</td><td>Smoke checklist passed</td><td>Hours</td></tr>
+      <tr><td>Closed beta</td><td>Product + QA</td><td>Internal passed</td><td>Crash-free and feedback targets met</td><td>Days</td></tr>
+      <tr><td>UAT</td><td>Product owner / business</td><td>Scenarios agreed, staging ready</td><td>Written sign-off</td><td>Fixed deadline</td></tr>
+      <tr><td>Staged rollout</td><td>Release manager + on-call</td><td>UAT accepted</td><td>100% with gates green</td><td>Days to a week</td></tr>
+      <tr><td>Experiment</td><td>Product + data + engineering</td><td>Hypothesis and metrics written</td><td>Decision recorded, flag removed</td><td>Pre-agreed duration</td></tr>
+    </table>
+    <h3>Scale the process to the risk</h3>
+    <ul>
+      <li><strong>Low risk</strong> (copy, small UI): CI, internal smoke, rollout at 20% steps.</li>
+      <li><strong>Medium</strong> (new screen, new API use): add closed beta and per-feature flag, finer rollout.</li>
+      <li><strong>High</strong> (payments, auth, data migration, regulated features): add UAT with sign-off, upgrade-path and security review, 1% canary with long observation, and a rehearsed kill switch.</li>
+    </ul>
+    <h3>Measure the process itself</h3>
+    <p>I track a few numbers to see whether the system is improving: <strong>escaped defects</strong> per release (found in production), <strong>crash-free users</strong> per version, <strong>time from merge to production</strong>, <strong>change failure rate</strong> (releases needing a hotfix or halt), <strong>mean time to recover</strong>, and <strong>flaky test rate</strong>. If lead time grows while escaped defects stay flat, the gates are too heavy. If defects escape while gates are green, the gates test the wrong things.</p>
+
+    <h2 id="anti">11. Anti-patterns I keep seeing</h2>
+    <div class="bad">
+      <strong>What goes wrong</strong>
+      <ul>
+        <li><strong>QA as a phase at the end.</strong> Quality is built in; a final phase only discovers the cost of not doing so.</li>
+        <li><strong>Users as the test suite.</strong> Skipping earlier layers and using an A/B test or full rollout to find bugs.</li>
+        <li><strong>Gates with no criteria.</strong> &ldquo;Looks fine to me&rdquo; is not an exit condition.</li>
+        <li><strong>UAT that tests code.</strong> UAT should check business intent; if it finds crashes, layers 1 to 3 failed.</li>
+        <li><strong>Rebuilding per environment.</strong> What was tested is not what shipped.</li>
+        <li><strong>Experiments without guardrails</strong>, or with the winner chosen after looking at 20 metrics.</li>
+        <li><strong>Flag graveyards.</strong> Hundreds of stale flags and untested combinations.</li>
+        <li><strong>Dogfooding as theater.</strong> A build nobody installs, or feedback nobody reads.</li>
+        <li><strong>Treating the rollback as free.</strong> On Android it is not. Design the kill switch up front.</li>
+      </ul>
+    </div>
+    <div class="good">
+      <strong>What works</strong>
+      <ul>
+        <li>Name the risk first, then choose the test.</li>
+        <li>Automate the cheap layers, use people for what machines cannot judge.</li>
+        <li>Pre-agree thresholds so decisions during an incident are mechanical.</li>
+        <li>Invest in flags, observability and compatibility before adding another test phase.</li>
+        <li>Review the process after incidents, and remove gates that never catch anything.</li>
+      </ul>
+    </div>
+
+    <h2 id="wrap">12. Takeaways and glossary</h2>
+    <ul>
+      <li>Release validation is a set of tools for different risks. A/B testing answers &ldquo;which is better?&rdquo;, not &ldquo;is it safe?&rdquo;</li>
+      <li>Use five layers: automated tests, non-functional checks, human testing (dogfooding, internal, closed, UAT), staged rollout with observability, and experiments.</li>
+      <li>Give every gate an owner, entry and exit criteria, and a time box. Scale the process to the risk of the change.</li>
+      <li>Architecture is the lever: flags, a kill switch, compatible APIs, telemetry and one promoted artifact.</li>
+      <li>Measure the release process itself and keep improving it.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Dogfooding</td><td>Your own people use the unfinished product for real work.</td></tr>
+      <tr><td>Release candidate</td><td>The build you intend to ship, if no gate rejects it.</td></tr>
+      <tr><td>UAT</td><td>User acceptance testing: the business confirms the product does what was asked.</td></tr>
+      <tr><td>Track</td><td>A Google Play release channel: internal, closed, open or production.</td></tr>
+      <tr><td>Staged rollout</td><td>Releasing to a growing percentage of users while watching health.</td></tr>
+      <tr><td>Kill switch</td><td>A remote flag that disables a feature immediately, without a new release.</td></tr>
+      <tr><td>Canary</td><td>A very small first exposure used to detect harm early.</td></tr>
+      <tr><td>Primary / guardrail metric</td><td>The number that decides a test, and the numbers that must not get worse.</td></tr>
+      <tr><td>Exposure</td><td>The moment a user actually sees a variant, which is what you should count.</td></tr>
+      <tr><td>Escaped defect</td><td>A bug found in production that earlier gates should have caught.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://support.google.com/googleplay/android-developer/answer/9845334" target="_blank" rel="noopener">Set up an open, closed or internal test</a> &middot; <a href="https://support.google.com/googleplay/android-developer/answer/6346149" target="_blank" rel="noopener">Staged rollouts</a> &middot; <a href="https://firebase.google.com/docs/ab-testing" target="_blank" rel="noopener">Firebase A/B Testing</a> &middot; <a href="https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview" target="_blank" rel="noopener">Macrobenchmark</a></li>
+      <li>On this site: <a href="android-testing-guide.html">Testing Android apps</a> &middot; <a href="android-arch-part-8-testing-and-proof.html">Architecture: testing and proof</a> &middot; <a href="firebase-remote-config-overview.html">Remote Config</a> &middot; <a href="firebase-app-distribution-overview.html">App Distribution</a> &middot; <a href="firebase-crashlytics-overview.html">Crashlytics</a> &middot; <a href="firebase-analytics-overview.html">Analytics</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+</body>
+</html>

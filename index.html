@@ -481,6 +481,23 @@
     .tag .si { width: 14px; height: 14px; flex-shrink: 0; opacity: .65; filter: invert(1); }
 
     /* ────────────────── BLOG ────────────────── */
+    .topic-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+    .topic-chip { font: inherit; font-size: calc(13px * var(--fs, 1)); color: var(--text); background: transparent; border: 1px solid var(--border-h); border-radius: 999px; padding: 6px 14px; cursor: pointer; display: inline-flex; align-items: baseline; gap: 8px; transition: background .2s, border-color .2s; }
+    .topic-chip .tc-n { font-size: .92em; color: var(--muted); }
+    .topic-chip:hover { background: var(--card-h); }
+    .topic-chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .topic-chip[aria-pressed="true"] .tc-n { color: inherit; opacity: .7; }
+    .topic-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .topic-results { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 8px; margin: -6px 0 26px; }
+    .topic-results[hidden] { display: none; }
+    .topic-results .tr-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: calc(12px * var(--fs, 1)); color: var(--muted); margin-bottom: 6px; }
+    .topic-results .tr-head strong { color: var(--text); font-size: calc(14px * var(--fs, 1)); }
+    .topic-results .tr-clear { font: inherit; color: var(--sub); background: none; border: 0; cursor: pointer; text-decoration: underline; }
+    .topic-results ul { list-style: none; margin: 0; padding: 0; }
+    .topic-results li a { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); color: var(--text); text-decoration: none; font-size: calc(14px * var(--fs, 1)); line-height: 1.45; }
+    .topic-results li a:hover .tr-t { text-decoration: underline; }
+    .topic-results .tr-src { flex: none; color: var(--muted); font-size: calc(11px * var(--fs, 1)); white-space: nowrap; }
+    @media (max-width: 600px) { .topic-results li a { flex-direction: column; gap: 2px; } }
     .blog-cat { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
     .blog-cat.first { margin-top: 0; }
     .blog-cat .bc-title { font-size: calc(15px * var(--fs, 1)); font-weight: 600; color: var(--text); letter-spacing: -.2px; }
@@ -982,9 +999,18 @@
 <section id="blogs">
   <div class="container">
     <p class="section-label">Technical Writing</p>
+    <div class="topic-chips" id="topicChips" role="group" aria-label="Browse writing by topic"></div>
+    <div class="topic-results" id="topicResults" hidden aria-live="polite"></div>
 
-    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">9 posts</span></p>
+    <p class="blog-cat first"><span class="bc-title">Articles</span><span class="bc-sub">10 posts</span></p>
     <div class="blog-grid new-grid">
+      <a href="blog/android-release-validation-strategy.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Shipping Android Apps Safely: A Release Validation Strategy for Testing, Rollout and Experiments</div>
+        <div class="blog-summary">A senior engineering view of what to test, who owns each gate and when: automated and non-functional checks, dogfooding, internal and closed testing, UAT, staged rollout, and A/B experiments, plus the architecture that makes it cheap.</div>
+        <div class="blog-tags"><span class="blog-tag">Release strategy</span><span class="blog-tag">Android</span><span class="blog-tag">Dogfooding</span><span class="blog-tag">UAT</span><span class="blog-tag">A/B testing</span></div>
+        <div class="blog-footer"><span class="views-badge">~18 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
       <a href="blog/android-studio-plugin-firebase-distribution.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
         <div class="blog-title">Build Your Own Android Studio Plugin: Architecture, Templates and a Firebase Distribution Example</div>
@@ -2049,6 +2075,68 @@
     const arch = [...document.querySelectorAll('#blogs .blog-cat')].find(c => /Archive/.test(c.textContent));
     const archived = arch ? parseInt((arch.querySelector('.bc-sub') || {}).textContent, 10) || 0 : 0;
     add(label('Technical Writing'), articles + parts + archived, 'post');
+  })();
+
+  /* Topic chips under Technical Writing: counts and lists are worked out from the posts on the page */
+  (function () {
+    const chips = document.getElementById('topicChips'), out = document.getElementById('topicResults');
+    if (!chips || !out) return;
+    const TOPICS = [
+      ['Android', /android|kotlin|google play|compose/i],
+      ['Architecture & Clean Code', /architecture|mvvm|mvp|mvc|viper|redux|solid|design pattern|clean code|dependency inject|design system|design token/i],
+      ['Testing & Release Quality', /\btest|tdd|junit|espresso|appium|\buat\b|a\/b|dogfood|rollout|crashlytics|remote config|app distribution/i],
+      ['Firebase & Delivery', /firebase|crashlytics|remote config|app distribution|analytics|ci\/cd|github actions|jira/i],
+      ['AI & LLM', /\bai\b|llm|claude|codex|agent|openai|\bmcp\b|llama|language model/i],
+      ['System Design & Docs', /system design|design doc/i],
+      ['Data Structures & Algorithms', /algorithm|data structure|\bdsa\b|big-o|recursion|sorting|graphs?\b|stacks?\b|trees?\b|hanoi|hash map/i],
+      ['Git & Version Control', /\bgit\b|version control|branching/i],
+      ['IDE Plugins & Tooling', /plugin|intellij|android studio|build system|buck\b/i],
+      ['Java & Desktop', /java|javafx|swing|jpackage/i],
+      ['Fonts & Typography', /font|typography|truetype/i]
+    ];
+    const clean = t => (t || '').replace(/\s+/g, ' ').trim();
+    const items = [];
+    document.querySelectorAll('#blogs a.blog-card').forEach(a => {
+      const title = clean(a.querySelector('.blog-title')?.textContent);
+      const tags = [...a.querySelectorAll('.blog-tag')].map(t => t.textContent).join(' ');
+      const arch = a.closest('#archive');
+      items.push({ a, title, src: arch ? 'Archive' : 'Article', text: [title, tags, clean(a.querySelector('.blog-summary')?.textContent)].join(' ') });
+    });
+    document.querySelectorAll('#blogs a.series-part').forEach(a => {
+      const series = clean(a.closest('.series-card')?.querySelector('.series-title')?.textContent);
+      const title = clean(a.querySelector('.sp-title')?.textContent);
+      const short = series.split(':')[0].replace(/, from first install.*/, '');
+      items.push({ a, title, src: 'Series · ' + (short.length > 30 ? short.slice(0, 28) + '…' : short), text: [title, clean(a.querySelector('.sp-desc')?.textContent), series].join(' ') });
+    });
+    const topics = TOPICS.map(([name, re]) => ({ name, list: items.filter(i => re.test(i.text)) })).filter(t => t.list.length);
+    topics.sort((x, y) => y.list.length - x.list.length);
+    let active = null;
+    function render() {
+      chips.querySelectorAll('.topic-chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.topic === active)));
+      const t = topics.find(x => x.name === active);
+      if (!t) { out.hidden = true; out.textContent = ''; return; }
+      out.textContent = '';
+      const head = document.createElement('div'); head.className = 'tr-head';
+      head.innerHTML = '<span><strong></strong> &middot; ' + t.list.length + ' posts</span><button type="button" class="tr-clear">Clear</button>';
+      head.querySelector('strong').textContent = t.name;
+      head.querySelector('.tr-clear').addEventListener('click', () => { active = null; render(); });
+      const ul = document.createElement('ul');
+      t.list.forEach(i => {
+        const li = document.createElement('li'), a = document.createElement('a');
+        a.href = i.a.getAttribute('href');
+        if (i.a.target === '_blank') { a.target = '_blank'; a.rel = 'noopener'; }
+        a.innerHTML = '<span class="tr-t"></span><span class="tr-src"></span>';
+        a.querySelector('.tr-t').textContent = i.title; a.querySelector('.tr-src').textContent = i.src;
+        li.appendChild(a); ul.appendChild(li);
+      });
+      out.append(head, ul); out.hidden = false;
+    }
+    topics.forEach(t => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'topic-chip'; b.dataset.topic = t.name; b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<span></span><span class="tc-n"></span>'; b.firstChild.textContent = t.name; b.lastChild.textContent = t.list.length;
+      b.addEventListener('click', () => { active = active === t.name ? null : t.name; render(); });
+      chips.appendChild(b);
+    });
   })();
 </script>
 <script src="data/search/search.js" data-home defer></script>
