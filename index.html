@@ -2110,7 +2110,9 @@
       ['Git & Version Control', /\bgit\b|version control|branching/i],
       ['IDE Plugins & Tooling', /plugin|intellij|android studio|build system|buck\b/i],
       ['Java & Desktop', /java|javafx|swing|jpackage/i],
-      ['Fonts & Typography', /font|typography|truetype/i]
+      ['Fonts & Typography', /font|typography|truetype/i],
+      ['Quicksheets', /quicksheet/i],
+      ['Livefeeds', /live ?feed|daily-updated/i]
     ];
     const clean = t => (t || '').replace(/\s+/g, ' ').trim();
     const items = [];
@@ -2118,7 +2120,7 @@
       const title = clean(a.querySelector('.blog-title')?.textContent);
       const tags = [...a.querySelectorAll('.blog-tag')].map(t => t.textContent).join(' ');
       const arch = a.closest('#archive');
-      items.push({ a, title, src: arch ? 'Archive' : 'Article', text: [title, tags, clean(a.querySelector('.blog-summary')?.textContent)].join(' ') });
+      items.push({ a, title, src: arch ? 'Archive' : 'Article', text: [title, tags, clean(a.querySelector('.blog-idx')?.textContent), clean(a.querySelector('.blog-summary')?.textContent)].join(' ') });
     });
     document.querySelectorAll('#blogs a.series-part').forEach(a => {
       const series = clean(a.closest('.series-card')?.querySelector('.series-title')?.textContent);
