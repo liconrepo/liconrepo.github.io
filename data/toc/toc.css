@@ -1,5 +1,18 @@
 /* Sticky right-hand table of contents (wide screens), built by toc.js from the article headings */
 .side-toc { display: none; }
+.toc-fab { position: fixed; right: 16px; bottom: 16px; z-index: 31; font: inherit; font-size: calc(13px * var(--fs, 1)); font-weight: 600; color: var(--text); background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 9px 16px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+.toc-fab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Narrow screens: the contents open from the floating button */
+@media (max-width: 1239px) {
+  .side-toc.show { display: block; position: fixed; right: 16px; bottom: 64px; width: min(320px, calc(100vw - 32px)); max-height: 60vh; overflow-y: auto; padding: 14px 8px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.18); font-size: calc(13px * var(--fs, 1)); line-height: 1.4; z-index: 30; }
+  .side-toc strong { display: block; margin: 0 0 8px 12px; font-size: calc(11px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .side-toc ul { list-style: none; margin: 0; padding: 0; }
+  .side-toc a { display: block; padding: 6px 12px; color: var(--sub); text-decoration: none; border-radius: 6px; }
+  .side-toc a.active { color: var(--text); font-weight: 600; }
+  .side-toc .sub { display: none; }
+  .side-toc li.open > .sub { display: block; }
+  .side-toc .sub a { padding-left: 26px; }
+}
 @media (min-width: 1240px) {
   .side-toc { display: block; position: fixed; top: 50%; transform: translateY(-50%); right: max(16px, calc((100vw - 740px) / 2 - 276px)); width: 244px; max-height: calc(100vh - 160px); overflow-y: auto; font-size: calc(13px * var(--fs, 1)); line-height: 1.4; z-index: 20; scrollbar-width: thin; }
   .side-toc strong { display: block; margin: 0 0 10px 14px; font-size: calc(11px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
@@ -11,5 +24,5 @@
   .side-toc .sub { display: none; }
   .side-toc li.open > .sub { display: block; }
   .side-toc .sub a { padding-left: 26px; font-size: .95em; }
-  article > .toc { display: none; }
+  article > .toc, .toc-fab { display: none; }
 }

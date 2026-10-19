@@ -28,6 +28,15 @@
   panel.innerHTML = html + (open ? '</ul></li>' : '') + '</ul>';
   document.body.appendChild(panel);
 
+  var fab = document.createElement('button');
+  fab.type = 'button';
+  fab.className = 'toc-fab';
+  fab.textContent = 'Contents';
+  fab.setAttribute('aria-expanded', 'false');
+  fab.onclick = function () { fab.setAttribute('aria-expanded', String(panel.classList.toggle('show'))); };
+  panel.addEventListener('click', function (e) { if (e.target.closest('a')) { panel.classList.remove('show'); fab.setAttribute('aria-expanded', 'false'); } });
+  document.body.appendChild(fab);
+
   var links = [].slice.call(panel.querySelectorAll('a'));
   var targets = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
   function update() {
