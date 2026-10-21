@@ -1727,7 +1727,7 @@
       status.textContent = 'Thanks! Your message has been sent.';
       f.reset();
     } catch (err) {
-      status.textContent = 'Could not send. Please email licon.cseru10@gmail.com directly.';
+      status.textContent = 'Could not send' + (err.message && err.message !== 'failed' ? ' (' + err.message + ')' : '') + '. Please email licon.cseru10@gmail.com directly.';
     } finally { btn.disabled = false; }
   });
 
