@@ -171,7 +171,7 @@
   <article>
     <p class="kicker">Typography &middot; Do it yourself</p>
     <h1>Make Your Own Font: Design a TTF File from Sketch to Install</h1>
-    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~20 min read</span></div>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~28 min read</span></div>
     <div class="tags"><span class="tag">Fonts</span><span class="tag">TrueType</span><span class="tag">Typography</span><span class="tag">FontForge</span><span class="tag">fontTools</span><span class="tag">Adobe Illustrator</span></div>
 
     <figure class="fig">
@@ -198,6 +198,7 @@
         <li>Every letter lives on a grid called the <strong>em square</strong> (often 1000 or 2048 units tall) with guide lines: baseline, x-height, cap height.</li>
         <li>The work is: <strong>draw, space, kern, set metrics, test, export, validate</strong>.</li>
         <li>Free tools: <strong>FontForge</strong> and <strong>BirdFont</strong> (drawing), <strong>fontTools</strong> (code). Paid favourites: Glyphs, FontLab, RoboFont. <strong>Adobe Illustrator</strong> can draw the shapes, with a plugin such as Fontself Maker or a font editor to build the file.</li>
+        <li><strong>Font size</strong> is the em square, not a letter height. <strong>Weight</strong> is stroke thickness (100&ndash;900), and you only declare it in <code>@font-face</code> when a family has several files. Other scripts need their own glyphs, shaping rules and taller metrics.</li>
         <li>Spacing makes a font look good more than clever shapes do.</li>
         <li>Pick a licence (the SIL Open Font License is common) and never copy someone else&rsquo;s outlines.</li>
       </ul>
@@ -213,6 +214,9 @@
         <li><a href="#draw">Draw clean outlines</a></li>
         <li><a href="#space">Spacing and kerning</a></li>
         <li><a href="#metrics">Vertical metrics</a></li>
+        <li><a href="#height">Font size, height and line height</a></li>
+        <li><a href="#weight">Font weight, and when you need to declare it</a></li>
+        <li><a href="#intl">International fonts and scripts</a></li>
         <li><a href="#code">Build a tiny font from code</a></li>
         <li><a href="#ship">Export, check, test</a></li>
         <li><a href="#licence">Names and licence</a></li>
@@ -408,7 +412,149 @@
     </ul>
     <p>The <a href="https://googlefonts.github.io/gf-guide/" target="_blank" rel="noopener">Google Fonts Guide</a> has a clear chapter on this.</p>
 
-    <h2 id="code">8. Build a tiny font from code <span class="sticker">Try it!</span></h2>
+    <h2 id="height">8. Font size, height and line height</h2>
+    <p>&ldquo;Font height&rdquo; means three different things, and mixing them up is the cause of most clipped-text and uneven-line bugs.</p>
+    <table class="gloss">
+      <tr><th>Height</th><th>What it is</th><th>Where it lives</th></tr>
+      <tr><td>Font size</td><td>The height of the <strong>em square</strong>, not of any letter. <code>font-size: 16px</code> means the em square is 16 px tall.</td><td><code>head.unitsPerEm</code> + your CSS</td></tr>
+      <tr><td>Glyph heights</td><td>Cap height, x-height, ascender: how tall letters are <em>inside</em> the em square. Two fonts at the same size can look big or small.</td><td>The outlines (<code>glyf</code>), plus <code>OS/2</code> <code>sCapHeight</code>, <code>sxHeight</code></td></tr>
+      <tr><td>Line height</td><td>The room one line of text takes: ascent + descent + line gap, unless CSS overrides it.</td><td><code>hhea</code>, <code>OS/2</code> typo and win values</td></tr>
+    </table>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 300" role="img" aria-label="Left: an em square 1000 units tall with the ascent line at 800 above the baseline and the descent line at 200 below it. The letters H and x sit inside, with cap height 700 and x-height 500 marked. Right: two stacked line boxes, each ascent plus descent tall, separated by a line gap.">
+        <rect class="boxb" x="30" y="30" width="230" height="220" rx="6" style="fill-opacity:.5"/>
+        <text class="b" x="30" y="20">Em square = font-size</text>
+        <g stroke-width="1.4" fill="none"><path d="M30,206 L270,206" stroke="#ef4444" style="stroke-width:2"/><path d="M30,52 L270,52" class="rule" stroke-dasharray="5 4"/><path d="M30,96 L270,96" class="rule" stroke-dasharray="5 4"/></g>
+        <g fill="none" stroke="#1d4ed8" stroke-width="14" stroke-linecap="round"><path d="M70,58 L70,200"/><path d="M118,58 L118,200"/><path d="M70,129 L118,129"/><path d="M160,102 L204,200"/><path d="M204,102 L160,200"/></g>
+        <text class="sub" x="276" y="40">ascent 800</text><text class="sub" x="276" y="56">cap height 700</text><text class="sub" x="276" y="100">x-height 500</text><text class="sub b" x="276" y="210" style="fill:#ef4444">baseline 0</text><text class="sub" x="276" y="246">descent &minus;200</text>
+        <rect class="boxg" x="420" y="30" width="196" height="100" rx="8"/><text class="b c" x="518" y="72">Line 1</text><text class="sub c" x="518" y="94">ascent + descent</text>
+        <rect class="boxo" x="420" y="130" width="196" height="26" rx="4"/><text class="sub c b" x="518" y="148">line gap</text>
+        <rect class="boxg" x="420" y="156" width="196" height="100" rx="8"/><text class="b c" x="518" y="198">Line 2</text><text class="sub c" x="518" y="220">ascent + descent</text>
+        <text class="b" x="420" y="20">Line box</text>
+        <use href="#emmy" x="556" y="236" width="56" height="56"/>
+      </svg>
+      <figcaption>The em square is the canvas. Ascent and descent decide how much vertical room a line asks for, and they are usually taller than the letters themselves.</figcaption>
+    </figure>
+    <p>Because 1 em = <code>unitsPerEm</code> units, the maths is simple: at <code>font-size: 16px</code> with 1000 units per em, one unit is 0.016 px, so a cap height of 700 draws 11.2 px tall. The unit count (1000 or 2048) changes only the precision of your coordinates, never the size on screen.</p>
+    <p>When CSS says <code>line-height: normal</code>, the browser reads the ascent, descent and line gap from the font. A font with ascent 800 and descent 200 at 16 px gets a line about 16 px tall. If a script needs tall marks (see section 10) and your ascent is too small, the marks are clipped or crash into the line above. That is why section 7 asks you to choose these numbers deliberately.</p>
+    <div class="note"><p><strong>Tip:</strong> setting <code>line-height: 1.5</code> (no unit) in CSS is relative to font-size and ignores the font&rsquo;s own line gap. Fonts with generous ascent and descent still decide how much glyphs <em>overflow</em> their line box, so test both.</p></div>
+
+    <h2 id="weight">9. Font weight, and when you need to declare it</h2>
+    <h3>What weight means</h3>
+    <p><strong>Weight</strong> is how heavy the strokes look: the thickness of the stems relative to the letter height. It is not a size and not a colour. Designers name the steps, and CSS and the font&rsquo;s <code>OS/2</code> table share the same numeric scale (<code>usWeightClass</code>, 1 to 1000, normally multiples of 100).</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 262" role="img" aria-label="Nine letter H shapes with stems getting thicker from left to right, labelled 100 Thin, 200 ExtraLight, 300 Light, 400 Regular, 500 Medium, 600 SemiBold, 700 Bold, 800 ExtraBold, 900 Black. Below, two ways to ship them: nine static files, or one variable font file with a weight slider from 100 to 900.">
+        <g fill="none" stroke="#1d4ed8" stroke-linecap="butt">
+          <g stroke-width="2"><path d="M26,40 V100 M52,40 V100 M26,70 H52"/></g>
+          <g stroke-width="4"><path d="M92,40 V100 M118,40 V100 M92,70 H118"/></g>
+          <g stroke-width="6"><path d="M158,40 V100 M184,40 V100 M158,70 H184"/></g>
+          <g stroke-width="8"><path d="M224,40 V100 M250,40 V100 M224,70 H250"/></g>
+          <g stroke-width="10"><path d="M290,40 V100 M316,40 V100 M290,70 H316"/></g>
+          <g stroke-width="12"><path d="M356,40 V100 M382,40 V100 M356,70 H382"/></g>
+          <g stroke-width="14"><path d="M422,40 V100 M448,40 V100 M422,70 H448"/></g>
+          <g stroke-width="16"><path d="M488,40 V100 M514,40 V100 M488,70 H514"/></g>
+          <g stroke-width="18"><path d="M554,40 V100 M580,40 V100 M554,70 H580"/></g>
+        </g>
+        <g class="sub c" style="font-size:12px">
+          <text class="c b" x="39" y="122">100</text><text class="c b" x="105" y="122">200</text><text class="c b" x="171" y="122">300</text><text class="c b" x="237" y="122">400</text><text class="c b" x="303" y="122">500</text><text class="c b" x="369" y="122">600</text><text class="c b" x="435" y="122">700</text><text class="c b" x="501" y="122">800</text><text class="c b" x="567" y="122">900</text>
+          <text class="sub c" x="39" y="138" style="font-size:10px">Thin</text><text class="sub c" x="105" y="138" style="font-size:10px">ExtraLight</text><text class="sub c" x="171" y="138" style="font-size:10px">Light</text><text class="sub c" x="237" y="138" style="font-size:10px">Regular</text><text class="sub c" x="303" y="138" style="font-size:10px">Medium</text><text class="sub c" x="369" y="138" style="font-size:10px">SemiBold</text><text class="sub c" x="435" y="138" style="font-size:10px">Bold</text><text class="sub c" x="501" y="138" style="font-size:10px">ExtraBold</text><text class="sub c" x="567" y="138" style="font-size:10px">Black</text>
+        </g>
+        <rect class="boxo" x="20" y="160" width="290" height="82" rx="14"/><text class="b" x="36" y="184">Static fonts</text><text class="sub" x="36" y="204">One .ttf per weight</text><text class="sub" x="36" y="222">Light.ttf &middot; Regular.ttf &middot; Bold.ttf &hellip;</text>
+        <rect class="boxp" x="330" y="160" width="290" height="82" rx="14"/><text class="b" x="346" y="184">Variable font</text><text class="sub" x="346" y="204">One .ttf with a wght axis</text>
+        <path d="M346,224 H600" stroke="var(--sub)" stroke-width="3" stroke-linecap="round"/><circle cx="470" cy="224" r="7" fill="#a855f7" stroke="var(--text)" stroke-width="2"/><text class="sub" x="346" y="238" style="font-size:10px">100</text><text class="sub" x="586" y="238" style="font-size:10px">900</text>
+      </svg>
+      <figcaption>Weight is stroke thickness. You can ship each step as its own file, or ship one variable font that holds the whole range.</figcaption>
+    </figure>
+    <p>Weight is only one axis of a family. The others you will meet: <strong>width</strong> (condensed to expanded, <code>usWidthClass</code> 1&ndash;9, CSS <code>font-stretch</code>) and <strong>slant</strong> (italic or oblique, CSS <code>font-style</code>). A &ldquo;family&rdquo; is a set of fonts that share a design and differ along these axes.</p>
+
+    <h3>How <code>@font-face</code> connects to your TTF</h3>
+    <p>On the web the browser does not guess a weight from the file. The <code>@font-face</code> rule is the link: its <code>font-family</code> is the name you will use in CSS, and its <code>font-weight</code> and <code>font-style</code> <em>descriptors</em> tell the browser which request this file should answer. For web fonts those descriptors win over the numbers inside the file.</p>
+<pre><code>/* A family with two static files */
+@font-face { font-family: "My Font"; src: url("MyFont-Regular.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "My Font"; src: url("MyFont-Bold.woff2")    format("woff2"); font-weight: 700; }
+
+/* One variable file covers a whole range */
+@font-face { font-family: "My Var"; src: url("MyVar.woff2") format("woff2-variations"); font-weight: 100 900; }
+
+p      { font-family: "My Font"; }           /* uses the 400 file */
+strong { font-family: "My Font"; font-weight: 700; }  /* uses the 700 file */</code></pre>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 286" role="img" aria-label="Top row: the page asks for My Font at weight 700. The browser looks through the @font-face rules for My Font, finds a 400 file and a 700 file, and picks the 700 file: sharp bold. Bottom row: only one 400 file is declared. The page asks for 700. No match exists, so the browser takes the 400 file and fakes bold by smearing the outlines, which looks blurry; font-synthesis none turns this off.">
+        <text class="b" x="12" y="20">Family with a Bold file</text>
+        <rect class="box" x="12" y="30" width="150" height="56" rx="12"/><text class="b c" x="87" y="54">CSS asks</text><text class="sub c" x="87" y="73">weight: 700</text>
+        <rect class="boxb" x="226" y="22" width="190" height="34" rx="10"/><text class="sub c" x="321" y="44">Regular.woff2 &middot; 400</text>
+        <rect class="boxg" x="226" y="62" width="190" height="34" rx="10"/><text class="sub c b" x="321" y="84">Bold.woff2 &middot; 700 &#10003;</text>
+        <rect class="boxg" x="480" y="30" width="148" height="56" rx="12"/><text class="b c" x="554" y="54">Real bold</text><text class="sub c" x="554" y="73">designed shapes</text>
+        <path class="arrow" d="M164,58 L224,76"/><path class="arrow" d="M418,79 L478,65"/>
+        <text class="b" x="12" y="140">Family with one file only</text>
+        <rect class="box" x="12" y="150" width="150" height="56" rx="12"/><text class="b c" x="87" y="174">CSS asks</text><text class="sub c" x="87" y="193">weight: 700</text>
+        <rect class="boxb" x="226" y="152" width="190" height="52" rx="10"/><text class="sub c b" x="321" y="174">Regular.woff2 &middot; 400</text><text class="sub c" x="321" y="193">the only choice</text>
+        <rect class="boxr" x="480" y="150" width="148" height="56" rx="12"/><text class="b c" x="554" y="174">Faux bold</text><text class="sub c" x="554" y="193">smeared outlines</text>
+        <path class="arrow" d="M164,178 L224,178"/><path class="arrow" d="M418,178 L478,178"/>
+        <rect class="box" x="226" y="226" width="402" height="44" rx="10" stroke-dasharray="6 5"/><text class="sub c" x="427" y="246">font-synthesis: none</text><text class="sub c" x="427" y="262">stops the browser from faking bold or italic</text>
+        <use href="#emmy" x="30" y="214" width="60" height="60"/>
+      </svg>
+      <figcaption>The browser picks the closest declared weight. If nothing matches, it fakes the missing style unless you switch that off.</figcaption>
+    </figure>
+
+    <h3>Why not every font file needs a declared weight</h3>
+    <p>Many fonts ship only one style. Then there is nothing to choose between, and the default is enough. This is why a lot of TTF files work with no weight at all:</p>
+    <ul>
+      <li><strong>The descriptor defaults to <code>normal</code> (400).</strong> Omit <code>font-weight</code> in <code>@font-face</code> and the file is treated as the regular style. With a single file in the family, every request resolves to it.</li>
+      <li><strong>Installed fonts need no CSS at all.</strong> The operating system reads <code>usWeightClass</code> and the <code>name</code> table when you install the file; nobody declares a weight by hand.</li>
+      <li><strong>Single-style fonts are common.</strong> Display and decorative fonts, handwriting, pixel fonts, icon fonts and many scripts with few styles are drawn in one weight. Our Tiny Blocks file is one of them, so its <code>@font-face</code> has no <code>font-weight</code>.</li>
+      <li><strong>You only declare weights to choose between several files.</strong> Two or more files in one family need a descriptor each, so the browser knows which answers <code>bold</code>. A variable font needs one range, such as <code>100 900</code>.</li>
+    </ul>
+<pre><code>/* Single-style font: no weight needed. Optionally forbid fake bold/italic. */
+@font-face { font-family: "Tiny Blocks"; src: url("TinyBlocks-Regular.ttf") format("truetype"); }
+h1 { font-family: "Tiny Blocks", monospace; font-synthesis: none; }</code></pre>
+    <div class="callout">
+      <strong>Make the file say the right thing too</strong>
+      <p>Even if you never write a descriptor, set <code>usWeightClass</code> (in <code>OS/2</code>), the style name (<code>name</code> table: Regular, Bold, &hellip;) and the <code>fsSelection</code>/<code>macStyle</code> bold and italic bits to match the design. Installed fonts, design apps and font menus rely on them, and a mismatch is what makes a &ldquo;Regular&rdquo; file appear as an odd extra style in menus.</p>
+    </div>
+
+    <h2 id="intl">10. International fonts and scripts</h2>
+    <p>A font does not know languages; it knows <strong>characters</strong>. The <code>cmap</code> table (section 1) maps Unicode code points to glyphs, so a font supports a script only if it contains glyphs for that script&rsquo;s code points. Most Latin-only fonts have a few hundred glyphs. Japanese, Chinese and Korean fonts need thousands, which is why they are big files.</p>
+    <figure class="fig">
+      <svg class="toon" viewBox="0 0 640 320" role="img" aria-label="The text Hello, a Japanese greeting and a Bengali word at the top. Each script maps by Unicode range to its own font file: Latin U+0000 to U+00FF to a Latin font, Kana and Kanji U+3000 to U+30FF and U+4E00 to U+9FFF to a Japanese font, Bengali U+0980 to U+09FF to a Bengali font. A dashed arrow shows that a missing glyph falls back to the next family in the font-family list.">
+        <rect class="box" x="20"  y="20" width="180" height="56" rx="12"/><text class="b c" x="110" y="55" style="font-size:20px">Hello</text>
+        <rect class="box" x="230" y="20" width="180" height="56" rx="12"/><text class="b c" x="320" y="55" style="font-size:20px">&#12371;&#12435;&#12395;&#12385;&#12399;</text>
+        <rect class="box" x="440" y="20" width="180" height="56" rx="12"/><text class="b c" x="530" y="55" style="font-size:20px">&#2476;&#2494;&#2434;&#2482;&#2494;</text>
+        <text class="sub c" x="110" y="96">Latin</text><text class="sub c" x="320" y="96">Japanese</text><text class="sub c" x="530" y="96">Bengali</text>
+        <path class="arrow" d="M110,104 L110,142"/><path class="arrow" d="M320,104 L320,142"/><path class="arrow" d="M530,104 L530,142"/>
+        <rect class="boxb" x="20"  y="146" width="180" height="70" rx="14"/><text class="b c" x="110" y="170">cmap range</text><text class="sub c" x="110" y="190">U+0000&ndash;00FF</text><text class="sub c" x="110" y="206" style="font-size:11px">~300 glyphs</text>
+        <rect class="boxg" x="230" y="146" width="180" height="70" rx="14"/><text class="b c" x="320" y="170">cmap range</text><text class="sub c" x="320" y="190">U+3000&ndash;30FF, 4E00&ndash;9FFF</text><text class="sub c" x="320" y="206" style="font-size:11px">thousands of glyphs</text>
+        <rect class="boxp" x="440" y="146" width="180" height="70" rx="14"/><text class="b c" x="530" y="170">cmap range</text><text class="sub c" x="530" y="190">U+0980&ndash;09FF</text><text class="sub c" x="530" y="206" style="font-size:11px">shaping rules (GSUB)</text>
+        <path class="arrow" d="M110,218 L110,244"/><path class="arrow" d="M320,218 L320,244"/><path class="arrow" d="M530,218 L530,244"/>
+        <rect class="boxo" x="20"  y="248" width="180" height="40" rx="12"/><text class="b c" x="110" y="273">Latin.woff2</text>
+        <rect class="boxo" x="230" y="248" width="180" height="40" rx="12"/><text class="b c" x="320" y="273">Japanese.woff2</text>
+        <rect class="boxo" x="440" y="248" width="180" height="40" rx="12"/><text class="b c" x="530" y="273">Bengali.woff2</text>
+        <path d="M200,300 H440" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#arr)"/>
+        <text class="sub c" x="320" y="314">missing glyph? try the next family in font-family</text>
+      </svg>
+      <figcaption>One font rarely covers every script. The browser assembles text from several files, character by character.</figcaption>
+    </figure>
+    <h3>What changes when you design for other scripts</h3>
+    <ul>
+      <li><strong>Glyph count and file size.</strong> TrueType stores the glyph count in 16 bits, so one font tops out at 65,535 glyphs. CJK fonts approach that, and each extra weight multiplies the download. This is why CJK families often ship fewer weights, or a variable font.</li>
+      <li><strong>Shaping.</strong> Latin mostly maps one character to one glyph. Bengali, Devanagari, Arabic and Thai do not: vowel signs move before the consonant, consonants fuse into conjuncts, and Arabic letters change shape by position. These rules live in the <code>GSUB</code> and <code>GPOS</code> tables and are run by a shaping engine such as HarfBuzz. Your <code>cmap</code> alone is not enough.</li>
+      <li><strong>Vertical metrics.</strong> Scripts with stacked marks (Thai, Bengali, Devanagari, Vietnamese tone marks) need a taller ascent and deeper descent than Latin. Too small and marks collide with the line above.</li>
+      <li><strong>Baselines and the em box.</strong> CJK glyphs fill a full square em box and sit on an <em>ideographic</em> baseline slightly below the Latin one. When you mix scripts, fallback fonts of different size or baseline make lines look uneven.</li>
+      <li><strong>Direction.</strong> Arabic and Hebrew run right to left. The browser handles direction, but your spacing and kerning must work in both directions.</li>
+      <li><strong>Language-specific forms.</strong> One Han code point can have different preferred shapes in Japanese, Chinese and Korean. Fonts handle this with the <code>locl</code> feature, selected by the HTML <code>lang</code> attribute.</li>
+      <li><strong>Matching weight across scripts.</strong> A Latin 700 next to a Japanese 700 from another designer can look unbalanced. Pairs such as Noto Sans and Noto Sans JP are drawn to match.</li>
+    </ul>
+    <h3>Combining fonts on the web</h3>
+    <p>Two CSS tools do the work. A <strong>font stack</strong> lists fallbacks, and the browser tries them per character. <code>unicode-range</code> goes further: it tells the browser to download a file <em>only if</em> the page uses characters in that range.</p>
+<pre><code>@font-face { font-family: "Site"; src: url("site-latin.woff2");   unicode-range: U+0000-00FF; }
+@font-face { font-family: "Site"; src: url("site-jp.woff2");      unicode-range: U+3000-30FF, U+4E00-9FFF; }
+@font-face { font-family: "Site"; src: url("site-bengali.woff2"); unicode-range: U+0980-09FF; }
+
+body { font-family: "Site", "Noto Sans", sans-serif; }
+html[lang="ja"] { font-family: "Site", "Noto Sans JP", sans-serif; }</code></pre>
+    <p>The same idea applies when you make your own font: decide which scripts you cover, add their code points to <code>cmap</code>, set the <code>ulUnicodeRange</code> bits in <code>OS/2</code> to match, and state clearly what is <em>not</em> covered. A &ldquo;tofu&rdquo; box (the <code>.notdef</code> glyph) is how a font admits it has no glyph for a character.</p>
+
+    <h2 id="code">11. Build a tiny font from code <span class="sticker">Try it!</span></h2>
     <p>Here is a fun way to see the tables in action: build a real font with a few lines of Python. <strong>Tiny Blocks</strong> has six letters (<code>H E L O T I</code>), each a polygon of straight lines. The sample below is drawn with the font itself, loaded from the file you can download.</p>
     <div class="specimen" aria-label="Sample text in the Tiny Blocks font">HOTEL TILE<br>HELLO<small>If you see ordinary letters, your browser did not load the font file (for instance when the page is opened straight from disk).</small></div>
     <p><a href="../data/fonts/TinyBlocks-Regular.ttf" download>Download TinyBlocks-Regular.ttf</a> (about 1 KB) &middot; <a href="../data/fonts/make_tiny_blocks.py" download>make_tiny_blocks.py</a></p>
@@ -440,7 +586,7 @@ fb.setupPost()
 fb.save("TinyBlocks-Regular.ttf")</code></pre>
     <p>Install it with <code>pip install fonttools</code>. Then double-click the generated file to install it on your computer, or use it on the web with the CSS in the next section. Try changing a coordinate and rebuilding: the letter changes right away.</p>
 
-    <h2 id="ship">9. Export, check, test</h2>
+    <h2 id="ship">12. Export, check, test</h2>
     <figure class="fig">
       <svg class="toon" viewBox="0 0 640 214" role="img" aria-label="Pipeline: source file, compile or generate, the TTF file, check with validators, then ship by installing or converting to WOFF2. An optional ttfautohint step sits under the TTF.">
         <rect class="boxo" x="8"   y="60" width="108" height="64" rx="14"/><text class="b c" x="62"  y="86">Source</text><text class="sub c" x="62"  y="106">.sfd .ufo .glyphs</text>
@@ -479,7 +625,7 @@ fb.save("TinyBlocks-Regular.ttf")</code></pre>
 h1 { font-family: "My Font", sans-serif; }</code></pre>
     <p>Convert to WOFF2 for smaller downloads (fontTools can do it, see the <a href="https://www.w3.org/TR/WOFF2/" target="_blank" rel="noopener">WOFF2 specification</a>). The <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="_blank" rel="noopener">MDN <code>@font-face</code> page</a> explains every option.</p>
 
-    <h2 id="licence">10. Names and licence</h2>
+    <h2 id="licence">13. Names and licence</h2>
     <ul>
       <li><strong>Name it.</strong> Fill in the family name, style, designer, copyright and licence text in the <code>name</code> table. Avoid names that clash with famous fonts.</li>
       <li><strong>Pick a licence.</strong> The <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL Open Font License</a> is the most common one for free fonts. It lets people use, study, change and share the font under clear rules. Or keep it all-rights-reserved if you sell it.</li>
@@ -488,7 +634,7 @@ h1 { font-family: "My Font", sans-serif; }</code></pre>
     </ul>
     <p>This is general information, not legal advice.</p>
 
-    <h2 id="wrap">11. Checklist and glossary</h2>
+    <h2 id="wrap">14. Checklist and glossary</h2>
     <div class="good">
       <strong>Before you call it done</strong>
       <ul>
@@ -511,6 +657,11 @@ h1 { font-family: "My Font", sans-serif; }</code></pre>
       <tr><td>cmap</td><td>The table that maps characters to glyphs.</td></tr>
       <tr><td>Hinting</td><td>Instructions that help glyphs snap to pixels at small sizes.</td></tr>
       <tr><td>TTF / OTF / WOFF2</td><td>TrueType outlines / OpenType (often cubic CFF outlines) / compressed font for the web.</td></tr>
+      <tr><td>Font weight</td><td>How heavy the strokes are, on a 100&ndash;900 scale (<code>usWeightClass</code>, CSS <code>font-weight</code>).</td></tr>
+      <tr><td>Ascent / descent / line gap</td><td>Vertical room a line asks for above the baseline, below it, and between lines.</td></tr>
+      <tr><td>Faux bold</td><td>Fake weight a browser adds when no bold file exists. Disable with <code>font-synthesis: none</code>.</td></tr>
+      <tr><td>unicode-range</td><td>A CSS descriptor that loads a font file only for the characters in its range.</td></tr>
+      <tr><td>Shaping</td><td>Turning characters into the right glyphs, order and positions (<code>GSUB</code>/<code>GPOS</code>), vital for Bengali, Arabic and Thai.</td></tr>
       <tr><td>Variable font</td><td>One file that holds a range of weights or widths.</td></tr>
     </table>
 
@@ -519,7 +670,7 @@ h1 { font-family: "My Font", sans-serif; }</code></pre>
       <li><a href="https://learn.microsoft.com/en-us/typography/opentype/spec/" target="_blank" rel="noopener">OpenType specification</a> &middot; <a href="https://developer.apple.com/fonts/TrueType-Reference-Manual/" target="_blank" rel="noopener">Apple TrueType Reference Manual</a> &middot; <a href="https://www.w3.org/TR/WOFF2/" target="_blank" rel="noopener">WOFF2</a></li>
       <li><a href="https://fontforge.org/" target="_blank" rel="noopener">FontForge</a> &middot; <a href="https://birdfont.org/" target="_blank" rel="noopener">BirdFont</a> &middot; <a href="https://glyphsapp.com/" target="_blank" rel="noopener">Glyphs</a> &middot; <a href="https://www.fontlab.com/" target="_blank" rel="noopener">FontLab</a> &middot; <a href="https://robofont.com/" target="_blank" rel="noopener">RoboFont</a> &middot; <a href="https://www.calligraphr.com/" target="_blank" rel="noopener">Calligraphr</a> &middot; <a href="https://www.adobe.com/products/illustrator.html" target="_blank" rel="noopener">Adobe Illustrator</a> &middot; <a href="https://www.fontself.com/" target="_blank" rel="noopener">Fontself</a> &middot; <a href="https://www.adobe.com/products/capture.html" target="_blank" rel="noopener">Adobe Capture</a></li>
       <li><a href="https://fonttools.readthedocs.io/" target="_blank" rel="noopener">fontTools</a> &middot; <a href="https://github.com/googlefonts/fontmake" target="_blank" rel="noopener">fontmake</a> &middot; <a href="https://unifiedfontobject.org/" target="_blank" rel="noopener">UFO format</a> &middot; <a href="https://fontbakery.readthedocs.io/" target="_blank" rel="noopener">Font Bakery</a> &middot; <a href="https://freetype.org/ttfautohint/" target="_blank" rel="noopener">ttfautohint</a></li>
-      <li><a href="https://googlefonts.github.io/gf-guide/" target="_blank" rel="noopener">Google Fonts Guide</a> &middot; <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL Open Font License</a> &middot; <a href="https://www.unicode.org/charts/" target="_blank" rel="noopener">Unicode charts</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="_blank" rel="noopener">MDN: @font-face</a></li>
+      <li><a href="https://googlefonts.github.io/gf-guide/" target="_blank" rel="noopener">Google Fonts Guide</a> &middot; <a href="https://openfontlicense.org/" target="_blank" rel="noopener">SIL Open Font License</a> &middot; <a href="https://www.unicode.org/charts/" target="_blank" rel="noopener">Unicode charts</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face" target="_blank" rel="noopener">MDN: @font-face</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight" target="_blank" rel="noopener">MDN: font-weight</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-synthesis" target="_blank" rel="noopener">MDN: font-synthesis</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/unicode-range" target="_blank" rel="noopener">MDN: unicode-range</a> &middot; <a href="https://harfbuzz.github.io/" target="_blank" rel="noopener">HarfBuzz</a></li>
     </ul>
 
     <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
