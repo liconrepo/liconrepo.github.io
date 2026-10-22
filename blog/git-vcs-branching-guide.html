@@ -57,6 +57,7 @@
 
     h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
     h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; }
     p { margin: 14px 0; color: var(--text); }
     ul, ol { margin: 14px 0 14px 22px; }
     li { margin: 6px 0; }
@@ -377,6 +378,126 @@ git blame src/Login.kt               # who changed each line, and in which commi
       <tr><td><strong>Squash merge</strong></td><td>All commits of the branch become one commit on the target.</td><td>One commit per pull request on main. Easy to read and to revert.</td><td>Branch commits are messy (&ldquo;wip&rdquo;, &ldquo;fix typo&rdquo;). The most common choice for small PRs.</td></tr>
       <tr><td><strong>Rebase</strong></td><td>Replays your commits on top of the latest target, giving them new IDs.</td><td>A straight line, no merge commits.</td><td>Tidying <em>your own</em> branch before review. Never rebase commits others already pulled.</td></tr>
     </table>
+    <h3>Rebase vs merge: what changes and what you pay</h3>
+    <p>Both commands answer the same question: <em>how do I get the latest work from <code>main</code> into my branch (or my branch into <code>main</code>)?</em> They differ in what they do to history. Suppose <code>main</code> moved on to C while you built D and E on a branch that started at B.</p>
+
+    <h4>1. Rebase: a linear history</h4>
+    <p>Replays your commits on top of the latest base branch. D and E are copied as new commits D&prime; and E&prime;.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Rebase. Before: main has A, B, C and the PR branch has D and E starting at B. After rebase onto main: one straight line A, B, C, D prime, E prime.">
+        <text class="sub" x="20" y="22">Before</text>
+        <path class="rule" d="M60,50 L240,50"/><path class="rule" d="M150,50 L240,100"/><path class="rule" d="M240,100 L330,100"/>
+        <circle class="boxg" cx="60"  cy="50" r="14"/><text class="b c" x="60"  y="55">A</text>
+        <circle class="boxg" cx="150" cy="50" r="14"/><text class="b c" x="150" y="55">B</text>
+        <circle class="boxg" cx="240" cy="50" r="14"/><text class="b c" x="240" y="55">C</text>
+        <circle class="boxb" cx="240" cy="100" r="14"/><text class="b c" x="240" y="105">D</text>
+        <circle class="boxb" cx="330" cy="100" r="14"/><text class="b c" x="330" y="105">E</text>
+        <text class="sub" x="280" y="55">main</text><text class="sub" x="360" y="105">PR branch</text>
+        <path class="rule" d="M20,135 L620,135" stroke-dasharray="4 4"/>
+        <text class="sub" x="20" y="162">After <tspan style="font-family:monospace">git rebase main</tspan></text>
+        <path class="rule" d="M60,200 L420,200"/>
+        <circle class="boxg" cx="60"  cy="200" r="14"/><text class="b c" x="60"  y="205">A</text>
+        <circle class="boxg" cx="150" cy="200" r="14"/><text class="b c" x="150" y="205">B</text>
+        <circle class="boxg" cx="240" cy="200" r="14"/><text class="b c" x="240" y="205">C</text>
+        <circle class="boxb" cx="330" cy="200" r="14"/><text class="b c" x="330" y="205">D&prime;</text>
+        <circle class="boxb" cx="420" cy="200" r="14"/><text class="b c" x="420" y="205">E&prime;</text>
+        <text class="sub c" x="375" y="236">new commits, new hashes</text>
+      </svg>
+      <figcaption>Rebase moves the start of your branch from B to C. The result is one straight line.</figcaption>
+    </figure>
+    <div class="good"><strong>Advantages</strong><ul><li>Cleaner, linear history.</li><li>Easy to follow with <code>git log</code>, and <code>git bisect</code> walks a simple line.</li><li>Avoids unnecessary merge commits such as &ldquo;Merge branch &lsquo;main&rsquo; into feature&rdquo;.</li></ul></div>
+    <div class="bad"><strong>Disadvantages</strong><ul><li>Rewrites commit hashes (D and E are replaced by D&prime; and E&prime;).</li><li>You may resolve the same conflict several times, once per replayed commit.</li><li>A branch you already pushed needs a force-push, which is dangerous if others use it.</li></ul></div>
+
+    <h4>2. Merge: preserves branch history</h4>
+    <p>Joins the two lines of work with a merge commit M that has two parents. D and E keep their original hashes.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Merge. Main has A, B, C. The PR branch has D and E from B. A merge commit M joins C and E.">
+        <path class="rule" d="M60,50 L420,50"/><path class="rule" d="M150,50 L240,115"/><path class="rule" d="M240,115 L330,115"/><path class="rule" d="M330,115 L420,50"/>
+        <circle class="boxg" cx="60"  cy="50" r="14"/><text class="b c" x="60"  y="55">A</text>
+        <circle class="boxg" cx="150" cy="50" r="14"/><text class="b c" x="150" y="55">B</text>
+        <circle class="boxg" cx="240" cy="50" r="14"/><text class="b c" x="240" y="55">C</text>
+        <circle class="boxo" cx="420" cy="50" r="14"/><text class="b c" x="420" y="55">M</text>
+        <circle class="boxb" cx="240" cy="115" r="14"/><text class="b c" x="240" y="120">D</text>
+        <circle class="boxb" cx="330" cy="115" r="14"/><text class="b c" x="330" y="120">E</text>
+        <text class="sub" x="460" y="55">main</text><text class="sub" x="360" y="150">PR branch</text>
+        <text class="sub c" x="420" y="28">merge commit</text>
+      </svg>
+      <figcaption>Nothing is rewritten. The graph shows that D and E were developed in parallel with C.</figcaption>
+    </figure>
+    <div class="good"><strong>Advantages</strong><ul><li>Preserves the original commits and the real branch history.</li><li>Safe on shared branches: no hashes change, so no force-push.</li><li>Conflicts are resolved once, in the merge commit.</li></ul></div>
+    <div class="bad"><strong>Disadvantages</strong><ul><li>History gets noisy with merge commits and criss-crossing lines.</li><li><code>git log</code> and <code>git bisect</code> are harder to read on a busy repo.</li><li>Reverting a whole feature means reverting the merge commit (<code>git revert -m 1</code>).</li></ul></div>
+
+    <h4>Side by side</h4>
+    <table>
+      <tr><th></th><th>Rebase</th><th>Merge</th></tr>
+      <tr><td><strong>History shape</strong></td><td>Linear</td><td>Branching, with merge commits</td></tr>
+      <tr><td><strong>Commit hashes</strong></td><td>Rewritten</td><td>Unchanged</td></tr>
+      <tr><td><strong>Conflict handling</strong></td><td>Possibly per commit</td><td>Once, in the merge commit</td></tr>
+      <tr><td><strong>Needs force-push</strong></td><td>Yes, if the branch was pushed</td><td>No</td></tr>
+      <tr><td><strong>Safe on shared branches</strong></td><td>No</td><td>Yes</td></tr>
+      <tr><td><strong>Undo</strong></td><td><code>git reflog</code>, then <code>git reset</code> to the old tip</td><td><code>git revert -m 1 &lt;merge&gt;</code></td></tr>
+      <tr><td><strong>Best for</strong></td><td>Updating your private branch before review</td><td>Landing shared or long-lived branches</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Rule of thumb</strong>
+      <p><strong>Rebase to catch up, merge to land.</strong> Rebase your <em>own, unshared</em> branch onto the latest <code>main</code> while you work, then let the pull request merge (or squash) it. Never rebase commits that other people have already pulled.</p>
+    </div>
+
+    <h3>Resolving a conflict step by step</h3>
+    <p>A conflict means both sides changed the same lines. Git stops, marks the file, and waits for you. The steps are the same for merge and rebase.</p>
+<pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+timeout = 30          # the branch you are on (ours)
+=======
+timeout = 60          # the branch being merged in (theirs)
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/login</code></pre>
+    <ol>
+      <li><code>git status</code> lists the files marked <em>both modified</em>.</li>
+      <li>Open each file, keep the right lines (or combine them) and delete the three marker lines.</li>
+      <li>Run the tests. A clean merge can still be a broken build.</li>
+      <li><code>git add &lt;file&gt;</code>, then <code>git merge --continue</code> or <code>git rebase --continue</code>.</li>
+      <li>Changed your mind? <code>git merge --abort</code> or <code>git rebase --abort</code> returns you to where you started.</li>
+    </ol>
+    <div class="note"><p>Turn on <code>git config --global rerere.enabled true</code>. Git then remembers how you resolved a conflict and reuses the answer if the same conflict appears again, which helps a lot when rebasing a long branch.</p></div>
+
+    <h3>Tidy your branch with interactive rebase</h3>
+    <p>Before you open a pull request, <code>git rebase -i main</code> lets you edit your own commits: reorder them, merge small ones, reword messages or drop mistakes.</p>
+<pre><code>pick   a1b2c3d Add login form
+squash e4f5a6b wip
+fixup  c7d8e9f fix typo
+reword 1a2b3c4 add validation   # you will be asked for a better message
+drop   5d6e7f8 debug logging</code></pre>
+    <table>
+      <tr><th>Keyword</th><th>Effect</th></tr>
+      <tr><td><code>pick</code></td><td>Keep the commit as it is.</td></tr>
+      <tr><td><code>reword</code></td><td>Keep the changes, edit the message.</td></tr>
+      <tr><td><code>squash</code></td><td>Fold into the previous commit and combine the messages.</td></tr>
+      <tr><td><code>fixup</code></td><td>Fold into the previous commit and discard this message.</td></tr>
+      <tr><td><code>drop</code></td><td>Remove the commit.</td></tr>
+    </table>
+    <p>Shortcut: <code>git commit --fixup &lt;commit&gt;</code> while you work, then <code>git rebase -i --autosquash main</code> arranges everything for you.</p>
+
+    <h3>Force-pushing safely after a rebase</h3>
+    <p>After a rebase your local branch and the remote branch have different histories, so a normal push is rejected. Do not reach for <code>--force</code>: it overwrites whatever is on the remote, including a teammate&rsquo;s new commit you have not fetched.</p>
+<pre><code>git push --force-with-lease origin feature/login</code></pre>
+    <div class="good"><strong>Why <code>--force-with-lease</code></strong><ul><li>It refuses to push if the remote branch moved since your last fetch.</li><li>You still get the rewritten history you wanted.</li><li>Set an alias so you never type plain <code>--force</code> by habit.</li></ul></div>
+    <div class="bad"><strong>Never force-push to</strong><ul><li><code>main</code>, <code>develop</code> or any release branch. Protect them on the server so it is impossible.</li><li>A branch other people have checked out, unless you agreed with them first.</li></ul></div>
+
+    <h3>Recovering from a rebase that went wrong</h3>
+    <p>A rebase does not delete your old commits at once; they stay reachable from the reflog for a while.</p>
+<pre><code>git rebase --abort                    # still in the middle of it? stop here
+
+git reflog                            # find the entry from before the rebase
+# e.g.  9fceb02 HEAD@{5}: checkout: moving from main to feature/login
+git reset --hard HEAD@{5}             # put the branch back where it was</code></pre>
+    <p>Create a safety branch first (<code>git branch backup/login</code>) when you are about to do something risky. It costs nothing and can be deleted later.</p>
+
+    <h3>Which one should <code>git pull</code> use?</h3>
+    <p><code>git pull</code> is <code>fetch</code> plus a merge by default. If you have local commits and the remote has new ones, that default creates a noisy &ldquo;Merge branch &lsquo;main&rsquo; of &hellip;&rdquo; commit. Pick one behaviour and set it once:</p>
+<pre><code>git config --global pull.rebase true     # replay my local commits on top (linear)
+# or
+git config --global pull.ff only         # refuse to create surprise merge commits</code></pre>
+    <p>Either setting stops accidental merge commits. <code>pull.rebase true</code> is convenient for private feature branches; <code>pull.ff only</code> is the more cautious choice because it makes you decide explicitly what to do when histories diverge.</p>
+
     <h3>Guard rails</h3>
     <ul>
       <li><strong>Protect the main branch.</strong> Require a pull request, at least one review and passing CI. Block force-pushes.</li>

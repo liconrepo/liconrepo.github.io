@@ -1051,6 +1051,13 @@
         <div class="blog-tags"><span class="blog-tag">AI agents</span><span class="blog-tag">Building effective agents</span><span class="blog-tag">Jira</span><span class="blog-tag">Crashlytics</span><span class="blog-tag">CI/CD</span></div>
         <div class="blog-footer"><span class="views-badge">~15 min read</span><span class="blog-date">Oct 2026</span></div>
       </a>
+      <a href="blog/ai-agents-subagents-and-teams.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Configuring AI Coding Agents: Subagents, Agent Teams, JSON and Markdown Files</div>
+        <div class="blog-summary">Define subagents as Markdown, JSON or TOML, run and monitor them in the terminal, set up a team of subagents, and use Claude Code agent teams and Codex custom agents safely. With diagrams and ready prompts.</div>
+        <div class="blog-tags"><span class="blog-tag">Subagents</span><span class="blog-tag">Agent teams</span><span class="blog-tag">Claude Code</span><span class="blog-tag">Codex</span><span class="blog-tag">Configuration</span></div>
+        <div class="blog-footer"><span class="views-badge">~25 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
       <a href="blog/git-vcs-branching-guide.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
         <div class="blog-title">Version Control, Git and Branching Strategies: Which Workflow Fits Which Team</div>
@@ -2151,6 +2158,17 @@
       const short = series.split(':')[0].replace(/, from first install.*/, '');
       items.push({ a, title, src: 'Series · ' + (short.length > 30 ? short.slice(0, 28) + '…' : short), text: [title, clean(a.querySelector('.sp-desc')?.textContent), series].join(' ') });
     });
+    /* Exact page titles come from the search index (the same text as each page's heading); the short card titles are only a fallback. */
+    const fullTitle = {};
+    const keyOf = i => (i.a.getAttribute('href') || '').replace(/[#?].*$/, '');
+    function loadFullTitles() {
+      const fill = () => { ((window.SITE_SEARCH || {}).articles || []).forEach(x => { fullTitle[x.u] = x.t; }); };
+      if (window.SITE_SEARCH) return fill();
+      const sc = document.createElement('script');
+      sc.src = 'data/search/search-data.js';
+      sc.onload = () => { fill(); render(); };
+      document.head.appendChild(sc);
+    }
     const topics = TOPICS.map(([name, re]) => ({ name, list: items.filter(i => re.test(i.text)) })).filter(t => t.list.length);
     topics.sort((x, y) => y.list.length - x.list.length);
     let active = null;
@@ -2169,11 +2187,12 @@
         a.href = i.a.getAttribute('href');
         if (i.a.target === '_blank') { a.target = '_blank'; a.rel = 'noopener'; }
         a.innerHTML = '<span class="tr-t"></span><span class="tr-src"></span>';
-        a.querySelector('.tr-t').textContent = i.title; a.querySelector('.tr-src').textContent = i.src;
+        a.querySelector('.tr-t').textContent = fullTitle[keyOf(i)] || i.title; a.querySelector('.tr-src').textContent = i.src;
         li.appendChild(a); ul.appendChild(li);
       });
       out.append(head, ul); out.hidden = false;
     }
+    loadFullTitles();
     const lo = Math.log(Math.min(...topics.map(t => t.list.length))), hi = Math.log(Math.max(...topics.map(t => t.list.length)));
     topics.forEach(t => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'topic-chip'; b.dataset.topic = t.name; b.style.setProperty('--w', hi > lo ? ((Math.log(t.list.length) - lo) / (hi - lo)).toFixed(2) : 0); b.setAttribute('aria-pressed', 'false');

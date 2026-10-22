@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Configuring AI Coding Agents: Subagents, Agent Teams, JSON and Markdown Files — Khairul Alam</title>
+  <meta name="description" content="How to configure AI coding agents: subagents as Markdown, JSON or TOML files, running them in the terminal, setting up a team of subagents, Claude Code agent teams, and Codex custom agents, with diagrams." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Khairul Alam" />
+  <meta property="og:title" content="Configuring AI Coding Agents: Subagents, Agent Teams, JSON and Markdown Files" />
+  <meta property="og:description" content="How to configure AI coding agents: subagents as Markdown, JSON or TOML files, running them in the terminal, setting up a team of subagents, Claude Code agent teams, and Codex custom agents, with diagrams." />
+  <meta property="og:url" content="https://liconrepo.github.io/blog/ai-agents-subagents-and-teams.html" />
+  <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+  <link rel="stylesheet" href="../data/toc/toc.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+
+  <symbol id="bot" viewBox="0 0 60 74">
+    <line x1="30" y1="3" x2="30" y2="11" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="30" cy="4" r="3.5" fill="#fbbf24" stroke="#1f2937" stroke-width="2"/>
+    <rect x="3" y="22" width="6" height="12" rx="3" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="51" y="22" width="6" height="12" rx="3" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="8" y="10" width="44" height="31" rx="11" fill="var(--bc)" stroke="#1f2937" stroke-width="2.5"/>
+    <rect x="13" y="16" width="34" height="19" rx="8" fill="#fff" stroke="#1f2937" stroke-width="1.5"/>
+    <circle cx="23" cy="24.5" r="3.6" fill="#1f2937"/><circle cx="37" cy="24.5" r="3.6" fill="#1f2937"/>
+    <circle cx="24.2" cy="23.2" r="1.1" fill="#fff"/><circle cx="38.2" cy="23.2" r="1.1" fill="#fff"/>
+    <path d="M25 30 Q30 34 35 30" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/>
+    <rect x="14" y="43" width="32" height="23" rx="9" fill="var(--bc)" stroke="#1f2937" stroke-width="2.5"/>
+    <circle cx="30" cy="54" r="4.5" fill="#fff" stroke="#1f2937" stroke-width="1.5"/>
+    <rect x="3" y="45" width="9" height="17" rx="4.5" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="48" y="45" width="9" height="17" rx="4.5" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="17" y="66" width="10" height="7" rx="3" fill="#1f2937"/><rect x="33" y="66" width="10" height="7" rx="3" fill="#1f2937"/>
+  </symbol>
+  <symbol id="doc" viewBox="0 0 30 38">
+    <path d="M3 2 H20 L27 9 V36 H3 Z" fill="#fff" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M20 2 V9 H27" fill="#e5e7eb" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M8 16 H22 M8 22 H22 M8 28 H17" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">AI coding agents &middot; Claude Code &middot; Codex &middot; Configuration</p>
+    <h1>Configuring AI Coding Agents: Subagents, Agent Teams, JSON and Markdown Files</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~25 min read</span></div>
+    <div class="tags"><span class="tag">Subagents</span><span class="tag">Agent teams</span><span class="tag">Claude Code</span><span class="tag">Codex</span><span class="tag">Configuration</span><span class="tag">Git worktrees</span></div>
+
+    <p class="lede">One coding agent in one chat is a good start. When the job grows (review a whole app, investigate a bug with several theories, build a feature across layers) you want helpers: small agents with their own instructions, tools and context. This article shows how to define them three ways (in the terminal, in JSON, and in Markdown or TOML files), how to run them, and how to arrange them into a team that does not trip over itself.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 290" role="img" aria-label="Cartoon: a blue main-agent robot says it will delegate, with four helper robots below it: an explorer with a magnifying glass, an implementer with a wrench, a reviewer with a clipboard and a test writer with a check mark.">
+        <path class="rule" d="M295,141 L70,170 M295,141 L200,170 M295,141 L430,170 M295,141 L560,170" stroke-dasharray="5 4"/>
+        <use href="#bot" x="250" y="30" width="90" height="111" style="--bc:#3b82f6"/>
+        <path class="box" d="M360,56 L346,62 L360,68 Z"/><rect class="box" x="360" y="38" width="190" height="40" rx="10"/>
+        <text class="c" x="455" y="63">Team, I need a hand!</text>
+        <use href="#bot" x="40" y="170" width="60" height="74" style="--bc:#10b981"/>
+        <circle cx="112" cy="214" r="9" fill="#e0f2fe" stroke="#1f2937" stroke-width="2.2"/><path d="M118,221 L128,232" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
+        <text class="b c" x="70" y="262">Explorer</text><text class="sub c" x="70" y="278">finds things</text>
+        <use href="#bot" x="170" y="170" width="60" height="74" style="--bc:#f59e0b"/>
+        <rect x="236" y="200" width="7" height="30" rx="3" fill="#9ca3af" stroke="#1f2937" stroke-width="2" transform="rotate(28 240 215)"/><circle cx="249" cy="198" r="7" fill="#9ca3af" stroke="#1f2937" stroke-width="2"/>
+        <text class="b c" x="200" y="262">Implementer</text><text class="sub c" x="200" y="278">makes changes</text>
+        <use href="#bot" x="400" y="170" width="60" height="74" style="--bc:#a855f7"/>
+        <rect x="464" y="198" width="24" height="32" rx="4" fill="#fff" stroke="#1f2937" stroke-width="2"/><path d="M469,208 H483 M469,215 H483 M469,222 H478" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><rect x="471" y="195" width="10" height="6" rx="2" fill="#1f2937"/>
+        <text class="b c" x="430" y="262">Reviewer</text><text class="sub c" x="430" y="278">checks the diff</text>
+        <use href="#bot" x="530" y="170" width="60" height="74" style="--bc:#06b6d4"/>
+        <path d="M596,212 l6,8 l13,-16" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text class="b c" x="560" y="262">Test writer</text><text class="sub c" x="560" y="278">runs the tests</text>
+      </svg>
+      <figcaption>The cast of this article: one main agent and a few specialists, each with a single job.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <strong>The whole post in 60 seconds</strong>
+      <ul>
+        <li>A <strong>subagent</strong> is a helper with its own context window, system prompt, tools and model. It does a side task and sends back a summary. Your main chat stays small.</li>
+        <li>In <strong>Claude Code</strong> you define one as a Markdown file with a short YAML header (<code>.claude/agents/name.md</code>), or for one session as JSON with <code>claude --agents '{...}'</code>.</li>
+        <li>In <strong>Codex</strong> you define one as a TOML file (<code>.codex/agents/name.toml</code>) and tune limits in <code>config.toml</code>.</li>
+        <li>An <strong>agent team</strong> (Claude Code, experimental) is different: several full sessions that message each other and share a task list. It costs more and is worth it only for work that parallelises.</li>
+        <li><strong>Parallel is faster only for independent work.</strong> Dependent steps should run in order; extra agents add cost and a merge step.</li>
+        <li>Start with <strong>read-only parallel work</strong> (review, research, debugging). Give every agent its own files or its own Git worktree. Never let two agents edit the same file.</li>
+        <li>Agents inherit your permissions. A &ldquo;do not edit&rdquo; sentence is a request, not a sandbox; restrict <code>tools</code> or the sandbox instead.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#model">The mental model: one agent, subagents, teams</a></li>
+        <li><a href="#ways">Three ways to configure an agent</a></li>
+        <li><a href="#md">Markdown files (Claude Code)</a></li>
+        <li><a href="#json">JSON and settings (Claude Code)</a></li>
+        <li><a href="#terminal">Running and managing agents in the terminal</a></li>
+        <li><a href="#setup">Setting up a team of subagents</a></li>
+        <li><a href="#teams">Agent teams (Claude Code, experimental)</a></li>
+        <li><a href="#codex">Codex: TOML agent files</a></li>
+        <li><a href="#compare">Claude Code and Codex side by side</a></li>
+        <li><a href="#speed">Pros and cons: parallel vs serial</a></li>
+        <li><a href="#safety">Safety, cost and habits</a></li>
+        <li><a href="#mistakes">Common mistakes</a></li>
+        <li><a href="#takeaways">Takeaways and glossary</a></li>
+      </ol>
+    </details>
+
+    <h2 id="model">1. The mental model: one agent, subagents, teams</h2>
+    <p>An agent is a language model running in a loop with tools: it reads files, runs commands, and decides what to do next. The problem with a single agent is its <strong>context window</strong>. Every file it reads and every log line it sees stays in the conversation, so a long task fills the window and quality drops. Helpers solve that by doing messy work somewhere else.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="Three setups. A single session does everything itself. With subagents the main agent delegates to helpers and gets summaries back. In an agent team a lead and teammates share a task list and message each other.">
+        <text class="b c" x="100" y="20">One session</text>
+        <rect class="boxb" x="45" y="50" width="110" height="60" rx="10"/><text class="b c" x="100" y="76">Main agent</text><text class="sub c" x="100" y="96">does everything</text>
+        <text class="sub c" x="100" y="140">Context fills</text><text class="sub c" x="100" y="158">with file reads</text>
+
+        <text class="b c" x="320" y="20">Subagents</text>
+        <rect class="boxb" x="265" y="50" width="110" height="46" rx="10"/><text class="b c" x="320" y="78">Main agent</text>
+        <rect class="boxg" x="215" y="150" width="70" height="40" rx="8"/><text class="sub c" x="250" y="175">helper</text>
+        <rect class="boxg" x="355" y="150" width="70" height="40" rx="8"/><text class="sub c" x="390" y="175">helper</text>
+        <path class="arrow" d="M300,98 L260,146"/><path class="arrow" d="M340,98 L380,146"/>
+        <text class="sub c" x="320" y="124">task</text>
+        <text class="sub c" x="320" y="216">results return as summaries</text>
+
+        <text class="b c" x="540" y="20">Agent team</text>
+        <rect class="boxp" x="490" y="40" width="100" height="40" rx="10"/><text class="b c" x="540" y="65">Lead</text>
+        <rect class="boxo" x="440" y="150" width="80" height="40" rx="8"/><text class="sub c" x="480" y="175">teammate</text>
+        <rect class="boxo" x="560" y="150" width="80" height="40" rx="8"/><text class="sub c" x="600" y="175">teammate</text>
+        <path class="arrow" d="M525,82 L490,146"/><path class="arrow" d="M555,82 L590,146"/>
+        <path class="rule" d="M522,170 L558,170" stroke-dasharray="4 3"/>
+        <text class="sub c" x="540" y="108">shared task list</text>
+        <text class="sub c" x="540" y="216">teammates talk to each other</text>
+        <text class="sub c" x="320" y="256">Each box has its own context window. Cost grows from left to right.</text>
+      </svg>
+      <figcaption>A subagent reports back to whoever called it. Teammates are full sessions that coordinate among themselves.</figcaption>
+    </figure>
+    <table>
+      <tr><th></th><th>Subagent</th><th>Agent team (Claude Code)</th></tr>
+      <tr><td><strong>What it is</strong></td><td>A helper started inside one session</td><td>Several separate sessions led by one lead</td></tr>
+      <tr><td><strong>Talks to</strong></td><td>The caller (returns a result)</td><td>Each other, through messages and a shared task list</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Focused jobs where only the result matters: search, review, test runs</td><td>Work that needs discussion: competing hypotheses, cross-layer features</td></tr>
+      <tr><td><strong>Token cost</strong></td><td>Lower: summaries come back</td><td>Higher: every teammate is a full session</td></tr>
+      <tr><td><strong>Status</strong></td><td>Stable feature</td><td>Experimental, off by default</td></tr>
+    </table>
+    <div class="analogy"><strong>Analogy: a kitchen</strong>
+      <p>Subagents are cooks you send to the pantry: &ldquo;find the three spices I need and tell me where they are.&rdquo; You never see the shelves. An agent team is a few cooks each running a station, calling out to each other. It is faster for a banquet, but you pay more wages and the station boundaries must be clear.</p>
+    </div>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Cartoon: on the left a robot sweats under a huge backpack stuffed with files and logs. On the right a robot with a small backpack receives short summary notes from three helper robots.">
+        <text class="b" x="10" y="20">Without helpers</text>
+        <rect x="22" y="76" width="52" height="84" rx="14" fill="#f59e0b" stroke="#1f2937" stroke-width="2.5"/>
+        <rect x="30" y="54" width="14" height="30" rx="2" fill="#fff" stroke="#1f2937" stroke-width="1.8" transform="rotate(-12 37 69)"/>
+        <rect x="46" y="48" width="14" height="34" rx="2" fill="#e0f2fe" stroke="#1f2937" stroke-width="1.8" transform="rotate(8 53 65)"/>
+        <rect x="30" y="86" width="36" height="12" rx="3" fill="#fde68a" stroke="#1f2937" stroke-width="1.5"/><text class="sub" x="35" y="96" style="font-size:9px">file.kt</text>
+        <rect x="30" y="102" width="36" height="12" rx="3" fill="#fde68a" stroke="#1f2937" stroke-width="1.5"/><text class="sub" x="35" y="112" style="font-size:9px">log.txt</text>
+        <rect x="30" y="118" width="36" height="12" rx="3" fill="#fde68a" stroke="#1f2937" stroke-width="1.5"/><text class="sub" x="35" y="128" style="font-size:9px">file.kt</text>
+        <use href="#bot" x="72" y="62" width="75" height="92" style="--bc:#3b82f6"/>
+        <path d="M150,70 q4,8 0,12 q-4,-4 0,-12 Z" fill="#60a5fa" stroke="#1f2937" stroke-width="1.3"/>
+        <path d="M60,48 q4,8 0,12 q-4,-4 0,-12 Z" fill="#60a5fa" stroke="#1f2937" stroke-width="1.3"/>
+        <text class="c" x="190" y="104" style="font-size:20px">&#128565;</text>
+        <text class="b c" x="105" y="184">Everything in one head</text>
+        <text class="sub c" x="105" y="203">Context fills up, quality drops</text>
+
+        <path class="rule" d="M320,30 L320,230" stroke-dasharray="4 4"/>
+
+        <text class="b" x="350" y="20">With subagents</text>
+        <use href="#bot" x="360" y="70" width="75" height="92" style="--bc:#3b82f6"/>
+        <rect x="352" y="100" width="16" height="28" rx="6" fill="#f59e0b" stroke="#1f2937" stroke-width="2"/>
+        <path class="arrow" d="M545,60 L450,100"/><path class="arrow" d="M545,118 L450,118"/><path class="arrow" d="M545,176 L450,138"/>
+        <use href="#bot" x="548" y="38" width="42" height="52" style="--bc:#10b981"/>
+        <use href="#bot" x="548" y="94" width="42" height="52" style="--bc:#10b981"/>
+        <use href="#bot" x="548" y="150" width="42" height="52" style="--bc:#10b981"/>
+        <rect x="486" y="70" width="26" height="20" rx="3" fill="#fff" stroke="#1f2937" stroke-width="1.8"/><path d="M490,76 H508 M490,82 H503" stroke="#9ca3af" stroke-width="1.8"/>
+        <rect x="486" y="109" width="26" height="20" rx="3" fill="#fff" stroke="#1f2937" stroke-width="1.8"/><path d="M490,115 H508 M490,121 H503" stroke="#9ca3af" stroke-width="1.8"/>
+        <rect x="486" y="152" width="26" height="20" rx="3" fill="#fff" stroke="#1f2937" stroke-width="1.8"/><path d="M490,158 H508 M490,164 H503" stroke="#9ca3af" stroke-width="1.8"/>
+        <text class="sub" x="596" y="68">files</text><text class="sub" x="596" y="124">logs</text><text class="sub" x="596" y="180">tests</text>
+        <text class="b c" x="400" y="184">Short notes come back</text>
+        <text class="sub c" x="400" y="203">Main context stays light</text>
+      </svg>
+      <figcaption>A subagent does the heavy reading in its own head and returns only a summary.</figcaption>
+    </figure>
+
+    <h2 id="ways">2. Three ways to configure an agent</h2>
+    <p>Where the definition lives decides who can use it and which one wins when two share a name.</p>
+    <table>
+      <tr><th>Way</th><th>Format</th><th>Lives</th><th>Use it for</th></tr>
+      <tr><td><strong>Markdown file</strong> (Claude Code)</td><td>YAML header plus a prompt body</td><td><code>.claude/agents/</code> (project) or <code>~/.claude/agents/</code> (you)</td><td>Agents you keep, review in pull requests and share with the team.</td></tr>
+      <tr><td><strong>JSON on the command line</strong> (Claude Code)</td><td><code>claude --agents '{...}'</code></td><td>One session only</td><td>Quick experiments, scripts, CI jobs.</td></tr>
+      <tr><td><strong>TOML file</strong> (Codex)</td><td>One <code>.toml</code> per agent</td><td><code>.codex/agents/</code> or <code>~/.codex/agents/</code></td><td>Codex custom agents.</td></tr>
+      <tr><td><strong>Plain prompt</strong> (both)</td><td>Natural language</td><td>The conversation</td><td>&ldquo;Use subagents to review this in parallel.&rdquo; No setup at all.</td></tr>
+    </table>
+    <p>For Claude Code the lookup order, from strongest to weakest, is:</p>
+    <ol>
+      <li><strong>Managed settings</strong> (set by an organisation).</li>
+      <li>The <strong><code>--agents</code></strong> flag for this session.</li>
+      <li><strong><code>.claude/agents/</code></strong> in the project (the folder closest to your working directory wins).</li>
+      <li><strong><code>~/.claude/agents/</code></strong> for all your projects.</li>
+      <li><strong>Plugins</strong>, which ship their own <code>agents/</code> folder.</li>
+    </ol>
+    <div class="note"><p>Identity comes from the <code>name</code> field, not the file name or sub-folder. Two files with the same <code>name</code> collide, and the higher row in the list above wins.</p></div>
+
+    <h2 id="md">3. Markdown files (Claude Code)</h2>
+    <p>A subagent is a Markdown file. The part between the <code>---</code> lines is YAML configuration; everything after it is the agent&rsquo;s system prompt.</p>
+<pre><code>.claude/agents/code-reviewer.md
+
+---
+name: code-reviewer
+description: Reviews code for bugs, security and maintainability. Use proactively after code changes.
+tools: Read, Glob, Grep
+model: sonnet
+---
+
+You are a senior code reviewer.
+Review the changes you are pointed at. Report findings with file paths and line numbers,
+ordered by severity. Do not modify files. If everything looks fine, say so briefly.</code></pre>
+    <p>Save the file and it is picked up while the session runs (the very first agent file in a brand-new <code>agents</code> folder may need a restart). Only <code>name</code> and <code>description</code> are required.</p>
+
+    <h3>The header fields you will actually use</h3>
+    <table class="lib">
+      <tr><th>Field</th><th>What it does</th></tr>
+      <tr><td><code>name</code></td><td>Unique identifier. Required.</td></tr>
+      <tr><td><code>description</code></td><td>Tells Claude <em>when</em> to delegate. Required. Write it like a job posting; phrases such as &ldquo;use proactively&rdquo; make delegation more likely.</td></tr>
+      <tr><td><code>tools</code></td><td>Allowlist of tools, comma-separated or a YAML list. Leave it out and the agent inherits everything. A reviewer with only <code>Read, Glob, Grep</code> cannot change your code.</td></tr>
+      <tr><td><code>disallowedTools</code></td><td>Denylist, applied first. Use it when &ldquo;everything except these&rdquo; is easier to say.</td></tr>
+      <tr><td><code>model</code></td><td><code>sonnet</code>, <code>opus</code>, <code>haiku</code>, a full model ID, or <code>inherit</code>. Route easy work to a cheaper model.</td></tr>
+      <tr><td><code>permissionMode</code></td><td><code>default</code>, <code>acceptEdits</code>, <code>auto</code>, <code>dontAsk</code>, <code>bypassPermissions</code> or <code>plan</code>. The main session&rsquo;s stricter modes can override it.</td></tr>
+      <tr><td><code>maxTurns</code></td><td>Stops a runaway agent after N turns.</td></tr>
+      <tr><td><code>skills</code></td><td>Skills whose full text is preloaded into the agent.</td></tr>
+      <tr><td><code>mcpServers</code></td><td>MCP servers the agent can use, by name or defined inline.</td></tr>
+      <tr><td><code>hooks</code></td><td>Scripts that run around the agent&rsquo;s tool calls, for example to validate a command.</td></tr>
+      <tr><td><code>memory</code></td><td><code>user</code>, <code>project</code> or <code>local</code>: a folder where the agent keeps notes between runs.</td></tr>
+      <tr><td><code>background</code></td><td><code>true</code> always runs it in the background.</td></tr>
+      <tr><td><code>isolation</code></td><td><code>worktree</code> runs the agent in a temporary Git worktree so its edits cannot collide with yours.</td></tr>
+      <tr><td><code>effort</code></td><td>Reasoning effort from <code>low</code> to <code>max</code>, where the model supports it.</td></tr>
+      <tr><td><code>color</code></td><td>Label colour in the interface.</td></tr>
+    </table>
+    <div class="note"><p>Field names are case-sensitive, and unknown fields are silently ignored. If an agent does not appear, run <code>claude --debug</code> and look for the reason, or check parsing with <code>claude plugin validate .claude/agents</code>. A file is skipped if the opening <code>---</code> is not on line 1, the YAML is broken, or <code>name</code> or <code>description</code> is missing.</p></div>
+    <p>Fields change between versions, so treat this table as a map and check the <a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener">subagent reference</a> for your installed version.</p>
+
+    <h3>Example: a read-only agent that cannot be talked into editing</h3>
+<pre><code>---
+name: db-reader
+description: Runs read-only database queries to answer questions about data.
+tools: Bash
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "./scripts/validate-readonly-query.sh"
+---
+You answer data questions by running SELECT queries only.</code></pre>
+    <p>The script receives the pending command as JSON on standard input. Exiting with code 2 blocks the call. That is a real guard, unlike a sentence in the prompt.</p>
+
+    <h3>Example: an agent that works in its own worktree</h3>
+<pre><code>---
+name: refactorer
+description: Performs one mechanical refactor in an isolated branch checkout.
+isolation: worktree
+model: sonnet
+maxTurns: 40
+---
+Apply the requested refactor. Run the unit tests. Summarise what changed.</code></pre>
+    <p>With <code>isolation: worktree</code> the agent edits a temporary copy of the repository, so it can run beside your own work. The same idea is explained for people in the <a href="git-vcs-branching-guide.html">Git and branching guide</a> (<code>git worktree</code>).</p>
+
+    <h3>Where the prompt body goes</h3>
+    <ul>
+      <li>State the <strong>role</strong>, the <strong>steps</strong>, and the <strong>shape of the answer</strong> (&ldquo;findings with file paths and line numbers&rdquo;). The caller only sees that final message.</li>
+      <li>Say what <strong>not</strong> to do (&ldquo;do not modify files&rdquo;), and back it up with <code>tools</code>.</li>
+      <li>Keep it short. A subagent starts with a fresh context and does not see your conversation, so include everything it needs in the task you give it.</li>
+    </ul>
+
+    <h2 id="json">4. JSON and settings (Claude Code)</h2>
+    <h3>Define agents for one session with <code>--agents</code></h3>
+    <p>Each top-level key is an agent name. <code>prompt</code> takes the place of the Markdown body.</p>
+<pre><code>claude --agents '{
+  "code-reviewer": {
+    "description": "Expert code reviewer. Use proactively after code changes.",
+    "prompt": "You are a senior code reviewer. Focus on quality, security and best practices.",
+    "tools": ["Read", "Grep", "Glob", "Bash"],
+    "model": "sonnet"
+  },
+  "debugger": {
+    "description": "Debugging specialist for errors and test failures.",
+    "prompt": "You are an expert debugger. Find root causes and propose fixes."
+  }
+}'</code></pre>
+    <p>The same fields as the Markdown header are accepted (<code>description</code>, <code>tools</code>, <code>disallowedTools</code>, <code>model</code>, <code>permissionMode</code>, <code>mcpServers</code>, <code>hooks</code>, <code>maxTurns</code>, <code>skills</code>, <code>memory</code>, <code>effort</code>, <code>background</code>, <code>isolation</code> and a few more). <code>color</code> is ignored. In non-interactive runs (<code>-p</code>) newer versions also accept a file path:</p>
+<pre><code>claude -p "Review the staged changes" --agents ./agents.json</code></pre>
+    <p>Because <code>--agents</code> outranks files on disk, it is a handy way to override an agent for a CI job without touching the repository. On Windows PowerShell use a here-string (<code>@'...'@</code>) to avoid quote trouble.</p>
+
+    <h3>Make an agent the default with <code>settings.json</code></h3>
+    <p>To run the <em>whole session</em> as an agent (its prompt, tools and model replace the defaults), use the <code>--agent</code> flag, or set a project default:</p>
+<pre><code>// .claude/settings.json
+{
+  "agent": "code-reviewer"
+}</code></pre>
+    <p>The command-line flag <code>claude --agent code-reviewer</code> overrides the setting.</p>
+
+    <h3>Control delegation with permissions and environment variables</h3>
+<pre><code>// .claude/settings.json
+{
+  "permissions": {
+    "deny": ["Agent(Explore)"]          // block one agent; deny "Agent" to block all delegation
+  },
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",          // default model when the file names none
+    "CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "6",     // default is 20 at once
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"      // 1 turns off subagents spawning subagents
+  }
+}</code></pre>
+    <table>
+      <tr><th>Setting</th><th>Effect</th></tr>
+      <tr><td><code>permissions.deny: ["Agent(Name)"]</code></td><td>Stops delegation to that agent. The same works as <code>--disallowedTools "Agent(Name)"</code>.</td></tr>
+      <tr><td><code>CLAUDE_CODE_SUBAGENT_MODEL</code></td><td>Model for subagents that do not name one. Add <code>CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1</code> to force it on all of them.</td></tr>
+      <tr><td><code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code></td><td>Cap on subagents running at once.</td></tr>
+      <tr><td><code>CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH</code></td><td>How many layers deep subagents may spawn subagents (the default is 3 on current versions; <code>1</code> disables nesting).</td></tr>
+      <tr><td><code>CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS=1</code></td><td>Removes the built-in Explore and Plan agents.</td></tr>
+    </table>
+    <p>Which model does a subagent end up with? In order: the model named for that one call, then the <code>model</code> in the agent file (<code>inherit</code> means the main conversation&rsquo;s), then <code>CLAUDE_CODE_SUBAGENT_MODEL</code>, then the main conversation&rsquo;s model.</p>
+
+    <h2 id="terminal">5. Running and managing agents in the terminal</h2>
+    <h3>Three ways to call an agent</h3>
+    <table>
+      <tr><th>How</th><th>Example</th><th>Guarantee</th></tr>
+      <tr><td>Natural language</td><td><code>Use the code-reviewer subagent to check the auth module</code></td><td>Claude decides whether to delegate.</td></tr>
+      <tr><td>@-mention</td><td><code>@"code-reviewer (agent)" look at the auth changes</code></td><td>That agent runs.</td></tr>
+      <tr><td>Whole session</td><td><code>claude --agent code-reviewer</code></td><td>The main thread becomes that agent.</td></tr>
+    </table>
+    <p>Claude also delegates on its own when a task matches an agent&rsquo;s <code>description</code>. Three built-in agents are always there: <strong>Explore</strong> (read-only search, with quick, medium and very thorough levels), <strong>Plan</strong> (read-only research for plan mode) and <strong>general-purpose</strong> (all tools). A file of your own with the name <code>Explore</code> replaces the built-in one.</p>
+
+    <h3>Watching and steering</h3>
+    <ul>
+      <li><code>/tasks</code> lists running and finished subagents and the model each used. Press <code>x</code> on a row to stop one.</li>
+      <li><strong>Ctrl+B</strong> sends a running subagent to the background so you can keep typing. Subagents Claude starts from the main conversation run in the background by default, and their permission prompts appear in your main session.</li>
+      <li><strong>Resume:</strong> each call is a new instance, but you can say &ldquo;continue that code review and now look at authorization&rdquo; and Claude resumes it with its history. Explore and Plan are one-shot and cannot be resumed.</li>
+      <li><strong>Transcripts</strong> are stored under <code>~/.claude/projects/&hellip;/subagents/</code> and are cleaned up after the retention period (30 days by default).</li>
+      <li><code>/agents</code>: on current versions it only reminds you to ask Claude or edit the folders. Older versions (2.1.197 and earlier) opened a wizard for creating and editing agents.</li>
+    </ul>
+    <div class="note"><p>Subagents start with a <strong>fresh context</strong> and do not see your conversation. They also cannot ask you questions or enter plan mode. Put everything they need into the task message.</p></div>
+
+    <h3>Quick start: a parallel read-only review, no files needed</h3>
+<pre><code>Use subagents to review this project in parallel.
+
+- Agent 1: find bugs and edge cases.
+- Agent 2: review architecture and maintainability.
+- Agent 3: review unit test coverage.
+- Agent 4: identify performance and memory issues.
+
+Return findings with file paths and line numbers. Do not modify files.</code></pre>
+    <p>This is the safest first experiment: the agents only read, so there is nothing to conflict, and you get four independent opinions back as short summaries.</p>
+
+    <h2 id="setup">6. Setting up a team of subagents</h2>
+    <p>A &ldquo;team&rdquo; of subagents is not a feature switch. It is a set of well-separated roles plus a rule for how work flows between them. Three patterns cover most needs.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Two patterns. Fan-out: the main agent sends the same task to several reviewers with different lenses and merges their findings. Pipeline: an explorer finds files, an implementer changes them, a reviewer checks the result.">
+        <text class="b" x="10" y="18">Fan-out: parallel, read-only</text>
+        <rect class="boxb" x="10" y="60" width="100" height="44" rx="10"/><text class="b c" x="60" y="87">Main</text>
+        <rect class="boxg" x="190" y="30" width="130" height="34" rx="8"/><text class="sub c" x="255" y="52">security lens</text>
+        <rect class="boxg" x="190" y="76" width="130" height="34" rx="8"/><text class="sub c" x="255" y="98">performance lens</text>
+        <rect class="boxg" x="190" y="122" width="130" height="34" rx="8"/><text class="sub c" x="255" y="144">test-gap lens</text>
+        <path class="arrow" d="M112,76 L186,48"/><path class="arrow" d="M112,82 L186,94"/><path class="arrow" d="M112,90 L186,138"/>
+        <text class="sub" x="340" y="98">findings merge</text><text class="sub" x="340" y="116">in Main</text>
+
+        <text class="b" x="10" y="190">Pipeline: sequential hand-off</text>
+        <rect class="boxg" x="10"  y="204" width="120" height="36" rx="8"/><text class="sub c" x="70"  y="226">explorer</text>
+        <rect class="boxo" x="190" y="204" width="120" height="36" rx="8"/><text class="sub c" x="250" y="226">implementer</text>
+        <rect class="boxp" x="370" y="204" width="120" height="36" rx="8"/><text class="sub c" x="430" y="226">reviewer</text>
+        <path class="arrow" d="M132,222 L186,222"/><path class="arrow" d="M312,222 L366,222"/>
+        <text class="sub" x="505" y="226">fresh eyes at the end</text>
+      </svg>
+      <figcaption>Fan-out reads in parallel and merges. A pipeline hands one result to the next specialist.</figcaption>
+    </figure>
+
+    <h3>Step 1: split by role, not by file count</h3>
+    <p>Good roles have one job, a narrow tool list and a clear output. A reasonable starter set for an Android or backend project:</p>
+    <table>
+      <tr><th>Agent</th><th>Job</th><th>Tools</th><th>Model idea</th></tr>
+      <tr><td><code>explorer</code></td><td>Find where something lives, map the code. Read-only.</td><td>Read, Glob, Grep</td><td>Cheap and fast</td></tr>
+      <tr><td><code>implementer</code></td><td>Make a defined change in an agreed set of files.</td><td>Read, Edit, Write, Bash</td><td>Main model</td></tr>
+      <tr><td><code>test-writer</code></td><td>Add or fix tests for the change; run them.</td><td>Read, Edit, Write, Bash</td><td>Main model</td></tr>
+      <tr><td><code>reviewer</code></td><td>Review the diff with fresh context. Read-only.</td><td>Read, Glob, Grep</td><td>Stronger model for hard reviews</td></tr>
+    </table>
+
+    <h3>Step 2: write the files</h3>
+<pre><code>.claude/agents/explorer.md
+---
+name: explorer
+description: Read-only codebase explorer. Use to locate code, trace a call path or list affected files.
+tools: Read, Glob, Grep
+model: haiku
+---
+Find what was asked and answer with file paths and one-line explanations.
+Never edit files. Keep the answer under 40 lines.</code></pre>
+<pre><code>.claude/agents/implementer.md
+---
+name: implementer
+description: Implements one well-defined change in the files it is given. Use after the plan is agreed.
+tools: Read, Edit, Write, Bash
+model: sonnet
+isolation: worktree
+---
+Make the smallest change that satisfies the task. Touch only the files named in the task.
+Run the relevant tests before you finish. Report what changed and what you did not do.</code></pre>
+<pre><code>.claude/agents/reviewer.md
+---
+name: reviewer
+description: Independent reviewer of a diff. Use proactively after any implementation.
+tools: Read, Glob, Grep, Bash
+model: opus
+---
+Review the diff for correctness, security and missing tests. Use git diff to see it.
+Report findings by severity with file and line. Do not edit files.</code></pre>
+
+    <h3>Step 3: give the orchestrating prompt</h3>
+<pre><code>Add retry with backoff to the upload client.
+
+1. Use the explorer subagent to list every file involved in uploads.
+2. Propose a plan and wait for my OK.
+3. Use the implementer subagent for the change, and test-writer for the tests.
+   They must not edit the same file.
+4. Finish with the reviewer subagent on the full diff and summarise its findings.
+
+Do not commit, push or open a PR without my approval.</code></pre>
+
+    <h3>Step 4: keep agents from colliding</h3>
+    <ul>
+      <li><strong>One owner per file.</strong> Two agents writing the same file means one overwrites the other.</li>
+      <li><strong>Prefer worktrees for parallel writers.</strong> <code>isolation: worktree</code> (Claude Code) or <code>git worktree add</code> by hand gives each writer its own checkout and branch. Merge them one by one afterwards, as described in the <a href="git-vcs-branching-guide.html">branching guide</a>.</li>
+      <li><strong>Read in parallel, write in sequence.</strong> It is the cheapest way to get speed without conflicts.</li>
+      <li><strong>Limit depth and count.</strong> A small cap on concurrent agents and a spawn depth of 1 or 2 keeps cost and confusion predictable.</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="Cartoon. Left: two robots tug the same file with a lightning bolt above and the words same file. Right: two robots each have their own folder, auth and ui, with check marks.">
+        <text class="b" x="10" y="20">Two writers, one file</text>
+        <use href="#bot" x="30" y="76" width="60" height="74" style="--bc:#ef4444"/>
+        <use href="#bot" x="210" y="76" width="60" height="74" style="--bc:#f59e0b"/>
+        <path d="M90,108 L128,112 M210,108 L172,112" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/>
+        <use href="#doc" x="125" y="92" width="30" height="38"/>
+        <path d="M150,58 L138,80 L148,80 L140,102 L162,76 L152,76 Z" fill="#fbbf24" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+        <text class="b c" x="150" y="52" style="fill:#ef4444">Same file!</text>
+        <text class="sub c" x="150" y="182">One overwrites the other</text>
+
+        <path class="rule" d="M320,30 L320,210" stroke-dasharray="4 4"/>
+
+        <text class="b" x="350" y="20">One owner each</text>
+        <use href="#bot" x="360" y="62" width="60" height="74" style="--bc:#10b981"/>
+        <use href="#bot" x="530" y="62" width="60" height="74" style="--bc:#3b82f6"/>
+        <rect class="boxg" x="352" y="148" width="76" height="28" rx="8"/><text class="b c" x="390" y="167">auth/</text>
+        <rect class="boxb" x="522" y="148" width="76" height="28" rx="8"/><text class="b c" x="560" y="167">ui/</text>
+        <path d="M432,70 l6,8 l13,-16" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M602,70 l6,8 l13,-16" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text class="sub c" x="475" y="204">Separate files or separate worktrees</text>
+      </svg>
+      <figcaption>The cheapest conflict fix is not to create one: give every writer its own files or worktree.</figcaption>
+    </figure>
+
+    <h2 id="teams">7. Agent teams (Claude Code, experimental)</h2>
+    <p>Agent teams go beyond subagents. One session is the <strong>lead</strong>. It spawns <strong>teammates</strong>, each a full Claude Code session with its own context. They share a <strong>task list</strong> and can <strong>message each other</strong>, and you can talk to any of them directly. The feature is experimental and disabled by default, with known limits around resuming sessions and shutdown.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 280" role="img" aria-label="Cartoon of an agent team. A purple lead robot stands beside a shared task board. Three teammate robots below chat with each other in speech bubbles, and each is linked to the lead.">
+        <use href="#bot" x="150" y="14" width="75" height="92" style="--bc:#a855f7"/>
+        <text class="b c" x="188" y="124">Lead</text>
+        <rect class="box" x="300" y="14" width="210" height="104" rx="12"/>
+        <rect x="380" y="8" width="50" height="14" rx="5" fill="#1f2937"/>
+        <text class="b" x="316" y="44">Shared task list</text>
+        <text class="sub" x="316" y="66">&#10003;  map the auth module</text>
+        <text class="sub" x="316" y="86">&#9679;  review token handling</text>
+        <text class="sub" x="316" y="106">&#9675;  add missing tests</text>
+        <path class="rule" d="M188,112 L90,176 M188,112 L320,176 M188,112 L550,176" stroke-dasharray="5 4"/>
+        <use href="#bot" x="60"  y="176" width="60" height="74" style="--bc:#10b981"/>
+        <use href="#bot" x="290" y="176" width="60" height="74" style="--bc:#f59e0b"/>
+        <use href="#bot" x="520" y="176" width="60" height="74" style="--bc:#06b6d4"/>
+        <rect class="box" x="30" y="132" width="132" height="28" rx="9"/><text class="sub c" x="96" y="151">Found a snag in auth</text>
+        <rect class="box" x="360" y="204" width="130" height="28" rx="9"/><text class="sub c" x="425" y="223">Which file is it?</text>
+        <rect class="box" x="436" y="140" width="160" height="28" rx="9"/><text class="sub c" x="516" y="159">I'll write the tests</text>
+        <path d="M128,226 L284,226" stroke="#71717a" stroke-width="1.6" stroke-dasharray="3 4" fill="none"/>
+        <path d="M356,238 L514,238" stroke="#71717a" stroke-width="1.6" stroke-dasharray="3 4" fill="none"/>
+        <text class="sub c" x="90" y="268">reviewer</text><text class="sub c" x="320" y="268">android</text><text class="sub c" x="550" y="268">tests</text>
+      </svg>
+      <figcaption>In a team, teammates talk to each other and pick tasks from a shared list, not only report to the lead.</figcaption>
+    </figure>
+
+    <h3>Turn it on</h3>
+<pre><code>// settings.json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}</code></pre>
+    <p>You can also export the variable in your shell. Teams need an interactive session; with <code>claude -p</code> and in SDK sessions no teammates are spawned.</p>
+    <div class="note"><p>Once enabled, a subagent that Claude gives a name to may launch as a teammate even when you did not ask for a team. To go back to ordinary subagents, set the variable to <code>0</code>.</p></div>
+
+    <h4>What each value does</h4>
+    <p>The variable is a plain on/off switch, not a number of teammates. Only a few words count as &ldquo;on&rdquo;; everything else, including bigger numbers, leaves teams off. This was checked against Claude Code 2.1.307, so re-test after big upgrades.</p>
+    <table>
+      <tr><th>Value</th><th>Effect</th><th>Why</th></tr>
+      <tr><td><code>"1"</code></td><td><strong>On</strong></td><td>Recognised as true. Teams can form when you ask for them, or when Claude names a subagent.</td></tr>
+      <tr><td><code>"0"</code></td><td><strong>Off</strong></td><td>Recognised as false. Named subagents launch as ordinary subagents again.</td></tr>
+      <tr><td><code>"5"</code></td><td><strong>Off</strong></td><td>Not a recognised true value. It does <em>not</em> mean five teammates.</td></tr>
+      <tr><td><code>"10"</code></td><td><strong>Off</strong></td><td>Same as <code>"5"</code>: not recognised, so the feature stays off.</td></tr>
+      <tr><td>unset or empty</td><td><strong>Off</strong></td><td>The default.</td></tr>
+    </table>
+    <ul>
+      <li><strong>Accepted &ldquo;on&rdquo; words:</strong> <code>1</code>, <code>true</code>, <code>yes</code>, <code>on</code> (case does not matter, spaces around the value are ignored). Accepted &ldquo;off&rdquo; words: <code>0</code>, <code>false</code>, <code>no</code>, <code>off</code>.</li>
+      <li><strong>A silent failure:</strong> a typo or a number such as <code>"10"</code> does not raise an error. Teams just never appear, which is easy to mistake for a bug. If no teammates show up, check this value first.</li>
+      <li><strong>The command-line flag</strong> <code>--agent-teams</code> also turns the feature on for one run, even when the variable is off.</li>
+      <li><strong>To choose how many teammates,</strong> say so in the prompt (&ldquo;Spawn 4 teammates&hellip;&rdquo;). Start with 3 to 5.</li>
+    </ul>
+
+    <h3>Start a team with a prompt</h3>
+    <p>There is no team configuration file. You describe the roles in plain language, and Claude creates the team, the task list and the teammates.</p>
+<pre><code>Create an agent team to investigate and improve this Android project.
+
+Roles:
+1. Lead developer: coordinate, inspect the architecture, integrate the findings.
+2. Code reviewer: look for bugs, concurrency issues and architectural problems. Do not modify files.
+3. Test engineer: find missing unit tests and implement tests for the agreed changes.
+4. Android specialist: review Kotlin, coroutines, lifecycle handling and Android best practices.
+
+First inspect the repository and make a plan. Give independent tasks to teammates and let
+them work in parallel. Avoid having several agents edit the same files. Review their
+findings, run the relevant tests and summarise the final changes.
+
+Do not commit, push or open a PR without my approval.</code></pre>
+    <p>Two more prompts that suit teams well:</p>
+<pre><code>Spawn three teammates to review PR #142: one for security, one for performance, one for test coverage.
+Have them each review and report findings.</code></pre>
+<pre><code>Users report the app exits after one message. Spawn 5 teammates to investigate different
+hypotheses. Have them try to disprove each other's theories, then update the findings doc
+with whatever consensus emerges.</code></pre>
+    <p>The second one shows why teams exist: several investigators arguing beats one agent that stops at the first plausible cause.</p>
+
+    <h3>Choose how teammates are displayed</h3>
+    <table>
+      <tr><th>Mode</th><th>What you see</th><th>Needs</th></tr>
+      <tr><td><code>in-process</code> (default)</td><td>All teammates inside your terminal. Select one in the agent panel with the arrow keys, press Enter to open it and message it.</td><td>Nothing</td></tr>
+      <tr><td><code>auto</code></td><td>Split panes if you are already inside tmux or iTerm2 (with the <code>it2</code> CLI), otherwise in-process.</td><td>tmux or iTerm2</td></tr>
+      <tr><td><code>tmux</code></td><td>Each teammate in its own tmux or iTerm2 pane.</td><td>tmux, or iTerm2 with <code>it2</code> and its Python API enabled</td></tr>
+      <tr><td><code>iterm2</code></td><td>Native iTerm2 split panes only.</td><td>iTerm2, <code>it2</code></td></tr>
+    </table>
+<pre><code>// ~/.claude/settings.json
+{
+  "teammateMode": "auto"
+}
+
+# or for one session
+claude --teammate-mode auto</code></pre>
+    <p>Split panes do not work in VS Code&rsquo;s integrated terminal, Windows Terminal or Ghostty. If panes do not appear, check <code>which tmux</code>, and kill leftovers with <code>tmux ls</code> and <code>tmux kill-session -t &lt;name&gt;</code>.</p>
+
+    <h3>Control the team</h3>
+    <ul>
+      <li><strong>Number and models:</strong> &ldquo;Spawn 4 teammates to refactor these modules in parallel. Use Sonnet for each.&rdquo; Start with 3 to 5.</li>
+      <li><strong>Names:</strong> tell the lead what to call each teammate, so you can say &ldquo;ask the researcher to shut down&rdquo; later.</li>
+      <li><strong>Plan first:</strong> put the lead in plan mode before spawning a teammate, and that teammate plans in read-only mode before it implements.</li>
+      <li><strong>Reuse your subagent files:</strong> &ldquo;Spawn a teammate using the security-reviewer agent type to audit the auth module.&rdquo; Its <code>tools</code> and <code>model</code> apply, and the body is added to its instructions. Define a role once, use it both ways. (The definition&rsquo;s <code>skills</code> are not applied to teammates.)</li>
+      <li><strong>Tasks:</strong> pending, in progress, completed, with dependencies. Teammates can claim the next free task themselves; claims use file locking so two cannot take the same one.</li>
+      <li><strong>Talk to a teammate:</strong> select it and type, or click its pane. <code>x</code> stops it, Ctrl+T toggles the task list.</li>
+      <li><strong>Stuck lead:</strong> if the lead starts doing the work itself, say &ldquo;Wait for your teammates to complete their tasks before proceeding.&rdquo;</li>
+    </ul>
+
+    <h3>Quality gates with hooks</h3>
+    <table>
+      <tr><th>Hook</th><th>Runs when</th><th>Exit code 2 does</th></tr>
+      <tr><td><code>TeammateIdle</code></td><td>A teammate is about to go idle</td><td>Sends feedback and keeps it working</td></tr>
+      <tr><td><code>TaskCreated</code></td><td>A task is being created</td><td>Blocks creation with feedback</td></tr>
+      <tr><td><code>TaskCompleted</code></td><td>A task is being marked done</td><td>Blocks completion with feedback</td></tr>
+    </table>
+    <p>For example, a <code>TaskCompleted</code> hook can run the unit tests and refuse to close a task while they fail.</p>
+
+    <h3>How it behaves</h3>
+    <ul>
+      <li>Teammates start with the lead&rsquo;s permission mode (except <code>dontAsk</code>). Their permission prompts show up in the lead&rsquo;s session. Pre-approve common safe commands first to cut interruptions.</li>
+      <li>A teammate loads CLAUDE.md, MCP servers and skills like any session, but <strong>not</strong> the lead&rsquo;s conversation. Put task details in the spawn prompt.</li>
+      <li>A message from another agent is never treated as your approval.</li>
+      <li>Team state lives under <code>~/.claude/teams/</code> and <code>~/.claude/tasks/</code>. Do not hand-edit the team config; it is rewritten constantly. A project file such as <code>.claude/teams/teams.json</code> is not recognised.</li>
+    </ul>
+
+    <div class="bad"><strong>Known limits (experimental)</strong>
+      <ul>
+        <li><code>/resume</code> and <code>/rewind</code> do not restore in-process teammates; ask the lead to spawn new ones.</li>
+        <li>One team per session. No nested teams: only the lead manages the team. The lead cannot be handed over.</li>
+        <li>Task status can lag, which blocks dependent tasks. Nudge the teammate or update the task.</li>
+        <li>Shutdown can be slow because teammates finish their current call first.</li>
+        <li>Per-teammate permission modes cannot be set at spawn time.</li>
+      </ul>
+    </div>
+    <div class="good"><strong>Good first uses</strong>
+      <ul>
+        <li>Pull request review from several angles.</li>
+        <li>Debugging with competing hypotheses.</li>
+        <li>Research that explores options in parallel.</li>
+        <li>New modules where each teammate owns a separate set of files.</li>
+      </ul>
+    </div>
+
+    <h2 id="codex">8. Codex: TOML agent files</h2>
+    <p>Codex also splits work across parallel agents and gathers the results into one reply. It handles the delegation itself when you ask for it or when your <code>AGENTS.md</code> or a skill says so. There is no separate &ldquo;team&rdquo; mode; you describe how to split the work.</p>
+    <h3>Ask for parallel work</h3>
+<pre><code>Review this branch with parallel subagents. Spawn one subagent for security risks, one for
+test gaps, and one for maintainability. Wait for all three, then summarize the findings
+by category with file references.</code></pre>
+    <p>A good prompt says <strong>how to split</strong> the work, <strong>whether to wait</strong> for all agents, and <strong>what to return</strong>. In the CLI, <code>/subagents</code> lets you inspect and switch between agent threads; in an IDE the background-agent panel shows status and can stop them all.</p>
+
+    <h3>Built-in agents</h3>
+    <table>
+      <tr><th>Agent</th><th>For</th></tr>
+      <tr><td><code>default</code></td><td>General-purpose fallback.</td></tr>
+      <tr><td><code>worker</code></td><td>Execution: implementation and fixes.</td></tr>
+      <tr><td><code>explorer</code></td><td>Read-heavy exploration of the codebase.</td></tr>
+    </table>
+    <p>A custom agent with one of these names takes precedence.</p>
+
+    <h3>Custom agents: one TOML file each</h3>
+    <p>Put personal agents in <code>~/.codex/agents/</code> and project agents in <code>.codex/agents/</code>. The <code>name</code> field is what counts; matching the file name is only a convention.</p>
+<pre><code># .codex/agents/reviewer.toml
+name = "reviewer"
+description = "PR reviewer focused on correctness, security, and missing tests."
+model_reasoning_effort = "medium"
+developer_instructions = """
+Review code like an owner.
+Do not edit files.
+Prioritize correctness, security, behavior regressions, and missing test coverage.
+Lead with concrete findings and include reproduction steps when possible.
+"""</code></pre>
+    <table class="lib">
+      <tr><th>Field</th><th>Notes</th></tr>
+      <tr><td><code>name</code>, <code>description</code>, <code>developer_instructions</code></td><td>Required. The instructions play the role of the Markdown body in Claude Code.</td></tr>
+      <tr><td><code>model</code>, <code>model_reasoning_effort</code>, <code>model_reasoning_summary</code>, <code>model_verbosity</code></td><td>Optional. Without them the agent inherits the parent&rsquo;s model and effort.</td></tr>
+      <tr><td><code>features.*</code></td><td>Switch features off for this agent (for example <code>features.shell_tool = false</code>).</td></tr>
+      <tr><td><code>skills.config</code></td><td>Enable or disable individual skills for this agent.</td></tr>
+      <tr><td>Not overridable</td><td><code>sandbox_mode</code>, <code>approval_policy</code>, <code>model_provider</code> and <code>mcp_servers</code> follow the parent session.</td></tr>
+    </table>
+
+    <h3>Global limits in <code>config.toml</code></h3>
+<pre><code># .codex/config.toml
+[agents]
+max_concurrent_threads_per_session = 8     # older name: max_threads
+# enabled = true                          # turn multi-agent tools off with false
+# default_subagent_model = "..."
+# default_subagent_reasoning_effort = "medium"</code></pre>
+
+    <div class="bad"><strong>Read this about safety</strong>
+      <ul>
+        <li>Codex subagents <strong>inherit the parent&rsquo;s sandbox and approvals</strong>, including a changed <code>/permissions</code> or <code>--yolo</code>. A custom agent file cannot loosen or tighten them.</li>
+        <li>&ldquo;Do not edit files&rdquo; in the instructions is guidance, not a read-only sandbox.</li>
+        <li>In a non-interactive run, an action that needs new approval fails and the error returns to the parent.</li>
+      </ul>
+    </div>
+    <p>Start with parallel <strong>read-heavy</strong> tasks. Parallel writes are riskier because of edit conflicts, and each subagent does its own model and tool work, so costs go up.</p>
+
+    <h2 id="compare">9. Claude Code and Codex side by side</h2>
+    <table>
+      <tr><th></th><th>Claude Code</th><th>Codex</th></tr>
+      <tr><td><strong>Agent file</strong></td><td>Markdown with YAML header</td><td>TOML</td></tr>
+      <tr><td><strong>Project folder</strong></td><td><code>.claude/agents/</code></td><td><code>.codex/agents/</code></td></tr>
+      <tr><td><strong>User folder</strong></td><td><code>~/.claude/agents/</code></td><td><code>~/.codex/agents/</code></td></tr>
+      <tr><td><strong>Prompt field</strong></td><td>Markdown body (or <code>prompt</code> in JSON)</td><td><code>developer_instructions</code></td></tr>
+      <tr><td><strong>Per-session JSON</strong></td><td><code>claude --agents '{...}'</code></td><td>Not applicable: use files and prompts</td></tr>
+      <tr><td><strong>Tool restriction</strong></td><td><code>tools</code>, <code>disallowedTools</code>, hooks</td><td><code>features.*</code> switches; sandbox follows the parent</td></tr>
+      <tr><td><strong>Own permission mode</strong></td><td><code>permissionMode</code> (the parent can override)</td><td>No, inherited</td></tr>
+      <tr><td><strong>Built-ins</strong></td><td>Explore, Plan, general-purpose</td><td>default, worker, explorer</td></tr>
+      <tr><td><strong>Concurrency cap</strong></td><td><code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code></td><td><code>agents.max_concurrent_threads_per_session</code></td></tr>
+      <tr><td><strong>Monitor</strong></td><td><code>/tasks</code>, agent panel, split panes</td><td><code>/subagents</code>, IDE background-agent panel</td></tr>
+      <tr><td><strong>Peer-to-peer teams</strong></td><td>Agent teams (experimental)</td><td>No separate mode; parallel subagents</td></tr>
+      <tr><td><strong>Repo instructions file</strong></td><td><code>CLAUDE.md</code></td><td><code>AGENTS.md</code></td></tr>
+    </table>
+    <p>Both tools read a project instructions file, and every agent you start loads it. Put shared rules there (commands to build and test, style, &ldquo;never commit without asking&rdquo;) instead of repeating them in each agent. If you use both tools, many teams keep one source of truth and point the other file to it. The two series on this site cover those files in depth: start with the Claude Code and Codex series.</p>
+
+    <h2 id="speed">10. Pros and cons: parallel vs serial</h2>
+    <p>Short answer: <strong>yes, parallel agents can make a job finish sooner, but only when the pieces are independent. Run dependent steps in parallel and it gets slower, costlier and messier than doing them one after another.</strong> Speed is not the only measure, so here is the full picture.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 270" role="img" aria-label="Illustrative timelines. Serial: four tasks one after another, long. Parallel on independent tasks: four bars side by side then a short merge, much shorter. Parallel on dependent tasks: bars, then a long merge and rework, about as long as serial.">
+        <text class="b" x="10" y="18">Serial</text>
+        <rect class="boxb" x="10"  y="26" width="110" height="26" rx="6"/><rect class="boxb" x="124" y="26" width="110" height="26" rx="6"/><rect class="boxb" x="238" y="26" width="110" height="26" rx="6"/><rect class="boxb" x="352" y="26" width="110" height="26" rx="6"/>
+        <text class="sub" x="470" y="44">longest wall-clock, cheapest, simplest</text>
+
+        <text class="b" x="10" y="90">Parallel, independent tasks</text>
+        <rect class="boxg" x="10" y="98"  width="110" height="18" rx="5"/><rect class="boxg" x="10" y="119" width="110" height="18" rx="5"/><rect class="boxg" x="10" y="140" width="110" height="18" rx="5"/><rect class="boxg" x="10" y="161" width="110" height="18" rx="5"/>
+        <rect class="boxo" x="124" y="98" width="40" height="81" rx="5"/><text class="sub" x="170" y="142">merge</text>
+        <text class="sub" x="230" y="124">about a third of the time, several times the tokens</text>
+
+        <text class="b" x="10" y="212">Parallel, dependent tasks</text>
+        <rect class="boxr" x="10" y="220" width="110" height="12" rx="4"/><rect class="boxr" x="10" y="235" width="110" height="12" rx="4"/><rect class="boxr" x="10" y="250" width="110" height="12" rx="4"/>
+        <rect class="boxo" x="124" y="220" width="250" height="42" rx="5"/><text class="sub" x="140" y="245">conflicts, rework, re-running tests</text>
+        <text class="sub" x="384" y="245">no faster than serial, and costs more</text>
+      </svg>
+      <figcaption>Illustrative, not measured. The gain comes from work that does not wait on other work; the merge step is the price.</figcaption>
+    </figure>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 310" role="img" aria-label="Cartoon relay race. Serial: four robots in a row, only the first runs with the baton while the others sleep and wait. Parallel: four robots each run their own lane at the same time toward the finish flag.">
+        <text class="b" x="10" y="20">Serial: wait for the baton</text>
+        <use href="#bot" x="30"  y="36" width="46" height="57" style="--bc:#10b981"/>
+        <use href="#bot" x="190" y="36" width="46" height="57" style="--bc:#3b82f6"/>
+        <use href="#bot" x="350" y="36" width="46" height="57" style="--bc:#a855f7"/>
+        <use href="#bot" x="510" y="36" width="46" height="57" style="--bc:#f59e0b"/>
+        <rect x="80" y="66" width="30" height="7" rx="3.5" fill="#ef4444" stroke="#1f2937" stroke-width="1.6"/>
+        <path d="M18,50 h-12 M18,60 h-16 M18,70 h-12" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+        <text class="sub" x="242" y="44">Zzz</text><text class="sub" x="402" y="44">Zzz</text><text class="sub" x="562" y="44">Zzz</text>
+        <path class="arrow" d="M124,66 L184,66" stroke-dasharray="5 4"/><path class="arrow" d="M280,66 L344,66" stroke-dasharray="5 4"/><path class="arrow" d="M440,66 L504,66" stroke-dasharray="5 4"/>
+        <text class="sub c" x="53"  y="112">working</text><text class="sub c" x="213" y="112">waiting&hellip;</text><text class="sub c" x="373" y="112">waiting&hellip;</text><text class="sub c" x="533" y="112">waiting&hellip;</text>
+        <text class="sub c" x="320" y="136">Time = step 1 + step 2 + step 3 + step 4, plus every hand-off</text>
+
+        <path class="rule" d="M10,152 L630,152" stroke-dasharray="4 4"/>
+
+        <text class="b" x="10" y="176">Parallel: everyone runs at once</text>
+        <path class="rule" d="M10,240 L560,240" stroke-dasharray="2 5"/>
+        <use href="#bot" x="70" y="186" width="40" height="50" style="--bc:#10b981"/><use href="#bot" x="190" y="186" width="40" height="50" style="--bc:#3b82f6"/>
+        <use href="#bot" x="310" y="186" width="40" height="50" style="--bc:#a855f7"/><use href="#bot" x="430" y="186" width="40" height="50" style="--bc:#f59e0b"/>
+        <path d="M62,200 h-18 M62,212 h-24 M62,224 h-18 M182,200 h-18 M182,212 h-24 M182,224 h-18 M302,200 h-18 M302,212 h-24 M302,224 h-18 M422,200 h-18 M422,212 h-24 M422,224 h-18" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+        <text class="sub c" x="90" y="258">task A</text><text class="sub c" x="210" y="258">task B</text><text class="sub c" x="330" y="258">task C</text><text class="sub c" x="450" y="258">task D</text>
+        <path d="M580,262 V190" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/><path d="M580,190 L616,200 L580,212 Z" fill="#ef4444" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+        <text class="sub c" x="598" y="280">finish</text>
+        <text class="sub c" x="290" y="294">Faster only because the four runs do not need each other</text>
+      </svg>
+      <figcaption>A relay is a dependent chain: runners wait. Side-by-side lanes are independent tasks.</figcaption>
+    </figure>
+
+    <h3>Why parallel helps</h3>
+    <div class="good"><strong>Pros of running agents in parallel</strong>
+      <ul>
+        <li><strong>Less waiting.</strong> Reading, searching and reviewing are mostly independent. Four reviewers finish in about the time of the slowest one.</li>
+        <li><strong>Fresh, focused context.</strong> Each agent holds only its slice, so it is less likely to lose track than one agent juggling everything.</li>
+        <li><strong>Independent opinions.</strong> A security lens and a performance lens catch different things. Competing hypotheses stop one agent from anchoring on the first theory.</li>
+        <li><strong>Your main chat stays small.</strong> Noisy output (logs, search results) is summarised instead of filling your window.</li>
+        <li><strong>Specialisation.</strong> A cheap, fast model can do the searching while a stronger one reviews.</li>
+      </ul>
+    </div>
+    <div class="bad"><strong>Cons of running agents in parallel</strong>
+      <ul>
+        <li><strong>More tokens and money.</strong> Each agent repeats setup work and does its own reading. Teams cost the most because every teammate is a full session.</li>
+        <li><strong>Conflicts.</strong> Two agents editing the same file, or the same area through different files, produce overwrites or code that does not fit together.</li>
+        <li><strong>A merge step you cannot skip.</strong> Someone (you or the lead) must reconcile the results, and that is where the saved time can disappear.</li>
+        <li><strong>Hidden dependencies.</strong> Task B quietly needs the output of task A. Run together, B guesses, and its work is thrown away.</li>
+        <li><strong>Less shared context.</strong> Each agent starts fresh and may repeat the same exploration or reach inconsistent decisions.</li>
+        <li><strong>Harder to supervise.</strong> More output to read, more permission prompts, more places for a mistake to hide.</li>
+        <li><strong>Limits.</strong> Rate limits, a cap on concurrent agents, and a slower machine when many run at once.</li>
+      </ul>
+    </div>
+
+    <h3>Why serial still has a place</h3>
+    <div class="good"><strong>Pros of serial work</strong>
+      <ul>
+        <li><strong>Cheapest.</strong> One context, no repeated setup.</li>
+        <li><strong>No collisions.</strong> One writer at a time, so no merge conflicts.</li>
+        <li><strong>Each step builds on the last.</strong> The agent remembers what it just learned and what you corrected.</li>
+        <li><strong>Easy to follow and steer.</strong> You can stop after step 2 and change direction.</li>
+      </ul>
+    </div>
+    <div class="bad"><strong>Cons of serial work</strong>
+      <ul>
+        <li><strong>Slowest wall-clock</strong> when the tasks could have run side by side.</li>
+        <li><strong>One crowded context.</strong> A long chain fills the window and quality can drop; this is the problem subagents were made for.</li>
+        <li><strong>One viewpoint.</strong> The same agent reviews its own work, with the same blind spots.</li>
+      </ul>
+    </div>
+
+    <h3>When one agent must wait for another</h3>
+    <p>Many agents do not mean many things happening at once. If every step needs the output of the step before it, the agents take turns, and the total time is the <strong>sum</strong> of all steps, plus the cost of handing work over. Having five agents in that line is not faster than one; it is usually slower, because each hand-off adds setup, a fresh context and a summary to write and read.</p>
+    <p>A real example is the pipeline in <a href="ai-jira-to-pull-request-agent.html">Building Effective Agents in Practice</a>. A Jira ticket, a plain spec or a Crashlytics crash goes through intake, an automatic prompt, the agent, checks, a draft pull request, a person&rsquo;s review, merge and release, and finally monitoring. Each stage needs what the previous one produced, so for one ticket the stages run in a line.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 230" role="img" aria-label="A linear chain of stages: intake, prompt, agent, checks, push and pull request, review, merge. Each stage starts only when the one before it ends, so total time is the sum. Below, three tickets run the same chain side by side, which raises throughput without making a single ticket faster.">
+        <text class="b" x="10" y="18">One ticket: a chain, each stage waits for the last</text>
+        <rect class="boxg" x="10"  y="30" width="70" height="34" rx="8"/><text class="sub c" x="45"  y="52">Intake</text>
+        <rect class="boxp" x="92"  y="30" width="70" height="34" rx="8"/><text class="sub c" x="127" y="52">Prompt</text>
+        <rect class="boxb" x="174" y="30" width="70" height="34" rx="8"/><text class="sub c" x="209" y="52">Agent</text>
+        <rect class="boxg" x="256" y="30" width="70" height="34" rx="8"/><text class="sub c" x="291" y="52">Checks</text>
+        <rect class="boxb" x="338" y="30" width="70" height="34" rx="8"/><text class="sub c" x="373" y="52">Push+PR</text>
+        <rect class="boxr" x="420" y="30" width="90" height="34" rx="8"/><text class="sub c" x="465" y="52">Review</text>
+        <rect class="boxo" x="522" y="30" width="108" height="34" rx="8"/><text class="sub c" x="576" y="52">Merge, release</text>
+        <path class="arrow" d="M81,47 L90,47"/><path class="arrow" d="M163,47 L172,47"/><path class="arrow" d="M245,47 L254,47"/><path class="arrow" d="M327,47 L336,47"/><path class="arrow" d="M409,47 L418,47"/><path class="arrow" d="M511,47 L520,47"/>
+        <text class="sub" x="10" y="88">Total time = sum of every stage. A person&rsquo;s review is often the longest wait of all.</text>
+
+        <text class="b" x="10" y="124">Many tickets: the same chain, side by side</text>
+        <rect class="boxb" x="10" y="136" width="620" height="16" rx="5"/>
+        <rect class="boxb" x="10" y="157" width="620" height="16" rx="5"/>
+        <rect class="boxb" x="10" y="178" width="620" height="16" rx="5"/>
+        <text class="sub" x="10" y="216">Throughput rises (three tickets done together). Each single ticket is no faster.</text>
+      </svg>
+      <figcaption>Parallelism across independent items (tickets) helps. Parallelism inside one dependent chain does not.</figcaption>
+    </figure>
+
+    <h4>Why it is slow: the critical path</h4>
+    <p>The <strong>critical path</strong> is the longest chain of steps where each one needs the one before. It sets the minimum time for the whole job, no matter how many agents you add. If a task has 60 minutes that must run in order and 20 minutes that could run side by side, even a hundred agents cannot finish it in under 60 minutes. This is the idea behind Amdahl&rsquo;s law: the part that must stay sequential limits the speed-up. Each extra agent on the sequential part only adds hand-off cost.</p>
+
+    <h4>Everyday examples of one agent waiting for another</h4>
+    <table>
+      <tr><th>Task</th><th>Chain</th><th>Why it cannot overlap</th></tr>
+      <tr><td>Add a field to an API</td><td>Change the data model, then the endpoint, then the callers, then the tests</td><td>Each layer is written against the one below it. Starting early means guessing names and types.</td></tr>
+      <tr><td>Fix a crash</td><td>Reproduce, find the cause, fix, verify</td><td>You cannot fix before you know the cause, or verify before there is a fix.</td></tr>
+      <tr><td>Database migration</td><td>Write migration, run it, update the code, run the tests</td><td>The code depends on the new schema existing.</td></tr>
+      <tr><td>Plan, implement, review</td><td>Planner, implementer, reviewer</td><td>The reviewer needs the finished diff.</td></tr>
+      <tr><td>Release</td><td>Build, test, sign, upload, roll out</td><td>Every step consumes the previous step&rsquo;s artifact.</td></tr>
+      <tr><td>Anything with a human gate</td><td>Agent opens a draft PR, a person reviews, then merge</td><td>Nothing proceeds until the person answers. Waiting on people is usually the biggest delay.</td></tr>
+    </table>
+    <div class="bad"><strong>What goes wrong when you force a chain into parallel</strong>
+      <ul>
+        <li>The tests agent writes tests for an API the implementer has not finished, and has to rewrite them.</li>
+        <li>The reviewer reviews code that changes under it.</li>
+        <li>Two agents invent different names for the same thing, and you spend the saved time reconciling.</li>
+      </ul>
+    </div>
+
+    <h4>What you can still do about a serial chain</h4>
+    <ul>
+      <li><strong>Keep the chain short.</strong> Cut stages that add little. Five hand-offs cost more than two.</li>
+      <li><strong>Use one agent for tightly linked steps.</strong> A single agent keeps the context from step to step. Split off only where a fresh context pays for itself, for example an independent reviewer.</li>
+      <li><strong>Overlap the independent bits.</strong> While the implementer works, an explorer can already gather the files for the next step, and a docs agent can draft the changelog.</li>
+      <li><strong>Run many chains at once.</strong> Ten tickets can each go through their own pipeline in parallel worktrees. This raises throughput, though no single ticket gets faster.</li>
+      <li><strong>Make hand-offs small and structured.</strong> Pass a short plan or a diff with file paths, not a long story. The Jira pipeline does this by turning every input into one task format first.</li>
+      <li><strong>Shorten the human wait.</strong> Small pull requests, clear descriptions and automatic checks make review quicker than any agent trick.</li>
+    </ul>
+    <div class="note"><p><strong>Latency vs throughput.</strong> Latency is how long one item takes; throughput is how many items finish per hour. Parallel agents on <em>independent</em> items raise throughput. Only parallel agents on independent <em>parts of one item</em> reduce its latency. A serial chain of many agents improves neither.</p></div>
+
+    <h3>A simple rule for choosing</h3>
+    <p>Ask: <em>does task B need anything produced by task A?</em> If no, they can run in parallel. If yes, run them in order. Speed-up is limited by the part that must stay sequential, so adding more agents has diminishing returns.</p>
+    <table>
+      <tr><th>Situation</th><th>Choose</th><th>Why</th></tr>
+      <tr><td>Review a codebase from several angles</td><td><strong>Parallel</strong>, read-only</td><td>Independent, nothing to conflict, big time saving.</td></tr>
+      <tr><td>Search a large repo for different things</td><td><strong>Parallel</strong> subagents</td><td>Keeps your context clean and finishes sooner.</td></tr>
+      <tr><td>Debug with several theories</td><td><strong>Parallel</strong> (a team if they should challenge each other)</td><td>Avoids anchoring on the first guess.</td></tr>
+      <tr><td>Separate modules with separate files</td><td><strong>Parallel</strong> in worktrees</td><td>Safe if ownership is clear.</td></tr>
+      <tr><td>Change an API, then its callers, then tests</td><td><strong>Serial</strong></td><td>Each step depends on the previous result.</td></tr>
+      <tr><td>Edits to the same file or tightly coupled code</td><td><strong>Serial</strong></td><td>Parallel writers would collide.</td></tr>
+      <tr><td>Small task, a few minutes of work</td><td><strong>Single agent</strong></td><td>Setup and merge cost more than the task.</td></tr>
+      <tr><td>Plan, implement, then review</td><td><strong>Serial pipeline</strong> with fresh reviewer</td><td>Sequential by nature, but the reviewer&rsquo;s clean context is worth it.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>The best of both</strong>
+      <p>The usual winning pattern is <strong>parallel to read, serial to write</strong>: fan out read-only agents to explore and review, then let one agent (or several in separate worktrees) make the changes in order, and finish with an independent reviewer. You get most of the speed with few of the conflicts.</p>
+    </div>
+    <p>One honest caveat: the real gain depends on the task, the model and your setup, so measure on your own work. Time one task done serially and in parallel, count the tokens, and include the time you spend reading and merging the results.</p>
+
+    <h2 id="safety">11. Safety, cost and habits</h2>
+    <div class="callout">
+      <strong>Cost</strong>
+      <p>Every agent does its own model and tool work, so tokens grow with the number of agents. Subagents are the cheaper option because only summaries come back; teams are the most expensive because every teammate is a full session. Use a cheaper model for search-type agents, set a cap on concurrency, and keep tasks well-defined so agents do not wander.</p>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="Cartoon: a robot hands a draft pull request to a person standing at a barrier gate. The person holds an approve stamp. Only after approval does the work continue to merge.">
+        <use href="#bot" x="30" y="60" width="60" height="74" style="--bc:#3b82f6"/>
+        <use href="#doc" x="96" y="84" width="30" height="38"/>
+        <text class="b c" x="70" y="156">Agent</text><text class="sub c" x="70" y="174">opens a draft PR</text>
+        <path class="arrow" d="M134,104 L214,104"/>
+        <rect x="224" y="70" width="12" height="70" rx="3" fill="#6b7280" stroke="#1f2937" stroke-width="2"/>
+        <rect x="236" y="92" width="110" height="12" rx="3" fill="#ef4444" stroke="#1f2937" stroke-width="2"/>
+        <path d="M252,92 l14,12 M276,92 l14,12 M300,92 l14,12" stroke="#fff" stroke-width="4"/>
+        <text class="b c" x="290" y="64">Human gate</text>
+        <circle cx="400" cy="86" r="17" fill="#fcd34d" stroke="#1f2937" stroke-width="2.5"/>
+        <circle cx="394" cy="84" r="2.4" fill="#1f2937"/><circle cx="406" cy="84" r="2.4" fill="#1f2937"/><path d="M393,92 Q400,98 407,92" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/>
+        <rect x="378" y="106" width="44" height="40" rx="13" fill="#6366f1" stroke="#1f2937" stroke-width="2.5"/>
+        <rect x="432" y="112" width="52" height="26" rx="6" fill="#10b981" stroke="#1f2937" stroke-width="2.2"/><text class="b c" x="458" y="130" style="fill:#fff">OK</text>
+        <path d="M422,122 L432,124" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
+        <text class="b c" x="400" y="170">You</text><text class="sub c" x="400" y="188">read the diff, run the tests</text>
+        <path class="arrow" d="M494,125 L548,125"/>
+        <rect class="boxg" x="552" y="102" width="78" height="46" rx="10"/><text class="b c" x="591" y="130">merge</text>
+      </svg>
+      <figcaption>Let agents do the work, but keep a person at the gate before anything is committed, pushed or merged.</figcaption>
+    </figure>
+
+    <ul>
+      <li><strong>Least privilege.</strong> Give each agent only the tools it needs. A reviewer does not need Edit.</li>
+      <li><strong>Enforce, do not ask.</strong> For &ldquo;never touch this&rdquo; use <code>tools</code>, hooks or the sandbox. Instructions can be ignored; a blocked tool cannot.</li>
+      <li><strong>Human gates.</strong> Say &ldquo;do not commit, push or open a PR without my approval&rdquo; and keep branch protection on the server, so the repository enforces it too.</li>
+      <li><strong>Trust the folder.</strong> Agent files in a repository can carry hooks and MCP servers. Treat a cloned repository&rsquo;s <code>.claude/agents/</code> like code you are about to run, and review it first.</li>
+      <li><strong>Review the result.</strong> An agent&rsquo;s summary describes what it intended. Read the diff, and run the tests yourself.</li>
+      <li><strong>Commit the agent files.</strong> Project agents in <code>.claude/agents/</code> or <code>.codex/agents/</code> go through pull requests like any other code, so the team improves them together.</li>
+      <li><strong>Start small.</strong> One read-only agent, then two in parallel, then a pipeline, then a team. Add a role only when you see a gap.</li>
+    </ul>
+
+    <h2 id="mistakes">12. Common mistakes</h2>
+    <ul>
+      <li><strong>A vague <code>description</code>.</strong> The agent never gets picked, or gets picked for everything. Say what it does and when to use it.</li>
+      <li><strong>Assuming the helper knows the conversation.</strong> Subagents and teammates start fresh. Give file paths, goals and constraints in the task.</li>
+      <li><strong>Two writers on one file.</strong> Divide by file or use worktrees.</li>
+      <li><strong>Too many agents for a small task.</strong> Coordination can cost more than the work. Three focused agents usually beat five scattered ones.</li>
+      <li><strong>Using a team where subagents suffice.</strong> If agents never need to talk to each other, subagents are cheaper and simpler.</li>
+      <li><strong>A broken header.</strong> The opening <code>---</code> must be on line 1; wrong field case or bad YAML means the file is skipped silently. Check with <code>claude --debug</code>.</li>
+      <li><strong>Trusting &ldquo;do not edit&rdquo;.</strong> Remove the Edit and Write tools, or use a read-only sandbox.</li>
+      <li><strong>Letting the lead implement.</strong> If the lead starts coding instead of coordinating, tell it to wait for its teammates.</li>
+      <li><strong>Forgetting the version.</strong> Agent features, fields and flags change quickly. Check the docs for your installed version.</li>
+    </ul>
+
+    <h2 id="takeaways">13. Takeaways and glossary</h2>
+    <ul>
+      <li>Subagents protect your main context and let work run in parallel. Define them as Markdown (Claude Code) or TOML (Codex), or pass JSON with <code>--agents</code> for one session.</li>
+      <li>Write a precise <code>description</code>, a narrow <code>tools</code> list and a short prompt that says what to return.</li>
+      <li>Build a team of subagents from roles: explorer, implementer, test-writer, reviewer. Fan out for read-only work, pipeline for hand-offs, and one owner per file.</li>
+      <li>Agent teams are for work that needs agents to talk to each other. They are experimental and cost more.</li>
+      <li>Parallel agents are faster only when tasks are independent; dependent steps run in parallel cost more and can be slower. Parallel to read, serial to write.</li>
+      <li>Agents inherit your permissions. Enforce limits with tools, hooks and sandboxes, and keep a human gate before commit and push.</li>
+    </ul>
+    <table class="gloss">
+      <tr><th>Term</th><th>In plain words</th></tr>
+      <tr><td>Agent</td><td>A model in a loop with tools that can read, run and edit.</td></tr>
+      <tr><td>Subagent</td><td>A helper agent with its own context that returns a summary to its caller.</td></tr>
+      <tr><td>Agent team</td><td>A lead plus teammates: separate sessions that message each other and share tasks.</td></tr>
+      <tr><td>Context window</td><td>The amount of text a model can hold in mind at once.</td></tr>
+      <tr><td>Frontmatter</td><td>The YAML block between <code>---</code> lines at the top of a Markdown file.</td></tr>
+      <tr><td>Hook</td><td>A script that runs at a defined moment and can block an action.</td></tr>
+      <tr><td>Worktree</td><td>A second checkout of the same repository in another folder.</td></tr>
+      <tr><td>Sandbox</td><td>An operating-system limit on what commands can touch.</td></tr>
+      <tr><td>MCP</td><td>Model Context Protocol, a standard way to connect an agent to outside tools and data.</td></tr>
+    </table>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener">Claude Code: create custom subagents</a> &middot; <a href="https://code.claude.com/docs/en/agent-teams" target="_blank" rel="noopener">Orchestrate teams of Claude Code sessions</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/agent-configuration/subagents" target="_blank" rel="noopener">Codex: subagents</a></li>
+      <li><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building effective agents</a> (Anthropic) &middot; <a href="ai-jira-to-pull-request-agent.html">Building Effective Agents in Practice</a></li>
+      <li><a href="git-vcs-branching-guide.html">Git, branching and worktrees</a> &middot; <a href="claude-md-part-6-extend-and-surfaces.html">Claude Code series, part 6</a> &middot; <a href="codex-part-6-extend-and-surfaces.html">Codex series, part 6</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+<script src="../data/toc/toc.js" defer></script>
+</body>
+</html>

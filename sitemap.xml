@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://liconrepo.github.io/</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://liconrepo.github.io/</loc><lastmod>2026-10-22</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/ai-agents-subagents-and-teams.html</loc><lastmod>2026-10-22</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/ai-jira-to-pull-request-agent.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-1-why-architecture.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-2-principles-and-patterns.html</loc><lastmod>2026-10-19</lastmod></url>
@@ -11,8 +12,8 @@
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-7-data-and-config-changes.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-8-testing-and-proof.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-arch-part-9-converting-architectures.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/android-devops-toolbox-ci-cd-mcp-agents.html</loc></url>
-  <url><loc>https://liconrepo.github.io/blog/android-release-lifecycle-dev-to-play-store.html</loc></url>
+  <url><loc>https://liconrepo.github.io/blog/android-devops-toolbox-ci-cd-mcp-agents.html</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/android-release-lifecycle-dev-to-play-store.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-release-validation-strategy.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-studio-plugin-firebase-distribution.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/android-testing-guide.html</loc><lastmod>2026-10-19</lastmod></url>
@@ -50,10 +51,10 @@
   <url><loc>https://liconrepo.github.io/blog/firebase-crashlytics-overview.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/firebase-remote-config-overview.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/git-quicksheet.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/git-vcs-branching-guide.html</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/git-vcs-branching-guide.html</loc><lastmod>2026-10-22</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/java-desktop-app-guide.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/llm-models-directory.html</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://liconrepo.github.io/blog/make-your-own-font-ttf.html</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://liconrepo.github.io/blog/make-your-own-font-ttf.html</loc><lastmod>2026-10-21</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-1-what-and-tour.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-2-design-tokens.html</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://liconrepo.github.io/blog/mds-part-3-building-a-component.html</loc><lastmod>2026-10-19</lastmod></url>
