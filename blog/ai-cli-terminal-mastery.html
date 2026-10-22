@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM0YXNF9DK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SM0YXNF9DK');
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Terminal Mastery with Claude Code and Codex: Commands, Flags, Shortcuts and Scripts — Khairul Alam</title>
+  <meta name="description" content="A practical terminal guide to Claude Code and the Codex CLI: commands, flags, slash commands, keyboard shortcuts, permissions and sandboxes, scripting with pipes and JSON, background sessions, worktrees, tmux and shell aliases." />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Khairul Alam" />
+        <meta name="theme-color" content="#e4e4e7" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232d2d31'/><text y='.9em' font-size='62' x='50%' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' fill='%23f0f0f2'>K</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e4e4e7; --surface: #dcdce0; --card: #efeff1; --card-h: #f7f7f8;
+      --border: rgba(0,0,0,0.09); --border-h: rgba(0,0,0,0.18);
+      --text: #1c1c20; --sub: #52525b; --muted: #71717a; --accent: #3b82f6;
+    }
+    [data-theme="dark"] {
+      --bg: #121214; --surface: #17171a; --card: #1b1b1f; --card-h: #232328;
+      --border: rgba(255,255,255,0.08); --border-h: rgba(255,255,255,0.16);
+      --text: #ececef; --sub: #a1a1aa; --muted: #71717a;
+      color-scheme: dark;
+    }
+    html[data-fs="small"]  { --fs: .9; }
+    html[data-fs="large"]  { --fs: 1.12; }
+    html[data-fs="xlarge"] { --fs: 1.25; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; font-size: calc(16px * var(--fs, 1)); }
+
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border); height: 60px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between; }
+    nav a { color: var(--sub); text-decoration: none; font-size: calc(13px * var(--fs, 1)); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    .logo { font-weight: 600; color: var(--text); letter-spacing: -.4px; font-size: calc(16px * var(--fs, 1)); }
+    .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+    main { max-width: 740px; margin: 0 auto; padding: 56px 24px 96px; }
+    .kicker { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    h1 { font-size: calc(36px * var(--fs, 1)); line-height: 1.2; letter-spacing: -.8px; margin: 12px 0 16px; }
+    .meta { color: var(--muted); font-size: calc(13px * var(--fs, 1)); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag { border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-size: calc(11px * var(--fs, 1)); color: var(--muted); }
+    .lede { font-size: calc(18px * var(--fs, 1)); color: var(--sub); margin: 28px 0 8px; }
+
+    h2 { font-size: calc(24px * var(--fs, 1)); letter-spacing: -.4px; margin: 56px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); line-height: 1.3; }
+    h3 { font-size: calc(18px * var(--fs, 1)); margin: 28px 0 8px; letter-spacing: -.2px; }
+    h4 { font-size: calc(16px * var(--fs, 1)); margin: 22px 0 6px; }
+    p { margin: 14px 0; color: var(--text); }
+    ul, ol { margin: 14px 0 14px 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+    code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .86em; background: var(--card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+    pre { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 18px 0; line-height: 1.6; }
+    pre code { background: none; border: 0; padding: 0; font-size: calc(13px * var(--fs, 1)); }
+    .note { border-left: 3px solid var(--accent); background: var(--card); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; color: var(--sub); }
+    .note p { margin: 4px 0; color: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(14px * var(--fs, 1)); display: block; overflow-x: auto; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .6px; }
+
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 22px; margin: 28px 0 0; }
+    .toc strong { font-size: calc(12px * var(--fs, 1)); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+    .toc ol { margin: 8px 0 0 20px; }
+    .toc a { color: var(--sub); text-decoration: none; }
+    .toc a:hover { color: var(--text); }
+    .toc summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; user-select: none; }
+    .toc summary::-webkit-details-marker { display: none; }
+    .toc summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .2s; flex: none; }
+    .toc[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .toc summary:hover strong { color: var(--text); }
+    .toc summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 18px 0; overflow-x: auto; }
+    .diagram pre { background: none; border: 0; padding: 0; margin: 0; }
+
+    footer { border-top: 1px solid var(--border); padding: 36px 24px; text-align: center; color: var(--muted); font-size: calc(12px * var(--fs, 1)); }
+    .back { display: inline-block; margin-top: 40px; }
+    @media (max-width: 600px) { h1 { font-size: calc(28px * var(--fs, 1)); } nav { padding: 0 16px; } main { padding-top: 36px; } }
+
+    /* ── Figures (inline SVG that follows the light/dark theme) ── */
+    .fig { margin: 26px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px 12px; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig figcaption { font-size: calc(13px * var(--fs, 1)); color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; padding: 0 8px; }
+    svg text { font-family: 'Inter', system-ui, sans-serif; fill: var(--text); font-size: 14px; }
+    svg .sub { fill: var(--muted); font-size: 12px; }
+    svg .b { font-weight: 600; }
+    svg .c { text-anchor: middle; }
+    svg .box  { fill: var(--bg); stroke: var(--border-h); stroke-width: 1.3; }
+    svg .boxb { fill: color-mix(in srgb, #3b82f6 15%, var(--card)); stroke: #3b82f6; stroke-width: 1.5; }
+    svg .boxg { fill: color-mix(in srgb, #10b981 17%, var(--card)); stroke: #10b981; stroke-width: 1.5; }
+    svg .boxo { fill: color-mix(in srgb, #f59e0b 18%, var(--card)); stroke: #f59e0b; stroke-width: 1.5; }
+    svg .boxp { fill: color-mix(in srgb, #a855f7 16%, var(--card)); stroke: #a855f7; stroke-width: 1.5; }
+    svg .boxr { fill: color-mix(in srgb, #ef4444 14%, var(--card)); stroke: #ef4444; stroke-width: 1.5; }
+    svg .ghost { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+    svg .arrow { stroke: var(--sub); stroke-width: 1.7; fill: none; marker-end: url(#arr); }
+    svg .rule { stroke: var(--border-h); stroke-width: 1.2; fill: none; }
+    .callout { background: color-mix(in srgb, var(--accent) 9%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 12px; padding: 14px 18px; margin: 22px 0; }
+    .callout > strong:first-child { display: block; margin-bottom: 4px; }
+    .callout p { margin: 6px 0; }
+    .analogy { border-left: 3px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--card)); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 20px 0; }
+    .analogy p { margin: 4px 0; }
+    .gloss td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td:first-child { white-space: nowrap; font-weight: 600; }
+    .lib td code { overflow-wrap: anywhere; }
+    .good, .bad { border-radius: 12px; padding: 12px 18px; margin: 18px 0; }
+    .good { border: 1px solid color-mix(in srgb, #10b981 40%, var(--border)); background: color-mix(in srgb, #10b981 8%, var(--card)); }
+    .bad  { border: 1px solid color-mix(in srgb, #ef4444 40%, var(--border)); background: color-mix(in srgb, #ef4444 7%, var(--card)); }
+    .good > strong:first-child, .bad > strong:first-child { display: block; margin-bottom: 2px; }
+    .good ul, .bad ul { margin-top: 6px; }
+  </style>
+  <script>
+    /* Reuse the theme and font size chosen on the home page */
+    (function () {
+      var t = localStorage.getItem('theme') || 'light';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.dataset.theme = 'dark';
+      var fs = localStorage.getItem('fs');
+      if (fs && fs !== 'medium') document.documentElement.dataset.fs = fs;
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../data/search/search.css">
+  <link rel="stylesheet" href="../data/toc/toc.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+
+  <symbol id="bot" viewBox="0 0 60 74">
+    <line x1="30" y1="3" x2="30" y2="11" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="30" cy="4" r="3.5" fill="#fbbf24" stroke="#1f2937" stroke-width="2"/>
+    <rect x="3" y="22" width="6" height="12" rx="3" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="51" y="22" width="6" height="12" rx="3" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="8" y="10" width="44" height="31" rx="11" fill="var(--bc)" stroke="#1f2937" stroke-width="2.5"/>
+    <rect x="13" y="16" width="34" height="19" rx="8" fill="#fff" stroke="#1f2937" stroke-width="1.5"/>
+    <circle cx="23" cy="24.5" r="3.6" fill="#1f2937"/><circle cx="37" cy="24.5" r="3.6" fill="#1f2937"/>
+    <circle cx="24.2" cy="23.2" r="1.1" fill="#fff"/><circle cx="38.2" cy="23.2" r="1.1" fill="#fff"/>
+    <path d="M25 30 Q30 34 35 30" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/>
+    <rect x="14" y="43" width="32" height="23" rx="9" fill="var(--bc)" stroke="#1f2937" stroke-width="2.5"/>
+    <circle cx="30" cy="54" r="4.5" fill="#fff" stroke="#1f2937" stroke-width="1.5"/>
+    <rect x="3" y="45" width="9" height="17" rx="4.5" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="48" y="45" width="9" height="17" rx="4.5" fill="var(--bc)" stroke="#1f2937" stroke-width="2.2"/>
+    <rect x="17" y="66" width="10" height="7" rx="3" fill="#1f2937"/><rect x="33" y="66" width="10" height="7" rx="3" fill="#1f2937"/>
+  </symbol>
+  <symbol id="doc" viewBox="0 0 30 38">
+    <path d="M3 2 H20 L27 9 V36 H3 Z" fill="#fff" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M20 2 V9 H27" fill="#e5e7eb" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M8 16 H22 M8 22 H22 M8 28 H17" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#71717a"/></marker>
+</defs></svg>
+
+<nav>
+  <a class="logo" href="../index.html">Khairul <em>Alam</em></a>
+  <a href="../index.html#blogs">&larr; All writing</a>
+</nav>
+
+<main>
+  <article>
+    <p class="kicker">Terminal &middot; Claude Code &middot; Codex &middot; Command line</p>
+    <h1>Terminal Mastery with Claude Code and Codex: Commands, Flags, Shortcuts and Scripts</h1>
+    <div class="meta"><span>Khairul Alam</span><span>&middot;</span><span>October 2026</span><span>&middot;</span><span>~30 min read</span></div>
+    <div class="tags"><span class="tag">Claude Code</span><span class="tag">Codex CLI</span><span class="tag">Terminal</span><span class="tag">CLI flags</span><span class="tag">Scripting</span><span class="tag">Shortcuts</span></div>
+
+    <p class="lede">Claude Code and Codex are at their best in a terminal, because a terminal is where your files, Git, tests and scripts already live. This guide takes you from typing <code>claude</code> or <code>codex</code> to running them in scripts, in the background, in parallel worktrees and in CI. It lists the commands, flags, slash commands and keyboard shortcuts that matter, with copy-ready recipes. Checked against Claude Code 2.1.308 and Codex CLI 0.160.0; run <code>--help</code> on your own version, because flags change quickly.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 250" role="img" aria-label="Cartoon: a dark terminal window showing a git diff piped into claude -p, and a robot reading the result.">
+        <rect x="20" y="20" width="430" height="210" rx="14" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+        <rect x="20" y="20" width="430" height="30" rx="14" fill="#374151"/><rect x="20" y="36" width="430" height="14" fill="#374151"/>
+        <circle cx="44" cy="35" r="6" fill="#ef4444"/><circle cx="64" cy="35" r="6" fill="#f59e0b"/><circle cx="84" cy="35" r="6" fill="#10b981"/>
+        <text x="110" y="40" style="fill:#9ca3af;font-size:12px;font-family:'JetBrains Mono',monospace">~/project &mdash; zsh</text>
+        <text x="40" y="82"  style="fill:#10b981;font-size:14px;font-family:'JetBrains Mono',monospace">$ git diff --staged | \</text>
+        <text x="40" y="104" style="fill:#e5e7eb;font-size:14px;font-family:'JetBrains Mono',monospace">    claude -p "commit message?"</text>
+        <text x="40" y="136" style="fill:#fbbf24;font-size:14px;font-family:'JetBrains Mono',monospace">Add retry with backoff to</text>
+        <text x="40" y="156" style="fill:#fbbf24;font-size:14px;font-family:'JetBrains Mono',monospace">the upload client</text>
+        <text x="40" y="190" style="fill:#10b981;font-size:14px;font-family:'JetBrains Mono',monospace">$ <tspan style="fill:#e5e7eb">codex exec --json "..." | jq</tspan></text>
+        <rect x="40" y="200" width="9" height="16" fill="#e5e7eb"/>
+        <use href="#bot" x="500" y="60" width="90" height="111" style="--bc:#a855f7"/>
+        <rect class="box" x="480" y="14" width="146" height="28" rx="9"/><path class="box" d="M536,42 L546,56 L556,42 Z"/>
+        <text class="sub c" x="553" y="33">Pipes are magic!</text>
+        <text class="b c" x="545" y="196">Your shell + an agent</text>
+      </svg>
+      <figcaption>The terminal gives an agent the one thing a chat window cannot: your whole toolbox, glued together with pipes.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <strong>The whole guide in 60 seconds</strong>
+      <ul>
+        <li>Four ways to run an agent from the terminal: <strong>interactive</strong> (<code>claude</code>, <code>codex</code>), <strong>one-shot</strong> (<code>claude -p</code>, <code>codex exec</code>), <strong>background</strong> (<code>claude --bg</code>), and <strong>cloud</strong>.</li>
+        <li>Inside a session, five prefixes do most of the work: <code>/</code> commands, <code>@</code> files, <code>!</code> shell, <code>Shift+Tab</code> modes and <code>Esc Esc</code> rewind (Claude Code).</li>
+        <li>Pipe text in, ask for <code>--output-format json</code> (Claude) or <code>--json</code> (Codex), and post-process with <code>jq</code>.</li>
+        <li>Control risk with a permission mode and a sandbox, not with politeness: <code>--permission-mode plan</code>, <code>-s read-only</code>, <code>--allowedTools</code>.</li>
+        <li>Resume with <code>claude -c</code> / <code>codex resume --last</code>. Run parallel work in worktrees (<code>claude -w</code>, <code>codex --worktree</code>).</li>
+        <li>Put your habits into shell aliases and small functions, and put team rules into CLAUDE.md / AGENTS.md.</li>
+      </ul>
+    </div>
+
+    <details class="toc">
+      <summary><strong>Contents</strong></summary>
+      <ol>
+        <li><a href="#modes">Four ways to run an agent</a></li>
+        <li><a href="#setup">Install, sign in, update, diagnose</a></li>
+        <li><a href="#start">Starting a session</a></li>
+        <li><a href="#input">Inside the session: input tricks and shortcuts</a></li>
+        <li><a href="#slash">Slash commands you will use daily</a></li>
+        <li><a href="#flags">The flags that matter</a></li>
+        <li><a href="#safety">Permissions and sandboxes from the terminal</a></li>
+        <li><a href="#script">Scripting: pipes, JSON and CI</a></li>
+        <li><a href="#sessions">Sessions: resume, fork, background</a></li>
+        <li><a href="#parallel">Parallel work: worktrees and tmux</a></li>
+        <li><a href="#config">Configuration and troubleshooting</a></li>
+        <li><a href="#term">Make your terminal comfortable</a></li>
+        <li><a href="#recipes">Aliases and shell recipes</a></li>
+        <li><a href="#checklist">Cheat sheet and checklist</a></li>
+      </ol>
+    </details>
+
+    <h2 id="modes">1. Four ways to run an agent</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Four ways to run: interactive chat, one-shot print mode for scripts, background sessions you can attach to later, and cloud sessions.">
+        <rect class="boxb" x="8"   y="20" width="146" height="120" rx="14"/><text class="b c" x="81" y="46">Interactive</text><text class="sub c" x="81" y="66">claude</text><text class="sub c" x="81" y="82">codex</text><text class="sub c" x="81" y="108">you chat, approve,</text><text class="sub c" x="81" y="124">steer</text>
+        <rect class="boxg" x="170" y="20" width="146" height="120" rx="14"/><text class="b c" x="243" y="46">One-shot</text><text class="sub c" x="243" y="66">claude -p</text><text class="sub c" x="243" y="82">codex exec</text><text class="sub c" x="243" y="108">answer, exit,</text><text class="sub c" x="243" y="124">scriptable</text>
+        <rect class="boxo" x="332" y="20" width="146" height="120" rx="14"/><text class="b c" x="405" y="46">Background</text><text class="sub c" x="405" y="66">claude --bg</text><text class="sub c" x="405" y="82">claude agents</text><text class="sub c" x="405" y="108">runs while you</text><text class="sub c" x="405" y="124">do other things</text>
+        <rect class="boxp" x="494" y="20" width="138" height="120" rx="14"/><text class="b c" x="563" y="46">Cloud</text><text class="sub c" x="563" y="66">claude --cloud</text><text class="sub c" x="563" y="82">codex cloud</text><text class="sub c" x="563" y="108">runs on remote</text><text class="sub c" x="563" y="124">machines</text>
+        <text class="sub c" x="320" y="172">More automation to the right, less hand-holding. Start on the left.</text>
+        <text class="sub c" x="320" y="190">Cloud and Remote Control need a signed-in account of the right plan.</text>
+      </svg>
+      <figcaption>Pick the mode by how much you want to watch. Most days: interactive for thinking, one-shot for chores.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Mode</th><th>Claude Code</th><th>Codex</th><th>Use it for</th></tr>
+      <tr><td><strong>Interactive</strong></td><td><code>claude</code></td><td><code>codex</code></td><td>Exploring, planning, back-and-forth changes.</td></tr>
+      <tr><td><strong>One-shot</strong></td><td><code>claude -p "query"</code></td><td><code>codex exec "query"</code></td><td>Scripts, git hooks, CI, quick answers piped to other tools.</td></tr>
+      <tr><td><strong>Background</strong></td><td><code>claude --bg "task"</code>, <code>claude agents</code></td><td><code>codex agents</code>, <code>codex queue</code></td><td>Long tasks while you keep working.</td></tr>
+      <tr><td><strong>Cloud</strong></td><td><code>claude --cloud "task"</code></td><td><code>codex cloud</code></td><td>Tasks that should run on a remote machine and open a PR.</td></tr>
+    </table>
+
+    <h2 id="setup">2. Install, sign in, update, diagnose</h2>
+    <table class="lib">
+      <tr><th>Task</th><th>Claude Code</th><th>Codex</th></tr>
+      <tr><td>Check version</td><td><code>claude --version</code></td><td><code>codex --version</code></td></tr>
+      <tr><td>Sign in</td><td><code>claude auth login</code> (add <code>--console</code> for API billing, <code>--sso</code> for SSO)</td><td><code>codex login</code></td></tr>
+      <tr><td>Who am I?</td><td><code>claude auth status</code> (JSON; <code>--text</code> for people)</td><td><code>codex login status</code></td></tr>
+      <tr><td>Sign out</td><td><code>claude auth logout</code></td><td><code>codex logout</code></td></tr>
+      <tr><td>Update</td><td><code>claude update</code>, or <code>claude install stable</code> / <code>latest</code></td><td><code>codex update</code> (where supported)</td></tr>
+      <tr><td>Health check</td><td><code>claude doctor</code> (read-only, no session needed)</td><td><code>codex doctor</code></td></tr>
+      <tr><td>Token for CI</td><td><code>claude setup-token</code> (long-lived OAuth token, printed once)</td><td>Use an API key in the CI secret store.</td></tr>
+      <tr><td>Shell completion</td><td>&mdash;</td><td><code>codex completion zsh</code> (also bash, fish, powershell, elvish)</td></tr>
+      <tr><td>Wipe local state</td><td><code>claude purge ~/work/repo --dry-run</code></td><td><code>codex delete &lt;session&gt;</code></td></tr>
+    </table>
+
+    <h2 id="start">3. Starting a session</h2>
+    <pre><code># Claude Code
+claude                              # interactive, in the current folder
+claude "explain this project"       # interactive, with a first prompt
+claude -c                           # continue the latest conversation here
+claude -r "auth-refactor"           # resume by name or ID (no name: picker)
+claude -n "my-feature"              # give the session a name
+claude --permission-mode plan       # start in read-only plan mode
+claude -w feature-auth              # work in an isolated git worktree
+
+# Codex
+codex                               # interactive
+codex "fix the failing tests"       # interactive, with a first prompt
+codex resume --last                 # continue the most recent session
+codex resume &lt;name-or-id&gt;           # resume a specific one (no id: picker)
+codex -C ../other-repo              # use another folder as the working root
+codex --worktree                    # new managed git worktree for the session</code></pre>
+    <div class="note"><p>Run these from the project root. The agent sees the folder you start in, and project files such as CLAUDE.md or AGENTS.md are read from there. To give access to a sibling folder add <code>--add-dir ../lib</code> (both tools have it).</p></div>
+
+    <h2 id="input">4. Inside the session: input tricks and shortcuts</h2>
+    <h3>The five prefixes (Claude Code)</h3>
+    <table class="lib">
+      <tr><th>Type</th><th>What happens</th></tr>
+      <tr><td><code>/</code> at the start</td><td>Commands and skills. Type <code>/</code> to see the menu, then letters to filter.</td></tr>
+      <tr><td><code>@</code></td><td>File path autocomplete. <code>@src/auth/Login.kt</code> puts that file in the prompt.</td></tr>
+      <tr><td><code>!</code> at the start</td><td>Shell mode: runs your command directly, adds its output to the session, and Claude responds to it. <code>!git status</code>, <code>!npm test</code>.</td></tr>
+      <tr><td><code>?</code> on an empty line</td><td>Shows the shortcut help panel.</td></tr>
+      <tr><td>Paste an image</td><td><code>Ctrl+V</code> (or <code>Cmd+V</code> in iTerm2, <code>Alt+V</code> on Windows) inserts an <code>[Image #N]</code> chip you can refer to by number.</td></tr>
+    </table>
+    <p>In Codex, type <code>@</code> to mention a file or use <code>/mention src/lib/api.ts</code>, and attach images at launch with <code>-i shot.png</code>.</p>
+
+    <h3>Claude Code keyboard shortcuts</h3>
+    <table class="lib">
+      <tr><th>Keys</th><th>Action</th></tr>
+      <tr><td><code>Shift+Tab</code></td><td>Cycle permission modes: default, acceptEdits, plan, and others you have enabled.</td></tr>
+      <tr><td><code>Esc</code></td><td>Stop the current response mid-turn. Claude keeps the work done so far, so you can redirect.</td></tr>
+      <tr><td><code>Esc Esc</code></td><td>With text in the prompt: clear it (saved to history). With an empty prompt: open rewind.</td></tr>
+      <tr><td><code>Ctrl+C</code></td><td>Interrupt a running operation. Press again on an empty prompt to exit.</td></tr>
+      <tr><td><code>Ctrl+D</code></td><td>Exit (press twice quickly).</td></tr>
+      <tr><td><code>Ctrl+R</code></td><td>Search your prompt history.</td></tr>
+      <tr><td><code>Ctrl+G</code> or <code>Ctrl+X Ctrl+E</code></td><td>Edit the prompt in your <code>$EDITOR</code>. Best for long prompts.</td></tr>
+      <tr><td><code>Ctrl+O</code></td><td>Toggle the transcript viewer: tool calls, timestamps, the model used.</td></tr>
+      <tr><td><code>Ctrl+B</code></td><td>Send a running command or agent to the background (tmux users press it twice).</td></tr>
+      <tr><td><code>Ctrl+T</code></td><td>Show or hide the task checklist.</td></tr>
+      <tr><td><code>Ctrl+S</code></td><td>Stash the prompt you are writing; press again on an empty prompt to restore it.</td></tr>
+      <tr><td><code>Ctrl+L</code></td><td>Redraw a garbled screen without losing history.</td></tr>
+      <tr><td><code>Ctrl+Z</code></td><td>Suspend to the shell (Unix); <code>fg</code> brings it back.</td></tr>
+      <tr><td><code>Option+P</code> / <code>Alt+P</code></td><td>Switch model without clearing the prompt.</td></tr>
+      <tr><td><code>Option+T</code> / <code>Alt+T</code></td><td>Toggle extended thinking (not on models that always think).</td></tr>
+      <tr><td><code>Option+O</code> / <code>Alt+O</code></td><td>Toggle fast mode.</td></tr>
+      <tr><td><code>Ctrl+A</code> <code>Ctrl+E</code> <code>Ctrl+K</code> <code>Ctrl+U</code> <code>Ctrl+W</code> <code>Ctrl+Y</code></td><td>Readline-style editing: line start, line end, cut to end, cut to start, cut word, paste.</td></tr>
+    </table>
+    <div class="note"><p><strong>macOS:</strong> the <code>Option</code>/<code>Alt</code> shortcuts need your terminal to send Option as Meta. In Terminal.app and iTerm2 this is a profile setting; run <code>/terminal-setup</code> or check the terminal-config docs. <strong>Messages while it works:</strong> you can keep typing while Claude is busy. Your message is queued and sent after the current step.</p></div>
+    <p>For Codex, the interrupt and other keys are configurable. Run <code>/keymap</code> inside the CLI to see and change them, and <code>/debug-config</code> to see which config layer set a value.</p>
+
+    <h2 id="slash">5. Slash commands you will use daily</h2>
+    <h3>Claude Code</h3>
+    <table class="lib">
+      <tr><th>Command</th><th>What it does</th></tr>
+      <tr><td><code>/help</code></td><td>Help and the list of commands.</td></tr>
+      <tr><td><code>/clear</code></td><td>New conversation, empty context. Use between unrelated tasks.</td></tr>
+      <tr><td><code>/compact [focus]</code></td><td>Summarise the history to free context. Optionally say what to keep.</td></tr>
+      <tr><td><code>/context</code></td><td>Colored grid of what fills your context window.</td></tr>
+      <tr><td><code>/usage</code> (alias <code>/cost</code>)</td><td>Session cost, plan limits and activity.</td></tr>
+      <tr><td><code>/model [name]</code></td><td>Switch model; saved as your default for new sessions.</td></tr>
+      <tr><td><code>/effort [level]</code></td><td>Set reasoning effort from low to max.</td></tr>
+      <tr><td><code>/fast [on|off]</code></td><td>Toggle fast mode.</td></tr>
+      <tr><td><code>/plan [task]</code></td><td>Enter plan mode, optionally starting on a task.</td></tr>
+      <tr><td><code>/permissions</code></td><td>View and edit allow / ask / deny rules.</td></tr>
+      <tr><td><code>/diff</code></td><td>Review the working-tree changes, including Claude&rsquo;s edits.</td></tr>
+      <tr><td><code>/review</code> (alias of <code>/code-review</code>)</td><td>Review the current diff or a PR; flags like <code>--fix</code> and <code>--comment</code> exist.</td></tr>
+      <tr><td><code>/security-review</code></td><td>Look for vulnerabilities in the changes on your branch.</td></tr>
+      <tr><td><code>/rewind</code> (<code>/undo</code>, <code>/checkpoint</code>)</td><td>Go back to an earlier point in the conversation and/or the code.</td></tr>
+      <tr><td><code>/resume [session]</code>, <code>/rename</code>, <code>/branch</code>, <code>/fork</code></td><td>Resume, name, branch or copy a conversation.</td></tr>
+      <tr><td><code>/btw [question]</code></td><td>Ask a side question without adding to the conversation.</td></tr>
+      <tr><td><code>/tasks</code></td><td>See and manage background work and subagents.</td></tr>
+      <tr><td><code>/background [prompt]</code></td><td>Detach this session to run as a background agent.</td></tr>
+      <tr><td><code>/loop [interval] [prompt]</code></td><td>Repeat a prompt while the session stays open.</td></tr>
+      <tr><td><code>/goal [condition]</code></td><td>Keep working across turns until a condition is met.</td></tr>
+      <tr><td><code>/init</code></td><td>Create a CLAUDE.md for the project.</td></tr>
+      <tr><td><code>/memory</code></td><td>Edit CLAUDE.md files and auto-memory.</td></tr>
+      <tr><td><code>/mcp</code>, <code>/hooks</code>, <code>/skills</code>, <code>/plugin</code>, <code>/agents</code></td><td>Manage extensions (see the agents article for subagents).</td></tr>
+      <tr><td><code>/add-dir</code>, <code>/cd</code></td><td>Add a folder to the session, or move the session to another folder.</td></tr>
+      <tr><td><code>/export [file]</code>, <code>/copy [N]</code></td><td>Save the conversation as text, or copy the last reply (or the Nth latest).</td></tr>
+      <tr><td><code>/config</code>, <code>/status</code>, <code>/doctor</code>, <code>/theme</code>, <code>/terminal-setup</code>, <code>/statusline</code>, <code>/keybindings</code>, <code>/tui</code></td><td>Settings, status, checkup, look and feel (Section 12).</td></tr>
+    </table>
+    <h3>Codex CLI</h3>
+    <table class="lib">
+      <tr><th>Command</th><th>What it does</th></tr>
+      <tr><td><code>/new</code>, <code>/clear</code></td><td>Start a fresh chat; <code>/clear</code> also clears the screen. <code>/new name</code> names the chat.</td></tr>
+      <tr><td><code>/compact</code></td><td>Summarise to free context.</td></tr>
+      <tr><td><code>/model</code></td><td>Choose model and reasoning effort.</td></tr>
+      <tr><td><code>/permissions</code></td><td>Switch between approval and sandbox presets.</td></tr>
+      <tr><td><code>/plan</code></td><td>Plan before changing anything.</td></tr>
+      <tr><td><code>/review</code></td><td>Review local changes or a branch.</td></tr>
+      <tr><td><code>/diff</code></td><td>Show the Git diff.</td></tr>
+      <tr><td><code>/mention path</code></td><td>Attach a file or folder to the prompt (like typing <code>@</code>).</td></tr>
+      <tr><td><code>/init</code></td><td>Create an AGENTS.md.</td></tr>
+      <tr><td><code>/status</code></td><td>Model, approvals, usage and other session state.</td></tr>
+      <tr><td><code>/resume</code>, <code>/fork</code>, <code>/side</code></td><td>Reload a saved chat, branch one, or ask a quick side question in an ephemeral fork.</td></tr>
+      <tr><td><code>/goal</code></td><td>Give a long task a goal to keep working toward.</td></tr>
+      <tr><td><code>/ps</code>, <code>/stop</code></td><td>List background terminals and their output; stop them.</td></tr>
+      <tr><td><code>/mcp</code>, <code>/skills</code>, <code>/hooks</code></td><td>Extensions.</td></tr>
+      <tr><td><code>/fast</code></td><td>Toggle a faster service tier, if the model has one.</td></tr>
+      <tr><td><code>/keymap</code>, <code>/debug-config</code></td><td>Customise keys; see which config layer won.</td></tr>
+      <tr><td><code>/exit</code>, <code>/quit</code></td><td>Leave.</td></tr>
+    </table>
+    <p>Which commands appear depends on version and plan, so type <code>/</code> to see yours.</p>
+
+    <h2 id="flags">6. The flags that matter</h2>
+    <h3>Claude Code</h3>
+    <table class="lib">
+      <tr><th>Flag</th><th>What it does</th></tr>
+      <tr><td><code>-p</code>, <code>--print</code></td><td>Answer once and exit (non-interactive).</td></tr>
+      <tr><td><code>-c</code>, <code>--continue</code></td><td>Continue the latest conversation in this folder.</td></tr>
+      <tr><td><code>-r</code>, <code>--resume [id|name]</code></td><td>Resume a session, or open the picker. Add <code>--fork-session</code> to branch instead of reusing the ID.</td></tr>
+      <tr><td><code>-n</code>, <code>--name</code></td><td>Name the session (shown in the picker and terminal title).</td></tr>
+      <tr><td><code>--model</code></td><td>Alias (<code>sonnet</code>, <code>opus</code>, <code>haiku</code>, <code>fable</code>) or a full model name.</td></tr>
+      <tr><td><code>--effort</code></td><td><code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code> (depends on model).</td></tr>
+      <tr><td><code>--fallback-model</code></td><td>Models to try if the main one is overloaded, e.g. <code>sonnet,haiku</code>.</td></tr>
+      <tr><td><code>--permission-mode</code></td><td><code>default</code>, <code>acceptEdits</code>, <code>plan</code>, <code>auto</code>, <code>dontAsk</code>, <code>bypassPermissions</code>.</td></tr>
+      <tr><td><code>--allowedTools</code> / <code>--disallowedTools</code></td><td>Tools that run without asking / tools that are denied. Patterns like <code>"Bash(git diff *)"</code>.</td></tr>
+      <tr><td><code>--tools</code></td><td>Restrict the built-in tool set, e.g. <code>"Bash,Edit,Read"</code>.</td></tr>
+      <tr><td><code>--add-dir</code></td><td>Extra folders Claude may read and edit.</td></tr>
+      <tr><td><code>-w</code>, <code>--worktree [name]</code></td><td>Start in an isolated git worktree. <code>--tmux</code> adds a tmux session for it.</td></tr>
+      <tr><td><code>--bg</code>, <code>--background</code></td><td>Start as a background agent and return at once.</td></tr>
+      <tr><td><code>--append-system-prompt[-file]</code></td><td>Add instructions to the default system prompt. <code>--system-prompt[-file]</code> replaces it.</td></tr>
+      <tr><td><code>--output-format</code></td><td><code>text</code>, <code>json</code>, <code>stream-json</code> (with <code>-p</code>).</td></tr>
+      <tr><td><code>--json-schema</code></td><td>Force the final answer to match a JSON Schema (with <code>-p</code>).</td></tr>
+      <tr><td><code>--max-turns</code>, <code>--max-budget-usd</code></td><td>Stop after N turns or a spend estimate (with <code>-p</code>).</td></tr>
+      <tr><td><code>--bare</code></td><td>Skip hooks, plugins, MCP discovery, auto-memory and CLAUDE.md discovery for a fast, predictable start (scripts).</td></tr>
+      <tr><td><code>--settings</code>, <code>--setting-sources</code></td><td>Load extra settings (file or inline JSON) / choose which settings layers load.</td></tr>
+      <tr><td><code>--mcp-config</code>, <code>--strict-mcp-config</code></td><td>Load MCP servers from a file / use only those.</td></tr>
+      <tr><td><code>--agents</code>, <code>--agent</code></td><td>Define subagents as JSON / run the session as an agent.</td></tr>
+      <tr><td><code>--debug[=filter]</code>, <code>--debug-file</code>, <code>--verbose</code></td><td>Troubleshooting output.</td></tr>
+      <tr><td><code>--safe-mode</code></td><td>Start with all customisations off to find out which one breaks things.</td></tr>
+    </table>
+    <h3>Codex</h3>
+    <table class="lib">
+      <tr><th>Flag</th><th>What it does</th></tr>
+      <tr><td><code>-m</code>, <code>--model</code></td><td>Choose the model.</td></tr>
+      <tr><td><code>-s</code>, <code>--sandbox</code></td><td><code>read-only</code>, <code>workspace-write</code> or <code>danger-full-access</code>.</td></tr>
+      <tr><td><code>-a</code>, <code>--ask-for-approval</code></td><td><code>on-request</code> (model decides when to ask) or <code>never</code>.</td></tr>
+      <tr><td><code>--approve-for-me</code></td><td>Route approvals through automatic review, in the workspace-write sandbox.</td></tr>
+      <tr><td><code>--dangerously-bypass-approvals-and-sandbox</code> (<code>--yolo</code>)</td><td>No prompts, no sandbox. Only inside an already isolated environment.</td></tr>
+      <tr><td><code>-C</code>, <code>--cd</code></td><td>Working root.</td></tr>
+      <tr><td><code>--add-dir</code></td><td>Extra writable folders.</td></tr>
+      <tr><td><code>--worktree</code></td><td>Run in a new managed git worktree.</td></tr>
+      <tr><td><code>-i</code>, <code>--image</code></td><td>Attach image(s) to the first prompt.</td></tr>
+      <tr><td><code>--search</code></td><td>Allow live web search.</td></tr>
+      <tr><td><code>-c key=value</code></td><td>Override any <code>config.toml</code> value for this run, e.g. <code>-c model="..."</code>.</td></tr>
+      <tr><td><code>-p</code>, <code>--profile</code></td><td>Layer a named config file on top of your base config. (Note: <code>-p</code> means <em>profile</em> here, not <em>print</em>.)</td></tr>
+      <tr><td><code>--enable</code> / <code>--disable</code></td><td>Turn a feature on or off for this run.</td></tr>
+      <tr><td><code>--oss</code>, <code>--local-provider</code></td><td>Use a local open-source model provider (<code>lmstudio</code> or <code>ollama</code>).</td></tr>
+      <tr><td><code>--no-alt-screen</code></td><td>Inline mode that keeps your terminal scrollback.</td></tr>
+      <tr><td><code>--strict-config</code></td><td>Fail if <code>config.toml</code> has fields this version does not know.</td></tr>
+      <tr><td><code>codex exec</code>: <code>--json</code>, <code>-o</code>, <code>--output-schema</code>, <code>--ephemeral</code>, <code>--skip-git-repo-check</code>, <code>--color</code></td><td>JSON event stream / write the last message to a file / force a JSON shape / do not save the session / allow running outside Git / color control.</td></tr>
+    </table>
+
+    <h2 id="safety">7. Permissions and sandboxes from the terminal</h2>
+    <p>The terminal makes it easy to run an agent with the keys to your machine. Decide the trust level on purpose.</p>
+    <table>
+      <tr><th>You want&hellip;</th><th>Claude Code</th><th>Codex</th></tr>
+      <tr><td>Read-only exploration</td><td><code>claude --permission-mode plan</code></td><td><code>codex -s read-only</code></td></tr>
+      <tr><td>Normal work with prompts</td><td><code>claude</code> (default mode)</td><td><code>codex</code> (default preset; switch with <code>/permissions</code>)</td></tr>
+      <tr><td>Auto-accept file edits</td><td><code>--permission-mode acceptEdits</code></td><td><code>-s workspace-write -a on-request</code></td></tr>
+      <tr><td>Fewer prompts, safely</td><td><code>--permission-mode auto</code>, or allow specific commands: <code>--allowedTools "Bash(npm test)"</code></td><td><code>--approve-for-me</code></td></tr>
+      <tr><td>Allow only named tools in a script</td><td><code>--tools "Read,Grep"</code>, <code>--permission-prompts none</code> (denies instead of asking)</td><td><code>-s read-only -a never</code></td></tr>
+      <tr><td>No checks at all</td><td><code>--dangerously-skip-permissions</code></td><td><code>--yolo</code></td></tr>
+    </table>
+    <div class="bad"><strong>Before you use a &ldquo;no checks&rdquo; flag</strong>
+      <ul>
+        <li>Do it only in a throwaway container or VM with no internet and no secrets.</li>
+        <li>An agent that reads untrusted text (web pages, issues, logs) can be tricked into running commands. Fewer prompts means fewer chances to notice.</li>
+        <li>Prefer narrow allow rules, such as <code>"Bash(git diff *)"</code>, over blanket bypass.</li>
+      </ul>
+    </div>
+    <p>Test a sandbox without the agent: <code>codex sandbox</code> runs a command inside a Codex-provided sandbox, so you can see what it blocks.</p>
+
+    <h2 id="script">8. Scripting: pipes, JSON and CI</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="A pipeline: a command output flows through a pipe into claude -p or codex exec, then out as text or JSON into jq or a file.">
+        <rect class="boxg" x="8" y="40" width="130" height="56" rx="12"/><text class="b c" x="73" y="64">git diff</text><text class="sub c" x="73" y="82">logs, files</text>
+        <path class="arrow" d="M140,68 L186,68"/><text class="sub c" x="163" y="58">|</text>
+        <rect class="boxb" x="190" y="30" width="190" height="76" rx="12"/><text class="b c" x="285" y="58">claude -p</text><text class="b c" x="285" y="78">codex exec</text><text class="sub c" x="285" y="96">prompt + stdin</text>
+        <path class="arrow" d="M382,68 L428,68"/><text class="sub c" x="405" y="58">|</text>
+        <rect class="boxo" x="432" y="40" width="90" height="56" rx="12"/><text class="b c" x="477" y="64">jq</text><text class="sub c" x="477" y="82">grep, tee</text>
+        <path class="arrow" d="M524,68 L568,68"/>
+        <rect class="boxp" x="570" y="40" width="64" height="56" rx="12"/><text class="b c" x="602" y="72">file</text>
+        <text class="sub c" x="320" y="136">stdin in, text or JSON out: the agent is one more Unix tool.</text>
+      </svg>
+      <figcaption>The agent reads standard input and writes standard output, so it composes like <code>grep</code> or <code>sort</code>.</figcaption>
+    </figure>
+
+    <h3>Claude Code one-shot recipes</h3>
+<pre><code># 1. Pipe content in
+git diff --staged | claude -p "Write a one-line commit message"
+cat error.log | claude -p "What is the root cause? Be brief."
+
+# 2. Machine-readable result
+claude -p "List the TODOs in src/" --output-format json | jq -r '.result'
+
+# 3. Validated structure (the answer must match the schema)
+claude -p "Summarise this repo" \
+  --json-schema '{"type":"object","properties":{"summary":{"type":"string"}},"required":["summary"]}'
+
+# 4. Guard rails for unattended use
+claude -p "Fix the failing test" \
+  --max-turns 8 --max-budget-usd 2 \
+  --allowedTools "Read" "Edit" "Bash(npm test)" \
+  --permission-mode acceptEdits
+
+# 5. Fast, predictable start in CI (skips hooks, plugins, CLAUDE.md discovery)
+claude --bare -p "Check for type errors in src/" \
+  --append-system-prompt-file ./ci-rules.txt
+
+# 6. Continue a previous run
+claude -c -p "Now also update the tests"</code></pre>
+    <p>The JSON output includes the final text in a <code>result</code> field along with session and cost details. <code>stream-json</code> emits events as they happen (it needs <code>--verbose</code> with <code>-p</code>), which suits live dashboards. <code>--no-session-persistence</code> avoids saving the run to disk.</p>
+
+    <h3>Codex one-shot recipes</h3>
+<pre><code># 1. Run a task and exit
+codex exec "Add input validation to the signup form"
+
+# 2. Pipe content in (stdin is appended to your prompt)
+git diff | codex exec "Summarise this change for a PR description"
+
+# 3. Events as JSON lines, and the final answer to a file
+codex exec --json "Find unused dependencies" | jq -c 'select(.type)'
+codex exec -o answer.txt "Summarise the architecture"
+
+# 4. A required answer shape
+codex exec --output-schema ./schema.json "List modules and owners"
+
+# 5. Read-only, no saved session, outside a git repo
+codex exec -s read-only --ephemeral --skip-git-repo-check "Explain this folder"
+
+# 6. Review without opening the UI
+codex review --uncommitted          # staged, unstaged and untracked changes
+codex review --base main            # against a base branch
+codex review --commit &lt;sha&gt;        # one commit
+codex review "Focus on security"    # custom instructions
+
+# 7. Continue or fork a non-interactive session
+codex exec resume --last "Now add tests"</code></pre>
+    <p>If stdin is piped <em>and</em> a prompt is given, Codex appends stdin as a block after the prompt. With no prompt (or <code>-</code>), the whole prompt is read from stdin.</p>
+
+    <h3>Loops and batches</h3>
+<pre><code># Review every changed file, one call each
+git diff --name-only main | while read f; do
+  claude -p "Review $f for bugs. Reply with 'OK' if none." --allowedTools "Read" &lt; /dev/null
+done
+
+# Parallel fan-out, four at a time
+ls src/*.kt | xargs -P4 -I{} sh -c 'claude -p "Add KDoc to {}" --permission-mode acceptEdits --max-turns 5'</code></pre>
+    <div class="note"><p>Parallel writers on different files are fine; on the same file they clash (see <a href="ai-agents-subagents-and-teams.html#speed">parallel vs serial</a>). Cap the budget and turns on every unattended call. Each call has its own cost, so a loop over 500 files is 500 requests.</p></div>
+
+    <h3>CI and git hooks</h3>
+    <ul>
+      <li><strong>Authenticate</strong> with a secret: <code>claude setup-token</code> output or an API key for Claude, an API key for Codex. Never print it into logs.</li>
+      <li><strong>Make it deterministic:</strong> <code>--bare</code> for Claude, <code>--ignore-user-config</code> and <code>--ephemeral</code> for Codex.</li>
+      <li><strong>No questions in CI:</strong> deny instead of ask (<code>--permission-prompts none</code> for Claude, <code>-a never</code> for Codex).</li>
+      <li><strong>Gate on exit code,</strong> and keep a human approval before merging anything the agent wrote.</li>
+      <li><strong>Pre-commit example:</strong> <code>git diff --staged | claude -p "Any secrets or debug prints? Answer NONE if clean." </code> and fail the hook if the answer is not <code>NONE</code>. Keep such hooks fast and optional.</li>
+    </ul>
+
+    <h2 id="sessions">9. Sessions: resume, fork, background</h2>
+    <table class="lib">
+      <tr><th>Goal</th><th>Claude Code</th><th>Codex</th></tr>
+      <tr><td>Continue the latest</td><td><code>claude -c</code></td><td><code>codex resume --last</code></td></tr>
+      <tr><td>Pick from a list</td><td><code>claude -r</code> or <code>/resume</code></td><td><code>codex resume</code> or <code>/resume</code></td></tr>
+      <tr><td>Resume by name or ID</td><td><code>claude -r auth-refactor</code></td><td><code>codex resume &lt;name-or-id&gt;</code></td></tr>
+      <tr><td>Branch without losing the original</td><td><code>claude -r &lt;id&gt; --fork-session</code>, <code>/branch</code></td><td><code>codex fork --last</code>, <code>/fork</code></td></tr>
+      <tr><td>Resume the session linked to a PR</td><td><code>claude --from-pr 123</code></td><td>&mdash;</td></tr>
+      <tr><td>Name it</td><td><code>claude -n "name"</code>, <code>/rename</code></td><td><code>/new name</code></td></tr>
+      <tr><td>Hide / delete old sessions</td><td><code>claude purge</code></td><td><code>codex archive</code>, <code>codex unarchive</code>, <code>codex delete</code></td></tr>
+      <tr><td>Apply a cloud result locally</td><td><code>claude --teleport</code> (pull a cloud session here)</td><td><code>codex apply</code> (latest diff), <code>codex cloud</code></td></tr>
+    </table>
+
+    <h3>Background sessions (Claude Code)</h3>
+    <p>A background session keeps working after you close the terminal tab. A small supervisor process hosts them.</p>
+<pre><code>claude --bg "investigate the flaky checkout test"   # prints a session ID, returns at once
+claude agents                  # live view of all background sessions
+claude agents --json           # the same, for scripts
+claude attach 7c5dcf5d         # reconnect to it in this terminal
+claude logs 7c5dcf5d           # print recent output without attaching
+claude stop 7c5dcf5d           # stop it (transcript and worktree are kept)
+claude respawn 7c5dcf5d        # restart with the conversation intact
+claude rm 7c5dcf5d             # remove it from the list
+claude daemon status           # is the supervisor healthy?</code></pre>
+    <p>Inside a running session, <code>/background</code> detaches it, and <code>Ctrl+B</code> pushes a single long command into the background. For Codex, <code>codex agents</code> browses agent sessions on the shared local server, and <code>codex queue</code> sends a message to an existing session.</p>
+
+    <h2 id="parallel">10. Parallel work: worktrees and tmux</h2>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="A tmux window split into three panes, each running an agent in its own git worktree on its own branch.">
+        <rect x="10" y="10" width="620" height="200" rx="12" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+        <path d="M216,10 L216,210 M424,10 L424,210" stroke="#6b7280" stroke-width="2"/>
+        <text x="24" y="34" style="fill:#fbbf24;font-size:12px;font-family:'JetBrains Mono',monospace">feature/auth</text>
+        <text x="24" y="60" style="fill:#10b981;font-size:12px;font-family:'JetBrains Mono',monospace">$ claude -w auth</text>
+        <text x="24" y="82" style="fill:#e5e7eb;font-size:12px;font-family:'JetBrains Mono',monospace">editing Login.kt...</text>
+        <text x="232" y="34" style="fill:#fbbf24;font-size:12px;font-family:'JetBrains Mono',monospace">feature/ui</text>
+        <text x="232" y="60" style="fill:#10b981;font-size:12px;font-family:'JetBrains Mono',monospace">$ claude -w ui</text>
+        <text x="232" y="82" style="fill:#e5e7eb;font-size:12px;font-family:'JetBrains Mono',monospace">editing Theme.kt...</text>
+        <text x="440" y="34" style="fill:#fbbf24;font-size:12px;font-family:'JetBrains Mono',monospace">review</text>
+        <text x="440" y="60" style="fill:#10b981;font-size:12px;font-family:'JetBrains Mono',monospace">$ codex review</text>
+        <text x="440" y="82" style="fill:#e5e7eb;font-size:12px;font-family:'JetBrains Mono',monospace">--base main</text>
+        <use href="#bot" x="150" y="140" width="40" height="50" style="--bc:#10b981"/><use href="#bot" x="360" y="140" width="40" height="50" style="--bc:#3b82f6"/><use href="#bot" x="568" y="140" width="40" height="50" style="--bc:#a855f7"/>
+      </svg>
+      <figcaption>One worktree and one branch per agent keeps parallel edits from colliding.</figcaption>
+    </figure>
+<pre><code># Claude Code
+claude -w feature-auth               # worktree at .claude/worktrees/feature-auth
+claude -w feature-auth --tmux        # ...and open it in its own tmux session
+claude -w "#123"                     # worktree branched from a pull request
+
+# Codex
+codex --worktree                     # managed git worktree for this session
+
+# By hand (works for any tool)
+git worktree add ../app-auth -b feature/auth
+cd ../app-auth &amp;&amp; claude</code></pre>
+    <ul>
+      <li><strong>tmux layout:</strong> one window, one pane per agent, plus a pane for <code>git status</code>. <code>tmux new -s agents</code>, <code>Ctrl+b %</code> to split.</li>
+      <li><strong>Claude agent teams</strong> can place each teammate in a tmux or iTerm2 pane: <code>claude --teammate-mode auto</code> (see the <a href="ai-agents-subagents-and-teams.html#teams">agents article</a>).</li>
+      <li><strong>Clean up:</strong> <code>git worktree list</code> then <code>git worktree remove ../app-auth</code> once merged.</li>
+    </ul>
+
+    <h2 id="config">11. Configuration and troubleshooting</h2>
+    <h3>Where settings come from</h3>
+    <table>
+      <tr><th></th><th>Claude Code</th><th>Codex</th></tr>
+      <tr><td>User config</td><td><code>~/.claude/settings.json</code></td><td><code>~/.codex/config.toml</code></td></tr>
+      <tr><td>Project config</td><td><code>.claude/settings.json</code> (shared), <code>.claude/settings.local.json</code> (yours)</td><td><code>.codex/config.toml</code></td></tr>
+      <tr><td>Instructions file</td><td><code>CLAUDE.md</code></td><td><code>AGENTS.md</code></td></tr>
+      <tr><td>Override for one run</td><td><code>--settings ./file.json</code> or inline JSON</td><td><code>-c key=value</code>, <code>-p profile</code></td></tr>
+      <tr><td>Choose layers</td><td><code>--setting-sources user,project</code></td><td><code>--ignore-user-config</code>, <code>--strict-config</code></td></tr>
+      <tr><td>Environment variables</td><td><code>&quot;env&quot;</code> block in settings or your shell</td><td>Shell environment; <code>CODEX_HOME</code> moves the config folder</td></tr>
+    </table>
+    <h3>When something is off</h3>
+    <ol>
+      <li><strong>Check the basics:</strong> <code>claude doctor</code> / <code>codex doctor</code>, then <code>claude auth status</code> / <code>codex login status</code>.</li>
+      <li><strong>Strip customisations:</strong> <code>claude --safe-mode</code> starts with CLAUDE.md, skills, plugins, hooks and MCP servers off. If the problem disappears, add things back one by one.</li>
+      <li><strong>Read the logs:</strong> <code>claude --debug='mcp,startup'</code> or <code>--debug-file /tmp/claude.log</code>. In Codex, <code>/debug-config</code> shows which config layer set a value.</li>
+      <li><strong>Check the layers:</strong> a project file can override your user file, and a managed policy overrides both.</li>
+      <li><strong>Garbled screen?</strong> <code>Ctrl+L</code> in Claude Code. In Codex try <code>--no-alt-screen</code>.</li>
+      <li><strong>Reinstall cleanly:</strong> <code>claude install stable</code>, or reinstall Codex with your package manager.</li>
+    </ol>
+    <h3>MCP and plugins from the shell</h3>
+<pre><code>claude mcp                      # manage MCP servers (add, list, remove...)
+claude mcp login sentry         # run a server's OAuth flow without the interactive panel
+claude plugin install code-review@claude-plugins-official
+
+codex mcp add / list / get / remove / login / logout
+codex plugin add / list / remove
+codex features list             # inspect feature flags</code></pre>
+
+    <h2 id="term">12. Make your terminal comfortable</h2>
+    <ul>
+      <li><strong>Shift+Enter for a new line:</strong> run <code>/terminal-setup</code> in Claude Code to install the keybinding in VS Code, Cursor, Alacritty or Zed. In Apple Terminal enable Option+Enter. Everywhere, a trailing <code>\</code> then Enter also adds a line.</li>
+      <li><strong>Option as Meta (macOS):</strong> required for the <code>Alt+</code> shortcuts. It is a profile setting in Terminal.app and iTerm2.</li>
+      <li><strong>Long prompts:</strong> <code>Ctrl+G</code> opens your <code>$EDITOR</code>. Set <code>EDITOR</code> in your shell profile.</li>
+      <li><strong>Vim keys in the prompt:</strong> <code>/config</code> then Editor mode. The prompt then supports NORMAL and INSERT modes, motions such as <code>w</code>, <code>b</code>, <code>0</code>, <code>$</code>, and edits such as <code>dd</code>, <code>cw</code>, <code>yy</code>, <code>p</code>.</li>
+      <li><strong>Look and feel:</strong> <code>/theme</code> (including an auto light/dark option and colorblind-friendly themes), <code>/statusline</code> to show model, branch or cost in the footer, <code>/color</code> to tag a session.</li>
+      <li><strong>Flicker-free fullscreen:</strong> <code>/tui fullscreen</code> switches the renderer and keeps your conversation. <code>/tui default</code> goes back.</li>
+      <li><strong>Scrollback:</strong> for Codex <code>--no-alt-screen</code> keeps your terminal history; in Claude Code&rsquo;s transcript view (<code>Ctrl+O</code>) you can search and open it in your editor.</li>
+      <li><strong>Accessibility:</strong> <code>claude --ax-screen-reader</code> gives plain, flat output for screen readers.</li>
+      <li><strong>Custom keys:</strong> <code>/keybindings</code> (Claude Code) or <code>/keymap</code> (Codex).</li>
+    </ul>
+
+    <h2 id="recipes">13. Aliases and shell recipes</h2>
+    <p>Put these in <code>~/.zshrc</code> or <code>~/.bashrc</code>. They are examples; change the names and flags to taste.</p>
+<pre><code># short names
+alias cc='claude'
+alias ccc='claude -c'                       # continue
+alias ccp='claude --permission-mode plan'   # safe exploration
+alias cx='codex'
+alias cxr='codex resume --last'
+
+# ask a question about the code, read-only, answer on stdout
+ask() { claude -p "$*" --permission-mode plan; }
+
+# commit message from the staged diff
+cmsg() { git diff --staged | claude -p "Write a concise conventional commit message. Output only the message."; }
+
+# explain the last failing command's output
+why() { "$@" 2&gt;&amp;1 | tail -50 | claude -p "Why did this fail? Give the likely cause and the fix."; }
+
+# review my branch against main with Codex
+rv() { codex review --base "${1:-main}"; }
+
+# new worktree + agent in one go
+wt() { git worktree add "../$(basename "$PWD")-$1" -b "feature/$1" &amp;&amp; cd "../$(basename "$PWD")-$1" &amp;&amp; claude; }</code></pre>
+    <div class="note"><p>Do not alias plain <code>claude</code> to include <code>--dangerously-skip-permissions</code>. It turns every session, including ones in untrusted folders, into a no-checks session.</p></div>
+
+    <h2 id="checklist">14. Cheat sheet and checklist</h2>
+    <table class="lib">
+      <tr><th>I want to&hellip;</th><th>Claude Code</th><th>Codex</th></tr>
+      <tr><td>Chat in this folder</td><td><code>claude</code></td><td><code>codex</code></td></tr>
+      <tr><td>Ask once, print, exit</td><td><code>claude -p "q"</code></td><td><code>codex exec "q"</code></td></tr>
+      <tr><td>Pipe a diff in</td><td><code>git diff | claude -p "q"</code></td><td><code>git diff | codex exec "q"</code></td></tr>
+      <tr><td>JSON out</td><td><code>--output-format json</code></td><td><code>--json</code>, <code>-o file</code></td></tr>
+      <tr><td>Plan only</td><td><code>--permission-mode plan</code>, <code>/plan</code></td><td><code>-s read-only</code>, <code>/plan</code></td></tr>
+      <tr><td>Resume</td><td><code>claude -c</code>, <code>claude -r</code></td><td><code>codex resume --last</code></td></tr>
+      <tr><td>Review changes</td><td><code>/review</code>, <code>claude ultrareview 1234</code></td><td><code>codex review --uncommitted</code></td></tr>
+      <tr><td>Parallel worktree</td><td><code>claude -w name</code></td><td><code>codex --worktree</code></td></tr>
+      <tr><td>Background</td><td><code>claude --bg "task"</code></td><td><code>codex agents</code></td></tr>
+      <tr><td>Context too big</td><td><code>/context</code>, <code>/compact</code>, <code>/clear</code></td><td><code>/compact</code>, <code>/new</code></td></tr>
+      <tr><td>Cost</td><td><code>/usage</code>, <code>--max-budget-usd</code></td><td><code>/status</code></td></tr>
+      <tr><td>Diagnose</td><td><code>claude doctor</code>, <code>--safe-mode</code></td><td><code>codex doctor</code>, <code>/debug-config</code></td></tr>
+    </table>
+    <h3>Before you hand a task to an agent in the terminal</h3>
+    <ol>
+      <li>Are you in the right folder and on the right branch (<code>git status</code>)?</li>
+      <li>Is the trust level right: plan or read-only for exploring, narrow allow rules for editing, no bypass flags outside a sandbox?</li>
+      <li>Is the work in a worktree if other things are in progress?</li>
+      <li>For scripts: a turn cap, a budget cap, no prompts, and a human gate before merge?</li>
+      <li>After the run: <code>git diff</code>, run the tests, and read the change yourself.</li>
+    </ol>
+    <div class="callout">
+      <strong>Mastery in one sentence</strong>
+      <p>Treat the agent as a Unix tool with a brain: give it clear input (pipes, <code>@</code> files), clear limits (modes, sandboxes, caps), and clear output (JSON, files, exit codes), and keep your own judgment at the end of the pipe.</p>
+    </div>
+
+    <h2 id="links">Links and further reading</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/cli-reference" target="_blank" rel="noopener">Claude Code CLI reference</a> &middot; <a href="https://code.claude.com/docs/en/interactive-mode" target="_blank" rel="noopener">Interactive mode</a> &middot; <a href="https://code.claude.com/docs/en/commands" target="_blank" rel="noopener">Commands</a> &middot; <a href="https://code.claude.com/docs/en/headless" target="_blank" rel="noopener">Run Claude Code programmatically</a></li>
+      <li><a href="https://learn.chatgpt.com/docs/developer-commands?surface=cli" target="_blank" rel="noopener">Codex CLI commands and flags</a></li>
+      <li>On this site: <a href="claude-md-part-1-setup.html">Claude Code series</a> &middot; <a href="codex-part-1-setup.html">Codex series</a> &middot; <a href="ai-agents-subagents-and-teams.html">Configuring AI Coding Agents</a> &middot; <a href="ai-engineering-glossary-quicksheet.html">AI Engineering Quicksheet</a> &middot; <a href="git-quicksheet.html">Git quicksheet</a></li>
+    </ul>
+
+    <a class="back" href="../index.html#blogs">&larr; Back to all writing</a>
+  </article>
+</main>
+
+<footer>&copy; 2026 Khairul Alam &nbsp;&middot;&nbsp; Tokyo, Japan</footer>
+<script src="../data/search/search.js" defer></script>
+<script src="../data/toc/toc.js" defer></script>
+</body>
+</html>

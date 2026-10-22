@@ -1051,6 +1051,13 @@
         <div class="blog-tags"><span class="blog-tag">AI agents</span><span class="blog-tag">Building effective agents</span><span class="blog-tag">Jira</span><span class="blog-tag">Crashlytics</span><span class="blog-tag">CI/CD</span></div>
         <div class="blog-footer"><span class="views-badge">~15 min read</span><span class="blog-date">Oct 2026</span></div>
       </a>
+      <a href="blog/ai-cli-terminal-mastery.html" class="blog-card featured reveal">
+        <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
+        <div class="blog-title">Terminal Mastery with Claude Code and Codex: Commands, Flags, Shortcuts and Scripts</div>
+        <div class="blog-summary">Everything you can do from the command line with Claude Code and the Codex CLI: sessions, slash commands, shortcuts, flags, permissions and sandboxes, pipes and JSON scripting, background agents, worktrees and shell aliases.</div>
+        <div class="blog-tags"><span class="blog-tag">Claude Code</span><span class="blog-tag">Codex CLI</span><span class="blog-tag">Terminal</span><span class="blog-tag">Scripting</span><span class="blog-tag">Shortcuts</span></div>
+        <div class="blog-footer"><span class="views-badge">~30 min read</span><span class="blog-date">Oct 2026</span></div>
+      </a>
       <a href="blog/ai-agents-subagents-and-teams.html" class="blog-card featured reveal">
         <div class="blog-idx">Article<span class="blog-new">NEW</span></div>
         <div class="blog-title">Configuring AI Coding Agents: Subagents, Agent Teams, JSON and Markdown Files</div>
@@ -2169,7 +2176,9 @@
       sc.onload = () => { fill(); render(); };
       document.head.appendChild(sc);
     }
-    const topics = TOPICS.map(([name, re]) => ({ name, list: items.filter(i => re.test(i.text)) })).filter(t => t.list.length);
+    /* Posts kept out of a topic even though their text matches its pattern. */
+    const EXCLUDE = { 'AI & LLM': ['blog/android-devops-toolbox-ci-cd-mcp-agents.html'] };
+    const topics = TOPICS.map(([name, re]) => ({ name, list: items.filter(i => re.test(i.text) && !(EXCLUDE[name] || []).includes(keyOf(i))) })).filter(t => t.list.length);
     topics.sort((x, y) => y.list.length - x.list.length);
     let active = null;
     function render() {

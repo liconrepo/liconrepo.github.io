@@ -212,6 +212,7 @@
         <li>In <strong>Claude Code</strong> you define one as a Markdown file with a short YAML header (<code>.claude/agents/name.md</code>), or for one session as JSON with <code>claude --agents '{...}'</code>.</li>
         <li>In <strong>Codex</strong> you define one as a TOML file (<code>.codex/agents/name.toml</code>) and tune limits in <code>config.toml</code>.</li>
         <li>An <strong>agent team</strong> (Claude Code, experimental) is different: several full sessions that message each other and share a task list. It costs more and is worth it only for work that parallelises.</li>
+        <li>Two ways to start agents from the terminal: <strong>subagents inside one session</strong> (Claude starts helpers; summaries return) or <strong>separate sessions</strong> you start yourself (terminals, tmux, <code>claude --bg</code>), each in its own worktree. Agent teams automate the second way.</li>
         <li><strong>Parallel is faster only for independent work.</strong> Dependent steps should run in order; extra agents add cost and a merge step.</li>
         <li>Start with <strong>read-only parallel work</strong> (review, research, debugging). Give every agent its own files or its own Git worktree. Never let two agents edit the same file.</li>
         <li>Agents inherit your permissions. A &ldquo;do not edit&rdquo; sentence is a request, not a sandbox; restrict <code>tools</code> or the sandbox instead.</li>
@@ -226,6 +227,7 @@
         <li><a href="#md">Markdown files (Claude Code)</a></li>
         <li><a href="#json">JSON and settings (Claude Code)</a></li>
         <li><a href="#terminal">Running and managing agents in the terminal</a></li>
+        <li><a href="#twoways">Two ways to start agents from the terminal</a></li>
         <li><a href="#setup">Setting up a team of subagents</a></li>
         <li><a href="#teams">Agent teams (Claude Code, experimental)</a></li>
         <li><a href="#codex">Codex: TOML agent files</a></li>
@@ -482,7 +484,119 @@ Apply the requested refactor. Run the unit tests. Summarise what changed.</code>
 Return findings with file paths and line numbers. Do not modify files.</code></pre>
     <p>This is the safest first experiment: the agents only read, so there is nothing to conflict, and you get four independent opinions back as short summaries.</p>
 
-    <h2 id="setup">6. Setting up a team of subagents</h2>
+    <h2 id="twoways">6. Two ways to start agents from the terminal</h2>
+    <p>There are two basic ways to get more than one agent working. You can ask one session to start <strong>subagents</strong> inside itself, or you can start <strong>separate sessions</strong> yourself (several terminals, tmux panes or background sessions). A third way, agent teams (section 8), is a separate-sessions setup that Claude Code organises for you.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 290" role="img" aria-label="Cartoon comparing two ways. Left: one terminal window with a main robot and three small helper robots inside it, labeled subagents in one session. Right: three separate terminal windows, each with its own robot and its own worktree folder, labeled separate sessions.">
+        <text class="b" x="10" y="20">A. Subagents: one session</text>
+        <rect x="10" y="32" width="250" height="196" rx="12" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+        <text x="24" y="54" style="fill:#10b981;font-size:12px;font-family:'JetBrains Mono',monospace">$ claude</text>
+        <use href="#bot" x="100" y="64" width="64" height="79" style="--bc:#3b82f6"/>
+        <use href="#bot" x="30"  y="164" width="40" height="50" style="--bc:#10b981"/><use href="#bot" x="110" y="164" width="40" height="50" style="--bc:#f59e0b"/><use href="#bot" x="190" y="164" width="40" height="50" style="--bc:#a855f7"/>
+        <path d="M120,146 L56,162 M132,146 L132,162 M146,146 L208,162" stroke="#9ca3af" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+        <text class="sub c" x="135" y="252">Claude starts helpers inside the session.</text>
+        <text class="sub c" x="135" y="270">Only summaries come back.</text>
+
+        <path class="rule" d="M280,30 L280,280" stroke-dasharray="4 4"/>
+
+        <text class="b" x="300" y="20">B. Separate sessions: you start each one</text>
+        <rect x="300" y="32" width="100" height="150" rx="10" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+        <rect x="415" y="32" width="100" height="150" rx="10" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+        <rect x="530" y="32" width="100" height="150" rx="10" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+        <text x="310" y="52" style="fill:#10b981;font-size:11px;font-family:'JetBrains Mono',monospace">$ claude</text><text x="425" y="52" style="fill:#10b981;font-size:11px;font-family:'JetBrains Mono',monospace">$ claude</text><text x="540" y="52" style="fill:#10b981;font-size:11px;font-family:'JetBrains Mono',monospace">$ codex</text>
+        <use href="#bot" x="320" y="76" width="60" height="74" style="--bc:#10b981"/><use href="#bot" x="435" y="76" width="60" height="74" style="--bc:#3b82f6"/><use href="#bot" x="550" y="76" width="60" height="74" style="--bc:#f59e0b"/>
+        <rect class="boxg" x="304" y="192" width="92" height="24" rx="7"/><text class="sub c" x="350" y="209">worktree: auth</text>
+        <rect class="boxb" x="419" y="192" width="92" height="24" rx="7"/><text class="sub c" x="465" y="209">worktree: ui</text>
+        <rect class="boxo" x="534" y="192" width="92" height="24" rx="7"/><text class="sub c" x="580" y="209">worktree: api</text>
+        <path d="M402,110 L413,110 M517,110 L528,110" stroke="#71717a" stroke-width="2" stroke-dasharray="3 3"/>
+        <text class="sub c" x="465" y="240">Each has its own context and checkout.</text>
+        <text class="sub c" x="465" y="258">You (or messages) connect them.</text>
+      </svg>
+      <figcaption>A is one conversation with helpers. B is several conversations side by side.</figcaption>
+    </figure>
+
+    <h3>A. Subagents inside one session</h3>
+    <p>You start one <code>claude</code> (or <code>codex</code>) and ask it to delegate. Everything runs under that one session, and the helpers report back to it.</p>
+<pre><code>claude
+&gt; Use subagents to review this project in parallel: one for bugs, one for tests, one for performance.
+&gt; @"code-reviewer (agent)" look at the auth changes     # name one explicitly
+
+claude --agents '{"reviewer":{"description":"Reviews code","prompt":"You are a code reviewer"}}'
+claude --agent code-reviewer                              # run the whole session as that agent</code></pre>
+    <ul>
+      <li><strong>You manage one thing:</strong> the main session. See helpers with <code>/tasks</code>; press <code>Ctrl+B</code> to push one to the background.</li>
+      <li><strong>Low overhead:</strong> only short summaries return, so the main context stays small.</li>
+      <li><strong>Limits:</strong> helpers cannot ask you questions, and they end when the session ends (resume them by asking the main agent to continue).</li>
+      <li><strong>In Codex:</strong> ask for it in the prompt (&ldquo;spawn one subagent per point&rdquo;), and use <code>/subagents</code> to inspect the threads.</li>
+    </ul>
+
+    <h3>B. Separate sessions you start yourself</h3>
+    <p>Here you start each agent as its own process. They share nothing but the repository (and any messages you let them send), so give each its own worktree and branch.</p>
+    <h4>B1. Several terminals or tmux panes</h4>
+<pre><code># pane 1
+claude -w auth -n auth-work          # isolated worktree + a name you can message
+# pane 2
+claude -w ui   -n ui-work
+# pane 3 (Codex)
+codex --worktree
+
+# or by hand, for any tool
+git worktree add ../app-auth -b feature/auth &amp;&amp; (cd ../app-auth &amp;&amp; claude)</code></pre>
+    <p>This is the manual version of an agent team: you are the lead. It costs nothing extra to set up, you see every session in full, and you can mix tools (Claude Code and Codex side by side). What you give up is automatic coordination.</p>
+    <h4>B2. Background sessions (Claude Code)</h4>
+    <p>A background session keeps running with no terminal attached, so you can start several and come back later.</p>
+<pre><code>claude --bg "investigate the flaky checkout test"       # starts and returns immediately
+claude --bg --name "flaky-fix" "investigate ..."        # with a name
+claude agents                    # one screen with every session: working, blocked, done
+claude attach flaky-fix          # open one in this terminal
+claude logs flaky-fix            # read recent output without attaching
+claude stop flaky-fix            # stop it (transcript is kept)</code></pre>
+    <ul>
+      <li>Inside a session, <code>/background</code> detaches it, and <code>/fork [prompt]</code> copies it into a new background session while you keep working here.</li>
+      <li>Closing your terminal does not stop them; a separate supervisor process runs them. After a reboot they stop, and you can attach to restart from the saved conversation.</li>
+      <li>Dispatched sessions move into a Git worktree under <code>.claude/worktrees/</code> before editing, which keeps them apart. They commit (and may open a draft PR) but never push to <code>main</code> or force-push.</li>
+      <li>Each session uses your plan quota on its own, so five background sessions cost about five times one.</li>
+      <li>Codex has <code>codex agents</code> to browse agent sessions on the local server and <code>codex queue</code> to send a message to an existing one.</li>
+    </ul>
+    <h4>B3. Letting separate sessions talk (Claude Code)</h4>
+    <p>Separate sessions on the same machine can pass short text messages to each other. Claude lists the sessions it can reach and sends the message; you do not call any tool yourself. It needs Claude Code 2.1.224 or later on macOS and Linux (2.1.234 on native Windows), and there is nothing to switch on.</p>
+<pre><code>Ask the session running in my other terminal whether the migration finished
+Let @api-worker know the schema migration finished
+/list-agents                # which sessions can Claude reach? (alias: /peers)</code></pre>
+    <ul>
+      <li><strong>Name your sessions</strong> with <code>claude -n api-worker</code> or <code>/rename</code>, then <code>@</code>-mention them.</li>
+      <li><strong>A message is plain text,</strong> never the sender&rsquo;s whole conversation or files. To move a whole conversation, resume it instead.</li>
+      <li><strong>It cannot approve anything.</strong> A message from another session is not your consent, cannot change settings, and cannot run a slash command. The receiver&rsquo;s own permission prompts still apply.</li>
+      <li><strong>Control what arrives</strong> with the <code>crossSessionInbound</code> setting: <code>accept</code>, <code>hold</code> (show a notice, deliver only if you approve) or <code>refuse</code>. By default, a session that bypasses permission prompts holds messages for your approval.</li>
+      <li><strong>Same-machine messages</strong> travel over a local socket, not through Anthropic servers. Reaching sessions on other machines or in the cloud needs Remote Control and a claude.ai sign-in.</li>
+      <li>Good uses: warn a session that a change affects its work, hand over a finding, or ask to be told when a long task goes idle.</li>
+    </ul>
+    <div class="note"><p>Messaging is for a note mid-task, such as &ldquo;the schema changed&rdquo;. It is not a task queue and has no shared task list. If you want a shared task list and teammates that claim work, use an agent team (section 8).</p></div>
+
+    <h3>Which one should you start?</h3>
+    <table>
+      <tr><th></th><th>A. Subagents</th><th>B. Separate sessions</th><th>Agent team</th></tr>
+      <tr><td><strong>Who starts them</strong></td><td>The main agent, on your request</td><td>You, in each terminal or with <code>--bg</code></td><td>The lead, on your request</td></tr>
+      <tr><td><strong>Your view</strong></td><td>One session; helpers hidden behind summaries</td><td>Every session in full</td><td>Agent panel or split panes</td></tr>
+      <tr><td><strong>Context</strong></td><td>Fresh per helper; result returns to the caller</td><td>Fully separate</td><td>Fully separate</td></tr>
+      <tr><td><strong>Talking to each other</strong></td><td>Report to the caller only</td><td>Optional text messages</td><td>Direct messages plus a shared task list</td></tr>
+      <tr><td><strong>Isolation</strong></td><td>Shares the session&rsquo;s checkout unless <code>isolation: worktree</code></td><td>One worktree each (you set it up)</td><td>You still need file ownership</td></tr>
+      <tr><td><strong>Survives closing the terminal</strong></td><td>No (ends with the session)</td><td>Yes for <code>--bg</code> sessions</td><td>No; experimental limits on resume</td></tr>
+      <tr><td><strong>Mix Claude and Codex</strong></td><td>No</td><td>Yes</td><td>No</td></tr>
+      <tr><td><strong>Token cost</strong></td><td>Lower</td><td>One full session each</td><td>Highest</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Read-only fan-out: search, review, research</td><td>Independent features or fixes that need their own long conversations</td><td>Work that needs agents to debate or coordinate</td></tr>
+    </table>
+    <div class="good"><strong>Quick rules</strong>
+      <ul>
+        <li><strong>Need answers fast and read-only?</strong> Subagents in one session.</li>
+        <li><strong>Two or three separate pieces of work, each deserving its own conversation?</strong> Separate sessions, each in a worktree. Add <code>--bg</code> if you do not want to watch.</li>
+        <li><strong>Pieces that depend on each other or need debate?</strong> A team, or keep it serial (see parallel vs serial in section 11).</li>
+        <li><strong>Unsure?</strong> Start with subagents. Move to separate sessions when one conversation gets too long or the pieces stop being read-only.</li>
+      </ul>
+    </div>
+    <p>The full command list for sessions, <code>--bg</code> and worktrees is in the <a href="ai-cli-terminal-mastery.html">terminal mastery article</a>.</p>
+
+    <h2 id="setup">7. Setting up a team of subagents</h2>
     <p>A &ldquo;team&rdquo; of subagents is not a feature switch. It is a set of well-separated roles plus a rule for how work flows between them. Three patterns cover most needs.</p>
     <figure class="fig">
       <svg viewBox="0 0 640 250" role="img" aria-label="Two patterns. Fan-out: the main agent sends the same task to several reviewers with different lenses and merges their findings. Pipeline: an explorer finds files, an implementer changes them, a reviewer checks the result.">
@@ -588,7 +702,7 @@ Do not commit, push or open a PR without my approval.</code></pre>
       <figcaption>The cheapest conflict fix is not to create one: give every writer its own files or worktree.</figcaption>
     </figure>
 
-    <h2 id="teams">7. Agent teams (Claude Code, experimental)</h2>
+    <h2 id="teams">8. Agent teams (Claude Code, experimental)</h2>
     <p>Agent teams go beyond subagents. One session is the <strong>lead</strong>. It spawns <strong>teammates</strong>, each a full Claude Code session with its own context. They share a <strong>task list</strong> and can <strong>message each other</strong>, and you can talk to any of them directly. The feature is experimental and disabled by default, with known limits around resuming sessions and shutdown.</p>
 
     <figure class="fig">
@@ -728,7 +842,7 @@ claude --teammate-mode auto</code></pre>
       </ul>
     </div>
 
-    <h2 id="codex">8. Codex: TOML agent files</h2>
+    <h2 id="codex">9. Codex: TOML agent files</h2>
     <p>Codex also splits work across parallel agents and gathers the results into one reply. It handles the delegation itself when you ask for it or when your <code>AGENTS.md</code> or a skill says so. There is no separate &ldquo;team&rdquo; mode; you describe how to split the work.</p>
     <h3>Ask for parallel work</h3>
 <pre><code>Review this branch with parallel subagents. Spawn one subagent for security risks, one for
@@ -783,7 +897,7 @@ max_concurrent_threads_per_session = 8     # older name: max_threads
     </div>
     <p>Start with parallel <strong>read-heavy</strong> tasks. Parallel writes are riskier because of edit conflicts, and each subagent does its own model and tool work, so costs go up.</p>
 
-    <h2 id="compare">9. Claude Code and Codex side by side</h2>
+    <h2 id="compare">10. Claude Code and Codex side by side</h2>
     <table>
       <tr><th></th><th>Claude Code</th><th>Codex</th></tr>
       <tr><td><strong>Agent file</strong></td><td>Markdown with YAML header</td><td>TOML</td></tr>
@@ -801,7 +915,7 @@ max_concurrent_threads_per_session = 8     # older name: max_threads
     </table>
     <p>Both tools read a project instructions file, and every agent you start loads it. Put shared rules there (commands to build and test, style, &ldquo;never commit without asking&rdquo;) instead of repeating them in each agent. If you use both tools, many teams keep one source of truth and point the other file to it. The two series on this site cover those files in depth: start with the Claude Code and Codex series.</p>
 
-    <h2 id="speed">10. Pros and cons: parallel vs serial</h2>
+    <h2 id="speed">11. Pros and cons: parallel vs serial</h2>
     <p>Short answer: <strong>yes, parallel agents can make a job finish sooner, but only when the pieces are independent. Run dependent steps in parallel and it gets slower, costlier and messier than doing them one after another.</strong> Speed is not the only measure, so here is the full picture.</p>
 
     <figure class="fig">
@@ -967,7 +1081,7 @@ max_concurrent_threads_per_session = 8     # older name: max_threads
     </div>
     <p>One honest caveat: the real gain depends on the task, the model and your setup, so measure on your own work. Time one task done serially and in parallel, count the tokens, and include the time you spend reading and merging the results.</p>
 
-    <h2 id="safety">11. Safety, cost and habits</h2>
+    <h2 id="safety">12. Safety, cost and habits</h2>
     <div class="callout">
       <strong>Cost</strong>
       <p>Every agent does its own model and tool work, so tokens grow with the number of agents. Subagents are the cheaper option because only summaries come back; teams are the most expensive because every teammate is a full session. Use a cheaper model for search-type agents, set a cap on concurrency, and keep tasks well-defined so agents do not wander.</p>
@@ -1004,7 +1118,7 @@ max_concurrent_threads_per_session = 8     # older name: max_threads
       <li><strong>Start small.</strong> One read-only agent, then two in parallel, then a pipeline, then a team. Add a role only when you see a gap.</li>
     </ul>
 
-    <h2 id="mistakes">12. Common mistakes</h2>
+    <h2 id="mistakes">13. Common mistakes</h2>
     <ul>
       <li><strong>A vague <code>description</code>.</strong> The agent never gets picked, or gets picked for everything. Say what it does and when to use it.</li>
       <li><strong>Assuming the helper knows the conversation.</strong> Subagents and teammates start fresh. Give file paths, goals and constraints in the task.</li>
@@ -1017,7 +1131,7 @@ max_concurrent_threads_per_session = 8     # older name: max_threads
       <li><strong>Forgetting the version.</strong> Agent features, fields and flags change quickly. Check the docs for your installed version.</li>
     </ul>
 
-    <h2 id="takeaways">13. Takeaways and glossary</h2>
+    <h2 id="takeaways">14. Takeaways and glossary</h2>
     <ul>
       <li>Subagents protect your main context and let work run in parallel. Define them as Markdown (Claude Code) or TOML (Codex), or pass JSON with <code>--agents</code> for one session.</li>
       <li>Write a precise <code>description</code>, a narrow <code>tools</code> list and a short prompt that says what to return.</li>
