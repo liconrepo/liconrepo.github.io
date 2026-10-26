@@ -200,6 +200,7 @@
         <li>The API needs a Claude Console account and an API key. Keep the key in an environment variable and never ship it inside an app.</li>
         <li>Four models are current (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5). Older ones are legacy, deprecated or retired.</li>
         <li>An alias like <code>sonnet</code> is a convenience; a full ID like <code>claude-sonnet-5-5</code> is a pinned snapshot you can rely on.</li>
+        <li>Claude Code can be pointed at a local model with <code>ANTHROPIC_BASE_URL</code>. It keeps code private and costs nothing per token, but needs a capable PC and gives weaker results.</li>
         <li>The official links are grouped at the end, so you can bookmark one section.</li>
       </ul>
     </div>
@@ -211,6 +212,7 @@
         <li><a href="#api">The Claude API in five minutes</a></li>
         <li><a href="#models">Every Claude model published so far</a></li>
         <li><a href="#choose">Choosing between models</a></li>
+        <li><a href="#local">Using Claude Code with a local model</a></li>
         <li><a href="#links">Official links</a></li>
         <li><a href="#end">Series wrap-up and glossary</a></li>
       </ol>
@@ -370,7 +372,49 @@ for block in message.content:
     </table>
     <p>Two sources, two slightly different defaults: the API guide starts you at Opus 5.5, while the Claude Code cost guide suggests Sonnet for everyday coding and Opus for complex architecture. Both are consistent with one rule: <strong>start with the model your plan defaults to, move down to save time and money when the task is easy, and move up when you are stuck.</strong> Test on your own tasks, because a cheaper model that passes your checks is the better choice. The docs have a <a href="https://platform.claude.com/docs/en/about-claude/models/choosing-a-model" target="_blank" rel="noopener">choosing a model</a> guide, and the <a href="https://platform.claude.com/docs/en/about-claude/models/migration-guide" target="_blank" rel="noopener">migration guide</a> helps when you move to a newer generation.</p>
 
-    <h2 id="links">5. Official links</h2>
+    <h2 id="local">5. Using Claude Code with a local model</h2>
+    <p>Claude Code is a front end: it sends your conversation to an API endpoint and acts on the reply. By default that endpoint is Anthropic&rsquo;s. If you point it at a server on your own PC that speaks the same protocol, the same tool runs against a model that never leaves your machine. This is an unofficial, best-effort setup, so expect rough edges and check the <a href="https://code.claude.com/docs/en/model-config" target="_blank" rel="noopener">model configuration</a> and LLM gateway docs for what is supported today.</p>
+
+    <h3>How it works</h3>
+    <ul>
+      <li><strong>Run a local model server.</strong> Ollama, LM Studio and llama.cpp&rsquo;s <code>llama-server</code> are the common choices. Recent versions of these expose an Anthropic-compatible endpoint, but support is new and varies by version.</li>
+      <li><strong>If your server only speaks the OpenAI format,</strong> put a translating proxy such as LiteLLM between Claude Code and the server.</li>
+      <li><strong>Redirect Claude Code with environment variables:</strong></li>
+    </ul>
+    <div class="doc"><div class="doc-bar">Terminal (macOS / Linux)</div>
+<pre><code>export ANTHROPIC_BASE_URL="http://localhost:11434"   # your local server
+export ANTHROPIC_AUTH_TOKEN="local"                  # any placeholder
+export ANTHROPIC_MODEL="qwen3-coder"                 # a model name your server knows
+claude</code></pre></div>
+    <p>On Windows PowerShell, use <code>$env:ANTHROPIC_BASE_URL = "http://localhost:11434"</code> and the same pattern for the other two. The port and model name above are examples; use the ones your server reports.</p>
+
+    <h3>Pros and cons</h3>
+    <table>
+      <tr><th>Pros</th><th>Cons</th></tr>
+      <tr><td><strong>Privacy:</strong> code and prompts stay on your PC.</td><td><strong>Weaker results:</strong> local models you can run on a normal PC are much less capable than current Claude models on multi-file, multi-step work.</td></tr>
+      <tr><td><strong>No per-token bill</strong> once the hardware is paid for.</td><td><strong>Tool calling is fragile:</strong> Claude Code relies on reliable tool use, and small models often botch edits, shell commands or plans.</td></tr>
+      <tr><td><strong>Works offline</strong> after the model is downloaded.</td><td><strong>Slower:</strong> without a strong GPU, replies can take minutes and large prompts feel painful.</td></tr>
+      <tr><td><strong>Good for learning and experiments:</strong> you can try the workflow with nothing at stake.</td><td><strong>Missing features:</strong> things like extended thinking, prompt caching and some tools may not work or behave differently off the Anthropic API.</td></tr>
+      <tr><td><strong>You choose the model</strong> and can swap it freely.</td><td><strong>You are the support desk:</strong> setup, updates and compatibility bugs are yours to solve.</td></tr>
+    </table>
+
+    <h3>What you need on your PC</h3>
+    <table>
+      <tr><th>Item</th><th>Guidance</th></tr>
+      <tr><td><strong>Operating system</strong></td><td>macOS, Linux or Windows. Claude Code itself needs a terminal and the install from Part 1.</td></tr>
+      <tr><td><strong>Memory</strong></td><td>The model must fit in GPU memory (VRAM) or, on Apple silicon, unified memory. As a rough rule, a 7 to 8B model at 4-bit needs about 6 to 8 GB, a 14B model about 10 to 12 GB, and a 30B+ model 20 GB or more. Leave room for the context window on top.</td></tr>
+      <tr><td><strong>GPU</strong></td><td>An NVIDIA GPU with enough VRAM, or an Apple silicon Mac. CPU-only works but is slow for an agent that sends large prompts.</td></tr>
+      <tr><td><strong>Disk</strong></td><td>Models are several GB each. Plan for 10 to 50 GB if you want to try a few.</td></tr>
+      <tr><td><strong>Runtime</strong></td><td>Ollama, LM Studio or llama.cpp, installed and serving on a local port.</td></tr>
+      <tr><td><strong>Context window</strong></td><td>Set it high in the server (32k tokens or more). Claude Code&rsquo;s prompts are large, and a small default window makes it forget or fail.</td></tr>
+      <tr><td><strong>Model choice</strong></td><td>Pick a coding-tuned model with good tool-calling support. Test it on a tiny task before trusting it with your project.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>A sensible way to start</strong>
+      <p>Run the server, set the three variables, then ask for something small and checkable, such as &ldquo;list the files in this folder&rdquo;. If tool calls work, try a one-file edit. Keep permission mode on manual (Part 1) so a weak model cannot run commands unchecked. For serious work, switch back to a hosted Claude model.</p>
+    </div>
+
+    <h2 id="links">6. Official links</h2>
     <p>All of these were reachable when I wrote this post. Anthropic reorganises its docs from time to time (the Claude Code docs, for example, moved to <code>code.claude.com</code>), so if a link breaks, search the docs index at <a href="https://code.claude.com/docs/llms.txt" target="_blank" rel="noopener">code.claude.com/docs/llms.txt</a>.</p>
 
     <h3>Claude Code: getting started</h3>
@@ -425,7 +469,7 @@ for block in message.content:
       <tr><td><a href="https://www.anthropic.com/discord" target="_blank" rel="noopener">Community Discord</a></td><td>Tips and support from other users.</td></tr>
     </table>
 
-    <h2 id="end">6. Beginner-level wrap-up and glossary</h2>
+    <h2 id="end">7. Beginner-level wrap-up and glossary</h2>
     <ol>
       <li><strong>Part 1:</strong> set up Claude Code safely, learn the modes, and pick a model.</li>
       <li><strong>Part 2:</strong> give Claude lasting context with CLAUDE.md, rules and skills.</li>

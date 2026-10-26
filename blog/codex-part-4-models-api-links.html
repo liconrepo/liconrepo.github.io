@@ -200,6 +200,7 @@
         <li>The API needs an API key. Keep it in an environment variable, never inside an app you ship.</li>
         <li>The docs now recommend GPT-6.1 Sol (<code>gpt-6.1-sol</code>) for complex coding and GPT-6 Luna (<code>gpt-6-luna</code>) for focused, repeatable tasks. GPT-6 Astra is the most capable model. GPT-5.5 left Codex with ChatGPT sign-in on 14 October 2026.</li>
         <li>Switch model in the CLI with <code>/model</code>, <code>--model</code> or a <code>model</code> line in <code>config.toml</code>. More reasoning effort is better for hard work, slower, and uses more tokens.</li>
+        <li>Codex CLI can also run against a local model (<code>--oss</code> or a custom provider in <code>config.toml</code>). It keeps code private and costs nothing per token, but needs a capable PC and gives weaker results.</li>
         <li>The official links are grouped at the end, so you can bookmark one section.</li>
       </ul>
     </div>
@@ -213,6 +214,7 @@
         <li><a href="#switch">Switching models and reasoning effort</a></li>
         <li><a href="#choose">Choosing a model and an effort</a></li>
         <li><a href="#plans">Plans and pricing, at a high level</a></li>
+        <li><a href="#local">Using Codex with a local model</a></li>
         <li><a href="#links">Official links</a></li>
         <li><a href="#end">Series wrap-up and glossary</a></li>
       </ol>
@@ -389,7 +391,52 @@ model_reasoning_effort = "medium"</code></pre></div>
     </table>
     <p>Usage depends on the model, the size of the task, the context, tool use and caching, so the same-looking tasks can cost different amounts. Smaller, cheaper models such as Luna go further on a plan than Astra. The pricing page also has a usage estimate table, credit rates and answers to questions like &ldquo;where can I see my current usage limits&rdquo;. Check it, and your own usage dashboard, rather than trusting any number copied into a blog post (including mine).</p>
 
-    <h2 id="links">7. Official links</h2>
+    <h2 id="local">7. Using Codex with a local model</h2>
+    <p>Codex CLI is a front end too: it sends your conversation to a model provider and acts on the reply. Besides OpenAI&rsquo;s hosted models, it can talk to a provider you define yourself, including a server running on your own PC. This is a best-effort setup that depends on your Codex version and your local server, so check the Codex configuration docs for what is supported today.</p>
+
+    <h3>How it works</h3>
+    <ul>
+      <li><strong>Run a local model server.</strong> Ollama, LM Studio and llama.cpp&rsquo;s <code>llama-server</code> are the common choices, each exposing an OpenAI-style HTTP endpoint on a local port.</li>
+      <li><strong>Quick route:</strong> the CLI has an <code>--oss</code> option meant for local open-source backends such as Ollama and LM Studio. Try <code>codex --oss -m &lt;model&gt;</code> first.</li>
+      <li><strong>Explicit route:</strong> declare a provider in <code>config.toml</code> and select it:</li>
+    </ul>
+    <div class="doc"><div class="doc-bar">~/.codex/config.toml</div>
+<pre><code>model = "qwen3-coder"
+model_provider = "local"
+
+[model_providers.local]
+name = "Local server"
+base_url = "http://localhost:11434/v1"
+wire_api = "chat"        # or "responses", depending on what your server supports</code></pre></div>
+    <p>The port, model name and <code>wire_api</code> value are examples. Codex has moved between the Responses API and chat completions across versions, so use whichever your Codex version and your server both support. A local server usually needs no real API key.</p>
+
+    <h3>Pros and cons</h3>
+    <table>
+      <tr><th>Pros</th><th>Cons</th></tr>
+      <tr><td><strong>Privacy:</strong> code and prompts stay on your PC.</td><td><strong>Weaker results:</strong> local models that fit a normal PC are well behind current hosted models on hard, multi-file work.</td></tr>
+      <tr><td><strong>No usage cost or plan limits</strong> once the hardware is paid for.</td><td><strong>Tool calling is fragile:</strong> Codex depends on the model emitting correct commands and patches, and small models often get them wrong.</td></tr>
+      <tr><td><strong>Works offline</strong> after the model is downloaded.</td><td><strong>Slower:</strong> without a strong GPU, replies can take minutes.</td></tr>
+      <tr><td><strong>Good for experiments:</strong> you can try the workflow at no cost.</td><td><strong>Missing features:</strong> ChatGPT sign-in features, cloud tasks, reasoning-effort levels and speed modes belong to hosted models and will not apply.</td></tr>
+      <tr><td><strong>Full model choice</strong>, swappable in one config line.</td><td><strong>You are the support desk:</strong> compatibility between Codex versions and servers is yours to sort out.</td></tr>
+    </table>
+
+    <h3>What you need on your PC</h3>
+    <table>
+      <tr><th>Item</th><th>Guidance</th></tr>
+      <tr><td><strong>Operating system</strong></td><td>macOS or Linux are the smoothest for the CLI. On Windows, check the Codex docs for the supported route (for example WSL).</td></tr>
+      <tr><td><strong>Memory</strong></td><td>The model must fit in GPU memory (VRAM) or, on Apple silicon, unified memory. As a rough rule, a 7 to 8B model at 4-bit needs about 6 to 8 GB, a 14B model about 10 to 12 GB, and a 30B+ model 20 GB or more, plus room for the context window.</td></tr>
+      <tr><td><strong>GPU</strong></td><td>An NVIDIA GPU with enough VRAM, or an Apple silicon Mac. CPU-only works but is slow.</td></tr>
+      <tr><td><strong>Disk</strong></td><td>Models are several GB each. Plan for 10 to 50 GB if you want to try a few.</td></tr>
+      <tr><td><strong>Runtime</strong></td><td>Ollama, LM Studio or llama.cpp, installed and serving on a local port.</td></tr>
+      <tr><td><strong>Context window</strong></td><td>Set it high in the server (32k tokens or more). Agent prompts are large, and a small default window causes failures.</td></tr>
+      <tr><td><strong>Model choice</strong></td><td>Pick a coding-tuned model with good tool-calling support, and test it on a tiny task first.</td></tr>
+    </table>
+    <div class="callout">
+      <strong>A sensible way to start</strong>
+      <p>Start the server, run Codex against it, and ask for something small and checkable, such as &ldquo;list the files in this folder&rdquo;. If that works, try a one-file edit. Keep the approval mode strict (Part 1) so a weak model cannot run commands unchecked. For serious work, switch back to a hosted model.</p>
+    </div>
+
+    <h2 id="links">8. Official links</h2>
     <p>Codex changes quickly. This series was checked against the official documentation on 18 October 2026; always confirm details on the official pages. Every link below returned HTTP 200 when I checked it. If a link breaks, the docs are indexed at <a href="https://learn.chatgpt.com/docs" target="_blank" rel="noopener">learn.chatgpt.com/docs</a> and the API docs at <a href="https://developers.openai.com/api/docs/models" target="_blank" rel="noopener">developers.openai.com</a>.</p>
 
     <h3>Codex: getting started and sign-in</h3>
@@ -437,7 +484,7 @@ model_reasoning_effort = "medium"</code></pre></div>
       <tr><td><a href="https://learn.chatgpt.com/resources" target="_blank" rel="noopener">Resources</a></td><td>Videos, community programs and other OpenAI resources.</td></tr>
     </table>
 
-    <h2 id="end">8. Beginner-level wrap-up and glossary</h2>
+    <h2 id="end">9. Beginner-level wrap-up and glossary</h2>
     <ol>
       <li><strong>Part 1:</strong> <a href="codex-part-1-setup.html">set up Codex safely</a>, learn the modes and sign in.</li>
       <li><strong>Part 2:</strong> give Codex lasting context with <a href="codex-part-2-agents-md.html">AGENTS.md</a>.</li>
